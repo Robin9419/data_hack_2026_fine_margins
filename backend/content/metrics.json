@@ -1,0 +1,149 @@
+{
+  "_comment": "Metric library. 'column' is the header in the Wisehockey match statistics CSV. Definitions follow 'wh_portal Data Dictionaries 2026.pdf' (section 9), rewritten in plain language.",
+  "metrics": [
+    {
+      "id": "goals",
+      "column": "G",
+      "label": "Goals",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "How many times the player put the puck in the opponent's net.",
+      "source_definition": "G — Number of goals scored by a player"
+    },
+    {
+      "id": "assists",
+      "column": "A",
+      "label": "Assists",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Credited when the player passed, shot or touched the puck in a way that set up a teammate's goal.",
+      "source_definition": "A — Number of assists received from shooting, passing or deflecting the puck towards the scoring teammate or touching it in any other way which enabled a goal"
+    },
+    {
+      "id": "points",
+      "column": "P",
+      "label": "Points",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Goals plus assists. The simplest measure of how many goals a player was directly involved in.",
+      "source_definition": "P — Number of points received by a player for goals scored or assists earned"
+    },
+    {
+      "id": "shots",
+      "column": "S",
+      "label": "Shots",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "How many shots the player took. More shots usually means more pressure on the opposing goalkeeper.",
+      "source_definition": "S — Number of a player's shots"
+    },
+    {
+      "id": "shot_top_speed",
+      "column": "S TOP (km/h)",
+      "label": "Hardest shot",
+      "format": "decimal1",
+      "unit": "km/h",
+      "higher_is_better": true,
+      "definition": "The speed of the player's fastest shot in the game, measured by puck tracking.",
+      "source_definition": "S TOP — Player's hardest shot"
+    },
+    {
+      "id": "xg_sum",
+      "column": "xGsum",
+      "label": "Expected goals (xG)",
+      "format": "decimal2",
+      "unit": "xG",
+      "higher_is_better": true,
+      "definition": "Every shot gets a probability of becoming a goal, based on distance, angle, passes before the shot, screens and the goalkeeper's position. xG adds those up: 0.60 xG means the player's chances were worth about 0.6 goals on average.",
+      "source_definition": "xGsum — Sum of a player's all shot xG values"
+    },
+    {
+      "id": "skate_top_speed",
+      "column": "SPD TOP (km/h)",
+      "label": "Top skating speed",
+      "format": "decimal1",
+      "unit": "km/h",
+      "higher_is_better": true,
+      "definition": "The fastest the player skated at any moment in the game.",
+      "source_definition": "SPD TOP — Player's top speed (km/h)"
+    },
+    {
+      "id": "distance",
+      "column": "Dist (m)",
+      "label": "Distance skated",
+      "format": "km",
+      "unit": "km",
+      "higher_is_better": true,
+      "definition": "The total distance the player skated during the game. It reflects workload and ice time.",
+      "source_definition": "DIST — Total distance a player traveled on the ice (m)"
+    },
+    {
+      "id": "toi",
+      "column": "TOI (s)",
+      "label": "Time on ice",
+      "format": "mmss",
+      "unit": "min",
+      "higher_is_better": true,
+      "definition": "How long the player was on the ice in total. Coaches give the most ice time to players they trust.",
+      "source_definition": "TOI — Player's time on the ice in total"
+    },
+    {
+      "id": "blocks",
+      "column": "BKS",
+      "label": "Blocked shots",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "How many opponent shots the player stopped with their body or stick before they reached the goal. It is a defensive sacrifice.",
+      "source_definition": "BKS — Number of shots blocked by a player"
+    },
+    {
+      "id": "faceoff_win_pct",
+      "column": "FOW-%",
+      "count_column": "FOW",
+      "total_column": "No. FO",
+      "label": "Faceoff win %",
+      "format": "pct",
+      "unit": "%",
+      "higher_is_better": true,
+      "definition": "Share of faceoffs (the puck drop that restarts play) the player won. Winning the faceoff gives your team the puck.",
+      "source_definition": "FOW% — Faceoff win percentage (per a player's all faceoffs)"
+    },
+    {
+      "id": "pass_pct",
+      "column": "Pass-%",
+      "count_column": "Passes",
+      "total_column": "All passes",
+      "label": "Pass success",
+      "format": "pct",
+      "unit": "%",
+      "higher_is_better": true,
+      "definition": "Share of the player's passes that reached a teammate.",
+      "source_definition": "Pass% — Percentage of successful passes per a player's all passes"
+    },
+    {
+      "id": "passes",
+      "column": "Passes",
+      "label": "Successful passes",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "How many of the player's passes reached a teammate.",
+      "source_definition": "Passes — Successful passes per a player's all passes"
+    },
+    {
+      "id": "puck_contest_wins",
+      "column": "PCW",
+      "label": "Puck battles won",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "How many times the player won a contested puck, a one-on-one fight for a loose puck.",
+      "source_definition": "PCW — Number of a player's puck contest wins"
+    }
+  ]
+}

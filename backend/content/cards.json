@@ -1,0 +1,94 @@
+{
+  "_comment": "Hand-picked cards. Players are matched to the stats CSV by team + jersey. Attribute values are NOT stored here: the backend reads them from the CSV so they can't drift. 'position' is null because the dataset has no position column. 'video' is null until an authorized clip exists.",
+  "starter_card_ids": ["tambellini", "nussbaumer", "mccartthy"],
+  "cards": [
+    {
+      "id": "tambellini",
+      "team": "HC Davos",
+      "jersey": 19,
+      "position": null,
+      "title": "Two-Goal Night",
+      "attributes": ["goals", "points", "shots"],
+      "explanation": "Scored twice, once in the first period and once in the second, and set up another goal in Davos's 6–3 win.",
+      "achievement": null,
+      "video": null
+    },
+    {
+      "id": "corvi",
+      "team": "HC Davos",
+      "jersey": 70,
+      "position": null,
+      "title": "The Playmaker",
+      "attributes": ["points", "faceoff_win_pct", "pass_pct"],
+      "explanation": "Was involved in three goals (one goal, two assists), won most of the faceoffs taken and completed almost every pass.",
+      "achievement": "playmaker",
+      "video": null
+    },
+    {
+      "id": "zadina",
+      "team": "HC Davos",
+      "jersey": 18,
+      "position": null,
+      "title": "Shooting Gallery",
+      "attributes": ["shots", "shot_top_speed", "points"],
+      "explanation": "Took more shots than anyone else in the game and scored in the third period.",
+      "achievement": null,
+      "video": null
+    },
+    {
+      "id": "stransky",
+      "team": "HC Davos",
+      "jersey": 44,
+      "position": null,
+      "title": "Chance Creator",
+      "attributes": ["xg_sum", "shot_top_speed", "goals"],
+      "explanation": "Created the most dangerous scoring chances of anyone in the match, measured by expected goals, and scored Davos's final goal late in the third period.",
+      "achievement": null,
+      "video": null
+    },
+    {
+      "id": "nussbaumer",
+      "team": "HC Davos",
+      "jersey": 66,
+      "position": null,
+      "title": "Fastest on the Ice",
+      "attributes": ["skate_top_speed", "puck_contest_wins", "passes"],
+      "explanation": "Reached the highest skating speed in the game and won more puck battles than any other player.",
+      "achievement": null,
+      "video": null
+    },
+    {
+      "id": "mccartthy",
+      "team": "U.S. Collegiate Selects",
+      "jersey": 2,
+      "position": null,
+      "title": "Shot Blocker",
+      "attributes": ["blocks", "shot_top_speed", "toi"],
+      "explanation": "Blocked more shots than anyone in the game and also recorded the hardest shot of the night.",
+      "achievement": null,
+      "video": null
+    },
+    {
+      "id": "pohlkamp",
+      "team": "U.S. Collegiate Selects",
+      "jersey": 23,
+      "position": null,
+      "title": "The Workhorse",
+      "attributes": ["toi", "distance", "blocks"],
+      "explanation": "Played more minutes and skated farther than any other player in the game.",
+      "achievement": null,
+      "video": null
+    },
+    {
+      "id": "fink",
+      "team": "U.S. Collegiate Selects",
+      "jersey": 18,
+      "position": null,
+      "title": "Leading the Charge",
+      "attributes": ["goals", "shots", "xg_sum"],
+      "explanation": "Scored in the second period and led U.S. Collegiate Selects in shots and expected goals.",
+      "achievement": null,
+      "video": null
+    }
+  ]
+}

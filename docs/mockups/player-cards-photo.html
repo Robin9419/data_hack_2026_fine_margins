@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -546,7 +546,7 @@
   <header class="top">
     <div>
       <h1>Hockey Performance Cards · Photo Edition</h1>
-      <p>Spielerkarten im Base Design mit Action-Fotos, Teamlogo und Position, dazu Special-, Evolving- und Set-Karten. Fotos stammen aus Wikimedia Commons unter freier Lizenz und dienen nur als Entwurf; viele zeigen die Spieler in früheren Trikots. KPI-Werte: Wisehockey-Matchstatistik, Rang unter 40 Spielern.</p>
+      <p>Player cards in the base design with action photos, team logo and position, plus special, evolving and set cards. Photos come from Wikimedia Commons under free licences and are for this draft only; many show the players in earlier jerseys. KPI values: Wisehockey match statistics, rank among 40 players.</p>
     </div>
     <div class="scoreboard" aria-label="Final score: U.S. Collegiate Selects 3, HC Davos 6">
       <div class="team" id="sb-home"></div>
@@ -555,29 +555,29 @@
       <div class="meta">Spengler Cup · 31.12.2025 · Davos</div>
     </div>
     <fieldset class="switch" id="shapeSwitch">
-      <legend>Kartenform für alle Karten</legend>
-      <input type="radio" name="shape" id="sh-std" value="standard" checked><label for="sh-std">Form: Standard</label>
-      <input type="radio" name="shape" id="sh-shield" value="shield"><label for="sh-shield">Form: Wappen</label>
+      <legend>Card shape for all cards</legend>
+      <input type="radio" name="shape" id="sh-std" value="standard" checked><label for="sh-std">Shape: Standard</label>
+      <input type="radio" name="shape" id="sh-shield" value="shield"><label for="sh-shield">Shape: Shield</label>
     </fieldset>
   </header>
 
   <section aria-labelledby="s1">
     <div class="section-head"><div>
       <h2 id="s1">1 · Base Design</h2>
-      <p>Das Grundlayout für alle Spielerkarten. Alle anderen Editionen (Stufen, Specials, Evolving) bauen darauf auf und ändern nur Rahmen, Akzentfarbe und Details.</p>
+      <p>The base layout for all player cards. Every other edition (tiers, specials, evolving) builds on it and only changes the frame, accent colour and details.</p>
     </div></div>
     <div class="anatomy">
       <div class="anatomy-card" id="anatomyCard"></div>
       <ol class="anatomy-list">
-        <li><strong>Stufe</strong>Bronze, Silber, Gold oder Elite, klein direkt über dem Rating. Bestimmt auch die Farbe des Rahmens.</li>
-        <li><strong>Match Rating</strong>Gesamtwert 40–99 aus der Rolle des Spielers. Die größte Zahl auf der Karte.</li>
-        <li><strong>Position</strong>Dezent ausgeschrieben unter dem Rating, abgetrennt durch eine feine Linie.</li>
-        <li><strong>Teamlogo</strong>Oben rechts, auf hellem Grund, damit jedes Logo lesbar bleibt.</li>
-        <li><strong>Action-Foto</strong>Füllt die ganze Karte. Ein Verlauf nach unten sorgt für lesbaren Text.</li>
-        <li><strong>Team, Nummer, Name</strong>Der Nachname ist das zweitwichtigste Element nach dem Rating.</li>
-        <li><strong>Spielertyp und Titel</strong>Der Typ aus den KPIs plus ein Satz zur Leistung, z. B. „The Playmaker“.</li>
-        <li><strong>Drei KPIs mit Rang</strong>Wert, Rang unter allen 40 Spielern und ein Balken als Einordnung.</li>
-        <li><strong>Spiel und Details</strong>Ergebnis des Spiels. Ein Klick auf die Karte dreht sie um und zeigt die Erklärungen.</li>
+        <li><strong>Tier</strong>Bronze, Silver, Gold or Elite, small and right above the rating. Also sets the frame colour.</li>
+        <li><strong>Match Rating</strong>Overall value from 40 to 99 based on the player's role. The biggest number on the card.</li>
+        <li><strong>Position</strong>Written out subtly below the rating, separated by a thin line.</li>
+        <li><strong>Team logo</strong>Top right on a light background, so every logo stays readable.</li>
+        <li><strong>Action photo</strong>Fills the whole card. A gradient towards the bottom keeps the text readable.</li>
+        <li><strong>Team, number, name</strong>The surname is the second most important element after the rating.</li>
+        <li><strong>Player type and title</strong>The type derived from the KPIs plus a short line about the performance, e.g. “The Playmaker”.</li>
+        <li><strong>Three KPIs with rank</strong>Value, rank among all 40 players and a bar for context.</li>
+        <li><strong>Match and details</strong>Result of the match. Clicking the card flips it and shows the explanations.</li>
       </ol>
     </div>
   </section>
@@ -585,15 +585,15 @@
   <section aria-labelledby="s2">
     <div class="section-head"><div>
       <h2 id="s2">2 · Special Cards</h2>
-      <p>Gleiches Layout wie die Base Card, aber dunkler, mit feinem Glitzer und eigener Akzentfarbe. Der Nachname läuft rechts am Rand, das Label der Besonderheit links. Vergeben werden sie nach festen Regeln aus den Spieldaten.</p>
+      <p>Same layout as the base card, but darker, with fine glitter and its own accent colour. The surname runs along the right edge, the special label along the left. They are awarded by fixed rules based on the match data.</p>
     </div>
     <fieldset class="switch" id="labelSwitch">
-      <legend>Position des Special-Labels</legend>
-      <input type="radio" name="label" id="lb-side" value="side" checked><label for="lb-side">Label seitlich</label>
-      <input type="radio" name="label" id="lb-badge" value="badge"><label for="lb-badge">Label als Badge</label>
+      <legend>Position of the special label</legend>
+      <input type="radio" name="label" id="lb-side" value="side" checked><label for="lb-side">Label on the side</label>
+      <input type="radio" name="label" id="lb-badge" value="badge"><label for="lb-badge">Label as badge</label>
     </fieldset></div>
     <div class="grid" id="specials"></div>
-    <div class="table-scroll" style="margin-top:32px" tabindex="0" role="region" aria-label="Katalog der Special Cards">
+    <div class="table-scroll" style="margin-top:32px" tabindex="0" role="region" aria-label="Special card catalogue">
       <table class="matrix catalog" id="specialCatalog"></table>
     </div>
   </section>
@@ -601,8 +601,8 @@
   <section aria-labelledby="s3">
     <div class="section-head">
       <div>
-        <h2 id="s3">3 · Kollektion</h2>
-        <p>Alle Karten im Base Design, inklusive der beiden Goalies. Für Spieler ohne frei lizenziertes Foto zeigt die Karte einen Platzhalter in Teamfarben.</p>
+        <h2 id="s3">3 · Collection</h2>
+        <p>All cards in the base design, including both goalies. For players without a freely licensed photo the card shows a placeholder in team colours.</p>
       </div>
     </div>
     <div class="grid" id="collection"></div>
@@ -610,40 +610,40 @@
 
   <section aria-labelledby="s4">
     <div class="section-head"><div>
-      <h2 id="s4">4 · Kartenstufen</h2>
-      <p>Die Stufe ergibt sich aus dem Match Rating (MR) des Spielers in seiner Rolle. Je höher die Stufe, desto seltener die Karte und desto auffälliger der Rahmen. Special Cards stehen außerhalb dieser Skala, weil sie für ein Ereignis vergeben werden.</p>
+      <h2 id="s4">4 · Card tiers</h2>
+      <p>The tier follows from the player's Match Rating (MR) in his role. The higher the tier, the rarer the card and the more striking the frame. Special cards sit outside this scale because they are awarded for an event.</p>
     </div></div>
     <div class="tiers" id="tiers"></div>
   </section>
 
   <section aria-labelledby="s5">
     <div class="section-head"><div>
-      <h2 id="s5">5 · Spielertypen und KPIs</h2>
-      <p>Jeder Spieler bekommt den Typ, in dem er im Spiel am stärksten war. Die Tabelle zeigt, welche KPIs mit welchem Gewicht in einen Typ einfließen. Die Typen sind ein Vorschlag und lassen sich frei anpassen.</p>
+      <h2 id="s5">5 · Player types and KPIs</h2>
+      <p>Every player gets the type in which he was strongest in the match. The table shows which KPIs feed into each type and with what weight. The types are a proposal and can be adjusted freely.</p>
     </div></div>
     <div class="panel">
       <div class="formula">
-        <div><strong>1 · Perzentil je KPI</strong>Für jede Kennzahl wird bestimmt, wie viele der 40 Spieler schlechter waren: <code>0</code> = schwächster, <code>1</code> = bester Wert im Spiel.</div>
-        <div><strong>2 · Typ-Score</strong>Gewichtete Summe der Perzentile laut Tabelle: <code>Σ Gewicht × Perzentil</code>. Prozentwerte (Pass-%, Bully-%) zählen erst ab 10 Pässen bzw. 5 Bullys.</div>
-        <div><strong>3 · Typ und MR</strong>Der Typ mit dem höchsten Score wird der Kartentyp. <code>MR = 40 + 59 × Typ-Score</code>, also 40 bis 99.</div>
-        <div><strong>4 · Stufe</strong>Aus dem MR: Bronze <code>&lt; 80</code>, Silber <code>80–89</code>, Gold <code>90–96</code>, Elite <code>≥ 97</code>.</div>
-        <div><strong>Goalies</strong>Eigene Formel aus den Schüssen aufs Tor: Fangquote 45 %, gehaltene Großchancen (xG ab 0,15) 35 %, gehaltene Tore über Erwartung (GSAx) 20 %. Position GK, Typ „Goalie“.</div>
+        <div><strong>1 · Percentile per KPI</strong>For each metric we count how many of the 40 players were worse: <code>0</code> = weakest, <code>1</code> = best value in the match.</div>
+        <div><strong>2 · Type score</strong>Weighted sum of the percentiles per the table: <code>Σ weight × percentile</code>. Percentages (pass %, faceoff %) only count from 10 passes or 5 faceoffs.</div>
+        <div><strong>3 · Type and MR</strong>The type with the highest score becomes the card type. <code>MR = 40 + 59 × type score</code>, i.e. 40 to 99.</div>
+        <div><strong>4 · Tier</strong>From the MR: Bronze <code>&lt; 80</code>, Silver <code>80–89</code>, Gold <code>90–96</code>, Elite <code>≥ 97</code>.</div>
+        <div><strong>Goalies</strong>Own formula based on shots on goal: save % 45 %, high-danger saves (xG from 0.15) 35 %, goals saved above expected (GSAx) 20 %. Position GK, type “Goalie”.</div>
       </div>
-      <div class="table-scroll" tabindex="0" role="region" aria-label="KPI-Gewichtung je Spielertyp">
+      <div class="table-scroll" tabindex="0" role="region" aria-label="KPI weighting per player type">
         <table class="matrix" id="matrix"></table>
       </div>
       <div class="explorer">
         <div>
-          <label for="playerPick">Spieler auswählen</label>
+          <label for="playerPick">Choose a player</label>
           <select id="playerPick"></select>
-          <svg class="radar" id="radar" viewBox="0 0 300 300" role="img" aria-labelledby="radarTitle"><title id="radarTitle">Typ-Profil</title></svg>
+          <svg class="radar" id="radar" viewBox="0 0 300 300" role="img" aria-labelledby="radarTitle"><title id="radarTitle">Type profile</title></svg>
         </div>
         <div>
           <div class="pinfo" id="pinfo"></div>
           <ul class="scorelist" id="scorelist"></ul>
           <div class="dist">
-            <div><h3>Typen im Spiel (40 Spieler)</h3><ul class="scorelist" id="typeDist"></ul></div>
-            <div><h3>Stufen im Spiel</h3><ul class="scorelist" id="tierDist"></ul></div>
+            <div><h3>Types in the match (40 players)</h3><ul class="scorelist" id="typeDist"></ul></div>
+            <div><h3>Tiers in the match</h3><ul class="scorelist" id="tierDist"></ul></div>
           </div>
         </div>
       </div>
@@ -653,46 +653,46 @@
   <section aria-labelledby="s6">
     <div class="section-head"><div>
       <h2 id="s6">6 · Evolving Cards</h2>
-      <p>Eine Karte, die mit dem Turnier mitwächst. Sie startet als normale Karte nach dem ersten Spiel. Jede Stufe kommt durch ein klares Ereignis dazu und bringt ein sichtbares Upgrade. Spiel 1 ist echt, die Werte für Spiel 2 bis zum Finale sind ein fiktives Beispiel.</p>
+      <p>A card that grows with the tournament. It starts as a normal card after the first game. Each stage is unlocked by a clear event and brings a visible upgrade. Game 1 is real; the values for game 2 through the final are a fictional example.</p>
     </div></div>
     <ol class="stages" id="stages"></ol>
   </section>
 
   <section aria-labelledby="s7">
     <div class="section-head"><div>
-      <h2 id="s7">7 · Set-Bonus</h2>
-      <p>Sets geben dem Sammeln ein Ziel. Jedes Set nennt genau, welche Karten dazugehören, und hat eine Belohnung. Als Beispiel dient der Fortschritt mit den 8 Karten aus der Kollektion oben.</p>
+      <h2 id="s7">7 · Set bonus</h2>
+      <p>Sets give collecting a goal. Each set lists exactly which cards belong to it and comes with a reward. The progress shown is based on the cards in the collection above.</p>
     </div></div>
     <div class="sets" id="sets"></div>
   </section>
 
   <section aria-labelledby="s8">
     <div class="section-head"><div>
-      <h2 id="s8">8 · Weitere Karten</h2>
-      <p>Karten für Momente, Beziehungen und das Drumherum. Moment, Duo, Rivalen und Coach basieren auf den echten Spieldaten.</p>
+      <h2 id="s8">8 · More cards</h2>
+      <p>Cards for moments, relationships and everything around the game. Moment, duo, rivals and coach are based on the real match data.</p>
     </div></div>
     <div class="grid" id="ideas"></div>
     <div class="more">
-      <div><strong>Live-Drop</strong>Bei einem Tor bekommen alle Fans im Stadion für kurze Zeit die Momentkarte.</div>
-      <div><strong>Fan-Karte</strong>Eigenes Foto im Stadion als Karte mit Datum und Sitzplatz, als Erinnerung an den Besuch.</div>
+      <div><strong>Live drop</strong>When a goal is scored, every fan in the arena gets the moment card for a short time.</div>
+      <div><strong>Fan card</strong>Your own photo in the arena as a card with date and seat, as a souvenir of the visit.</div>
     </div>
   </section>
 
   <section aria-labelledby="s9">
     <div class="section-head"><div>
-      <h2 id="s9">9 · Editionen nach Pokémon-Vorbild</h2>
-      <p>Pokémon trennt zwei Dinge: wie selten eine Karte ist (Symbol unten auf der Karte) und wie sie gedruckt ist (Reverse Holo, Full Art, Gold, Illustration). Das übernehmen wir: Jede Spielerkarte kann zusätzlich in einer Druck-Edition erscheinen, unabhängig von Stufe und Special.</p>
+      <h2 id="s9">9 · Pokémon-inspired editions</h2>
+      <p>Pokémon separates two things: how rare a card is (symbol at the bottom of the card) and how it is printed (reverse holo, full art, gold, illustration). We adopt that: every player card can additionally appear in a print edition, independent of tier and special.</p>
     </div></div>
     <div class="grid" id="editions"></div>
-    <div class="table-scroll" style="margin-top:32px" tabindex="0" role="region" aria-label="Pokémon-Vorbilder und unsere Editionen">
+    <div class="table-scroll" style="margin-top:32px" tabindex="0" role="region" aria-label="Pokémon models and our editions">
       <table class="matrix catalog" id="editionTable"></table>
     </div>
   </section>
 
   <section aria-labelledby="s10">
     <div class="section-head"><div>
-      <h2 id="s10">10 · Kartenform</h2>
-      <p>Eine Form für alle Karten, damit die Sammlung einheitlich bleibt. Zur Auswahl stehen Standard und Wappen. Mit dem Umschalter oben auf der Seite lassen sich alle Karten auf einmal umstellen und direkt vergleichen.</p>
+      <h2 id="s10">10 · Card shape</h2>
+      <p>One shape for all cards, so the collection stays consistent. The options are standard and shield. The switch at the top of the page changes all cards at once for a direct comparison.</p>
     </div></div>
     <div class="grid shapes" id="shapes"></div>
   </section>
@@ -700,7 +700,7 @@
   <section aria-labelledby="s11">
     <div class="section-head"><div>
       <h2 id="s11">11 · Shadow Team</h2>
-      <p>Stell aus deinen Karten dein Traum-Team auf das Eis. Karte ziehen und auf eine Position ablegen, oder erst die Karte und dann die Position antippen. Das Team-Rating berücksichtigt, ob die Position passt und wie gut die Spieler zusammenpassen.</p>
+      <p>Put your dream team on the ice with your own cards. Drag a card onto a position, or tap the card first and then the position. The team rating takes into account whether the position fits and how well the players work together.</p>
     </div></div>
     <div class="shadow">
       <div class="rink-wrap">
@@ -719,10 +719,10 @@
       <div class="shadow-side">
         <div class="team-score" id="teamScore"></div>
         <div class="shadow-actions">
-          <button type="button" class="btn" id="shadowCopy">Aufstellung kopieren</button>
-          <button type="button" class="btn ghost" id="shadowReset">Zurücksetzen</button>
+          <button type="button" class="btn" id="shadowCopy">Copy lineup</button>
+          <button type="button" class="btn ghost" id="shadowReset">Reset</button>
         </div>
-        <h3 class="tray-h">Deine Karten</h3>
+        <h3 class="tray-h">Your cards</h3>
         <ul class="tray" id="tray"></ul>
         <p class="sr" aria-live="polite" id="shadowLive"></p>
       </div>
@@ -742,10 +742,10 @@
   </svg>
 
   <div class="credits">
-    <h2>Bildnachweise</h2>
-    Alle Fotos und Logos werden direkt von Wikimedia geladen und sind nur für diesen Entwurf gedacht. Für eine Veröffentlichung braucht es aktuelle Bilder, die vom Club bzw. vom Spengler Cup freigegeben sind.
+    <h2>Image credits</h2>
+    All photos and logos are loaded directly from Wikimedia and are meant for this draft only. A public release needs current images cleared by the club or the Spengler Cup.
     <ul id="creditList"></ul>
-    Das Logo der U.S. Collegiate Selects ist ein selbst gezeichneter Platzhalter, kein offizielles Logo.
+    The U.S. Collegiate Selects logo is a self-drawn placeholder, not an official logo.
   </div>
 </div>
 
@@ -759,7 +759,7 @@ const USC_LOGO = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="ht
 
 const TEAMS = {
   HCD: { name: 'HC Davos', short: 'HCD', c1: '#0a2d6e', c2: '#ffd400', logo: HCD_LOGO,
-    credit: { what: 'Logo HC Davos', by: 'Wikimedia Commons', license: 'Public domain (laut Commons)', href: 'https://commons.wikimedia.org/wiki/File:Logo_HC_Davos.svg' } },
+    credit: { what: 'Logo HC Davos', by: 'Wikimedia Commons', license: 'Public domain (per Commons)', href: 'https://commons.wikimedia.org/wiki/File:Logo_HC_Davos.svg' } },
   USC: { name: 'U.S. Collegiate Selects', short: 'USC', c1: '#13284f', c2: '#e0313f', c2a: '#ff8a95', logo: USC_LOGO },
 };
 
@@ -884,27 +884,27 @@ const ICONS = {
 /* Player types: KPI weights (%) must match the generator that produced match-data.js */
 const TYPE_ORDER = ['sniper', 'playmaker', 'speedster', 'defender', 'workhorse', 'faceoff'];
 const TYPES = {
-  sniper:    { label: 'Sniper',      icon: 'target', color: '#ff6a4a', desc: 'Trifft und kommt zu gefährlichen Abschlüssen.', w: { G: 35, xG: 35, S: 30 } },
-  playmaker: { label: 'Playmaker',   icon: 'nodes',  color: '#b98bff', desc: 'Bereitet Tore vor und spielt sichere Pässe.', w: { A: 40, PASS: 30, 'PASS%': 30 } },
-  speedster: { label: 'Speedster',   icon: 'bolt',   color: '#19e6ff', desc: 'Höchstes Tempo, viele Sprints, gewinnt Laufduelle.', w: { SPD: 50, SPRINT: 30, PCW: 20 } },
-  defender:  { label: 'Defender',    icon: 'shield', color: '#45ff92', desc: 'Blockt Schüsse, gewinnt Zweikämpfe, steht lange auf dem Eis.', w: { BLK: 50, PCW: 25, TOI: 25 } },
-  workhorse: { label: 'Workhorse',   icon: 'flame',  color: '#ff9a3c', desc: 'Viel Eiszeit und viele Kilometer.', w: { TOI: 50, DIST: 50 } },
-  faceoff:   { label: 'Faceoff Ace', icon: 'disc',   color: '#ffd76a', desc: 'Gewinnt Bullys und sichert so den Puckbesitz.', w: { FOW: 50, 'FO%': 50 } },
-  goalie:    { label: 'Goalie',      icon: 'shield', color: '#7cc4ff', desc: 'Hält die Schüsse des Gegners.', w: {} },
+  sniper:    { label: 'Sniper',      icon: 'target', color: '#ff6a4a', desc: 'Scores and gets to dangerous chances.', w: { G: 35, xG: 35, S: 30 } },
+  playmaker: { label: 'Playmaker',   icon: 'nodes',  color: '#b98bff', desc: 'Sets up goals and plays safe passes.', w: { A: 40, PASS: 30, 'PASS%': 30 } },
+  speedster: { label: 'Speedster',   icon: 'bolt',   color: '#19e6ff', desc: 'Top speed, lots of sprints, wins races for the puck.', w: { SPD: 50, SPRINT: 30, PCW: 20 } },
+  defender:  { label: 'Defender',    icon: 'shield', color: '#45ff92', desc: 'Blocks shots, wins battles, spends a lot of time on the ice.', w: { BLK: 50, PCW: 25, TOI: 25 } },
+  workhorse: { label: 'Workhorse',   icon: 'flame',  color: '#ff9a3c', desc: 'Lots of ice time and lots of kilometres.', w: { TOI: 50, DIST: 50 } },
+  faceoff:   { label: 'Faceoff Ace', icon: 'disc',   color: '#ffd76a', desc: 'Wins faceoffs and so secures possession.', w: { FOW: 50, 'FO%': 50 } },
+  goalie:    { label: 'Goalie',      icon: 'shield', color: '#7cc4ff', desc: 'Stops the opponent\u2019s shots.', w: {} },
 };
 const KPI_GROUPS = [
-  ['Offensive', [['G', 'Tore'], ['xG', 'xG'], ['S', 'Schüsse']]],
-  ['Passspiel', [['A', 'Assists'], ['PASS', 'Pässe'], ['PASS%', 'Pass-%']]],
+  ['Offence', [['G', 'Goals'], ['xG', 'xG'], ['S', 'Shots']]],
+  ['Passing', [['A', 'Assists'], ['PASS', 'Passes'], ['PASS%', 'Pass %']]],
   ['Skating', [['SPD', 'Top-Speed'], ['SPRINT', 'Sprint-Distanz'], ['DIST', 'Distanz']]],
-  ['Defensive', [['BLK', 'Blocks'], ['PCW', 'Zweikämpfe']]],
-  ['Einsatz', [['TOI', 'Eiszeit']]],
+  ['Defence', [['BLK', 'Blocks'], ['PCW', 'Puck battles']]],
+  ['Usage', [['TOI', 'Ice time']]],
   ['Bully', [['FOW', 'Bullys gew.'], ['FO%', 'Bully-%']]],
 ];
 const TIERS = {
-  bronze: { label: 'Bronze', sym: '●', range: 'MR < 80', min: 0, desc: 'Solide Leistung. Die häufigste Karte, gut zum Tauschen.' },
-  silver: { label: 'Silber', sym: '◆', range: 'MR 80–89', min: 80, desc: 'Überdurchschnittlich in der eigenen Rolle.' },
-  gold:   { label: 'Gold',   sym: '★', range: 'MR 90–96', min: 90, desc: 'Gehört in der eigenen Rolle zu den Besten des Spiels.' },
-  elite:  { label: 'Elite',  sym: '★★', range: 'MR ≥ 97',  min: 97, desc: 'Top-Leistung des Spiels. Animierter Rahmen, sehr selten.' },
+  bronze: { label: 'Bronze', sym: '●', range: 'MR < 80', min: 0, desc: 'Solid performance. The most common card, good for trading.' },
+  silver: { label: 'Silver', sym: '◆', range: 'MR 80–89', min: 80, desc: 'Above average in his own role.' },
+  gold:   { label: 'Gold',   sym: '★', range: 'MR 90–96', min: 90, desc: 'Among the best of the match in his own role.' },
+  elite:  { label: 'Elite',  sym: '★★', range: 'MR ≥ 97',  min: 97, desc: 'Top performance of the match. Animated frame, very rare.' },
 };
 const tierOf = mr => (mr >= 97 ? 'elite' : mr >= 90 ? 'gold' : mr >= 80 ? 'silver' : 'bronze');
 const SK = SKATERS.map(s => ({ team: s[0], no: s[1], first: s[2], last: s[3], type: s[4], mr: s[5], scores: s[6] }));
@@ -919,29 +919,29 @@ const GWG = (() => { let n = 0; return GOALS.find(g => g[3] === 'HCD' && ++n ===
 
 const SPECIALS = [
   { type: 'motm', pid: 'tambellini', badge: 'Player of the Match', icon: 'star',
-    rule: 'Meiste Punkte im Siegerteam. Bei Gleichstand entscheiden die Tore.', example: 'Tambellini: 2 Tore, 1 Assist', freq: '1 pro Spiel' },
+    rule: 'Most points on the winning team. Ties are broken by goals.', example: 'Tambellini: 2 goals, 1 assist', freq: '1 per game' },
   { type: 'gamewinner', pid: 'zadina', badge: 'Game Winner', icon: 'burst',
-    rule: 'Schütze des Siegtors, also des Tors, nach dem der Gegner nicht mehr ausgleicht.', example: `Zadina: Tor zum 3:4 (${fmtClock(GWG[0], GWG[1])})`, freq: '1 pro Spiel' },
+    rule: 'Scorer of the game-winning goal, i.e. the goal after which the opponent never draws level again.', example: `Zadina: goal to 3:4 (${fmtClock(GWG[0], GWG[1])})`, freq: '1 per game' },
   { type: 'sniper', pid: 'stransky', badge: 'Chance Creator', icon: 'target',
-    rule: 'Höchster xG-Wert des Spiels, also die gefährlichsten Abschlüsse.', example: 'Stransky: 0,63 xG', freq: '1 pro Spiel' },
+    rule: 'Highest xG of the match, i.e. the most dangerous chances.', example: 'Stransky: 0.63 xG', freq: '1 per game' },
   { type: 'playmaker', pid: 'corvi', badge: 'Playmaker', icon: 'nodes',
-    rule: 'Meiste Assists des Spiels.', example: 'Corvi: 2 Assists', freq: '1 pro Spiel' },
+    rule: 'Most assists of the match.', example: 'Corvi: 2 assists', freq: '1 per game' },
   { type: 'leader', pid: 'fink', badge: 'Team Leader', icon: 'flag',
-    rule: 'Höchster xG-Wert im unterlegenen Team. So bekommt auch der Verlierer eine Special Card.', example: 'Fink: 0,53 xG für USC', freq: '1 pro Spiel' },
+    rule: 'Highest xG on the losing team, so the loser also gets a special card.', example: 'Fink: 0.53 xG for USC', freq: '1 per game' },
   { type: 'wall', pid: 'gajan', badge: 'Brick Wall', icon: 'shield',
-    rule: 'Goalie mit den meisten gehaltenen Großchancen (xG ab 0,15), auch wenn das Team verliert.', example: 'Gajan: 7 von 7 Großchancen gehalten', freq: '1 pro Spiel' },
+    rule: 'Goalie with the most high-danger saves (xG from 0.15), even if his team loses.', example: 'Gajan: 7 of 7 high-danger chances saved', freq: '1 per game' },
 ];
 const EXTRA_SPECIALS = [
-  { type: 'record', badge: 'Record Breaker', icon: 'bolt', rule: 'Neuer Turnier-Bestwert bei Top-Speed oder Schussgeschwindigkeit.', example: 'Nussbaumer 37,8 km/h · McCartthy 146,0 km/h', freq: 'selten' },
-  { type: 'champion', badge: 'Champion', icon: 'trophy', rule: 'Letzte Stufe der Evolving Card für alle Spieler des Turniersiegers.', example: 'siehe Evolving Cards', freq: 'Turnierende' },
+  { type: 'record', badge: 'Record Breaker', icon: 'bolt', rule: 'New tournament best in top speed or shot speed.', example: 'Nussbaumer 37.8 km/h · McCartthy 146.0 km/h', freq: 'rare' },
+  { type: 'champion', badge: 'Champion', icon: 'trophy', rule: 'Final stage of the evolving card for every player of the tournament winner.', example: 'see Evolving Cards', freq: 'end of tournament' },
 ];
 const EDITIONS = {
-  reverse: { name: 'Reverse Foil', icon: 'star', poke: 'Reverse Holo', how: 'Foil auf Rahmen und Textfeld, das Foto bleibt klar.', when: 'häufig, 1 pro Pack' },
-  fullart: { name: 'Full Art', icon: 'star', poke: 'Full Art', how: 'Foto über die ganze Karte ohne Rahmen, feine Linienprägung.', when: 'selten' },
-  ice:     { name: 'Cracked Ice', icon: 'star', poke: 'Cracked-Ice-Holofoil', how: 'Foil mit Eissplittern in kühlem Blau, passt direkt zum Eishockey.', when: 'selten' },
-  gold:    { name: 'Gold', icon: 'trophy', poke: 'Gold Secret Rare / Hyper Rare', how: 'Ganze Karte in Gold getönt, Nummer außerhalb des Sets (021/020).', when: 'sehr selten' },
-  altart:  { name: 'Alt Art', icon: 'star', poke: 'Illustration Rare / Alternate Art', how: 'Gezeichnete Szene statt Foto, von einer Illustratorin oder einem Illustrator. Im Mockup mit einem Filter angedeutet.', when: 'sehr selten, Secret-Nummer' },
-  promo:   { name: 'Matchday Promo', icon: 'flag', poke: 'Black Star Promo / Stamped Promo', how: 'Stempel mit Spiel und Datum, gibt es nur vor Ort.', when: 'nur am Spieltag im Stadion' },
+  reverse: { name: 'Reverse Foil', icon: 'star', poke: 'Reverse Holo', how: 'Foil on frame and text area, the photo stays clear.', when: 'common, 1 per pack' },
+  fullart: { name: 'Full Art', icon: 'star', poke: 'Full Art', how: 'Photo across the whole card without a frame, fine etched lines.', when: 'rare' },
+  ice:     { name: 'Cracked Ice', icon: 'star', poke: 'Cracked Ice holofoil', how: 'Foil with ice shards in cool blue, a natural fit for ice hockey.', when: 'rare' },
+  gold:    { name: 'Gold', icon: 'trophy', poke: 'Gold Secret Rare / Hyper Rare', how: 'Whole card toned gold, number outside the set (021/020).', when: 'very rare' },
+  altart:  { name: 'Alt Art', icon: 'star', poke: 'Illustration Rare / Alternate Art', how: 'An illustrated scene instead of a photo, by an illustrator. Hinted at with a filter in this mockup.', when: 'very rare, secret number' },
+  promo:   { name: 'Matchday Promo', icon: 'flag', poke: 'Black Star Promo / Stamped Promo', how: 'Stamp with match and date, only available at the venue.', when: 'only in the arena on match day' },
 };
 
 const pct = (rank, of = N) => ((of + 1 - rank) / of) * 100;
@@ -951,7 +951,7 @@ const logo = (t, cls = 'logo') => `<img class="${cls}" src="${t.logo}" alt="${t.
 function art(p, t) {
   if (!p.photo) {
     return `<div class="placeholder" role="img" aria-label="No photo yet for ${p.first} ${p.last}">
-      ${logo(t)}<span class="ph-num" aria-hidden="true">${p.no}</span><span class="ph-note" aria-hidden="true">Foto ausstehend</span></div>`;
+      ${logo(t)}<span class="ph-num" aria-hidden="true">${p.no}</span><span class="ph-note" aria-hidden="true">Photo pending</span></div>`;
   }
   return `<img class="photo" src="${p.photo.src}" alt="${p.photo.alt}" style="--pos:${p.photo.pos}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`;
 }
@@ -975,10 +975,10 @@ const vname = p => `<span class="vname" style="--vfs:${Math.min(50, Math.floor(3
 /* Evolving cards: MR per game as small bars instead of the KPI list */
 function formBlock(games, trend) {
   const h = mr => Math.max(8, ((mr - 60) / 39) * 100).toFixed(0);
-  const aria = games.map(g => `${g.label}: ${g.mr ?? 'noch offen'}`).join(', ');
+  const aria = games.map(g => `${g.label}: ${g.mr ?? 'open'}`).join(', ');
   return `<div class="form">
-    <div class="form-head"><span>MR je Spiel</span>${trend ? `<span class="trend">${trend}</span>` : ''}</div>
-    <div class="form-bars" role="img" aria-label="MR je Spiel. ${aria}">${games.map(g => g.mr == null
+    <div class="form-head"><span>MR per game</span>${trend ? `<span class="trend">${trend}</span>` : ''}</div>
+    <div class="form-bars" role="img" aria-label="MR per game. ${aria}">${games.map(g => g.mr == null
       ? '<div class="b empty"><i style="--h:30%"></i></div>'
       : `<div class="b${g.fict ? ' fict' : ''}"><span>${g.mr}</span><i style="--h:${h(g.mr)}%"></i></div>`).join('')}</div>
     <div class="form-labels" aria-hidden="true">${games.map(g => `<span>${g.label}</span>`).join('')}</div>
@@ -999,7 +999,7 @@ function card(p, o = {}) {
   const credit = p.photo ? `Photo: ${p.photo.by}, ${p.photo.license} (Wikimedia). Draft only.` : 'No licensed photo yet.';
   const back = p.kpis.map(x => `<dt>${x.label} <span>${x.value}${x.unit ? ' ' + x.unit : ''} · #${x.rank}/${x.of ?? N}</span></dt><dd>${DEFS[x.short]}${x.detail ? ` (${x.detail})` : ''}</dd>`).join('');
   return `<div class="card-wrap">
-  <article class="card ${cls}" style="${style}"${o.mini ? '' : ' tabindex="0" role="button" aria-pressed="false"'} aria-label="${sp ? sp.badge + ': ' : ''}${p.first} ${p.last}, ${p.pos ? POS[p.pos] + ', ' : ''}${t.name}, MR ${r}${o.mini ? '' : '. Umdrehen für Details'}">
+  <article class="card ${cls}" style="${style}"${o.mini ? '' : ' tabindex="0" role="button" aria-pressed="false"'} aria-label="${sp ? sp.badge + ': ' : ''}${p.first} ${p.last}, ${p.pos ? POS[p.pos] + ', ' : ''}${t.name}, MR ${r}${o.mini ? '' : '. Flip for details'}">
     <div class="card-inner">
       <div class="face front"><div class="inner">
         <div class="art">
@@ -1019,17 +1019,17 @@ function card(p, o = {}) {
           <h3 class="last"><small>${p.first}</small>${p.last}</h3>
           <p class="ctitle">${typechip(s.type)}<span class="tt">${o.title ?? p.title}</span></p>
           ${o.form ? formBlock(o.form.games, o.form.trend) : `<ul class="kpis">${p.kpis.map(kpiRow).join('')}</ul>`}
-          <div class="foot"><span><span class="rar" title="Seltenheit / Set-Nummer">${rar}</span>${o.form ? 'Spengler Cup' : 'USC 3–6 HCD'}</span><span class="hint" aria-hidden="true">Details ${ICONS.back}</span></div>
+          <div class="foot"><span><span class="rar" title="Rarity / set number">${rar}</span>${o.form ? 'Spengler Cup' : 'USC 3–6 HCD'}</span><span class="hint" aria-hidden="true">Details ${ICONS.back}</span></div>
         </div>
         <div class="glare" aria-hidden="true"></div><div class="shine" aria-hidden="true"></div>
       </div></div>
       <div class="face back" inert>
         <h4>${p.first} ${p.last}</h4>
-        <p class="sub">${logo(t)} #${p.no}${p.pos ? ` · ${POS[p.pos]}` : ''}${p.posUnverified ? ' (unbestätigt)' : ''} · ${t.name}</p>
+        <p class="sub">${logo(t)} #${p.no}${p.pos ? ` · ${POS[p.pos]}` : ''}${p.posUnverified ? ' (unverified)' : ''} · ${t.name}</p>
         <p class="story">${p.story}</p>
         <dl>${back}</dl>
         <p class="src">${p.pos === 'GK' ? 'Rank among the 2 goalies of the match' : `Rank among all ${N} players`} · Wisehockey, 31.12.2025<br>Position: Wikipedia · ${credit}</p>
-        <span class="hint" aria-hidden="true">${ICONS.back} Zurück zur Vorderseite</span>
+        <span class="hint" aria-hidden="true">${ICONS.back} Back to front</span>
       </div>
     </div>
   </article></div>`;
@@ -1060,21 +1060,21 @@ addEventListener('resize', placePins);
 /* 2 · specials + catalog */
 document.getElementById('specials').innerHTML = SPECIALS.map(s => card(byId[s.pid], { special: s })).join('');
 document.getElementById('specialCatalog').innerHTML = `
-  <caption>Regeln für Special Cards. Alle Kriterien lassen sich direkt aus den Spieldaten berechnen.</caption>
-  <thead><tr><th scope="col">Special Card</th><th scope="col">Regel</th><th scope="col">Beispiel 31.12.2025</th><th scope="col">Häufigkeit</th></tr></thead>
+  <caption>Rules for special cards. Every criterion can be computed directly from the match data.</caption>
+  <thead><tr><th scope="col">Special card</th><th scope="col">Rule</th><th scope="col">Example 31.12.2025</th><th scope="col">Frequency</th></tr></thead>
   <tbody>${[...SPECIALS, ...EXTRA_SPECIALS].map(s => `<tr class="special-${s.type}"><th scope="row"><span class="sw">${ICONS[s.icon]}${s.badge}</span></th><td>${s.rule}</td><td>${s.example}</td><td>${s.freq}</td></tr>`).join('')}</tbody>`;
 
 /* 3 · collection */
 document.getElementById('collection').innerHTML = PLAYERS.map(p => card(p)).join('');
 
 const STADIUM = { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Innenaufnahme_Vaillant_Arena_Davos.JPG/960px-Innenaufnahme_Vaillant_Arena_Davos.JPG',
-  what: 'Eisstadion Davos (innen)', by: 'Michael Petri', license: 'CC BY-SA 2.0 DE', href: 'https://commons.wikimedia.org/wiki/File:Innenaufnahme_Vaillant_Arena_Davos.JPG' };
+  what: 'Davos ice stadium (inside)', by: 'Michael Petri', license: 'CC BY-SA 2.0 DE', href: 'https://commons.wikimedia.org/wiki/File:Innenaufnahme_Vaillant_Arena_Davos.JPG' };
 const TROPHY = { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Spengler_Cup.JPG/960px-Spengler_Cup.JPG',
-  what: 'Spengler-Cup-Pokal', by: 'Alaney2k', license: 'CC BY 3.0', href: 'https://commons.wikimedia.org/wiki/File:Spengler_Cup.JPG' };
+  what: 'Spengler Cup trophy', by: 'Alaney2k', license: 'CC BY 3.0', href: 'https://commons.wikimedia.org/wiki/File:Spengler_Cup.JPG' };
 
-const creditItems = PLAYERS.filter(p => p.photo).map(p => `<li>${p.first} ${p.last}: ${p.photo.by}, ${p.photo.license}, <a href="${p.photo.href}" target="_blank" rel="noopener noreferrer">Quelle</a></li>`);
+const creditItems = PLAYERS.filter(p => p.photo).map(p => `<li>${p.first} ${p.last}: ${p.photo.by}, ${p.photo.license}, <a href="${p.photo.href}" target="_blank" rel="noopener noreferrer">Source</a></li>`);
 for (const c of [TEAMS.HCD.credit, STADIUM, TROPHY]) {
-  creditItems.push(`<li>${c.what}: ${c.by}, ${c.license}, <a href="${c.href}" target="_blank" rel="noopener noreferrer">Quelle</a></li>`);
+  creditItems.push(`<li>${c.what}: ${c.by}, ${c.license}, <a href="${c.href}" target="_blank" rel="noopener noreferrer">Source</a></li>`);
 }
 document.getElementById('creditList').innerHTML = creditItems.join('');
 
@@ -1097,21 +1097,21 @@ const exampleFor = k => {
 const pill = (cls, text) => `<span class="tier ${cls}" style="position:static;transform:none">${text}</span>`;
 document.getElementById('tiers').innerHTML = Object.entries(TIERS).map(([k, T]) => `
   <div class="tiercol tier-${k}">${mini(exampleFor(k), `tier-${k}`)}<h3>${T.label}</h3>${pill('', `${T.sym} ${T.range}`)}
-    <span class="count">${inTier(k).length} von ${SK.length} Spielern</span><p>${T.desc}</p></div>`).join('') + `
+    <span class="count">${inTier(k).length} of ${SK.length} players</span><p>${T.desc}</p></div>`).join('') + `
   <div class="tiercol">${mini(skOf(byId.tambellini), 'special-mini', `<span class="typechip" style="--tc:#ffd76a">${ICONS.star}MOTM</span>`)}
-    <h3>Special</h3><span class="tier" style="position:static;transform:none;--t-grad:linear-gradient(90deg,#ffd76a,#fff6d1);--t-ink:#2a1d00">Ereignis</span><span class="count">unabhängig vom MR</span>
-    <p>Wird für ein Ereignis vergeben: Player of the Match, Rekordwert, erstes Tor, Siegtreffer.</p></div>`;
+    <h3>Special</h3><span class="tier" style="position:static;transform:none;--t-grad:linear-gradient(90deg,#ffd76a,#fff6d1);--t-ink:#2a1d00">Event</span><span class="count">independent of MR</span>
+    <p>Awarded for an event: Player of the Match, record value, first goal, game winner.</p></div>`;
 
 /* ---------- 5 · types & KPIs ---------- */
 const kpiCols = KPI_GROUPS.flatMap(g => g[1]);
 document.getElementById('matrix').innerHTML = `
-  <caption>Gewicht jeder Kennzahl im Typ-Score in Prozent. Je größer der Kreis, desto stärker zählt die Kennzahl.</caption>
-  <thead><tr class="grp"><th scope="col" rowspan="2">Spielertyp</th>${KPI_GROUPS.map(([g, cols]) => `<th scope="colgroup" colspan="${cols.length}">${g}</th>`).join('')}<th scope="col" rowspan="2">Spieler mit diesem Typ</th></tr>
+  <caption>Weight of each metric in the type score, in percent. The bigger the circle, the more the metric counts.</caption>
+  <thead><tr class="grp"><th scope="col" rowspan="2">Player type</th>${KPI_GROUPS.map(([g, cols]) => `<th scope="colgroup" colspan="${cols.length}">${g}</th>`).join('')}<th scope="col" rowspan="2">Players of this type</th></tr>
   <tr>${kpiCols.map(([, l]) => `<th scope="col">${l}</th>`).join('')}</tr></thead>
   <tbody>${TYPE_ORDER.map(tk => {
     const T = TYPES[tk];
     return `<tr style="--tc:${T.color}"><th scope="row"><span class="tname">${ICONS[T.icon]}${T.label}</span><span class="tdesc">${T.desc}</span></th>${
-      kpiCols.map(([key]) => T.w[key] ? `<td><span class="w" style="--v:${T.w[key]}">${T.w[key]}</span></td>` : '<td><span aria-label="nicht gewichtet" style="color:rgba(255,255,255,.2)">·</span></td>').join('')
+      kpiCols.map(([key]) => T.w[key] ? `<td><span class="w" style="--v:${T.w[key]}">${T.w[key]}</span></td>` : '<td><span aria-label="not weighted" style="color:rgba(255,255,255,.2)">·</span></td>').join('')
     }<td>${SK.filter(s => s.type === tk).length}</td></tr>`;
   }).join('')}</tbody>`;
 
@@ -1132,7 +1132,7 @@ function showPlayer() {
   const tk = tierOf(s.mr);
   radar.style.setProperty('--c2', t.c2);
   const ring = v => `<polygon class="grid-l" points="${TYPE_ORDER.map((_, i) => polar(i, v).join(',')).join(' ')}"/>`;
-  radar.innerHTML = `<title id="radarTitle">Typ-Profil von ${s.first} ${s.last}</title>
+  radar.innerHTML = `<title id="radarTitle">Type profile of ${s.first} ${s.last}</title>
     ${[26, 52, 79, 105].map(ring).join('')}
     ${TYPE_ORDER.map((_, i) => { const [x, y] = polar(i, 105); return `<line class="axis" x1="150" y1="150" x2="${x}" y2="${y}"/>`; }).join('')}
     <polygon class="shape" points="${s.scores.map((v, i) => polar(i, v * 1.05).join(',')).join(' ')}"/>
@@ -1154,21 +1154,21 @@ const tierCounts = Object.keys(TIERS).map(k => inTier(k).length);
 document.getElementById('tierDist').innerHTML = Object.keys(TIERS).map((k, i) => distRow(TIERS[k].label, '', TIER_COLORS[k], tierCounts[i], Math.max(...tierCounts))).join('');
 
 /* ---------- 6 · evolving cards (game 1 real, later games fictional) ---------- */
-const EVO_GAMES = [{ label: 'Spiel 1', mr: skOf(byId.tambellini).mr }, { label: 'Spiel 2', mr: 94, fict: true }, { label: 'Halbf.', mr: 96, fict: true }, { label: 'Finale', mr: 97, fict: true }];
+const EVO_GAMES = [{ label: 'Game 1', mr: skOf(byId.tambellini).mr }, { label: 'Game 2', mr: 94, fict: true }, { label: 'Semi', mr: 96, fict: true }, { label: 'Final', mr: 97, fict: true }];
 const evoAvg = n => Math.round(EVO_GAMES.slice(0, n).reduce((a, g) => a + g.mr, 0) / n);
 const evoGames = n => EVO_GAMES.map((g, i) => (i < n ? g : { label: g.label }));
 const STAGES = [
-  { n: 1, name: 'Debüt', when: 'Nach Spiel 1', tierCls: 'tier-gold',
-    trigger: 'Spieler macht sein erstes Turnierspiel.', change: 'Base Card in der Stufe aus dem MR des Spiels (hier Gold).',
+  { n: 1, name: 'Debut', when: 'After game 1', tierCls: 'tier-gold',
+    trigger: 'The player plays his first tournament game.', change: 'Base card in the tier from that game\u2019s MR (Gold here).',
     o: { mr: evoAvg(1), form: { games: evoGames(1) }, title: 'Two-Goal Night' } },
-  { n: 2, name: 'In Form', when: 'Nach Spiel 2', tierCls: 'tier-gold',
-    trigger: 'Jedes weitere Spiel. Das Karten-MR ist der Schnitt aller Turnierspiele.', change: 'MR steigt, Trendpfeil und Formkurve kommen dazu.',
+  { n: 2, name: 'In Form', when: 'After game 2', tierCls: 'tier-gold',
+    trigger: 'Every further game. The card MR is the average of all tournament games.', change: 'MR rises, a trend arrow and form chart are added.',
     o: { mr: evoAvg(2), form: { games: evoGames(2), trend: `▲ +${evoAvg(2) - evoAvg(1)}` }, title: 'In Form' } },
-  { n: 3, name: 'Hot Streak', when: 'Nach dem Halbfinale', tierCls: 'tier-elite',
-    trigger: 'Drei Spiele in Folge mit MR ab 90.', change: 'Eine Stufe aufwärts (Gold zu Elite) und feiner Glitzer.',
+  { n: 3, name: 'Hot Streak', when: 'After the semi-final', tierCls: 'tier-elite',
+    trigger: 'Three games in a row with an MR of 90 or more.', change: 'One tier up (Gold to Elite) and fine glitter.',
     o: { mr: evoAvg(3), tier: 'elite', glitter: true, form: { games: evoGames(3), trend: `▲ +${evoAvg(3) - evoAvg(1)}` }, title: 'Hot Streak' } },
-  { n: 4, name: 'Champion', when: 'Nach dem Finale', tierCls: 'tier-gold',
-    trigger: 'Das Team des Spielers gewinnt den Spengler Cup.', change: 'Champion-Edition: dunkler Goldrahmen, Name seitlich, Champion-Badge.',
+  { n: 4, name: 'Champion', when: 'After the final', tierCls: 'tier-gold',
+    trigger: 'The player\u2019s team wins the Spengler Cup.', change: 'Champion edition: dark gold frame, surname on the side, champion badge.',
     o: { mr: evoAvg(4), special: EXTRA_SPECIALS[1], form: { games: evoGames(4), trend: `▲ +${evoAvg(4) - evoAvg(1)}` }, title: 'Spengler Cup Champion' } },
 ];
 document.getElementById('stages').innerHTML = STAGES.map(st => `
@@ -1176,7 +1176,7 @@ document.getElementById('stages').innerHTML = STAGES.map(st => `
     <div class="stage-step"><span class="dot">${st.n}</span><span class="line" aria-hidden="true"></span><span class="when">${st.when}</span></div>
     ${card(byId.tambellini, st.o)}
     <h3>${st.n} · ${st.name}</h3>
-    <dl><dt>Auslöser</dt><dd>${st.trigger}</dd><dt>Neu auf der Karte</dt><dd>${st.change}</dd></dl>
+    <dl><dt>Trigger</dt><dd>${st.trigger}</dd><dt>New on the card</dt><dd>${st.change}</dd></dl>
   </li>`).join('');
 
 /* ---------- 7 · set bonus (progress = the 8 cards of the collection) ---------- */
@@ -1185,39 +1185,39 @@ const owns = s => OWNED.has(`${s.team}${s.no}`);
 const photoOf = s => PLAYERS.find(p => p.photo && p.team === s.team && p.no === s.no)?.photo;
 const uniq = list => [...new Map(list.map(x => [`${x.s.team}${x.s.no}`, x])).values()];
 
-const scorerSlots = uniq(GOALS.map(g => ({ s: skFromTag(g[2], g[3]), tag: `Tor ${fmtClock(g[0], g[1])}` })));
-const RECORDS = [['nussbaumer', 'Top-Speed 37,8 km/h'], ['mccartthy', 'Härtester Schuss 146,0 km/h'], ['zadina', 'Meiste Schüsse (10)'], ['pohlkamp', 'Meiste Eiszeit 24:25'], ['stransky', 'Höchster xG 0,63']];
+const scorerSlots = uniq(GOALS.map(g => ({ s: skFromTag(g[2], g[3]), tag: `Goal ${fmtClock(g[0], g[1])}` })));
+const RECORDS = [['nussbaumer', 'Top speed 37.8 km/h'], ['mccartthy', 'Hardest shot 146.0 km/h'], ['zadina', 'Most shots (10)'], ['pohlkamp', 'Most ice time 24:25'], ['stransky', 'Highest xG 0.63']];
 const recordSlots = RECORDS.map(([id, tag]) => ({ s: skOf(byId[id]), tag }));
 const typeSlots = TYPE_ORDER.map(k => {
   const mine = SK.filter(s => s.type === k && owns(s)).sort((a, b) => b.mr - a.mr)[0];
   const best = SK.filter(s => s.type === k).sort((a, b) => b.mr - a.mr)[0];
-  return mine ? { s: mine, tag: TYPES[k].label } : { s: best, tag: `${TYPES[k].label} · fehlt` };
+  return mine ? { s: mine, tag: TYPES[k].label } : { s: best, tag: `${TYPES[k].label} · missing` };
 });
 const teamSlots = [...GK, ...SK].filter(s => s.team === 'HCD').sort((a, b) => a.no - b.no).map(s => ({ s, tag: s.type === 'goalie' ? 'Goalie' : '' }));
 
 const SETS = [
-  { name: 'Torschützen 31.12.', icon: 'target', ac: '#ffd400', rule: `Alle ${scorerSlots.length} Spieler, die im Spiel USC gegen HCD ein Tor erzielt haben, aus beiden Teams.`, reward: 'Momentkarte „Tor zum 3:6“ in Gold', slots: scorerSlots },
-  { name: 'Rekordhalter', icon: 'bolt', ac: '#8ff6ff', rule: 'Die Spieler mit den Bestwerten des Spiels bei Tempo, Schusshärte, Schüssen, Eiszeit und xG.', reward: 'Special Card „Record Breaker“ nach Wahl', slots: recordSlots },
-  { name: 'Alle Spielertypen', icon: 'nodes', ac: '#b98bff', rule: 'Je eine Karte von jedem der 6 Spielertypen, egal aus welchem Team.', reward: 'Coach-Karte HC Davos', slots: typeSlots },
-  { name: 'Team HC Davos', icon: 'shield', ac: '#7cc4ff', rule: `Alle ${teamSlots.length} Spieler des HC Davos, die am 31.12. gespielt haben, inklusive Goalie.`, reward: 'Teamkarte mit offiziellem Teamfoto', slots: teamSlots, wide: true },
+  { name: 'Goal scorers 31.12.', icon: 'target', ac: '#ffd400', rule: `All ${scorerSlots.length} players from both teams who scored in USC vs HCD.`, reward: 'Moment card “Goal to 3:6” in gold', slots: scorerSlots },
+  { name: 'Record holders', icon: 'bolt', ac: '#8ff6ff', rule: 'The players with the match bests in speed, shot power, shots, ice time and xG.', reward: 'Special card “Record Breaker” of your choice', slots: recordSlots },
+  { name: 'All player types', icon: 'nodes', ac: '#b98bff', rule: 'One card of each of the 6 player types, from either team.', reward: 'Coach card HC Davos', slots: typeSlots },
+  { name: 'Team HC Davos', icon: 'shield', ac: '#7cc4ff', rule: `All ${teamSlots.length} HC Davos players who played on 31.12., including the goalie.`, reward: 'Team card with the official team photo', slots: teamSlots, wide: true },
 ];
 // Missing cards are shown as the real card, greyed out, so collectors see exactly what is still open.
 const setCard = x => {
   const have = owns(x.s);
   return `<li class="set-card${have ? '' : ' missing'}">${card(playerOf(x.s), { mini: true })}
-    ${have ? '' : `<span class="lock" aria-hidden="true">${ICONS.lock}</span><span class="sr">fehlt noch</span>`}
+    ${have ? '' : `<span class="lock" aria-hidden="true">${ICONS.lock}</span><span class="sr">still missing</span>`}
     <span class="cap"><b>${x.s.last}</b>${x.tag || ''}</span></li>`;
 };
 document.getElementById('sets').innerHTML = SETS.map(set => {
   const have = set.slots.filter(x => x.s && owns(x.s)).length;
   const n = set.slots.length;
   const done = have === n;
-  return `<article class="set${done ? ' done' : ''}${set.wide ? ' wide' : ''}" style="--ac:${set.ac}" aria-label="Set ${set.name}: ${have} von ${n} gesammelt">
+  return `<article class="set${done ? ' done' : ''}${set.wide ? ' wide' : ''}" style="--ac:${set.ac}" aria-label="Set ${set.name}: ${have} of ${n} collected">
     <div class="set-head"><span class="set-icon">${ICONS[set.icon]}</span><div><h3>${set.name}</h3></div></div>
     <p class="rule">${set.rule}</p>
     <ul class="slots">${set.slots.map(setCard).join('')}</ul>
-    <div class="progress"><span class="trk" aria-hidden="true"><i style="--w:${(have / n * 100).toFixed(0)}%"></i></span><span>${have} / ${n}${done ? ' · komplett' : ''}</span></div>
-    <div class="reward">${ICONS.gift}<span><strong>Belohnung:</strong> ${set.reward}</span></div>
+    <div class="progress"><span class="trk" aria-hidden="true"><i style="--w:${(have / n * 100).toFixed(0)}%"></i></span><span>${have} / ${n}${done ? ' · complete' : ''}</span></div>
+    <div class="reward">${ICONS.gift}<span><strong>Reward:</strong> ${set.reward}</span></div>
   </article>`;
 }).join('');
 
@@ -1234,68 +1234,68 @@ const vsRows = (rows, cl, cr) => `<div class="vs-rows">${rows.map(([label, a, b,
 
 const lg = GOALS[GOALS.length - 1];
 const goalSec = g => (g[0] - 1) * 1200 + g[1];
-const momentCard = ideaCard({ label: 'Moment', icon: 'star', tk: 'elite', aria: `Momentkarte: ${lastName(lg[2])} trifft zum 3 zu 6`, inner: `
+const momentCard = ideaCard({ label: 'Moment', icon: 'star', tk: 'elite', aria: `Moment card: ${lastName(lg[2])} scores to make it 3:6`, inner: `
   <div class="bg">${art(byId.stransky, TEAMS.HCD)}</div>
   <div class="glitter" style="--s1:#ffd76a" aria-hidden="true"></div>
   <span class="corner chip">${fmtClock(lg[0], lg[1])}</span>
   <div class="ib">
     <div class="big-score"><small>USC – HCD</small>3:<span class="hl">6</span></div>
-    <h3><small>Tor zum 3:6 · ${lg[0]}. Drittel</small>${lastName(lg[2])}</h3>
+    <h3><small>Goal to 3:6 · Period ${lg[0]}</small>${lastName(lg[2])}</h3>
     <p>Assists: ${lg[4].map(lastName).join(', ')}</p>
-    <div class="gtl" role="img" aria-label="Zeitpunkt aller ${GOALS.length} Tore, markiert ist das Tor zum 3 zu 6">${GOALS.map(g => `<i class="${g === lg ? 'now' : ''}" style="--x:${(goalSec(g) / 3600 * 100).toFixed(1)}%;--c:${TEAMS[g[3]].c2}"></i>`).join('')}</div>
+    <div class="gtl" role="img" aria-label="Timing of all ${GOALS.length} goals, the goal to 3:6 is highlighted">${GOALS.map(g => `<i class="${g === lg ? 'now' : ''}" style="--x:${(goalSec(g) / 3600 * 100).toFixed(1)}%;--c:${TEAMS[g[3]].c2}"></i>`).join('')}</div>
     <div class="gtl-l" aria-hidden="true"><span>0'</span><span>20'</span><span>40'</span><span>60'</span></div>
-    <span class="unlock">${ICONS.bolt}Live-Drop für Fans im Stadion</span>
+    <span class="unlock">${ICONS.bolt}Live drop for fans in the arena</span>
   </div>` });
 
 const DUO = ['Tambellini', 'Corvi'];
 const involved = g => [g[2], ...g[4]].map(lastName);
 const shared = GOALS.filter(g => DUO.every(n => involved(g).includes(n)));
-const duoCard = ideaCard({ label: 'Duo', icon: 'nodes', tk: 'gold', aria: `Duo-Karte Tambellini und Corvi: ${shared.length} gemeinsame Tore`, inner: `
+const duoCard = ideaCard({ label: 'Duo', icon: 'nodes', tk: 'gold', aria: `Duo card Tambellini and Corvi: ${shared.length} shared goals`, inner: `
   <div class="split">${photoImg(byId.tambellini)}${photoImg(byId.corvi)}<span class="seam" aria-hidden="true"></span></div>
-  <div class="link-badge" aria-hidden="true"><b>${shared.length}</b><span>Tore</span></div>
+  <div class="link-badge" aria-hidden="true"><b>${shared.length}</b><span>Goals</span></div>
   <div class="glitter" style="--s1:#ffd400" aria-hidden="true"></div>
   <span class="corner logo-chip">${logo(TEAMS.HCD)}</span>
   <div class="ib">
     <div class="duo-names"><span><small>#19 · F</small><b>Tambellini</b></span><span class="r"><small>#70 · C</small><b>Corvi</b></span></div>
-    ${shared.map(g => `<div class="goal-link"><span class="t">${fmtClock(g[0], g[1])}</span><span>Tor <b>${lastName(g[2])}</b> · Assist ${DUO.find(n => n !== lastName(g[2]))}</span></div>`).join('')}
-    <span class="unlock">${ICONS.lock}Freischalten: beide Spielerkarten sammeln</span>
+    ${shared.map(g => `<div class="goal-link"><span class="t">${fmtClock(g[0], g[1])}</span><span>Goal <b>${lastName(g[2])}</b> · Assist ${DUO.find(n => n !== lastName(g[2]))}</span></div>`).join('')}
+    <span class="unlock">${ICONS.lock}Unlock: collect both player cards</span>
   </div>` });
 
 const fx2 = v => v.toFixed(2);
-const rivalsCard = ideaCard({ label: 'Rivalen', icon: 'burst', tk: 'silver', aria: 'Rivalen-Karte: Tambellini gegen Fink, die Top-Scorer beider Teams', inner: `
+const rivalsCard = ideaCard({ label: 'Rivals', icon: 'burst', tk: 'silver', aria: 'Rivals card: Tambellini vs Fink, the top scorers of both teams', inner: `
   <div class="split rivals">${photoImg(byId.tambellini)}${photoImg(byId.fink)}<span class="seam" aria-hidden="true"></span></div>
   <div class="vs-badge" aria-hidden="true">VS</div>
   <div class="ib">
-    <div class="vs-head">${logo(TEAMS.HCD)}<h3 style="font-size:22px;text-align:center"><small>Top-Scorer-Duell</small>Tambellini · Fink</h3>${logo(TEAMS.USC)}</div>
-    ${vsRows([['Punkte', 3, 2], ['Tore', 2, 1], ['Schüsse', 4, 8], ['xG', 0.253, 0.525, fx2]], TEAMS.HCD.c2, TEAMS.USC.c2)}
-    <span class="unlock">${ICONS.lock}Freischalten: beide Spielerkarten sammeln</span>
+    <div class="vs-head">${logo(TEAMS.HCD)}<h3 style="font-size:22px;text-align:center"><small>Top scorer duel</small>Tambellini · Fink</h3>${logo(TEAMS.USC)}</div>
+    ${vsRows([['Points', 3, 2], ['Goals', 2, 1], ['Shots', 4, 8], ['xG', 0.253, 0.525, fx2]], TEAMS.HCD.c2, TEAMS.USC.c2)}
+    <span class="unlock">${ICONS.lock}Unlock: collect both player cards</span>
   </div>` });
 
 const COACH_SVG = `<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="40" r="20" fill="#24448c"/><path d="M18 120c0-28 19-44 42-44s42 16 42 44z" fill="#24448c"/>
   <path d="M46 78l14 18 14-18" fill="none" stroke="#ffd400" stroke-width="4"/><path d="M38 38a22 22 0 0 1 44 0" fill="none" stroke="#ffd400" stroke-width="3"/>
   <rect x="34" y="34" width="7" height="13" rx="3" fill="#ffd400"/><path d="M41 45q4 12 14 12" fill="none" stroke="#ffd400" stroke-width="2"/></svg>`;
 const pctf = v => `${v}%`;
-const coachCard = ideaCard({ label: 'Coach', icon: 'flag', tk: 'gold', aria: 'Coach-Karte HC Davos mit Teamwerten aus dem Spiel', inner: `
+const coachCard = ideaCard({ label: 'Coach', icon: 'flag', tk: 'gold', aria: 'Coach card HC Davos with team values from the match', inner: `
   <div class="coach-bg"><img class="wm" src="${HCD_LOGO}" alt="">${COACH_SVG}</div>
-  <span class="coach-note">Foto &amp; Name vom Club</span>
+  <span class="coach-note">Photo &amp; name from the club</span>
   <span class="corner logo-chip">${logo(TEAMS.HCD)}</span>
   <div class="ib">
-    <h3><small>HC Davos · Sieg 6:3 · HCD vs. USC</small>Head Coach</h3>
-    ${vsRows([['Schüsse', 70, 42], ['xG', 3.86, 2.61, fx2], ['Bully-%', 51, 49, pctf], ['Pass-%', 83, 75, pctf]], TEAMS.HCD.c2, TEAMS.USC.c2)}
-    <span class="unlock">${ICONS.gift}Belohnung aus dem Set „Alle Spielertypen“</span>
+    <h3><small>HC Davos · 6:3 win · HCD vs USC</small>Head Coach</h3>
+    ${vsRows([['Shots', 70, 42], ['xG', 3.86, 2.61, fx2], ['Faceoff %', 51, 49, pctf], ['Pass %', 83, 75, pctf]], TEAMS.HCD.c2, TEAMS.USC.c2)}
+    <span class="unlock">${ICONS.gift}Reward from the set “All player types”</span>
   </div>` });
 
-const stadiumCard = ideaCard({ label: 'Stadion', tk: 'silver', aria: 'Stadionkarte Eisstadion Davos', inner: `
+const stadiumCard = ideaCard({ label: 'Stadium', tk: 'silver', aria: 'Stadium card Davos ice stadium', inner: `
   <div class="bg"><img class="photo" src="${STADIUM.src}" alt="Inside the ice stadium in Davos with its wooden roof" style="--pos:50% 40%" loading="lazy" referrerpolicy="no-referrer"></div>
-  <div class="ib"><h3><small>Davos</small>Eisstadion Davos</h3><p>Heimstätte des HC Davos und Austragungsort des Spengler Cups.</p>
-    <ul class="facts"><li><span>Spiel</span><b>USC – HCD</b></li><li><span>Datum</span><b>31.12.2025</b></li></ul>
-    <span class="unlock">${ICONS.lock}Freischalten per Check-in im Stadion</span></div>` });
+  <div class="ib"><h3><small>Davos</small>Davos Ice Stadium</h3><p>Home of HC Davos and venue of the Spengler Cup.</p>
+    <ul class="facts"><li><span>Match</span><b>USC – HCD</b></li><li><span>Date</span><b>31.12.2025</b></li></ul>
+    <span class="unlock">${ICONS.lock}Unlock by checking in at the arena</span></div>` });
 
-const trophyCard = ideaCard({ label: 'Trophäe', icon: 'trophy', tk: 'elite', aria: 'Trophäenkarte Spengler Cup', inner: `
+const trophyCard = ideaCard({ label: 'Trophy', icon: 'trophy', tk: 'elite', aria: 'Trophy card Spengler Cup', inner: `
   <div class="bg"><img class="photo" src="${TROPHY.src}" alt="The Spengler Cup trophy" style="--pos:50% 35%" loading="lazy" referrerpolicy="no-referrer"></div>
   <div class="glitter" style="--s1:#ffd76a" aria-hidden="true"></div>
-  <div class="ib"><h3><small>seit 1923 in Davos</small>Spengler Cup</h3><p>Eines der traditionsreichsten Eishockey-Turniere.</p>
-    <span class="unlock">${ICONS.gift}Sammelziel: alle Karten des Turniers</span></div>` });
+  <div class="ib"><h3><small>in Davos since 1923</small>Spengler Cup</h3><p>One of the most traditional ice hockey tournaments.</p>
+    <span class="unlock">${ICONS.gift}Collection goal: all cards of the tournament</span></div>` });
 
 const MASCOT = `<svg viewBox="0 0 120 120" aria-hidden="true">
   <ellipse cx="60" cy="110" rx="34" ry="5" fill="rgba(0,0,0,.35)"/>
@@ -1305,10 +1305,10 @@ const MASCOT = `<svg viewBox="0 0 120 120" aria-hidden="true">
   <circle cx="47" cy="74" r="8" fill="#fff"/><circle cx="73" cy="74" r="8" fill="#fff"/><circle cx="49" cy="76" r="4" fill="#0a2d6e"/><circle cx="75" cy="76" r="4" fill="#0a2d6e"/>
   <path d="M48 90q12 10 24 0" stroke="#ffd400" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="92" cy="48" r="7" fill="#ffd400"/>
 </svg>`;
-const mascotCard = ideaCard({ label: 'Maskottchen', tk: 'bronze', aria: 'Maskottchen-Karte, Platzhalter', inner: `
+const mascotCard = ideaCard({ label: 'Mascot', tk: 'bronze', aria: 'Mascot card, placeholder', inner: `
   <div class="mascot">${MASCOT}</div>
-  <div class="ib"><h3><small>Kids &amp; Family</small>Maskottchen</h3><p>Platzhalter-Figur. Das echte Maskottchen liefert der Club als Grafik.</p>
-    <span class="unlock">${ICONS.gift}Bonuskarte für Familientickets oder den Kinderclub</span></div>` });
+  <div class="ib"><h3><small>Kids &amp; Family</small>Mascot</h3><p>Placeholder figure. The club provides the real mascot as artwork.</p>
+    <span class="unlock">${ICONS.gift}Bonus card for family tickets or the kids\u2019 club</span></div>` });
 
 document.getElementById('ideas').innerHTML = [momentCard, duoCard, rivalsCard, coachCard, stadiumCard, trophyCard, mascotCard].join('');
 
@@ -1319,13 +1319,13 @@ const ED_SHOWCASE = [
 document.getElementById('editions').innerHTML = ED_SHOWCASE.map(([ed, id, setNo]) =>
   card(byId[id], { edition: ed, setNo, glitter: ed === 'gold' })).join('');
 document.getElementById('editionTable').innerHTML = `
-  <caption>Was wir von Pokémon übernehmen und wie es bei uns heißt. Pokémon-Begriffe laut Bulbapedia (Rarity, TCG).</caption>
-  <thead><tr><th scope="col">Unsere Edition</th><th scope="col">Pokémon-Vorbild</th><th scope="col">Umsetzung</th><th scope="col">Seltenheit</th></tr></thead>
+  <caption>What we take from Pokémon and what it is called here. Pokémon terms per Bulbapedia (Rarity, TCG).</caption>
+  <thead><tr><th scope="col">Our edition</th><th scope="col">Pokémon model</th><th scope="col">Implementation</th><th scope="col">Rarity</th></tr></thead>
   <tbody>${Object.entries(EDITIONS).map(([k, e]) => `<tr class="ed-${k}"><th scope="row"><span class="sw">${ICONS[e.icon]}${e.name}</span></th><td>${e.poke}</td><td>${e.how}</td><td>${e.when}</td></tr>`).join('')}
-    <tr><th scope="row">Seltenheitssymbol</th><td>● ◆ ★ auf jeder Karte</td><td>Unten links auf allen Karten: ● Bronze, ◆ Silber, ★ Gold, ★★ Elite, ★★★ Special.</td><td>übernommen</td></tr>
-    <tr><th scope="row">Secret-Nummer</th><td>Secret Rare (z. B. 101/100)</td><td>Nummer über der Setgröße, z. B. 021/020 bei Gold und Alt Art.</td><td>übernommen</td></tr>
-    <tr><th scope="row">Breakout</th><td>Pokémon Star, LV.X, Full Art EX</td><td>Spieler ragt aus dem Rahmen. Braucht freigestellte Fotos vom Club.</td><td>nächster Schritt</td></tr>
-    <tr><th scope="row">Rainbow</th><td>Rainbow Rare</td><td>Bewusst nicht übernommen, wirkt neben den Teamfarben zu bunt.</td><td>–</td></tr></tbody>`;
+    <tr><th scope="row">Rarity symbol</th><td>● ◆ ★ on every card</td><td>Bottom left on all cards: ● Bronze, ◆ Silver, ★ Gold, ★★ Elite, ★★★ Special.</td><td>adopted</td></tr>
+    <tr><th scope="row">Secret number</th><td>Secret Rare (e.g. 101/100)</td><td>Number above the set size, e.g. 021/020 for Gold and Alt Art.</td><td>adopted</td></tr>
+    <tr><th scope="row">Breakout</th><td>Pokémon Star, LV.X, Full Art EX</td><td>Player breaks out of the frame. Needs cut-out photos from the club.</td><td>next step</td></tr>
+    <tr><th scope="row">Rainbow</th><td>Rainbow Rare</td><td>Deliberately not adopted; too colourful next to the team colours.</td><td>–</td></tr></tbody>`;
 
 /* ---------- 10 · card shapes ---------- */
 const SHAPE_PATHS = {
@@ -1336,8 +1336,8 @@ for (const [k, svg] of Object.entries(SHAPE_PATHS)) {
   document.documentElement.style.setProperty(`--shape-${k}`, `url("data:image/svg+xml,${encodeURIComponent(data)}")`);
 }
 const SHAPES = [
-  { k: null, name: 'Standard', text: 'Gerade Kanten mit leicht runden Ecken. Ruhig, klassisch und für jede Kartenart passend.' },
-  { k: 'shield', name: 'Wappen', text: 'Unten eine flache Spitze wie ein Clubwappen. Eigenständiger und sofort als Eishockey-Karte erkennbar.' },
+  { k: null, name: 'Standard', text: 'Straight edges with slightly rounded corners. Calm, classic and suitable for every card type.' },
+  { k: 'shield', name: 'Shield', text: 'A flat point at the bottom like a club crest. More distinctive and instantly recognisable as a hockey card.' },
 ];
 document.getElementById('shapes').innerHTML = SHAPES.map(sh => `<div class="variant">${card(byId.corvi, { shape: sh.k })}
   <h3>${sh.name}</h3><p>${sh.text}</p></div>`).join('');
@@ -1407,14 +1407,14 @@ function renderShadow() {
   rinkEl.querySelectorAll('.pos-slot').forEach(n => n.remove());
   rinkEl.insertAdjacentHTML('beforeend', Object.entries(SLOTS).map(([key, s]) => {
     if (s.locked) {
-      return `<div class="pos-slot locked" style="left:${s.x}%;top:${s.y}%" aria-label="Goalie, noch keine Goalie-Karten"><div class="drop">Goalie-Karten folgen</div><span class="tagline">G</span></div>`;
+      return `<div class="pos-slot locked" style="left:${s.x}%;top:${s.y}%" aria-label="Goalie, no goalie cards yet"><div class="drop">Goalie cards coming</div><span class="tagline">G</span></div>`;
     }
     const p = lineup[key] && byId[lineup[key]];
     const pen = p ? fitOf(key, p.pos) : 0;
     const tag = p ? `<span class="tagline${pen <= -8 ? ' bad' : pen < 0 ? ' warn' : ''}">${s.label}${pen ? ` ${pen}` : ' \u2713'}</span>` : `<span class="tagline">${s.label}</span>`;
     return `<div class="pos-slot${p ? ' filled' : ''}${selected && !p ? ' target' : ''}" data-slot="${key}" role="button" tabindex="0" style="left:${s.x}%;top:${s.y}%"
-      aria-label="${s.name}: ${p ? `${p.first} ${p.last}, MR ${skOf(p).mr}` : 'frei'}">
-      ${p ? `<div class="placed zoom40">${card(p, { mini: true })}<button type="button" class="remove" data-remove="${key}" aria-label="${p.last} vom Eis nehmen">\u00d7</button></div>` : `<div class="drop">${s.label}</div>`}
+      aria-label="${s.name}: ${p ? `${p.first} ${p.last}, MR ${skOf(p).mr}` : 'empty'}">
+      ${p ? `<div class="placed zoom40">${card(p, { mini: true })}<button type="button" class="remove" data-remove="${key}" aria-label="Take ${p.last} off the ice">\u00d7</button></div>` : `<div class="drop">${s.label}</div>`}
       ${tag}</div>`;
   }).join(''));
 
@@ -1428,18 +1428,18 @@ function renderShadow() {
   const fmt = v => `${v > 0 ? '+' : ''}${v.toFixed(1).replace('.0', '')}`;
   const duo = tr.links.filter(l => l.v >= 2).map(l => `${byId[lineup[l.a]].last} + ${byId[lineup[l.b]].last}`);
   document.getElementById('teamScore').innerHTML = `
-    <div class="big"><b>${tr.rating ?? '\u2013'}</b><span>Team-Rating \u00b7 ${tr.placed.length} von 6 Spielern</span></div>
+    <div class="big"><b>${tr.rating ?? '\u2013'}</b><span>Team rating \u00b7 ${tr.placed.length} of 6 players</span></div>
     <ul>
       <li><span>\u00d8 Match Rating</span><b>${tr.placed.length ? tr.avg.toFixed(1) : '\u2013'}</b></li>
-      <li><span>Positions-Fit</span><b class="${tr.fit < 0 ? 'minus' : ''}">${fmt(tr.fit)}</b></li>
-      <li><span>Chemie (Linien auf dem Eis)</span><b class="${tr.chem > 0 ? 'plus' : ''}">${fmt(tr.chem)}</b></li>
+      <li><span>Position fit</span><b class="${tr.fit < 0 ? 'minus' : ''}">${fmt(tr.fit)}</b></li>
+      <li><span>Chemistry (lines on the ice)</span><b class="${tr.chem > 0 ? 'plus' : ''}">${fmt(tr.chem)}</b></li>
     </ul>
-    <p class="tips">Gr\u00fcne Linie: gleiches Team (+1). Gelbe Linie: zus\u00e4tzlich gemeinsame Tore im Spiel (+1 je Tor). Rot gestrichelt: keine Verbindung.
-    ${duo.length ? `<br>Starkes Duo auf dem Eis: ${duo.join(', ')}.` : ''}</p>`;
+    <p class="tips">Green line: same team (+1). Yellow line: also shared goals in the match (+1 per goal). Red dashed: no connection.
+    ${duo.length ? `<br>Strong duo on the ice: ${duo.join(', ')}.` : ''}</p>`;
 
   document.getElementById('tray').innerHTML = PLAYERS.map(p => `<li><div class="tray-item${used.has(p.id) ? ' used' : ''}" role="button" tabindex="0" draggable="true" data-id="${p.id}"
-    aria-pressed="${selected === p.id}" aria-label="${p.first} ${p.last}, ${POS[p.pos]}, MR ${skOf(p).mr}${used.has(p.id) ? ', schon auf dem Eis' : ''}">
-    <div class="zoom40">${card(p, { mini: true })}</div><span class="cap">${POS[p.pos]}${used.has(p.id) ? ' \u00b7 auf dem Eis' : ''}</span></div></li>`).join('');
+    aria-pressed="${selected === p.id}" aria-label="${p.first} ${p.last}, ${POS[p.pos]}, MR ${skOf(p).mr}${used.has(p.id) ? ', already on the ice' : ''}">
+    <div class="zoom40">${card(p, { mini: true })}</div><span class="cap">${POS[p.pos]}${used.has(p.id) ? ' \u00b7 on the ice' : ''}</span></div></li>`).join('');
   localStorage.setItem(STORE, JSON.stringify(lineup));
 }
 
@@ -1449,12 +1449,12 @@ function place(slot, id) {
   lineup[slot] = id;
   selected = null;
   renderShadow();
-  live.textContent = `${byId[id].last} auf ${SLOTS[slot].name}. Team-Rating ${teamRating().rating}.`;
+  live.textContent = `${byId[id].last} at ${SLOTS[slot].name}. Team rating ${teamRating().rating}.`;
 }
 
 document.querySelector('.shadow').addEventListener('click', e => {
   const rm = e.target.closest('[data-remove]');
-  if (rm) { lineup[rm.dataset.remove] = null; renderShadow(); live.textContent = 'Position frei.'; return; }
+  if (rm) { lineup[rm.dataset.remove] = null; renderShadow(); live.textContent = 'Position cleared.'; return; }
   const item = e.target.closest('.tray-item');
   if (item) { selected = selected === item.dataset.id ? null : item.dataset.id; renderShadow(); return; }
   const slot = e.target.closest('.pos-slot[data-slot]');
@@ -1484,12 +1484,12 @@ document.getElementById('shadowReset').addEventListener('click', () => {
   lineup = { ...EMPTY };
   selected = null;
   renderShadow();
-  live.textContent = 'Aufstellung zurückgesetzt.';
+  live.textContent = 'Lineup reset.';
 });
 document.getElementById('shadowCopy').addEventListener('click', async () => {
   const tr = teamRating();
-  const text = `Mein Shadow Team (Team-Rating ${tr.rating ?? '–'}): ` + Object.keys(SLOTS).filter(k => lineup[k]).map(k => `${k} ${byId[lineup[k]].last}`).join(', ');
-  try { await navigator.clipboard.writeText(text); live.textContent = 'Aufstellung kopiert.'; } catch { live.textContent = text; }
+  const text = `My Shadow Team (team rating ${tr.rating ?? '–'}): ` + Object.keys(SLOTS).filter(k => lineup[k]).map(k => `${k} ${byId[lineup[k]].last}`).join(', ');
+  try { await navigator.clipboard.writeText(text); live.textContent = 'Lineup copied.'; } catch { live.textContent = text; }
 });
 renderShadow();
 

@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hockey Performance Cards – Design Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  @property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+  :root {
+    --bg: #060a14;
+    --text: #eef3ff;
+    --muted: #a9b8d3;
+    --line: rgba(255,255,255,.1);
+    --focus: #7cc4ff;
+    --display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+    --body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --ease-out: cubic-bezier(.2,.8,.2,1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text);
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(40,90,200,.25), transparent 60%),
+      radial-gradient(900px 500px at 100% 10%, rgba(255,212,0,.08), transparent 60%),
+      var(--bg);
+    min-height: 100vh;
+  }
+  a { color: var(--focus); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+  .page { max-width: 1280px; margin: 0 auto; padding: 32px 20px 64px; }
+  header.top { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between; margin-bottom: 40px; }
+  header.top h1 { font-family: var(--display); font-weight: 800; font-size: clamp(2rem, 4vw, 3rem); line-height: 1; margin: 0 0 8px; letter-spacing: .01em; }
+  header.top p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+  .scoreboard { display: grid; grid-template-columns: auto auto auto; align-items: center; gap: 16px; padding: 12px 20px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.04); }
+  .scoreboard .team { font-weight: 600; font-size: 14px; }
+  .scoreboard .team span { display: block; font-family: var(--display); font-size: 22px; font-weight: 800; letter-spacing: .04em; }
+  .scoreboard .score { font-family: var(--display); font-size: 40px; font-weight: 800; letter-spacing: .04em; }
+  .scoreboard .meta { grid-column: 1 / -1; text-align: center; font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+
+  section { margin-top: 56px; }
+  .section-head { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; }
+  .section-head h2 { font-family: var(--display); font-size: 30px; font-weight: 800; margin: 0; letter-spacing: .02em; }
+  .section-head p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 40px 24px; justify-items: center; }
+  .variant { display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 300px; }
+  .variant > h3 { margin: 0; font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: .03em; }
+  .variant > p { margin: 0; font-size: 14px; color: var(--muted); text-align: center; }
+
+  /* Theme switcher */
+  .switch { display: inline-flex; border: 1px solid var(--line); border-radius: 12px; padding: 4px; background: rgba(255,255,255,.04); margin: 0; }
+  .switch legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .switch input { position: absolute; opacity: 0; pointer-events: none; }
+  .switch label { min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 9px; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: background-color .2s, color .2s; }
+  .switch input:checked + label { background: var(--text); color: #0a0f1c; }
+  .switch input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 56px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.03); font-size: 14px; color: var(--muted); }
+  .legend strong { color: var(--text); display: block; margin-bottom: 4px; }
+  footer { margin-top: 32px; font-size: 13px; color: var(--muted); }
+
+  /* ================= CARD ================= */
+  .card-wrap { width: min(280px, 100%); perspective: 1100px; }
+  .card {
+    --rx: 0deg; --ry: 0deg; --flip: 0deg; --mx: 50%; --my: 30%;
+    --fg: #fff; --fg-muted: rgba(255,255,255,.78); --chip: rgba(255,255,255,.14); --track: rgba(255,255,255,.16);
+    position: relative; margin: 0; color: var(--fg);
+  }
+  .card-inner {
+    position: relative; width: 100%; aspect-ratio: 2 / 3;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip)));
+    transition: transform .6s var(--ease-out);
+  }
+  .card.tilting .card-inner { transition: transform .08s linear; }
+  .card.flipped { --flip: 180deg; }
+
+  .face {
+    position: absolute; inset: 0; border-radius: 18px; overflow: hidden;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    box-shadow: 0 24px 50px -18px rgba(0,0,0,.8), 0 2px 0 rgba(255,255,255,.08) inset;
+  }
+  .back { transform: rotateY(180deg); }
+  .front > .inner { position: relative; height: 100%; display: flex; flex-direction: column; border-radius: inherit; overflow: hidden; }
+
+  /* Art window with animated player */
+  .art {
+    position: relative; flex: 0 0 52%; overflow: hidden;
+    background:
+      radial-gradient(circle at 70% 25%, color-mix(in srgb, var(--c2) 38%, transparent), transparent 60%),
+      linear-gradient(180deg, var(--c1), #02040a 110%);
+  }
+  .art .bignum {
+    position: absolute; right: 6px; top: -14px; font-family: var(--display); font-weight: 800; font-size: 150px; line-height: 1;
+    color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--c2) 35%, transparent); user-select: none;
+  }
+  .art .ice {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 20%;
+    background:
+      linear-gradient(180deg, transparent, rgba(215,238,255,.22)),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.14) 0 2px, transparent 2px 46px);
+    background-size: 100% 100%, 92px 100%;
+    animation: ice .5s linear infinite;
+  }
+  @keyframes ice { to { background-position: 0 0, -92px 0; } }
+  .fx { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .streak {
+    position: absolute; left: 0; height: 2px; width: 38%; border-radius: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,.55), transparent);
+    animation: streak var(--d, 1.4s) linear infinite; animation-delay: var(--delay, 0s);
+    transform: translateX(280%);
+  }
+  @keyframes streak { from { transform: translateX(280%); } to { transform: translateX(-160%); } }
+
+  .skater { position: absolute; left: 2%; right: 0; bottom: 3%; width: 98%; height: 84%; overflow: visible; }
+  .skater * { transform-box: view-box; }
+  .skater .limb { fill: none; stroke: var(--leg); stroke-width: 15; stroke-linecap: round; stroke-linejoin: round; }
+  .skater .arm { stroke: var(--jersey); stroke-width: 11; }
+  .skater .torso { stroke: var(--jersey); stroke-width: 32; }
+  .skater .hip { fill: var(--leg); }
+  .skater .num { font-family: var(--display); font-weight: 800; font-size: 15px; fill: var(--c2); text-anchor: middle; }
+  .skater .helmet { fill: var(--c1); stroke: var(--c2); stroke-width: 2; }
+  .skater .visor { stroke: #a8e4ff; stroke-width: 3; stroke-linecap: round; }
+  .skater .skate { stroke: #e3edf7; stroke-width: 4; stroke-linecap: round; }
+  .skater .stick { stroke: #dbcca6; stroke-width: 4.5; stroke-linecap: round; }
+  .skater .blade { stroke: #0b0b0b; stroke-width: 6; stroke-linecap: round; }
+  .skater .glove { fill: var(--c1); stroke: var(--c2); stroke-width: 1.5; }
+  .skater .puck { fill: #0a0a0a; stroke: #555; stroke-width: 1; }
+  .skater .shadow { fill: rgba(0,0,0,.45); transform-origin: 100px 197px; animation: shadow calc(var(--stride) / 2) ease-in-out infinite alternate; }
+  .skater .body {
+    filter: drop-shadow(0 0 1.2px var(--c2)) drop-shadow(0 0 10px color-mix(in srgb, var(--c2) 45%, transparent));
+    animation: bob calc(var(--stride) / 2) ease-in-out infinite alternate;
+  }
+  .skater .legF { transform-origin: 92px 125px; animation: legF var(--stride) ease-in-out infinite; }
+  .skater .legB { transform-origin: 92px 125px; animation: legB var(--stride) ease-in-out infinite; }
+  .skater .armF { transform-origin: 120px 82px; animation: armF var(--stride) ease-in-out infinite; }
+  .skater .armB { transform-origin: 116px 86px; animation: armB var(--stride) ease-in-out infinite; }
+  .skater .spray circle { fill: #eaf7ff; animation: spray var(--stride) linear infinite; }
+  .skater .spray circle:nth-child(2) { animation-delay: calc(var(--stride) * -.33); }
+  .skater .spray circle:nth-child(3) { animation-delay: calc(var(--stride) * -.66); }
+  .skater .spray circle:nth-child(4) { animation-delay: calc(var(--stride) * -.15); }
+  @keyframes legF { 0%,100% { transform: rotate(-12deg); } 50% { transform: rotate(16deg); } }
+  @keyframes legB { 0%,100% { transform: rotate(10deg); } 50% { transform: rotate(-14deg); } }
+  @keyframes armF { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(7deg); } }
+  @keyframes armB { 0%,100% { transform: rotate(8deg); } 50% { transform: rotate(-8deg); } }
+  @keyframes bob { from { transform: translate(0,0); } to { transform: translate(2px,3px); } }
+  @keyframes shadow { from { transform: scaleX(1); } to { transform: scaleX(.9); } }
+  @keyframes spray { 0% { transform: translate(0,0); opacity: .9; } 100% { transform: translate(-34px,-16px); opacity: 0; } }
+
+  /* Overlays on the art */
+  .rating { position: absolute; left: 12px; top: 10px; display: flex; flex-direction: column; align-items: center; line-height: 1; text-shadow: 0 2px 10px rgba(0,0,0,.6); color: #fff; z-index: 2; }
+  .rating .r { font-family: var(--display); font-size: 44px; font-weight: 800; }
+  .rating .rl { font-size: 11px; font-weight: 700; letter-spacing: .14em; opacity: .9; }
+  .rating .tm { margin-top: 6px; font-family: var(--display); font-size: 15px; font-weight: 800; letter-spacing: .06em; padding: 2px 6px; border-radius: 5px; background: var(--c2); color: var(--c1); text-shadow: none; }
+  .tier { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; background: rgba(0,0,0,.45); color: #fff; border: 1px solid rgba(255,255,255,.25); z-index: 2; white-space: nowrap; }
+
+  .flip-btn {
+    position: absolute; right: 8px; top: 8px; z-index: 5; width: 44px; height: 44px; border-radius: 50%;
+    display: grid; place-items: center; border: 1px solid rgba(255,255,255,.35); background: rgba(0,0,0,.4);
+    color: #fff; cursor: pointer; backdrop-filter: blur(4px); transition: background-color .15s, transform .15s;
+  }
+  .flip-btn:hover { background: rgba(0,0,0,.65); }
+  .flip-btn:active { transform: scale(.94); }
+  .flip-btn svg { width: 20px; height: 20px; }
+
+  /* Card body */
+  .cbody { position: relative; flex: 1; display: flex; flex-direction: column; padding: 8px 16px 10px; min-height: 0; }
+  .cbody > * { flex-shrink: 0; }
+  .first { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-muted); }
+  .last { margin: -2px 0 0; font-family: var(--display); font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: .02em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ctitle { margin: 2px 0 8px; font-size: 13px; font-weight: 600; color: var(--fg-muted); }
+  .kpis { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .kpi { display: grid; grid-template-columns: 1fr auto auto; align-items: center; column-gap: 8px; row-gap: 3px; font-size: 13px; }
+  .kpi .kn { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kpi .kv { font-family: var(--display); font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+  .kpi .kv small { font-family: var(--body); font-size: 11px; font-weight: 600; margin-left: 2px; color: var(--fg-muted); }
+  .rank { font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: var(--chip); min-width: 34px; text-align: center; font-variant-numeric: tabular-nums; }
+  .rank.top { background: linear-gradient(135deg, #ffe58a, #e2b23a); color: #2a1d00; }
+  .bar { grid-column: 1 / -1; height: 3px; border-radius: 3px; background: var(--track); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: var(--w); background: var(--bar, var(--c2)); border-radius: inherit; }
+  .foot { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: .06em; color: var(--fg-muted); text-transform: uppercase; }
+
+  /* Shine, glare, holo overlays */
+  .shine, .glare, .holo { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; z-index: 3; }
+  .shine::before {
+    content: ''; position: absolute; top: -20%; bottom: -20%; width: 35%; left: 0;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent);
+    transform: translateX(-160%) skewX(-12deg); animation: sweep 6s ease-in-out infinite; animation-delay: var(--sweep-delay, 0s);
+  }
+  @keyframes sweep { 0%, 70% { transform: translateX(-160%) skewX(-12deg); } 100% { transform: translateX(420%) skewX(-12deg); } }
+  .glare { background: radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.35), transparent 45%); mix-blend-mode: overlay; opacity: 0; transition: opacity .3s; }
+  .card.tilting .glare { opacity: 1; }
+  .holo { opacity: 0; }
+
+  /* ----- Theme A: Classic Gold ----- */
+  .theme-gold { --fg: #1d1606; --fg-muted: #4f3e10; --chip: rgba(29,22,6,.12); --track: rgba(29,22,6,.15); --bar: #1d1606; }
+  .theme-gold .front { background: linear-gradient(150deg, #fbe7a0 0%, #d4ac45 30%, #fff3c4 52%, #c39a35 75%, #f6dc8a 100%); }
+  .theme-gold .front > .inner { margin: 8px; height: calc(100% - 16px); border-radius: 12px; border: 1px solid rgba(80,60,10,.35); }
+  .theme-gold .art { border-radius: 12px 12px 0 0; flex-basis: 48%; }
+  .theme-gold .cbody { background: linear-gradient(180deg, rgba(255,250,230,.55), rgba(255,240,190,.25)); }
+
+  /* ----- Theme B: Holo Prism ----- */
+  .theme-holo { --fg: #f4f6ff; --fg-muted: #c3cbec; }
+  .theme-holo .front { background: linear-gradient(160deg, #1d2346, #0d1022 55%, #2a1740); border: 1px solid rgba(255,255,255,.25); }
+  .theme-holo .holo {
+    opacity: .38; mix-blend-mode: color-dodge;
+    background: repeating-linear-gradient(115deg, #ff5ea8 0%, #ffd36e 7%, #6effc6 14%, #6ec8ff 21%, #b36eff 28%, #ff5ea8 35%);
+    background-size: 260% 260%; background-position: var(--mx) var(--my);
+    animation: holo-idle 8s ease-in-out infinite alternate;
+  }
+  .theme-holo.tilting .holo { animation: none; opacity: .5; }
+  @keyframes holo-idle { from { background-position: 0% 30%; } to { background-position: 100% 70%; } }
+
+  /* ----- Theme C: Night Ice (neon) ----- */
+  .theme-neon { --fg: #eaf6ff; --fg-muted: #a7bbd0; --chip: rgba(255,255,255,.1); }
+  .theme-neon .front {
+    background: #04060c; border: 1.5px solid var(--c2);
+    box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 0 22px -2px color-mix(in srgb, var(--c2) 70%, transparent), 0 24px 50px -18px rgba(0,0,0,.8);
+  }
+  .theme-neon .art {
+    flex-basis: 48%; margin: 8px 8px 0; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--c2) 40%, transparent);
+    background:
+      linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px) 0 0 / 100% 22px,
+      radial-gradient(circle at 70% 25%, color-mix(in srgb, var(--c2) 30%, transparent), transparent 60%),
+      linear-gradient(180deg, #08142e, #02040a);
+  }
+  .theme-neon .rating .r { color: var(--c2); text-shadow: 0 0 14px color-mix(in srgb, var(--c2) 80%, transparent); }
+  .theme-neon .last { text-shadow: 0 0 18px color-mix(in srgb, var(--c2) 45%, transparent); }
+
+  /* ----- Theme D: Glass / full-bleed motion ----- */
+  .theme-glass { --fg: #fff; --fg-muted: rgba(255,255,255,.82); }
+  .theme-glass .front { background: #02040a; }
+  .theme-glass .art { position: absolute; inset: 0; flex: none; }
+  .theme-glass .skater { height: 62%; bottom: 36%; }
+  .theme-glass .art .ice { bottom: 34%; height: 14%; }
+  .theme-glass .cbody {
+    position: absolute; left: 8px; right: 8px; bottom: 8px; border-radius: 14px; padding: 12px 14px;
+    background: rgba(8,12,26,.62); border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  /* ================= SPECIAL CARDS ================= */
+  .special { --fg: #fff; --fg-muted: rgba(255,255,255,.8); --bar: var(--s1); }
+  .special .front { padding: 3px; background: conic-gradient(from var(--angle), var(--s1), var(--s2), var(--s1), var(--s3), var(--s1)); animation: spin 4s linear infinite; }
+  .special .front > .inner { background: var(--sbg); border-radius: 15px; }
+  .special .art { background: radial-gradient(circle at 60% 35%, color-mix(in srgb, var(--s1) 40%, transparent), transparent 62%), linear-gradient(180deg, color-mix(in srgb, var(--s3) 40%, #02040a), #02040a 105%); }
+  .special .skater .body { filter: drop-shadow(0 0 1.5px var(--s2)) drop-shadow(0 0 14px var(--s1)); }
+  .special .art { flex-basis: 45%; }
+  .special .ctitle { display: none; }
+  .special .last { margin-bottom: 4px; }
+  .special .bignum { -webkit-text-stroke-color: color-mix(in srgb, var(--s1) 45%, transparent); }
+  .special .rating .r { color: var(--s2); text-shadow: 0 0 16px var(--s1); }
+  @keyframes spin { to { --angle: 360deg; } }
+
+  .sbadge {
+    position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 2;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    padding: 4px 12px; border-radius: 999px; background: var(--s1); color: #0b0b0b;
+    font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--s1) 70%, transparent);
+  }
+  .sbadge svg { width: 14px; height: 14px; }
+  .hero { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin: 0 0 6px; }
+  .hero .hv { font-family: var(--display); font-size: 46px; font-weight: 800; line-height: .95; color: var(--s1); text-shadow: 0 0 22px color-mix(in srgb, var(--s1) 60%, transparent); font-variant-numeric: tabular-nums; }
+  .hero .hu { font-family: var(--display); font-size: 20px; font-weight: 700; color: var(--s2); }
+  .hero .hl { flex-basis: 100%; font-size: 12px; font-weight: 600; color: var(--fg-muted); }
+
+  .special-motm      { --s1: #ffd76a; --s2: #fff6d1; --s3: #b8860b; --sbg: linear-gradient(180deg, #17110a, #050403); }
+  .special-speed     { --s1: #19e6ff; --s2: #e0fbff; --s3: #0057ff; --sbg: linear-gradient(180deg, #03141f, #01060a); }
+  .special-cannon    { --s1: #ff5a36; --s2: #ffd9cc; --s3: #9e0b1e; --sbg: linear-gradient(180deg, #1c0705, #070202); }
+  .special-iron      { --s1: #ff8a2a; --s2: #f1f4f8; --s3: #7d8796; --sbg: linear-gradient(180deg, #16181c, #08090b); }
+  .special-playmaker { --s1: #b98bff; --s2: #f1e6ff; --s3: #39d0bd; --sbg: linear-gradient(180deg, #140a24, #06030c); }
+  .special-sniper    { --s1: #45ff92; --s2: #e2ffec; --s3: #0b8d4e; --sbg: linear-gradient(180deg, #04160c, #010603); }
+
+  .special-speed .streak { height: 2px; background: linear-gradient(90deg, var(--s2), transparent); }
+  .ring { position: absolute; left: calc(93% - 30px); top: calc(88% - 30px); width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--s1); animation: ring 1.8s ease-out infinite; }
+  .ring:nth-child(2) { animation-delay: .6s; } .ring:nth-child(3) { animation-delay: 1.2s; }
+  @keyframes ring { from { transform: scale(.2); opacity: 1; } to { transform: scale(5); opacity: 0; } }
+  .rays { position: absolute; inset: -60%; background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--s1) 22%, transparent) 0 7deg, transparent 7deg 20deg); animation: rays 30s linear infinite; -webkit-mask: radial-gradient(circle, #000 15%, transparent 55%); mask: radial-gradient(circle, #000 15%, transparent 55%); }
+  @keyframes rays { to { transform: rotate(360deg); } }
+  .spark { position: absolute; bottom: -6px; width: 4px; height: 4px; border-radius: 50%; background: var(--s2); box-shadow: 0 0 8px var(--s1); animation: rise var(--d) linear infinite; animation-delay: var(--delay); }
+  .special-iron .spark { background: var(--s1); box-shadow: 0 0 10px #ff4b00; }
+  @keyframes rise { from { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } to { transform: translateY(-240px) translateX(var(--dx)); opacity: 0; } }
+  .net { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .net path { fill: none; stroke: var(--s1); stroke-width: 1.5; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; opacity: .7; animation: dash 1.2s linear infinite; }
+  .net circle { fill: var(--s3); animation: pulse 1.6s ease-in-out infinite alternate; }
+  @keyframes dash { to { stroke-dashoffset: -18; } }
+  @keyframes pulse { from { opacity: .4; } to { opacity: 1; } }
+  .scope { position: absolute; left: 50%; top: 42%; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; border: 1.5px solid color-mix(in srgb, var(--s1) 70%, transparent); animation: rays 14s linear infinite; }
+  .scope::before, .scope::after { content: ''; position: absolute; background: color-mix(in srgb, var(--s1) 70%, transparent); }
+  .scope::before { left: 50%; top: -12px; bottom: -12px; width: 1.5px; }
+  .scope::after { top: 50%; left: -12px; right: -12px; height: 1.5px; }
+  .scope.inner { width: 80px; height: 80px; margin: -40px 0 0 -40px; border-style: dashed; animation-direction: reverse; }
+
+  /* ================= BACK ================= */
+  .back { background: linear-gradient(170deg, #121a33, #070b17); border: 1px solid rgba(255,255,255,.14); color: #eef3ff; display: flex; flex-direction: column; padding: 18px 16px 14px; }
+  .back h4 { margin: 0 0 4px; font-family: var(--display); font-size: 24px; font-weight: 800; line-height: 1.05; text-transform: uppercase; letter-spacing: .02em; padding-right: 48px; }
+  .back .sub { margin: 0 0 8px; font-size: 12px; color: #a9b8d3; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+  .back .story { margin: 0 0 10px; font-size: 13px; line-height: 1.45; }
+  .back dl { margin: 0; display: grid; gap: 8px; overflow: auto; }
+  .back dt { font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; }
+  .back dt span { color: #ffd76a; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .back dd { margin: 0; font-size: 12px; line-height: 1.4; color: #b9c6dd; }
+  .back .src { margin-top: auto; padding-top: 8px; font-size: 11px; color: #8e9cb6; }
+  .back .flip-btn { background: rgba(255,255,255,.08); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div>
+      <h1>Hockey Performance Cards</h1>
+      <p>Design-Mockups für die Spielerkarten. Alle KPI-Werte und Ränge stammen aus den Wisehockey-Matchstatistiken des Spiels (40 Spieler). Fahr mit der Maus über eine Karte, um sie zu neigen. Mit dem Info-Button drehst du sie um.</p>
+    </div>
+    <div class="scoreboard" aria-label="Final score: U.S. Collegiate Selects 3, HC Davos 6">
+      <div class="team"><span>USC</span>U.S. Collegiate Selects</div>
+      <div class="score">3 : 6</div>
+      <div class="team" style="text-align:right"><span>HCD</span>HC Davos</div>
+      <div class="meta">Spengler Cup · 31.12.2025 · Davos</div>
+    </div>
+  </header>
+
+  <section aria-labelledby="s1">
+    <div class="section-head">
+      <div>
+        <h2 id="s1">1 · Design-Richtungen</h2>
+        <p>Vier Stilrichtungen mit derselben Karte. Der Aufbau bleibt gleich: Rating, Name, Titel, drei KPIs mit Rang. So lernt man die Karte einmal und kann jede Edition sofort lesen.</p>
+      </div>
+    </div>
+    <div class="grid" id="variants"></div>
+  </section>
+
+  <section aria-labelledby="s2">
+    <div class="section-head">
+      <div>
+        <h2 id="s2">2 · Special Cards</h2>
+        <p>Für herausragende Leistungen: animierter Rahmen, eine große Hero-Kennzahl und ein eigener Effekt je Kategorie. Vergeben werden sie nur bei Rang 1 im Spiel, damit sie selten bleiben.</p>
+      </div>
+    </div>
+    <div class="grid" id="specials"></div>
+  </section>
+
+  <section aria-labelledby="s3">
+    <div class="section-head">
+      <div>
+        <h2 id="s3">3 · Kollektion</h2>
+        <p>Alle Karten des Spiels im gewählten Stil.</p>
+      </div>
+      <fieldset class="switch" id="themeSwitch">
+        <legend>Kartenstil</legend>
+        <input type="radio" name="theme" id="t-gold" value="gold" checked><label for="t-gold">Classic</label>
+        <input type="radio" name="theme" id="t-holo" value="holo"><label for="t-holo">Holo</label>
+        <input type="radio" name="theme" id="t-neon" value="neon"><label for="t-neon">Night Ice</label>
+        <input type="radio" name="theme" id="t-glass" value="glass"><label for="t-glass">Glass</label>
+      </fieldset>
+    </div>
+    <div class="grid" id="collection"></div>
+  </section>
+
+  <div class="legend" role="note">
+    <div><strong>MR · Match Rating</strong>Demo-Formel: 99 − 3 × (durchschnittlicher Rang der drei Karten-KPIs − 1). Sie fasst zusammen, wie weit vorn der Spieler in seinen Kategorien lag.</div>
+    <div><strong>#1 · Rang im Spiel</strong>Der Platz unter allen 40 Spielern der Partie. Platz 1 ist zusätzlich als goldener Chip markiert und nicht nur über die Farbe erkennbar.</div>
+    <div><strong>Balken</strong>Zeigt dieselbe Platzierung als Anteil: voller Balken heißt bester Wert im Spiel.</div>
+    <div><strong>Bewegtbild</strong>Die animierte Figur ist ein Platzhalter in den Teamfarben. Ein lizenziertes Foto oder Video lässt sich pro Karte über <code>media</code> einsetzen.</div>
+  </div>
+  <footer>Datenquelle: Wisehockey match statistics, 31.12.2025. Positionen sind im Datensatz nicht enthalten und werden deshalb nicht angezeigt.</footer>
+</div>
+
+<script>
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const PLAYERS_IN_MATCH = 40;
+
+const TEAMS = {
+  HCD: { name: 'HC Davos', short: 'HCD', c1: '#0a2d6e', c2: '#ffd400', jersey: '#1f56c9', leg: '#0b1a3a' },
+  USC: { name: 'U.S. Collegiate Selects', short: 'USC', c1: '#13284f', c2: '#e0313f', jersey: '#f2f4f8', leg: '#1b2b52' },
+};
+
+const DEFS = {
+  G: 'How many times the player put the puck in the opponent\u2019s net.',
+  PTS: 'Goals plus assists: how many goals the player was directly involved in.',
+  S: 'Shots taken. More shots means more pressure on the goalkeeper.',
+  'FO%': 'Share of faceoffs won. Winning the faceoff gives your team the puck.',
+  'PASS%': 'Share of passes that reached a teammate.',
+  xG: 'Expected goals: how many goals the player\u2019s chances were worth on average.',
+  SHOT: 'Speed of the player\u2019s hardest shot, measured by puck tracking.',
+  SPD: 'Fastest skating speed reached at any moment in the game.',
+  PCW: 'One-on-one battles for a loose puck that the player won.',
+  PASS: 'Passes that reached a teammate.',
+  TOI: 'Total time on ice. Coaches give the most ice time to players they trust.',
+  DIST: 'Total distance skated during the game.',
+  BLK: 'Opponent shots stopped with the body or stick before reaching the goal.',
+};
+
+const k = (short, label, value, unit, rank, detail) => ({ short, label, value, unit, rank, detail });
+
+const PLAYERS = [
+  { id: 'tambellini', first: 'Adam', last: 'Tambellini', no: 19, team: 'HCD', title: 'Two-Goal Night', stride: 1.05,
+    story: 'Scored twice, once in the first period and once in the second, and set up another goal in Davos\u2019s 6\u20133 win.',
+    kpis: [k('G', 'Goals', '2', '', 1), k('PTS', 'Points', '3', '', 1), k('S', 'Shots', '4', '', 7)] },
+  { id: 'corvi', first: 'Enzo', last: 'Corvi', no: 70, team: 'HCD', title: 'The Playmaker', stride: 1.2,
+    story: 'Was involved in three goals (one goal, two assists), won most of the faceoffs taken and completed almost every pass.',
+    kpis: [k('PTS', 'Points', '3', '', 1), k('FO%', 'Faceoff win', '64', '%', 2, '9 of 14'), k('PASS%', 'Pass success', '95', '%', 6, '19 of 20')] },
+  { id: 'zadina', first: 'Filip', last: 'Zadina', no: 18, team: 'HCD', title: 'Shooting Gallery', stride: 1.0,
+    story: 'Took more shots than anyone else in the game and scored in the third period.',
+    kpis: [k('S', 'Shots', '10', '', 1), k('SHOT', 'Hardest shot', '143.4', 'km/h', 4), k('PTS', 'Points', '2', '', 3)] },
+  { id: 'stransky', first: 'Matej', last: 'Stransky', no: 44, team: 'HCD', title: 'Chance Creator', stride: 1.0,
+    story: 'Created the most dangerous scoring chances of anyone in the match, measured by expected goals, and scored Davos\u2019s final goal late in the third period.',
+    kpis: [k('xG', 'Expected goals', '0.63', 'xG', 1), k('SHOT', 'Hardest shot', '145.2', 'km/h', 2), k('G', 'Goals', '1', '', 2)] },
+  { id: 'nussbaumer', first: 'Valentin', last: 'Nussbaumer', no: 66, team: 'HCD', title: 'Fastest on the Ice', stride: .75,
+    story: 'Reached the highest skating speed in the game and won more puck battles than any other player.',
+    kpis: [k('SPD', 'Top speed', '37.8', 'km/h', 1), k('PCW', 'Puck battles won', '11', '', 1), k('PASS', 'Successful passes', '24', '', 3)] },
+  { id: 'mccartthy', first: 'Gavin', last: 'McCartthy', no: 2, team: 'USC', title: 'Shot Blocker', stride: 1.15,
+    story: 'Blocked more shots than anyone in the game and also recorded the hardest shot of the night.',
+    kpis: [k('BLK', 'Blocked shots', '5', '', 1), k('SHOT', 'Hardest shot', '146.0', 'km/h', 1), k('TOI', 'Time on ice', '17:08', 'min', 8)] },
+  { id: 'pohlkamp', first: 'Eric', last: 'Pohlkamp', no: 23, team: 'USC', title: 'The Workhorse', stride: 1.1,
+    story: 'Played more minutes and skated farther than any other player in the game.',
+    kpis: [k('TOI', 'Time on ice', '24:25', 'min', 1), k('DIST', 'Distance skated', '5.56', 'km', 1), k('BLK', 'Blocked shots', '2', '', 2)] },
+  { id: 'fink', first: 'Aiden', last: 'Fink', no: 18, team: 'USC', title: 'Leading the Charge', stride: .95,
+    story: 'Scored in the second period and led U.S. Collegiate Selects in shots and expected goals.',
+    kpis: [k('G', 'Goals', '1', '', 2), k('S', 'Shots', '8', '', 2), k('xG', 'Expected goals', '0.53', 'xG', 2)] },
+];
+const byId = Object.fromEntries(PLAYERS.map(p => [p.id, p]));
+
+const ICONS = {
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7L12 17.5 5.8 21.2l1.6-7L2 9.5l7.1-.6z"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 10-13h-7z"/></svg>',
+  burst: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1l2.2 6.1L20 4l-3.1 5.8L23 12l-6.1 2.2L20 20l-5.8-3.1L12 23l-2.2-6.1L4 20l3.1-5.8L1 12l6.1-2.2L4 4l5.8 3.1z"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2s5 4.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S9 11 10.5 11C10.5 7 12 2 12 2z"/></svg>',
+  nodes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="5" cy="6" r="2.5" fill="currentColor"/><circle cx="19" cy="6" r="2.5" fill="currentColor"/><circle cx="12" cy="18" r="2.5" fill="currentColor"/><path d="M7 7l3.5 9M17 7l-3.5 9M7.5 6h9"/></svg>',
+  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>',
+};
+
+const SPECIALS = [
+  { type: 'motm', pid: 'tambellini', badge: 'Player of the Match', icon: 'star',
+    hero: { to: 3, dec: 0, unit: 'PTS', label: '2 goals · 1 assist · most goals in the match' } },
+  { type: 'speed', pid: 'nussbaumer', badge: 'Speed Demon', icon: 'bolt',
+    hero: { to: 37.8, dec: 1, unit: 'km/h', label: 'Top skating speed · #1 of 40' } },
+  { type: 'cannon', pid: 'mccartthy', badge: 'Cannon', icon: 'burst',
+    hero: { to: 146.0, dec: 1, unit: 'km/h', label: 'Hardest shot of the night · #1 of 40' } },
+  { type: 'iron', pid: 'pohlkamp', badge: 'Iron Man', icon: 'flame',
+    hero: { to: 1465, fmt: 'mmss', unit: 'min', label: 'Most ice time · 5.56 km skated' } },
+  { type: 'playmaker', pid: 'corvi', badge: 'Playmaker', icon: 'nodes',
+    hero: { to: 95, dec: 0, unit: '%', label: 'Pass success · 19 of 20 · most assists' } },
+  { type: 'sniper', pid: 'stransky', badge: 'Chance Creator', icon: 'target',
+    hero: { to: 0.63, dec: 2, unit: 'xG', label: 'Most dangerous chances · #1 of 40' } },
+];
+
+const rating = p => Math.round(99 - 3 * (p.kpis.reduce((s, x) => s + x.rank, 0) / p.kpis.length - 1));
+const tier = r => (r >= 97 ? 'Elite' : r >= 94 ? 'Gold' : 'Silver');
+const pct = rank => ((PLAYERS_IN_MATCH + 1 - rank) / PLAYERS_IN_MATCH) * 100;
+const rand = (a, b) => a + Math.random() * (b - a);
+
+function skater(p) {
+  return `
+  <svg class="skater" viewBox="0 0 220 210" preserveAspectRatio="xMidYMax meet" aria-hidden="true" style="--stride:${p.stride}s">
+    <ellipse class="shadow" cx="100" cy="197" rx="72" ry="6"/>
+    <g class="spray"><circle cx="38" cy="170" r="2.4"/><circle cx="34" cy="168" r="1.8"/><circle cx="42" cy="172" r="1.6"/><circle cx="36" cy="171" r="2"/></g>
+    <g class="body">
+      <g class="legB"><path class="limb" d="M92 125 L68 152 L42 168"/><path class="skate" d="M30 165 L56 175"/></g>
+      <g class="armB"><path class="limb arm" d="M116 86 L128 108 L146 116"/></g>
+      <path class="limb torso" d="M90 124 L122 80"/>
+      <text class="num" x="106" y="108" transform="rotate(-54 106 103)">${p.no}</text>
+      <circle class="hip" cx="90" cy="126" r="14"/>
+      <g class="legF"><path class="limb" d="M92 125 L118 155 L108 190"/><path class="skate" d="M96 193 L130 193"/></g>
+      <circle class="helmet" cx="134" cy="62" r="12.5"/>
+      <path class="visor" d="M139 59 L148 63"/>
+      <g class="armF">
+        <path class="limb arm" d="M120 82 L140 100 L152 112"/>
+        <line class="stick" x1="150" y1="108" x2="182" y2="188"/>
+        <path class="blade" d="M180 189 L202 187"/>
+        <circle class="glove" cx="151" cy="111" r="6"/>
+        <ellipse class="puck" cx="208" cy="191" rx="6" ry="2.6"/>
+      </g>
+    </g>
+  </svg>`;
+}
+
+function streaks(n, fast) {
+  let out = '';
+  for (let i = 0; i < n; i++) {
+    out += `<span class="streak" style="top:${rand(8, 78).toFixed(0)}%;--d:${(fast ? rand(.35, .6) : rand(1.1, 2)).toFixed(2)}s;--delay:-${rand(0, 2).toFixed(2)}s;opacity:${rand(.3, .9).toFixed(2)}"></span>`;
+  }
+  return out;
+}
+function sparks(n) {
+  let out = '';
+  for (let i = 0; i < n; i++) {
+    out += `<span class="spark" style="left:${rand(4, 96).toFixed(0)}%;--d:${rand(2.4, 4.5).toFixed(2)}s;--delay:-${rand(0, 4).toFixed(2)}s;--dx:${rand(-20, 20).toFixed(0)}px"></span>`;
+  }
+  return out;
+}
+function fx(type) {
+  switch (type) {
+    case 'speed': return streaks(16, true);
+    case 'cannon': return '<span class="ring"></span><span class="ring"></span><span class="ring"></span>' + streaks(4);
+    case 'motm': return '<span class="rays"></span>' + sparks(14);
+    case 'iron': return sparks(18) + streaks(4);
+    case 'playmaker': return `<svg class="net" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M12 22 L38 40 L62 18 L88 38 M38 40 L28 72 L66 66 L88 38 M62 18 L66 66"/>
+        <circle cx="12" cy="22" r="1.6"/><circle cx="38" cy="40" r="1.6"/><circle cx="62" cy="18" r="1.6"/><circle cx="88" cy="38" r="1.6"/><circle cx="28" cy="72" r="1.6"/><circle cx="66" cy="66" r="1.6"/></svg>` + streaks(3);
+    case 'sniper': return '<span class="scope"></span><span class="scope inner"></span>' + streaks(4);
+    default: return streaks(6);
+  }
+}
+
+function kpiRow(x) {
+  const top = x.rank === 1;
+  return `<li class="kpi">
+    <span class="kn" title="${x.label}">${x.label}</span>
+    <span class="kv">${x.value}${x.unit ? `<small>${x.unit}</small>` : ''}</span>
+    <span class="rank${top ? ' top' : ''}" aria-label="Rank ${x.rank} of ${PLAYERS_IN_MATCH}">#${x.rank}</span>
+    <span class="bar" aria-hidden="true"><i style="--w:${pct(x.rank).toFixed(0)}%"></i></span>
+  </li>`;
+}
+
+function backFace(p, t) {
+  const kp = p.kpis.map(x => `<dt>${x.label} <span>${x.value}${x.unit ? ' ' + x.unit : ''} · #${x.rank}/${PLAYERS_IN_MATCH}</span></dt><dd>${DEFS[x.short]}${x.detail ? ` (${x.detail})` : ''}</dd>`).join('');
+  return `<div class="face back" inert>
+    <h4>${p.first} ${p.last}</h4>
+    <p class="sub">#${p.no} · ${t.name}</p>
+    <p class="story">${p.story}</p>
+    <dl>${kp}</dl>
+    <p class="src">Rank among all ${PLAYERS_IN_MATCH} players · Wisehockey, 31.12.2025</p>
+    <button class="flip-btn" type="button" aria-label="Show front of ${p.first} ${p.last} card">${ICONS.back}</button>
+  </div>`;
+}
+
+function card(p, theme, special) {
+  const t = TEAMS[p.team];
+  const r = rating(p);
+  const style = `--c1:${t.c1};--c2:${t.c2};--jersey:${t.jersey};--leg:${t.leg};--sweep-delay:${rand(0, 5).toFixed(1)}s`;
+  const cls = special ? `special special-${special.type}` : `theme-${theme}`;
+  const kpis = special ? p.kpis.slice(1) : p.kpis;
+  const hero = special ? `<p class="hero"><span class="hv" data-to="${special.hero.to}" data-dec="${special.hero.dec ?? 0}" data-fmt="${special.hero.fmt || ''}">${formatHero(special.hero, special.hero.to)}</span><span class="hu">${special.hero.unit}</span><span class="hl">${special.hero.label}</span></p>` : '';
+  const label = special ? `${special.badge}: ${p.first} ${p.last}` : `${p.first} ${p.last}, ${p.title}`;
+  return `<div class="card-wrap">
+  <article class="card ${cls}" style="${style}" aria-label="${label}">
+    <div class="card-inner">
+      <div class="face front"><div class="inner">
+        <div class="art">
+          <div class="fx" aria-hidden="true">${fx(special?.type)}</div>
+          <span class="bignum" aria-hidden="true">${p.no}</span>
+          <div class="ice" aria-hidden="true"></div>
+          ${skater(p)}
+          <div class="rating"><span class="r" aria-label="Match rating ${r}">${r}</span><span class="rl" aria-hidden="true">MR</span><span class="tm" title="${t.name}">${t.short}</span></div>
+          ${special
+            ? `<span class="sbadge">${ICONS[special.icon]}${special.badge}</span>`
+            : `<span class="tier">${tier(r)}</span>`}
+        </div>
+        <div class="cbody">
+          <p class="first">${p.first} · #${p.no}</p>
+          <h3 class="last">${p.last}</h3>
+          <p class="ctitle">${p.title}</p>
+          ${hero}
+          <ul class="kpis">${kpis.map(kpiRow).join('')}</ul>
+          <div class="foot"><span>USC 3–6 HCD</span><span>31.12.25</span></div>
+        </div>
+        <div class="holo" aria-hidden="true"></div><div class="glare" aria-hidden="true"></div><div class="shine" aria-hidden="true"></div>
+        <button class="flip-btn" type="button" aria-label="Show details for ${p.first} ${p.last}">${ICONS.info}</button>
+      </div></div>
+      ${backFace(p, t)}
+    </div>
+  </article></div>`;
+}
+
+function formatHero(h, v) {
+  if (h.fmt === 'mmss') {
+    const s = Math.round(v);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+  return Number(v).toFixed(h.dec ?? 0);
+}
+
+/* ---------- render ---------- */
+const VARIANTS = [
+  { theme: 'gold', name: 'A · Classic Gold', text: 'Vertraut wie EAFC- oder Panini-Karten: Goldrahmen und klare Reihenfolge von Rating über Name zu den KPIs. Passt als Standard-Edition.' },
+  { theme: 'holo', name: 'B · Holo Prism', text: 'Holografische Folie, die auf Maus und Neigung reagiert. Gedacht für seltene Karten (Elite).' },
+  { theme: 'neon', name: 'C · Night Ice', text: 'Dunkler Grund mit Neon in der Teamfarbe. Hoher Kontrast, eignet sich gut für Mobile und Dark Mode.' },
+  { theme: 'glass', name: 'D · Glass Motion', text: 'Das Bewegtbild füllt die ganze Karte, die KPIs liegen auf Milchglas. Ideal, sobald echte Clips vorliegen.' },
+];
+document.getElementById('variants').innerHTML = VARIANTS.map(v =>
+  `<div class="variant">${card(byId.tambellini, v.theme)}<h3>${v.name}</h3><p>${v.text}</p></div>`).join('');
+
+document.getElementById('specials').innerHTML = SPECIALS.map(s => card(byId[s.pid], null, s)).join('');
+
+const collection = document.getElementById('collection');
+function renderCollection(theme) {
+  collection.innerHTML = PLAYERS.map(p => card(p, theme)).join('');
+}
+renderCollection('gold');
+document.getElementById('themeSwitch').addEventListener('change', e => renderCollection(e.target.value));
+
+/* ---------- interactions ---------- */
+document.addEventListener('pointermove', e => {
+  if (REDUCE || e.pointerType === 'touch') return;
+  const wrap = e.target.closest('.card-wrap');
+  if (!wrap) return;
+  const c = wrap.querySelector('.card');
+  const r = wrap.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width;
+  const y = (e.clientY - r.top) / r.height;
+  c.style.setProperty('--rx', `${((.5 - y) * 14).toFixed(2)}deg`);
+  c.style.setProperty('--ry', `${((x - .5) * 18).toFixed(2)}deg`);
+  c.style.setProperty('--mx', `${(x * 100).toFixed(1)}%`);
+  c.style.setProperty('--my', `${(y * 100).toFixed(1)}%`);
+  c.classList.add('tilting');
+});
+document.addEventListener('pointerout', e => {
+  const wrap = e.target.closest('.card-wrap');
+  if (!wrap || wrap.contains(e.relatedTarget)) return;
+  const c = wrap.querySelector('.card');
+  c.classList.remove('tilting');
+  c.style.setProperty('--rx', '0deg');
+  c.style.setProperty('--ry', '0deg');
+});
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.flip-btn');
+  if (!btn) return;
+  const c = btn.closest('.card');
+  const flipped = c.classList.toggle('flipped');
+  const front = c.querySelector('.front');
+  const back = c.querySelector('.back');
+  front.inert = flipped;
+  back.inert = !flipped;
+  (flipped ? back : front).querySelector('.flip-btn').focus({ preventScroll: true });
+});
+
+/* Count-up for special hero stats when they scroll into view */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    io.unobserve(en.target);
+    if (REDUCE) return;
+    const el = en.target;
+    const h = { to: parseFloat(el.dataset.to), dec: parseInt(el.dataset.dec, 10), fmt: el.dataset.fmt };
+    const t0 = performance.now(), dur = 1100;
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      el.textContent = formatHero(h, h.to * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}, { threshold: .6 });
+document.querySelectorAll('.hero .hv').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

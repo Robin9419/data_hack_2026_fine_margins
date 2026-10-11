@@ -1,0 +1,508 @@
+{
+  "research_date": "2026-10-11",
+  "intended_use": "Private internal demo",
+  "players": [
+    {
+      "entity_id": "150983",
+      "name": "Sandro Aeschlimann",
+      "jersey": 29,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/29_Sandro_Aeschlimann_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "337830",
+      "name": "Matej Stransky",
+      "jersey": 44,
+      "team": "HC Davos",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/18/Mat%C4%9Bj_Str%C3%A1nsk%C3%BD_%2814452374314%29.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Mat%C4%9Bj_Str%C3%A1nsk%C3%BD_(14452374314).jpg",
+      "rights_status": "not established",
+      "notes": [
+        "Existing repository mockup candidate; credit Colin Peddle / TheAHL, CC BY 2.0 according to mockup; independently verify license."
+      ]
+    },
+    {
+      "entity_id": "301617",
+      "name": "Tino Kessler",
+      "jersey": 72,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/72_Tino_Kessler_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "340162",
+      "name": "Klas Dahlbeck",
+      "jersey": 6,
+      "team": "HC Davos",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Klas_Dahlbeck_%2815808098940%29.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Klas_Dahlbeck_(15808098940).jpg",
+      "rights_status": "CC BY-SA 2.0",
+      "notes": [
+        "Historical photo; Commons metadata retrieved. Visual identity and crop need review."
+      ],
+      "attribution": "<a rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/15257592@N08\">Lisa Gansky</a> from New York, NY, USA",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0"
+    },
+    {
+      "entity_id": "308175",
+      "name": "Nico Gross",
+      "jersey": 77,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/77_Nico_Gross_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "347698",
+      "name": "Rasmus Asplund",
+      "jersey": 74,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/74_Rasmus_Asplund_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "888057603",
+      "name": "Larry Keenan",
+      "jersey": 17,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/umassathletics.com/images/2025/9/26/Keenan.png",
+      "source_url": "https://umassathletics.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official roster portrait; abbreviated image alt text, full name confirmed in roster."
+      ]
+    },
+    {
+      "entity_id": "888057597",
+      "name": "Adam Gajan",
+      "jersey": 30,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://umdbulldogs.com/images/2025/10/1/30_gajan.png",
+      "source_url": "https://umdbulldogs.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "888057617",
+      "name": "Quinn Finley",
+      "jersey": 19,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/uwbadgers.com/images/2025/8/12/Finley.png",
+      "source_url": "https://uwbadgers.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official roster portrait; HCD current season images may postdate the final."
+      ]
+    },
+    {
+      "entity_id": "888057609",
+      "name": "T.J. Hughes",
+      "jersey": 13,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://mgoblue.com/images/2025/8/30/Hughes_TJ.jpg",
+      "source_url": "https://mgoblue.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": []
+    },
+    {
+      "entity_id": "888057601",
+      "name": "Eric Pohlkamp",
+      "jersey": 23,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/denverpioneers.com/images/2025/10/3/Pohlkamp_Eric_2025_HS_crop_Jt7G3.jpg",
+      "source_url": "https://denverpioneers.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "888057610",
+      "name": "Aiden Fink",
+      "jersey": 18,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://gopsusports.com/imgproxy/Gtm8e1JkM8M148BnPILqQOy4_5ZYIsGTVSm0de2cZF4/rs:fit:1980:0:0:0/g:ce:0:0/q:90/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2dvcHN1c3BvcnRzLXByb2QvMjAyMy8xMi8wMS9lUWh1UHV0cUY1U0ZVRVZaMFFUYzEwaFIxNUZxYjhZMExEZnN3QlhaLmpwZw.jpg",
+      "source_url": "https://gopsusports.com/sports/mens-ice-hockey/roster/season/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster photo metadata, 2025/26."
+      ]
+    },
+    {
+      "entity_id": "888057614",
+      "name": "Matt Dimarsico",
+      "jersey": 14,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://gopsusports.com/imgproxy/b9o-IcPV07MPVu0Ii2qzYxu5N83mSEB_Mk7Awn7FYDk/rs:fit:1980:0:0:0/g:ce:0:0/q:90/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2dvcHN1c3BvcnRzLXByb2QvMjAyMy8xMi8wMS9CdkNiZHBwOWw4cTVWY2Q2WG9qaGpWeGtOakFnRGxQeWFVeFhzRVAzLmpwZw.jpg",
+      "source_url": "https://gopsusports.com/sports/mens-ice-hockey/roster/season/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster photo metadata, 2025/26."
+      ]
+    },
+    {
+      "entity_id": "143575",
+      "name": "Enzo Corvi",
+      "jersey": 70,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/70_Enzo_Corvi_1.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "888057606",
+      "name": "Charlie Cerrato",
+      "jersey": 15,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://gopsusports.com/imgproxy/JEjB9iS3Pwl26X-IM0rwU0U_nf8QGD2vtvJ-Bz-n0Rc/rs:fit:1980:0:0:0/g:ce:0:0/q:90/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2dvcHN1c3BvcnRzLXByb2QvMjAyNC8wOC8zMC9Lekt4WlA5RXNBRWN4alp5aTJRRVRuTkhraTVHaFI5bDlVTTBWdFM4LmpwZw.jpg",
+      "source_url": "https://gopsusports.com/sports/mens-ice-hockey/roster/season/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster photo metadata, 2025/26."
+      ]
+    },
+    {
+      "entity_id": "888057604",
+      "name": "Gavin McCartthy",
+      "jersey": 2,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/goterriers.com/images/2025/9/25/McCarthyHS.jpg",
+      "source_url": "https://goterriers.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "888057615",
+      "name": "JJ Wiebusch",
+      "jersey": 86,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://gopsusports.com/imgproxy/mxazTaqp9QSWErD1kgAQAt0kG-cdLuGtZMcY0SvwWb4/rs:fit:1980:0:0:0/g:ce:0:0/q:90/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2dvcHN1c3BvcnRzLXByb2QvMjAyNC8wOC8zMC9GdlBEdlE3NWlwVDdmZzJOSm9scTlxbko5VDJoUlNCTncybGJhYjY1LmpwZw.jpg",
+      "source_url": "https://gopsusports.com/sports/mens-ice-hockey/roster/season/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster photo metadata, 2025/26."
+      ]
+    },
+    {
+      "entity_id": "345038",
+      "name": "Adam Tambellini",
+      "jersey": 19,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/19_Adam_Tambellini_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "305976",
+      "name": "Yannick Frehner",
+      "jersey": 93,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/93_Yannick_Frehner_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "888057600",
+      "name": "Jake Livanavage",
+      "jersey": 4,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://d1grw3qt5jab4c.cloudfront.net/images/2025/9/2/Livanavage_Jake_25_UGeZl.jpg",
+      "source_url": "https://fightinghawks.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "152416",
+      "name": "Sven Jung",
+      "jersey": 90,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/90_Sven_Jung_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "322236",
+      "name": "Calle Andersson",
+      "jersey": 55,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/55_Calle_Andersson_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "888057602",
+      "name": "Vincent Borgesi",
+      "jersey": 44,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://nuhuskies.com/images/2025/9/15/22_-_Borgesi.jpg",
+      "source_url": "https://nuhuskies.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official roster portrait; HCD current season images may postdate the final."
+      ]
+    },
+    {
+      "entity_id": "888057613",
+      "name": "Zam Plante",
+      "jersey": 27,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://umdbulldogs.com/images/2025/9/5/ZAM_PLANTE.png",
+      "source_url": "https://umdbulldogs.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "888057612",
+      "name": "Jack Musa",
+      "jersey": 9,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/umassathletics.com/images/2025/9/26/Musa.png",
+      "source_url": "https://umassathletics.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "347294",
+      "name": "Brendan Lemieux",
+      "jersey": 22,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/22_Brendan_Lemieux_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "153736",
+      "name": "Lukas Frick",
+      "jersey": 38,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/38_Lukas_Frick_1.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "312287",
+      "name": "Davyd Barandun",
+      "jersey": 57,
+      "team": "HC Davos",
+      "image_url": null,
+      "source_url": null,
+      "rights_status": "not established",
+      "notes": []
+    },
+    {
+      "entity_id": "345037",
+      "name": "Simon Ryfors",
+      "jersey": 15,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/15_Simon_Ryfors_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "346405",
+      "name": "Filip Zadina",
+      "jersey": 18,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/18_Filip_Zadina_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "888057611",
+      "name": "Joey Muldowney",
+      "jersey": 8,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/uconnhuskies.com/images/2023/9/15/Joey_Muldowney_HS.jpg",
+      "source_url": "https://uconnhuskies.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official roster portrait; abbreviated image alt text, full name confirmed in roster."
+      ]
+    },
+    {
+      "entity_id": "888057599",
+      "name": "Mac Gadowsky",
+      "jersey": 5,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://gopsusports.com/imgproxy/148LNra8RKVMCXSv6aAo9bltKX7BP1FC58b5ux6aKxo/rs:fit:1980:0:0:0/g:ce:0:0/q:90/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2dvcHN1c3BvcnRzLXByb2QvMjAyNS8wOS8yNS9QdENTbllNZ0dsT0tiSjYzQkJOeXgxNDJtdFdQVTg3UmkyQ2V4ekxDLmpwZw.jpg",
+      "source_url": "https://gopsusports.com/sports/mens-ice-hockey/roster/season/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster photo metadata, 2025/26."
+      ]
+    },
+    {
+      "entity_id": "312365",
+      "name": "Simon Knak",
+      "jersey": 36,
+      "team": "HC Davos",
+      "image_url": null,
+      "source_url": null,
+      "rights_status": "not established",
+      "notes": []
+    },
+    {
+      "entity_id": "309618",
+      "name": "Valentin Nussbaumer",
+      "jersey": 66,
+      "team": "HC Davos",
+      "image_url": "https://backend.hcd.ch/sites/default/files/2026-08/66_Valentin_Nussbaumer_0.png",
+      "source_url": "https://www.hcd.ch/de/teams/mens-team?tab=team",
+      "rights_status": "not established",
+      "notes": [
+        "Official 2026/27 portrait, later than the final; not a final-game photograph."
+      ]
+    },
+    {
+      "entity_id": "154648",
+      "name": "Chris Egli",
+      "jersey": 96,
+      "team": "HC Davos",
+      "image_url": null,
+      "source_url": null,
+      "rights_status": "not established",
+      "notes": []
+    },
+    {
+      "entity_id": "888057605",
+      "name": "Abram Wiebe",
+      "jersey": 25,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://d1grw3qt5jab4c.cloudfront.net/images/2025/9/2/Wiebe_Abram_25_Jrbe1.jpg",
+      "source_url": "https://fightinghawks.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "888057607",
+      "name": "Cole Knuble",
+      "jersey": 22,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://fightingirish.com/imgproxy/GYDONxltiMB0EPT9WwA40dzY56w0qCLELXlnzFRplIA/rs:fit:1980:0:0:0/g:ce:0:0/q:90/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2ZpZ2h0aW5naXJpc2gtY29tLzIwMjUvMDkvMjItS251YmxlLmpwZw.jpg",
+      "source_url": "https://fightingirish.com/sports/mhockey/roster/season/2025-26/",
+      "rights_status": "not established",
+      "notes": [
+        "Official roster photo metadata."
+      ]
+    },
+    {
+      "entity_id": "888057608",
+      "name": "Danny Nelson",
+      "jersey": 11,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://fightingirish.com/imgproxy/t7u4au9VoG-tgLK1x9d0xBd7CA-OsfjGFXZ9SSw2NZo/rs:fit:1980:0:0:0/g:ce:0:0/q:90/aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29tL2ZpZ2h0aW5naXJpc2gtY29tLzIwMjUvMDkvMTEtTmVsc29uLUQuLmpwZw.jpg",
+      "source_url": "https://fightingirish.com/sports/mhockey/roster/season/2025-26/",
+      "rights_status": "not established",
+      "notes": [
+        "Official roster photo metadata."
+      ]
+    },
+    {
+      "entity_id": "888057616",
+      "name": "Ryan Walsh",
+      "jersey": 21,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://cornellbigred.com/images/2025/8/27/Walsh_Ryan_26_cropped.jpg",
+      "source_url": "https://cornellbigred.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "310806",
+      "name": "Enzo Guebey",
+      "jersey": 12,
+      "team": "HC Davos",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/df/2024-05-06_Deutschland_gegen_Frankreich_%28Eishockey-L%C3%A4nderspiel%29_by_Sandro_Halank%E2%80%93069.jpg",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2024-05-06_Deutschland_gegen_Frankreich_(Eishockey-L%C3%A4nderspiel)_by_Sandro_Halank%E2%80%93069.jpg",
+      "rights_status": "CC BY-SA 4.0",
+      "notes": [
+        "Historical photo; Commons metadata retrieved. Visual identity and crop need review."
+      ],
+      "attribution": "<a href=\"//commons.wikimedia.org/wiki/User:Sandro_Halank\" title=\"User:Sandro Halank\">Sandro Halank, Wikimedia Commons</a>",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+    },
+    {
+      "entity_id": "888057619",
+      "name": "Martins Lavins",
+      "jersey": 6,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://dxbhsrqyrr690.cloudfront.net/sidearm.nextgen.sites/unh.sidearmsports.com/images/2025/7/31/Marty_Lavins_DSC5573.png",
+      "source_url": "https://unhwildcats.com/sports/mens-ice-hockey/roster/2025-26",
+      "rights_status": "not established",
+      "notes": [
+        "Official college roster, 2025/26; source markup associates image with player."
+      ]
+    },
+    {
+      "entity_id": "888057861",
+      "name": "Leonid Komarov",
+      "jersey": 47,
+      "team": "HC Davos",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/10/Leo_Komarov%2C_Finland-Russia_IHWC_2012_Simifinal.JPG",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Leo_Komarov,_Finland-Russia_IHWC_2012_Simifinal.JPG",
+      "rights_status": "CC BY-SA 3.0",
+      "notes": [
+        "Historical photo; Commons metadata retrieved. Visual identity and crop need review."
+      ],
+      "attribution": "<a href=\"//commons.wikimedia.org/wiki/User:Hellmaster_ru\" title=\"User:Hellmaster ru\">Alexey Chernyadyev</a>",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+    }
+  ]
+}

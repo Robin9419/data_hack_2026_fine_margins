@@ -1,5 +1,5 @@
 {
-  "_comment": "Metric library. 'column' is the header in the Wisehockey match statistics CSV. Definitions follow 'wh_portal Data Dictionaries 2026.pdf' (section 9), rewritten in plain language.",
+  "_comment": "Metric library. 'column' is the header in the Wisehockey match statistics CSV. Metrics with 'goalkeeper': true use columns counted from the match events CSV instead (see _load_goalie_stats in content.py) and are ranked among goalkeepers only. Definitions follow 'wh_portal Data Dictionaries 2026.pdf' (section 9), rewritten in plain language.",
   "metrics": [
     {
       "id": "goals",
@@ -144,6 +144,52 @@
       "higher_is_better": true,
       "definition": "How many times the player won a contested puck, a one-on-one fight for a loose puck.",
       "source_definition": "PCW — Number of a player's puck contest wins"
+    },
+    {
+      "id": "saves",
+      "column": "Saves",
+      "goalkeeper": true,
+      "label": "Saves",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Shots on goal the goalkeeper stopped.",
+      "source_definition": "Counted from match events: Shot events with ShotResult 'Saved' where the player is the goalkeeper"
+    },
+    {
+      "id": "shots_on_goal_against",
+      "column": "Shots on goal against",
+      "goalkeeper": true,
+      "label": "Shots on goal faced",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Shots that would have gone in without a save. More shots faced means a busier night in net.",
+      "source_definition": "Counted from match events: Shot events with ShotResult 'Saved' or 'Goal' where the player is the goalkeeper"
+    },
+    {
+      "id": "shot_attempts_against",
+      "column": "Shot attempts against",
+      "goalkeeper": true,
+      "label": "Shot attempts faced",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Every shot the opponent aimed at this goalkeeper's net, including shots that were blocked or missed.",
+      "source_definition": "Counted from match events: all Shot events where the player is the goalkeeper"
+    },
+    {
+      "id": "save_pct",
+      "column": "SV-%",
+      "count_column": "Saves",
+      "total_column": "Shots on goal against",
+      "goalkeeper": true,
+      "label": "Save percentage",
+      "format": "pct",
+      "unit": "%",
+      "higher_is_better": true,
+      "definition": "Share of shots on goal the goalkeeper stopped.",
+      "source_definition": "Saves divided by shots on goal faced, counted from match events"
     }
   ]
 }

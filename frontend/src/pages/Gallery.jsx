@@ -1,18 +1,24 @@
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import { useAuth } from '../auth'
 import CardTile from '../components/CardTile'
 
 export default function Gallery() {
   const location = useLocation()
-  const starterCardIds = location.state?.starterCardIds ?? []
+  const navigate = useNavigate()
+  const { setProgress } = useAuth()
+  const newCardIds = location.state?.newCardIds ?? []
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
 
   const load = () =>
     api
       .cards()
-      .then((data) => setCards(data.cards))
+      .then((data) => {
+        setCards(data.cards)
+        setProgress(data.progress)
+      })
       .catch((err) => setError(err.message))
 
   useEffect(() => {
@@ -20,8 +26,9 @@ export default function Gallery() {
   }, [])
 
   const onReset = async () => {
-    await api.reset()
-    load()
+    const data = await api.reset()
+    setProgress(data.progress)
+    navigate('/pack', { state: { pack: data.pack } })
   }
 
   if (error) return <p className="error">{error}</p>
@@ -31,9 +38,10 @@ export default function Gallery() {
 
   return (
     <section>
-      {starterCardIds.length > 0 && (
+      {newCardIds.length > 0 && (
         <div className="banner">
-          Welcome! You received {starterCardIds.length} free starter cards. Tap a card to see its stats.
+          {newCardIds.length} new {newCardIds.length === 1 ? 'card' : 'cards'} added to your collection. Tap a card to
+          see its stats.
         </div>
       )}
 
@@ -44,14 +52,22 @@ export default function Gallery() {
         </span>
       </div>
 
+      <Link to="/quiz" className="quiz-cta">
+        <span>
+          <strong>Play trivia, win more cards</strong>
+          <small>Three questions about the game. Answer at the stadium for the exclusive Stadium edition.</small>
+        </span>
+        <span aria-hidden="true">→</span>
+      </Link>
+
       <div className="card-grid">
         {cards.map((card) => (
-          <CardTile key={card.id} card={card} isNew={starterCardIds.includes(card.id)} />
+          <CardTile key={card.id} card={card} isNew={newCardIds.includes(card.id)} />
         ))}
       </div>
 
       <button className="link-button reset" onClick={onReset}>
-        Reset collection to starter pack
+        Reset collection and start over with a new starter pack
       </button>
     </section>
   )

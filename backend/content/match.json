@@ -8,5 +8,7 @@
   "home_score": 3,
   "away_score": 6,
   "stats_file": "U.S. Collegiate Selects_HC Davos_Wisehockey_Match_Statistics_31_12_2025 All.csv",
-  "source": "Wisehockey match statistics, 31.12.2025"
+  "events_file": "U.S. Collegiate Selects_HC Davos_Wisehockey_Match_Events_31_12_2025.csv",
+  "source": "Wisehockey match statistics, 31.12.2025",
+  "events_source": "Wisehockey match events, 31.12.2025"
 }

@@ -3,8 +3,12 @@
 Run from the backend folder:  uvicorn app.main:app --reload
 """
 
+import random
+
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 from . import db
@@ -42,18 +46,25 @@ class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=40)
 
 
+def open_pack(user_id: int) -> list[dict]:
+    """Draws distinct random cards, adds them to the collection and returns them in full."""
+    content = get_content()
+    drawn = random.sample(list(content.cards), min(content.pack_size, len(content.cards)))
+    new_ids = db.grant_cards(user_id, drawn)
+    return [{**content.cards[cid], "owned": True, "is_new": cid in new_ids} for cid in drawn]
+
+
+def progress_for(user_id: int) -> dict:
+    return get_content().progress(db.owned_cards(user_id))
+
+
 @app.post("/api/login")
 def login(body: LoginRequest):
-    """Dummy sign-in: any username works. New users get the starter pack."""
-    content = get_content()
-    user, created = db.get_or_create_user(body.username.strip(), content.starter_card_ids)
+    """Dummy sign-in: any username works. Only a brand new account gets a starter pack."""
+    user, created = db.get_or_create_user(body.username.strip())
     token = db.create_session(user["id"])
-    return {
-        "token": token,
-        "user": user,
-        "new_user": created,
-        "starter_card_ids": content.starter_card_ids if created else [],
-    }
+    pack = open_pack(user["id"]) if created else None
+    return {"token": token, "user": user, "new_user": created, "pack": pack}
 
 
 @app.post("/api/logout")
@@ -64,9 +75,7 @@ def logout(authorization: str | None = Header(default=None)):
 
 @app.get("/api/me")
 def me(user: dict = Depends(current_user)):
-    content = get_content()
-    owned = db.owned_cards(user["id"])
-    return {"user": user, "owned_count": len(owned), "total_cards": len(content.cards)}
+    return {"user": user, "progress": progress_for(user["id"])}
 
 
 @app.get("/api/cards")
@@ -80,7 +89,7 @@ def list_cards(user: dict = Depends(current_user)):
             result.append({**card, "owned": True, "edition": owned[card_id]})
         else:
             result.append({**content.card_summary(card), "owned": False})
-    return {"cards": result}
+    return {"cards": result, "progress": content.progress(owned)}
 
 
 @app.get("/api/cards/{card_id}")
@@ -102,6 +111,74 @@ def list_metrics():
 
 @app.post("/api/reset")
 def reset(user: dict = Depends(current_user)):
-    """Restore the user's collection to the starter pack (for demos/testing)."""
-    db.reset_cards(user["id"], get_content().starter_card_ids)
-    return {"ok": True}
+    """Empty the user's collection and open a fresh starter pack (for demos/testing)."""
+    db.clear_cards(user["id"])
+    return {"pack": open_pack(user["id"]), "progress": progress_for(user["id"])}
+
+
+QUESTIONS_PER_ROUND = 3
+
+
+class QuizStart(BaseModel):
+    # Self-reported in this demo. A real product would verify it (ticket scan, geofence, in-arena Wi-Fi).
+    venue: Literal["home", "stadium"]
+
+
+class QuizAnswer(BaseModel):
+    option_id: str
+
+
+def _edition(venue: str) -> str:
+    return "stadium" if venue == "stadium" else "standard"
+
+
+@app.post("/api/quiz/start")
+def quiz_start(body: QuizStart, user: dict = Depends(current_user)):
+    """Three questions (three options each), each about one card the user can still win. At home that is a card
+    they don't own; at the stadium it is also a card they own only as the home edition."""
+    content = get_content()
+    owned = db.owned_cards(user["id"])
+    stadium = body.venue == "stadium"
+    eligible = [cid for cid in content.cards if cid not in owned or (stadium and owned[cid] != "stadium")]
+    picks = random.sample(eligible, min(QUESTIONS_PER_ROUND, len(eligible)))
+    built = [(cid, content.build_question(cid, random)) for cid in picks]
+    ids = db.create_quiz(user["id"], body.venue, [(cid, q["option_ids"]) for cid, q in built])
+
+    def option(card_id: str) -> dict:
+        player = content.cards[card_id]["player"]
+        return {"id": card_id, "name": f'{player["first_name"]} {player["last_name"]}', "team": player["team"]}
+
+    questions = [
+        {
+            "id": qid,
+            "prompt": q["prompt"],
+            "clue": q["clue"],
+            "match": q["match"],
+            "reward": "upgrade" if cid in owned else "new",
+            "options": [option(oid) for oid in q["option_ids"]],
+        }
+        for qid, (cid, q) in zip(ids, built)
+    ]
+    return {"venue": body.venue, "questions": questions}
+
+
+@app.post("/api/quiz/{question_id}/answer")
+def quiz_answer(question_id: int, body: QuizAnswer, user: dict = Depends(current_user)):
+    """One attempt per question. A right answer unlocks the card in the quiz's edition."""
+    question = db.get_question(user["id"], question_id)
+    if not question:
+        raise HTTPException(404, "Question not found")
+    if question["answered"]:
+        raise HTTPException(409, "Already answered")
+    if body.option_id not in question["option_ids"]:
+        raise HTTPException(400, "Not one of the options")
+    db.mark_answered(question_id)
+    if body.option_id != question["card_id"]:
+        content = get_content()
+        player = content.cards[question["card_id"]]["player"]
+        return {"correct": False, "answer": f'{player["first_name"]} {player["last_name"]}'}
+
+    edition = _edition(question["venue"])
+    result = db.grant_card(user["id"], question["card_id"], edition)
+    card = {**get_content().cards[question["card_id"]], "owned": True, "edition": edition}
+    return {"correct": True, "result": result, "card": card, "progress": progress_for(user["id"])}

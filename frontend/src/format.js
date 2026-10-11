@@ -8,3 +8,6 @@ export const ordinal = (n) => {
   const v = n % 100
   return n + (s[(v - 20) % 10] || s[v] || s[0])
 }
+
+// CSS class for the team colours on a card.
+export const teamClass = (team) => (team === 'HC Davos' ? 'team-hcd' : 'team-usc')

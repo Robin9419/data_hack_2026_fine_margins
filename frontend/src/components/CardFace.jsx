@@ -1,0 +1,48 @@
+import { teamClass } from '../format'
+import PlayerPhoto from './PlayerPhoto'
+
+// Front of a card: photo, archetype, name, position and team. Nothing else.
+// state: 'owned' (full colour), 'locked' (gallery: grayed out photo only, no info) or 'hidden'
+// (a mystery card in a pack: no photo, name or archetype, so nothing leaks before it is revealed).
+// A card with edition 'stadium' gets the foil design.
+export default function CardFace({ card, state = 'owned' }) {
+  if (state === 'locked') {
+    return (
+      <div className={`card-face ${teamClass(card.player.team)} locked`}>
+        <PlayerPhoto player={card.player} className="card-art" />
+      </div>
+    )
+  }
+
+  if (state !== 'owned') {
+    return (
+      <div className={`card-face mystery ${state}`}>
+        <span className="mystery-mark">?</span>
+        <div className="card-info">
+          <p className="card-archetype">? ? ?</p>
+          <p className="card-name">Mystery player</p>
+        </div>
+      </div>
+    )
+  }
+
+  const { player } = card
+  const stadium = card.edition === 'stadium'
+  return (
+    <div className={`card-face ${teamClass(player.team)} ${stadium ? 'edition-stadium' : ''} ${state}`}>
+      <PlayerPhoto player={player} className="card-art" />
+      {stadium && <span className="edition-badge">🏟 Stadium</span>}
+      <div className="card-info">
+        <p className="card-archetype">{card.title}</p>
+        <p className="card-name">
+          <span className="card-first">{player.first_name}</span>
+          {player.last_name}
+        </p>
+        <p className="card-meta">
+          {player.position ? `${player.position} · ` : ''}
+          {player.team}
+        </p>
+      </div>
+    </div>
+  )
+}

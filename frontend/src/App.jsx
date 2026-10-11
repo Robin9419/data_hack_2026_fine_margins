@@ -3,6 +3,9 @@ import { useAuth } from './auth'
 import Login from './pages/Login'
 import Gallery from './pages/Gallery'
 import CardDetail from './pages/CardDetail'
+import PackOpening from './pages/PackOpening'
+import Quiz from './pages/Quiz'
+import RewardBar from './components/RewardBar'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
@@ -29,6 +32,8 @@ export default function App() {
         )}
       </header>
 
+      <RewardBar />
+
       <main>
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
@@ -37,6 +42,22 @@ export default function App() {
             element={
               <RequireAuth>
                 <Gallery />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/pack"
+            element={
+              <RequireAuth>
+                <PackOpening />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/quiz"
+            element={
+              <RequireAuth>
+                <Quiz />
               </RequireAuth>
             }
           />

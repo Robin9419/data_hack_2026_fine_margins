@@ -17,7 +17,7 @@ export default function AttributeRow({ attr }) {
       </button>
       {attr.match_rank && (
         <p className="muted small">
-          {ordinal(attr.match_rank)} of {attr.players_in_match} players in this match
+          {ordinal(attr.match_rank)} of {attr.players_in_match} {attr.rank_pool} in this match
           {attr.detail ? ` · ${attr.detail}` : ''}
         </p>
       )}

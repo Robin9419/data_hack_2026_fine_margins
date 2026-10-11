@@ -16,7 +16,9 @@ export default function Login() {
     setError(null)
     try {
       const data = await login(username.trim())
-      navigate('/', { state: { starterCardIds: data.starter_card_ids } })
+      // Only a brand new account gets a starter pack.
+      if (data.pack) navigate('/pack', { state: { pack: data.pack } })
+      else navigate('/')
     } catch (err) {
       setError(err.message)
       setSubmitting(false)
@@ -27,7 +29,7 @@ export default function Login() {
     <section className="login">
       <h1>The match is over. Who made the difference?</h1>
       <p className="muted">
-        Collect the performances that defined the game. Sign in with any name to get three free starter cards.
+        Collect the performances that defined the game. New here? Sign in with any name and open your three free starter cards. Win more by answering trivia about the game.
       </p>
       <form onSubmit={onSubmit} className="login-form">
         <label htmlFor="username">Username</label>

@@ -31,4 +31,7 @@ export const api = {
   cards: () => request('/cards'),
   card: (id) => request(`/cards/${id}`),
   reset: () => request('/reset', { method: 'POST' }),
+  quizStart: (venue) => request('/quiz/start', { method: 'POST', body: { venue } }),
+  quizAnswer: (questionId, optionId) =>
+    request(`/quiz/${questionId}/answer`, { method: 'POST', body: { option_id: optionId } }),
 }

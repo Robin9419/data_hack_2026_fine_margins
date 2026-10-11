@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import AttributeRow from '../components/AttributeRow'
+import PlayerPhoto from '../components/PlayerPhoto'
 import VideoSlot from '../components/VideoSlot'
 import { formatMatchDate, scoreline } from '../format'
 
@@ -33,22 +34,25 @@ export default function CardDetail() {
       <Link to="/">← Back to collection</Link>
 
       <header className="detail-header">
-        <p className="eyebrow">{card.title}</p>
-        <h1>
-          #{player.jersey} {player.first_name} {player.last_name}
-        </h1>
-        <p className="muted">
-          {player.team}
-          {player.position ? ` · ${player.position}` : ''}
-        </p>
-        {card.achievement && (
-          <div className="achievement">
-            <strong>
-              {card.achievement.badge} {card.achievement.title}
-            </strong>
-            <span>{card.achievement.criteria}</span>
-          </div>
-        )}
+        <PlayerPhoto player={player} className="detail-photo" />
+        <div className="detail-heading">
+          <p className="eyebrow">{card.title}</p>
+          <h1>
+            #{player.jersey} {player.first_name} {player.last_name}
+          </h1>
+          <p className="muted">
+            {player.team}
+            {player.position ? ` · ${player.position}` : ''}
+          </p>
+          {card.achievement && (
+            <div className="achievement">
+              <strong>
+                {card.achievement.badge} {card.achievement.title}
+              </strong>
+              <span>{card.achievement.criteria}</span>
+            </div>
+          )}
+        </div>
       </header>
 
       <div className="match-context">
@@ -85,7 +89,7 @@ export default function CardDetail() {
       <VideoSlot video={card.video} />
 
       <p className="muted small">
-        Source: {card.source} · Edition: {card.edition}
+        Source: {card.source} · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
       </p>
     </section>
   )

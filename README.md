@@ -43,6 +43,10 @@ Open http://localhost:5173. Vite forwards `/api` to the backend on port 8000. AP
 | Reward milestones and points per card edition | `backend/content/rewards.json` |
 | Quiz page and unlock animation | `frontend/src/pages/Quiz.jsx`, `frontend/src/components/CardUnlock.jsx`, `.unlock-*` in `index.css` |
 | Achievements | `backend/content/achievements.json` |
+| Video sources: full-game recording (sync offset, clip windows) and YouTube clip times per goal | `backend/content/videos.json` |
+| Cutting the event clips out of the recording | `backend/scripts/cut_clips.py` → `backend/media/clips/` |
+| Game events per player (goals, assists, shots, saves, faceoff wins) and their clips | `backend/app/events.py` |
+| Which events sit behind each KPI (`events`) | `backend/content/metrics.json` |
 | CSV loading, value formatting, match rank | `backend/app/content.py` |
 | API routes | `backend/app/main.py` |
 | Users / sessions / owned cards (SQLite) | `backend/app/db.py` → `backend/hockey_cards.sqlite3` |
@@ -60,6 +64,7 @@ A new account gets a starter pack of 3 random cards. After that cards are only w
 
 - **Positions** are not in the dataset. The values in `cards.json` (Forward / Defender / Goalkeeper) were entered by hand from the public team rosters.
 - **Competition stage** is not in the dataset. It is `null` until confirmed.
-- **Videos**: every card shows "Highlight unavailable in this demo". To add one, set `"video": {"url": "...", "poster": "...", "description": "..."}` on a card.
+- **Videos**: every game event on the card detail page has its own clip, cut from the full-game arena camera recording (`data/20251231_115035_SpenglerCup_Kam1 31.12.25 Game 11.mp4`, 13.7 GB). Neither the recording nor the clips are in git: put the recording in `data/` and run `python -m scripts.cut_clips` from `backend/` (a few minutes; it only decodes the seconds around each event), then restart the backend. Event time to video time is `Timestamp / 1000 - timestamp_offset` (`videos.json` → `recording`). The offset was measured by lining up the crowd noise with the 9 goals, and each period gave the same value, so the recording has no cuts. Without clips the page falls back to the official highlights of the final on the Spengler Cup Davos YouTube channel (`O3rLScC5SKw`), embedded with the YouTube player; those only cover the 9 goals and stay available as the "TV" replay. A card's highlight is the player's best moment on camera: first goal, else assist, else the most dangerous save or shot by xG. To use a self-hosted file instead, set `"video": {"url": "...", "poster": "...", "description": "..."}` on a card.
+- **Event links**: each KPI lists the match events behind its number where that is possible (goals, assists, shots, xG, hardest shot, faceoff wins, goalkeeper saves and shots against). Every count matches the statistics CSV. Blocked shots, time on ice, distance, speed, passing and puck battles can't be traced to single events: the events CSV does not name the blocker, and the others are tracking totals.
 - **Player photos** are hotlinked from the URLs in `docs/player-images.json` and need an internet connection. Rights are not cleared for most of them (see `docs/PLAYER_IMAGES.md`). Cards without a photo show the jersey number.
 - Delete `backend/hockey_cards.sqlite3` to wipe all users.

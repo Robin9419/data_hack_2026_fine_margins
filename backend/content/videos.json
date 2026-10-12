@@ -1,0 +1,100 @@
+{
+  "_comment": "Video sources for the match. 'videos' are broadcast highlights on YouTube. Each clip ties a stretch of the video (start/end in seconds) to one goal in the match events CSV, keyed by the Goal event's Period and MatchClock (seconds into the period). The backend refuses to start if a clip points to a goal that is not in the data. Clip times were read off the video's preview frames (2 s apart) by matching the on-screen clock and score to the event data, so they can be off by a second or two; fine-tune them while watching. The video is embedded with the official YouTube player from the organizer's own channel; downloading, re-cutting or re-hosting it is NOT cleared.",
+  "videos": [
+    {
+      "id": "final-highlights",
+      "youtube_id": "O3rLScC5SKw",
+      "title": "Highlights | U.S. Collegiate Selects vs. HC Davos | FINAL | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=O3rLScC5SKw",
+      "duration": 234,
+      "permission": "Official highlights, embedded with the YouTube player from the Spengler Cup Davos channel. Not downloaded or re-edited.",
+      "clips": [
+        {
+          "period": 1,
+          "match_clock": 675,
+          "_goal": "0–1 Asplund (PP)",
+          "start": 3,
+          "end": 19
+        },
+        {
+          "period": 1,
+          "match_clock": 805,
+          "_goal": "1–1 Walsh",
+          "start": 19,
+          "end": 41
+        },
+        {
+          "period": 1,
+          "match_clock": 889,
+          "_goal": "1–2 Tambellini",
+          "start": 41,
+          "end": 61
+        },
+        {
+          "period": 2,
+          "match_clock": 236,
+          "_goal": "2–2 Fink",
+          "start": 61,
+          "end": 79
+        },
+        {
+          "period": 2,
+          "match_clock": 663,
+          "_goal": "2–3 Tambellini",
+          "start": 79,
+          "end": 97
+        },
+        {
+          "period": 2,
+          "match_clock": 822,
+          "_goal": "3–3 Musa",
+          "start": 97,
+          "end": 117
+        },
+        {
+          "period": 3,
+          "match_clock": 921,
+          "_goal": "3–4 Zadina",
+          "start": 117,
+          "end": 151
+        },
+        {
+          "period": 3,
+          "match_clock": 1008,
+          "_goal": "3–5 Corvi",
+          "start": 151,
+          "end": 185
+        },
+        {
+          "period": 3,
+          "match_clock": 1069,
+          "_goal": "3–6 Stransky (empty net)",
+          "start": 185,
+          "end": 199
+        }
+      ]
+    }
+  ],
+  "recording": {
+    "_comment": "Full-game arena camera recording (not in git: it is 13.7 GB). backend/scripts/cut_clips.py cuts one short clip per card-player event from it into backend/media/clips/<event Timestamp>.mp4 (also not in git). Video second = event Timestamp in seconds - timestamp_offset. The offset was measured by lining up the crowd-noise peaks in the audio with the 9 goals: each period on its own gave the same value (+-1 s), so the recording has no cuts. Then checked on frames at three goals. 'windows' are seconds before/after the event that each clip covers.",
+    "id": "arena-camera",
+    "file": "data/20251231_115035_SpenglerCup_Kam1 31.12.25 Game 11.mp4",
+    "title": "Arena camera 1, full game recording",
+    "timestamp_offset": 1767178508.0,
+    "windows": {
+      "goal": [
+        -9,
+        6
+      ],
+      "shot": [
+        -6,
+        3
+      ],
+      "faceoff": [
+        -1,
+        5
+      ]
+    }
+  }
+}

@@ -59,6 +59,38 @@ button[type='submit']:disabled { opacity: 0.5; cursor: default; }
 .video-placeholder .play { font-size: 2.5rem; opacity: 0.5; }
 .video { margin: 0; }
 .video video { width: 100%; border-radius: 8px; }
+.video figcaption { margin-top: 8px; }
+.video-frame { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; background: #1d2731; }
+.video-frame iframe, .video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; background: #000; }
+.video-poster { padding: 0; border: none; cursor: pointer; }
+.video-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.video-poster .play { position: absolute; top: 50%; left: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(0, 0, 0, 0.65); color: #fff; font-size: 1.6rem; transition: transform 150ms, background 150ms; }
+.video-poster:hover .play { transform: scale(1.1); background: var(--accent); }
+.video-length { position: absolute; right: 8px; bottom: 8px; padding: 2px 6px; border-radius: 4px; background: rgba(0, 0, 0, 0.7); color: #fff; font-size: 0.75rem; }
+.video-source { display: block; margin-top: 4px; }
+
+/* Game events behind the numbers */
+.attribute-events { margin-top: 12px; }
+.attribute-events h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 6px; }
+.on-video { color: var(--accent); font-weight: 600; }
+.timeline-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.moments { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-direction: column; gap: 4px; }
+.moment { display: flex; align-items: center; gap: 12px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+.moment-goal { border-left-color: #1f9d55; }
+.moment-assist { border-left-color: var(--accent); }
+.moment-save { border-left-color: #7a5af8; }
+.moment-goal_against { border-left-color: #b42318; }
+.moment-time { display: flex; flex-direction: column; min-width: 4.5em; font-weight: 700; font-variant-numeric: tabular-nums; }
+.moment-time small { font-weight: 400; font-size: 0.7rem; color: var(--muted); }
+.moment-body { flex: 1; min-width: 0; }
+.moment-facts { display: block; font-size: 0.8rem; color: var(--muted); }
+.moment-play { flex-shrink: 0; padding: 6px 10px; border: none; border-radius: 999px; background: var(--accent); color: #fff; font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.moment-play:hover { filter: brightness(1.15); }
+.moment-play.secondary { background: none; color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.moment-actions { display: flex; gap: 4px; flex-shrink: 0; }
+@media (max-width: 520px) {
+  .moment-play span { display: none; }
+}
 
 /* Cards: photo, archetype, name, position, team */
 .team-hcd { --c1: #0a2d6e; --c2: #ffd400; }

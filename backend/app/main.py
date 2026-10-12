@@ -7,12 +7,13 @@ import random
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
 from . import db
-from .content import get_content
+from .content import MEDIA_DIR, get_content
 
 app = FastAPI(title="Hockey Performance Cards")
 app.add_middleware(
@@ -21,6 +22,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Clips cut from the match recording (scripts/cut_clips.py). Supports range requests, so videos can seek.
+app.mount("/api/media", StaticFiles(directory=MEDIA_DIR, check_dir=False), name="media")
 
 
 @app.on_event("startup")

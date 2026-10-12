@@ -11,3 +11,7 @@ frontend/dist/
 # OS / editor
 .DS_Store
 .vscode/
+
+# Media: full-game recordings and the clips cut from them (backend/scripts/cut_clips.py)
+data/*.mp4
+backend/media/

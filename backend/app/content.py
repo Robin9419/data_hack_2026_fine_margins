@@ -1,15 +1,19 @@
-"""Loads the static content (metrics, match, cards) and joins it with the
-Wisehockey match statistics CSV so card values always come from the data."""
+"""Loads the static content (metrics, match, cards, videos) and joins it with the
+Wisehockey match statistics and events CSVs so card values always come from the data."""
 
 import csv
 import json
 from functools import lru_cache
 from pathlib import Path
 
+from .events import MatchEvents
+
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_DIR = ROOT / "backend" / "content"
 DATA_DIR = ROOT / "data"
 PLAYER_IMAGES_FILE = ROOT / "docs" / "player-images.json"
+MEDIA_DIR = ROOT / "backend" / "media"  # served at /api/media; not in git
+CLIPS_DIR = MEDIA_DIR / "clips"  # filled by scripts/cut_clips.py
 
 
 def _load_json(name: str) -> dict:
@@ -54,7 +58,17 @@ class Content:
         rewards_doc = _load_json("rewards.json")
         self.card_points = rewards_doc["card_points"]
         self.rewards = rewards_doc["rewards"]
+        videos_doc = _load_json("videos.json")
+        self.videos = {v["id"]: v for v in videos_doc["videos"]}
+        self.recording = videos_doc.get("recording")
         self.rows = self._load_stats()
+        self.event_rows = self._load_events()
+        self.events = MatchEvents(
+            self.event_rows,
+            {"Home": self.match["home_team"], "Away": self.match["away_team"]},
+            list(self.videos.values()),
+            self._camera_clip,
+        )
         self.goalie_rows = self._load_goalie_stats()
         self.player_images = self._load_player_images()
         self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
@@ -64,12 +78,15 @@ class Content:
         with path.open(encoding="utf-8-sig", newline="") as f:
             return list(csv.DictReader(f))
 
+    def _load_events(self) -> list[dict]:
+        path = DATA_DIR / self.match["events_file"]
+        with path.open(encoding="utf-8-sig", newline="") as f:
+            return list(csv.DictReader(f))
+
     def _load_goalie_stats(self) -> list[dict]:
         """The stats CSV only covers skaters, so goalkeeper numbers are counted from the
         match events CSV: every Shot event names the goalkeeper as the secondary player."""
-        path = DATA_DIR / self.match["events_file"]
-        with path.open(encoding="utf-8-sig", newline="") as f:
-            shots = [r for r in csv.DictReader(f) if r["EventType"] == "Shot" and r["EventSecondaryPlayerName"]]
+        shots = [r for r in self.event_rows if r["EventType"] == "Shot" and r["EventSecondaryPlayerName"]]
         sides = {"Home": self.match["home_team"], "Away": self.match["away_team"]}
         goalies = {}
         for shot in shots:
@@ -117,7 +134,7 @@ class Content:
             return 1 + sum(1 for v in values if v > value)
         return 1 + sum(1 for v in values if v < value)
 
-    def _build_attribute(self, metric_id: str, row: dict) -> dict:
+    def _build_attribute(self, metric_id: str, row: dict, moments: list[dict]) -> dict:
         metric = self.metrics[metric_id]
         value = _to_number(row[metric["column"]])
         attr = {
@@ -133,12 +150,16 @@ class Content:
             "players_in_match": len(self._pool(metric)),
             "rank_pool": "goalkeepers" if metric.get("goalkeeper") else "players",
         }
+        # Ids of the events behind the number (see "events" in metrics.json); None if the
+        # metric can't be traced to single events (e.g. time on ice, skating distance).
+        attr["moment_ids"] = MatchEvents.select(moments, metric["events"]) if "events" in metric else None
         if "count_column" in metric:
             attr["detail"] = f'{row[metric["count_column"]]} of {row[metric["total_column"]]}'
         return attr
 
     def _build_card(self, cfg: dict) -> dict:
         row = self._find_row(cfg["team"], cfg["jersey"])
+        moments = self.events.moments(self.events.player_id(cfg["team"], cfg["jersey"]))
         m = self.match
         opponent = m["away_team"] if cfg["team"] == m["home_team"] else m["home_team"]
         return {
@@ -162,13 +183,78 @@ class Content:
                 "away_score": m["away_score"],
                 "opponent": opponent,
             },
-            "attributes": [self._build_attribute(mid, row) for mid in cfg["attributes"]],
+            "attributes": [self._build_attribute(mid, row, moments) for mid in cfg["attributes"]],
             "explanation": cfg["explanation"],
             "achievement": self.achievements.get(cfg["achievement"]) if cfg["achievement"] else None,
-            "video": cfg["video"],
+            "video": cfg["video"] or self._featured_video(moments),
+            "video_sources": [self._video_source(v) for v in self.videos.values()] + self._recording_source(),
+            "moments": moments,
             "edition": "standard",
             "source": m["events_source"] if cfg["position"] == "Goalkeeper" else m["source"],
         }
+
+    def _camera_clip(self, timestamp: str) -> dict | None:
+        """The clip cut from the arena recording for this event, if it has been cut
+        (scripts/cut_clips.py). Checked once at startup, so restart after cutting."""
+        if not self.recording or not (CLIPS_DIR / f"{timestamp}.mp4").exists():
+            return None
+        return {
+            "video_id": self.recording["id"],
+            "url": f"/api/media/clips/{timestamp}.mp4",
+            "poster": f"/api/media/clips/{timestamp}.jpg",
+        }
+
+    def _recording_source(self) -> list[dict]:
+        if not self.recording:
+            return []
+        return [{"id": self.recording["id"], "title": self.recording["title"]}]
+
+    @staticmethod
+    def _video_source(video: dict) -> dict:
+        return {k: video[k] for k in ("id", "youtube_id", "title", "channel", "url", "permission")}
+
+    def _featured_video(self, moments: list[dict]) -> dict | None:
+        """The card's highlight: the player's best moment on camera (first goal, else first
+        assist, else the most dangerous save or shot by xG, else a faceoff win). Without
+        camera clips, the player's first goal or assist in the broadcast highlights. Otherwise
+        the whole highlight reel, labelled as game highlights rather than as this player's."""
+        filmed = [m for m in moments if m["clip"]]
+
+        def of_kind(*kinds):
+            return [m for m in filmed if m["kind"] in kinds]
+
+        best = (
+            of_kind("goal")[:1]
+            or of_kind("assist")[:1]
+            or sorted(of_kind("save", "shot"), key=lambda m: -(m["xg"] or 0))[:1]
+            or of_kind("faceoff_win")[:1]
+        )
+        if best:
+            return {**best[0]["clip"], "description": self._describe(best[0]), "scope": "moment"}
+        own = next((m for m in moments if m["kind"] in ("goal", "assist") and m["broadcast"]), None)
+        if own:
+            return {
+                **own["broadcast"],
+                "poster": f'https://i.ytimg.com/vi/{own["broadcast"]["youtube_id"]}/hqdefault.jpg',
+                "description": self._describe(own),
+                "scope": "moment",
+            }
+        if not self.videos:
+            return None
+        video = next(iter(self.videos.values()))
+        return {
+            "video_id": video["id"],
+            "youtube_id": video["youtube_id"],
+            "start": 0,
+            "end": None,
+            "poster": f'https://i.ytimg.com/vi/{video["youtube_id"]}/hqdefault.jpg',
+            "description": "Official highlights of the whole game. None of this player's own goals or assists are in it.",
+            "scope": "game",
+        }
+
+    @staticmethod
+    def _describe(m: dict) -> str:
+        return f'{m["title"]} at {m["clock"]} of the {m["period_label"]}. {m["text"]}'.strip()
 
     def card_summary(self, card: dict) -> dict:
         """What the gallery shows for a card the user does not own yet: only the (grayed out) photo."""

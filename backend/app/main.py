@@ -197,12 +197,17 @@ def _edition(venue: str) -> str:
 
 @app.post("/api/quiz/start")
 def quiz_start(body: QuizStart, user: dict = Depends(current_user)):
-    """Three questions (three options each), each about one card the user can still win. At home that is a card
-    they don't own; at the stadium it is also a card they own only as the home edition."""
+    """Three questions (three options each), each about one special card the user can still win. At home that is a
+    special card they don't own; at the stadium it is also one they own only as the home edition. Base cards are
+    not won through trivia."""
     content = get_content()
     owned = db.owned_cards(user["id"])
     stadium = body.venue == "stadium"
-    eligible = [cid for cid in content.cards if cid not in owned or (stadium and owned[cid] != "stadium")]
+    eligible = [
+        cid
+        for cid, card in content.cards.items()
+        if card["type"] == "special" and (cid not in owned or (stadium and owned[cid] != "stadium"))
+    ]
     picks = random.sample(eligible, min(QUESTIONS_PER_ROUND, len(eligible)))
     built = [(cid, content.build_question(cid, random)) for cid in picks]
     ids = db.create_quiz(user["id"], body.venue, [(cid, q["option_ids"]) for cid, q in built])

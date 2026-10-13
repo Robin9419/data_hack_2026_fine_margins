@@ -25,7 +25,9 @@ async function request(path, { method = 'GET', body } = {}) {
 }
 
 export const api = {
-  login: (username) => request('/login', { method: 'POST', body: { username } }),
+  login: (username, favoriteTeam) =>
+    request('/login', { method: 'POST', body: { username, favorite_team: favoriteTeam || null } }),
+  teams: () => request('/teams'),
   logout: () => request('/logout', { method: 'POST' }),
   me: () => request('/me'),
   cards: () => request('/cards'),

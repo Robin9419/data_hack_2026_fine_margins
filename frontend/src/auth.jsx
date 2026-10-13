@@ -22,8 +22,8 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false))
   }, [])
 
-  const login = async (username) => {
-    const data = await api.login(username)
+  const login = async (username, favoriteTeam) => {
+    const data = await api.login(username, favoriteTeam)
     setToken(data.token)
     setUser(data.user)
     api.me().then((me) => setProgress(me.progress))

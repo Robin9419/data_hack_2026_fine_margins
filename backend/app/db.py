@@ -51,16 +51,21 @@ def connect():
 def init_db():
     with connect() as conn:
         conn.executescript(SCHEMA)
+        columns = [r["name"] for r in conn.execute("PRAGMA table_info(users)")]
+        if "favorite_team" not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN favorite_team TEXT")
 
 
-def get_or_create_user(username: str) -> tuple[dict, bool]:
-    """Returns (user, created)."""
+def get_or_create_user(username: str, favorite_team: str | None = None) -> tuple[dict, bool]:
+    """Returns (user, created). The favorite team is only stored for a new account."""
     with connect() as conn:
-        row = conn.execute("SELECT id, username FROM users WHERE username = ?", (username,)).fetchone()
+        row = conn.execute(
+            "SELECT id, username, favorite_team FROM users WHERE username = ?", (username,)
+        ).fetchone()
         if row:
             return dict(row), False
-        cur = conn.execute("INSERT INTO users (username) VALUES (?)", (username,))
-        return {"id": cur.lastrowid, "username": username}, True
+        cur = conn.execute("INSERT INTO users (username, favorite_team) VALUES (?, ?)", (username, favorite_team))
+        return {"id": cur.lastrowid, "username": username, "favorite_team": favorite_team}, True
 
 
 def create_session(user_id: int) -> str:
@@ -78,7 +83,7 @@ def delete_session(token: str):
 def user_for_token(token: str) -> dict | None:
     with connect() as conn:
         row = conn.execute(
-            "SELECT u.id, u.username FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?",
+            "SELECT u.id, u.username, u.favorite_team FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?",
             (token,),
         ).fetchone()
         return dict(row) if row else None

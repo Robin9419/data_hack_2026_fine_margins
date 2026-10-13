@@ -45,14 +45,31 @@ def current_user(authorization: str | None = Header(default=None)) -> dict:
     return user
 
 
+TEAMS = [
+    "SCL Tigers",
+    "Adler Mannheim",
+    "Ilves Tampere",
+    "HC Davos",
+    "Frölunda HC",
+    "U.S. Collegiate Selects",
+]
+
+
 class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=40)
+    favorite_team: Literal[tuple(TEAMS)] | None = None
 
 
-def open_pack(user_id: int) -> list[dict]:
-    """Draws distinct random cards, adds them to the collection and returns them in full."""
+def open_pack(user_id: int, favorite_team: str | None = None) -> list[dict]:
+    """Draws distinct random cards, adds them to the collection and returns them in full. If the user has a
+    favorite team with cards in the set, one of the cards is guaranteed to be from that team."""
     content = get_content()
-    drawn = random.sample(list(content.cards), min(content.pack_size, len(content.cards)))
+    size = min(content.pack_size, len(content.cards))
+    favorites = [cid for cid, card in content.cards.items() if card["player"]["team"] == favorite_team]
+    drawn = [random.choice(favorites)] if favorites else []
+    rest = [cid for cid in content.cards if cid not in drawn]
+    drawn += random.sample(rest, size - len(drawn))
+    random.shuffle(drawn)
     new_ids = db.grant_cards(user_id, drawn)
     return [{**content.cards[cid], "owned": True, "is_new": cid in new_ids} for cid in drawn]
 
@@ -64,10 +81,17 @@ def progress_for(user_id: int) -> dict:
 @app.post("/api/login")
 def login(body: LoginRequest):
     """Dummy sign-in: any username works. Only a brand new account gets a starter pack."""
-    user, created = db.get_or_create_user(body.username.strip())
+    user, created = db.get_or_create_user(body.username.strip(), body.favorite_team)
     token = db.create_session(user["id"])
-    pack = open_pack(user["id"]) if created else None
+    pack = open_pack(user["id"], user["favorite_team"]) if created else None
     return {"token": token, "user": user, "new_user": created, "pack": pack}
+
+
+@app.get("/api/teams")
+def list_teams():
+    """The selectable favorite teams and how many cards the set has for each."""
+    cards = get_content().cards.values()
+    return {"teams": [{"name": t, "cards": sum(c["player"]["team"] == t for c in cards)} for t in TEAMS]}
 
 
 @app.post("/api/logout")
@@ -116,7 +140,7 @@ def list_metrics():
 def reset(user: dict = Depends(current_user)):
     """Empty the user's collection and open a fresh starter pack (for demos/testing)."""
     db.clear_cards(user["id"])
-    return {"pack": open_pack(user["id"]), "progress": progress_for(user["id"])}
+    return {"pack": open_pack(user["id"], user["favorite_team"]), "progress": progress_for(user["id"])}
 
 
 QUESTIONS_PER_ROUND = 3

@@ -55,6 +55,7 @@ class Content:
         cards_doc = _load_json("cards.json")
         self.pack_size = cards_doc["pack_size"]
         self.archetypes = cards_doc["archetypes"]
+        self.archetype_metrics = {k: v for k, v in cards_doc["archetype_metrics"].items() if not k.startswith("_")}
         rewards_doc = _load_json("rewards.json")
         self.card_points = rewards_doc["card_points"]
         self.rewards = rewards_doc["rewards"]
@@ -72,6 +73,8 @@ class Content:
         self.goalie_rows = self._load_goalie_stats()
         self.player_images = self._load_player_images()
         self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
+        base_doc = _load_json("base_cards.json")
+        self.cards |= {c["id"]: self._build_base_card(c, base_doc) for c in base_doc["cards"]}
 
     def _load_stats(self) -> list[dict]:
         path = DATA_DIR / self.match["stats_file"]
@@ -134,6 +137,14 @@ class Content:
             return 1 + sum(1 for v in values if v > value)
         return 1 + sum(1 for v in values if v < value)
 
+    def _team_rank(self, metric: dict, value, team: str) -> int:
+        """Like _rank, but only among the player's own team."""
+        values = [_to_number(r[metric["column"]]) for r in self._pool(metric) if r["Team"] == team]
+        values = [v for v in values if v is not None]
+        if metric["higher_is_better"]:
+            return 1 + sum(1 for v in values if v > value)
+        return 1 + sum(1 for v in values if v < value)
+
     def _build_attribute(self, metric_id: str, row: dict, moments: list[dict]) -> dict:
         metric = self.metrics[metric_id]
         value = _to_number(row[metric["column"]])
@@ -147,6 +158,7 @@ class Content:
             "definition": metric["definition"],
             "source_definition": metric["source_definition"],
             "match_rank": self._rank(metric, value) if value is not None else None,
+            "team_rank": self._team_rank(metric, value, row["Team"]) if value is not None else None,
             "players_in_match": len(self._pool(metric)),
             "rank_pool": "goalkeepers" if metric.get("goalkeeper") else "players",
         }
@@ -161,28 +173,15 @@ class Content:
         row = self._find_row(cfg["team"], cfg["jersey"])
         moments = self.events.moments(self.events.player_id(cfg["team"], cfg["jersey"]))
         m = self.match
-        opponent = m["away_team"] if cfg["team"] == m["home_team"] else m["home_team"]
         return {
             "id": cfg["id"],
-            "player": {
-                "first_name": row["FirstName"],
-                "last_name": row["LastName"],
-                "jersey": cfg["jersey"],
-                "team": cfg["team"],
-                "position": cfg["position"],
-                "image_url": self.player_images.get((cfg["team"], cfg["jersey"])),
-            },
+            "type": "special",
+            "player": self._player(cfg, row),
             "title": cfg["title"],
-            "match": {
-                "id": m["id"],
-                "date": m["date"],
-                "stage": m["stage"],
-                "home_team": m["home_team"],
-                "away_team": m["away_team"],
-                "home_score": m["home_score"],
-                "away_score": m["away_score"],
-                "opponent": opponent,
-            },
+            "archetype": self.archetypes.get(cfg["title"]),
+            # The KPIs that earned the archetype, for the card back (may differ from the card's own attributes).
+            "archetype_kpis": [self._build_attribute(mid, row, moments) for mid in self.archetype_metrics[cfg["title"]]],
+            "match": self._match(cfg["team"]),
             "attributes": [self._build_attribute(mid, row, moments) for mid in cfg["attributes"]],
             "explanation": cfg["explanation"],
             "achievement": self.achievements.get(cfg["achievement"]) if cfg["achievement"] else None,
@@ -191,6 +190,45 @@ class Content:
             "moments": moments,
             "edition": "standard",
             "source": m["events_source"] if cfg["position"] == "Goalkeeper" else m["source"],
+        }
+
+    def _player(self, cfg: dict, row: dict) -> dict:
+        return {
+            "first_name": row["FirstName"],
+            "last_name": row["LastName"],
+            "jersey": cfg["jersey"],
+            "team": cfg["team"],
+            "position": cfg["position"],
+            "image_url": self.player_images.get((cfg["team"], cfg["jersey"])),
+        }
+
+    def _match(self, team: str) -> dict:
+        m = self.match
+        return {
+            "id": m["id"],
+            "date": m["date"],
+            "stage": m["stage"],
+            "home_team": m["home_team"],
+            "away_team": m["away_team"],
+            "home_score": m["home_score"],
+            "away_score": m["away_score"],
+            "opponent": m["away_team"] if team == m["home_team"] else m["home_team"],
+        }
+
+    def _build_base_card(self, cfg: dict, doc: dict) -> dict:
+        """A plain card with the player's profile only: no archetype, stats or highlights."""
+        row = self._find_row(cfg["team"], cfg["jersey"])
+        bio_keys = ("date_of_birth", "place_of_birth", "nationality", "height_cm", "weight_kg", "shoots", "draft", "club")
+        return {
+            "id": cfg["id"],
+            "type": "base",
+            "player": self._player(cfg, row),
+            "title": None,
+            "match": self._match(cfg["team"]),
+            "bio": {k: cfg.get(k) for k in bio_keys},
+            "edition": "standard",
+            "source": doc["source"],
+            "source_url": cfg.get("ep_url"),
         }
 
     def _camera_clip(self, timestamp: str) -> dict | None:
@@ -261,6 +299,7 @@ class Content:
         player = card["player"]
         return {
             "id": card["id"],
+            "type": card["type"],
             "player": {
                 "image_url": player.get("image_url"),
                 "jersey": player.get("jersey"),
@@ -284,19 +323,32 @@ class Content:
         }
 
     def build_question(self, card_id: str, rng) -> dict:
-        """Multiple choice 'who was the <archetype>?' question: the card's player plus two
-        other players from the set, shuffled. option_ids are card ids."""
+        """Multiple choice question: the card's player plus two other players with the same card
+        type (so a player never shows up twice), shuffled. option_ids are card ids. Special cards
+        ask 'who was the <archetype>?', base cards 'who is this player?' with a profile clue."""
         card = self.cards[card_id]
-        others = [c for c in self.cards if c != card_id]
+        others = [c for c, other in self.cards.items() if c != card_id and other["type"] == card["type"]]
         option_ids = rng.sample(others, min(2, len(others))) + [card_id]
         rng.shuffle(option_ids)
         m = card["match"]
+        if card["type"] == "base":
+            prompt, clue = "Who is this player?", self._profile_clue(card)
+        else:
+            prompt, clue = f'Who was the "{card["title"]}" in this game?', self.archetypes[card["title"]]
         return {
             "option_ids": option_ids,
-            "prompt": f'Who was the "{card["title"]}" in this game?',
-            "clue": self.archetypes[card["title"]],
+            "prompt": prompt,
+            "clue": clue,
             "match": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}',
         }
+
+    @staticmethod
+    def _profile_clue(card: dict) -> str:
+        player, bio = card["player"], card["bio"]
+        clue = f'{player["position"]} for {player["team"]}, wearing #{player["jersey"]}'
+        if bio["date_of_birth"] and bio["place_of_birth"]:
+            clue += f', born {bio["date_of_birth"][:4]} in {bio["place_of_birth"]}'
+        return clue + "."
 
 
 @lru_cache

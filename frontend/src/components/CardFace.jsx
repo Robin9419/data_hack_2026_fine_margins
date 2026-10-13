@@ -1,7 +1,7 @@
 import { teamClass } from '../format'
 import PlayerPhoto from './PlayerPhoto'
 
-// Front of a card: photo, archetype, name, position and team. Nothing else.
+// Front of a card: photo, archetype (or 'Base' for a base card), name, position and team. Nothing else.
 // state: 'owned' (full colour), 'locked' (gallery: grayed out photo only, no info) or 'hidden'
 // (a mystery card in a pack: no photo, name or archetype, so nothing leaks before it is revealed).
 // A card with edition 'stadium' gets the foil design.
@@ -28,12 +28,13 @@ export default function CardFace({ card, state = 'owned' }) {
 
   const { player } = card
   const stadium = card.edition === 'stadium'
+  const base = card.type === 'base'
   return (
-    <div className={`card-face ${teamClass(player.team)} ${stadium ? 'edition-stadium' : ''} ${state}`}>
+    <div className={`card-face ${teamClass(player.team)} ${stadium ? 'edition-stadium' : ''} ${base ? 'base' : ''} ${state}`}>
       <PlayerPhoto player={player} className="card-art" />
       {stadium && <span className="edition-badge">🏟 Stadium</span>}
       <div className="card-info">
-        <p className="card-archetype">{card.title}</p>
+        <p className="card-archetype">{base ? 'Base' : card.title}</p>
         <p className="card-name">
           <span className="card-first">{player.first_name}</span>
           {player.last_name}

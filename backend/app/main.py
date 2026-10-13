@@ -3,7 +3,9 @@
 Run from the backend folder:  uvicorn app.main:app --reload
 """
 
+import os
 import random
+from datetime import datetime, timezone
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -61,17 +63,38 @@ class LoginRequest(BaseModel):
 
 
 def open_pack(user_id: int, favorite_team: str | None = None) -> list[dict]:
-    """Draws distinct random cards, adds them to the collection and returns them in full. If the user has a
-    favorite team with cards in the set, one of the cards is guaranteed to be from that team."""
+    """Draws distinct random base cards, adds them to the collection and returns them in full. If the user has a
+    favorite team with base cards in the set, one of the cards is guaranteed to be from that team."""
     content = get_content()
-    size = min(content.pack_size, len(content.cards))
-    favorites = [cid for cid, card in content.cards.items() if card["player"]["team"] == favorite_team]
+    base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
+    size = min(content.pack_size, len(base_ids))
+    favorites = [cid for cid in base_ids if content.cards[cid]["player"]["team"] == favorite_team]
     drawn = [random.choice(favorites)] if favorites else []
-    rest = [cid for cid in content.cards if cid not in drawn]
+    rest = [cid for cid in base_ids if cid not in drawn]
     drawn += random.sample(rest, size - len(drawn))
     random.shuffle(drawn)
     new_ids = db.grant_cards(user_id, drawn)
     return [{**content.cards[cid], "owned": True, "is_new": cid in new_ids} for cid in drawn]
+
+
+# The product rule is one daily card per day. It is off by default so the demo can claim as often as it likes;
+# start the server with ENFORCE_DAILY_LIMIT=1 to turn the rule on.
+ENFORCE_DAILY_LIMIT = os.environ.get("ENFORCE_DAILY_LIMIT") == "1"
+
+
+def _today() -> str:
+    return datetime.now(timezone.utc).date().isoformat()
+
+
+def open_daily_card(user_id: int) -> list[dict]:
+    """One base card, preferring one the user doesn't own yet (a duplicate only once they own all of them)."""
+    content = get_content()
+    base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
+    owned = db.owned_cards(user_id)
+    candidates = [cid for cid in base_ids if cid not in owned] or base_ids
+    drawn = random.choice(candidates)
+    new_ids = db.grant_cards(user_id, [drawn])
+    return [{**content.cards[drawn], "owned": True, "is_new": drawn in new_ids}]
 
 
 def progress_for(user_id: int) -> dict:
@@ -85,6 +108,19 @@ def login(body: LoginRequest):
     token = db.create_session(user["id"])
     pack = open_pack(user["id"], user["favorite_team"]) if created else None
     return {"token": token, "user": user, "new_user": created, "pack": pack}
+
+
+@app.get("/api/daily")
+def daily_status(user: dict = Depends(current_user)):
+    return {"available": not ENFORCE_DAILY_LIMIT or db.last_daily_claim(user["id"]) != _today()}
+
+
+@app.post("/api/daily/claim")
+def daily_claim(user: dict = Depends(current_user)):
+    """One free base card per (UTC) day, unless the limit is switched off for the demo."""
+    if ENFORCE_DAILY_LIMIT and not db.claim_daily(user["id"], _today()):
+        raise HTTPException(409, "You already claimed today's card. Come back tomorrow!")
+    return {"pack": open_daily_card(user["id"]), "progress": progress_for(user["id"])}
 
 
 @app.get("/api/teams")

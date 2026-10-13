@@ -97,7 +97,7 @@ button[type='submit']:disabled { opacity: 0.5; cursor: default; }
 .team-usc { --c1: #13284f; --c2: #ff4d5a; }
 .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin: 16px 0 24px; }
 .card-tile { position: relative; display: block; aspect-ratio: 5 / 7; border-radius: 14px; text-decoration: none; color: inherit; transition: transform 150ms, box-shadow 150ms; }
-a.card-tile:hover { transform: translateY(-4px); box-shadow: 0 14px 28px -12px rgba(10, 30, 60, 0.6); }
+a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-shadow: 0 14px 28px -12px rgba(10, 30, 60, 0.6); }
 .card-face {
   position: relative;
   height: 100%;
@@ -130,6 +130,28 @@ a.card-tile:hover { transform: translateY(-4px); box-shadow: 0 14px 28px -12px r
 .dup-tag { background: #5b6b7a; color: #fff; }
 .reset { font-size: 0.85rem; }
 
+/* Base cards: muted pill instead of the archetype colour */
+.card-face.base .card-archetype { background: rgba(255, 255, 255, 0.16); color: #fff; }
+
+/* Gallery filters and pages of 8 cards */
+.gallery-filters { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 16px 0 0; }
+.filter-select { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--muted, var(--text)); }
+.filter-select select { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; font-size: 0.9rem; min-width: 180px; }
+.filter-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.filter-chip { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; font-size: 0.85rem; cursor: pointer; }
+.filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.card-pager { display: flex; align-items: center; gap: 8px; }
+.card-pager .card-grid { flex: 1; min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); touch-action: pan-y; }
+.pager-arrow { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1.6rem; line-height: 1; cursor: pointer; }
+.pager-arrow:disabled { opacity: 0.3; cursor: default; }
+.pager-dots { display: flex; justify-content: center; gap: 8px; margin: -8px 0 24px; }
+.pager-dots button { width: 10px; height: 10px; padding: 0; border-radius: 50%; border: none; background: var(--border); cursor: pointer; }
+.pager-dots button.active { background: var(--accent); }
+@media (max-width: 720px) {
+  .card-pager .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .pager-arrow { width: 32px; height: 32px; font-size: 1.3rem; }
+}
+
 /* Card detail photo */
 .detail-header { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
 .detail-heading { flex: 1; min-width: 220px; }
@@ -149,7 +171,8 @@ a.card-tile:hover { transform: translateY(-4px); box-shadow: 0 14px 28px -12px r
 }
 .pack-stage h1 { font-size: 2rem; letter-spacing: 0.04em; text-transform: uppercase; }
 .pack-hint { color: #9fb3c6; margin: 0 0 28px; min-height: 1.4em; }
-.pack-row { display: grid; grid-template-columns: repeat(3, minmax(0, 220px)); justify-content: center; gap: 24px; }
+.pack-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; }
+.pack-row > .pack-card { width: 220px; max-width: 100%; }
 
 .pack-card {
   position: relative;
@@ -252,7 +275,7 @@ a.card-tile:hover { transform: translateY(-4px); box-shadow: 0 14px 28px -12px r
 }
 
 @media (max-width: 640px) {
-  .pack-row { grid-template-columns: minmax(0, 240px); }
+  .pack-row > .pack-card { width: 240px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .pack-card, .pack-card *, .pack-card *::before, .pack-button { animation: none !important; transition: none !important; }
@@ -297,6 +320,7 @@ a.card-tile:hover { transform: translateY(-4px); box-shadow: 0 14px 28px -12px r
 
 /* Gallery call to action */
 .quiz-cta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; padding: 14px 18px; border-radius: 12px; text-decoration: none; color: #fff; background: linear-gradient(90deg, #0b5cad, #13284f); font-size: 1.3rem; }
+button.quiz-cta { width: 100%; border: 0; font-family: inherit; text-align: left; cursor: pointer; }
 .quiz-cta strong { display: block; font-size: 1.05rem; }
 .quiz-cta small { display: block; font-size: 0.85rem; opacity: 0.85; }
 .quiz-cta:hover { filter: brightness(1.12); }
@@ -380,3 +404,62 @@ button.cta:disabled { opacity: 0.5; cursor: not-allowed; }
 .step h3 { margin: 6px 0; font-size: 1rem; }
 .step p { margin: 0; font-size: 0.9rem; }
 .step-icon { font-size: 1.6rem; }
+
+/* Spotlight: a special card popped out of the gallery, flipped to its back, next to clips that show it */
+button.card-tile { width: 100%; padding: 0; border: none; background: none; font: inherit; text-align: left; cursor: pointer; }
+.spotlight { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(4, 9, 16, 0.82); backdrop-filter: blur(4px); overflow-y: auto; animation: unlock-fade 200ms ease-out; }
+.spotlight-panel { position: relative; display: flex; gap: 28px; align-items: flex-start; width: 100%; max-width: 900px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 28px; border-radius: 20px; color: #e9f1f8; background: linear-gradient(160deg, #13253d, #070d16 80%); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); animation: spotlight-pop 450ms cubic-bezier(0.2, 0.9, 0.3, 1.15); }
+.spotlight-close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 1rem; cursor: pointer; }
+.spotlight-close:hover { background: rgba(255, 255, 255, 0.2); }
+.spotlight-card-col { flex: 0 0 300px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.spotlight-card { display: block; width: 100%; aspect-ratio: 5 / 7; padding: 0; border: none; background: none; font: inherit; text-align: left; cursor: pointer; perspective: 1200px; }
+.spotlight-flip { position: relative; display: block; height: 100%; transform-style: preserve-3d; transition: transform 700ms cubic-bezier(0.3, 0.9, 0.3, 1.05); }
+.spotlight-card.flipped .spotlight-flip { transform: rotateY(180deg); }
+/* No filter on the flipping element: it would flatten the 3D and show the front through the back. */
+.spotlight-front, .spotlight-back { position: absolute; inset: 0; border-radius: 14px; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5); }
+.spotlight-front { display: block; }
+.spotlight-hint { margin: 0; font-size: 0.75rem; color: #9fb3c6; }
+
+.spotlight-back { transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 24px 18px; }
+.spotlight-back.card-face { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c2) 55%, transparent), 0 18px 40px rgba(0, 0, 0, 0.5); }
+.spotlight-back::after { display: none; }
+.back-title { align-self: center; padding: 6px 18px; border-radius: 999px; background: var(--c2); color: var(--c1); font-size: 1.15rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; }
+.back-kpis { display: flex; flex-direction: column; gap: 10px; }
+.back-kpi { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 12px 10px; border-radius: 12px; background: rgba(255, 255, 255, 0.08); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); text-align: center; }
+.back-kpi.top { box-shadow: inset 0 0 0 2px var(--c2); }
+.back-kpi-value { font-size: 1.8rem; font-weight: 800; line-height: 1; white-space: nowrap; }
+.back-kpi-value small { margin-left: 4px; font-size: 0.7rem; font-weight: 600; opacity: 0.7; }
+.back-kpi-label { font-size: 0.85rem; font-weight: 700; }
+.back-kpi-rank { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.7; }
+.back-kpi.top .back-kpi-rank { color: var(--c2); opacity: 1; }
+
+.spotlight-clips { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.spotlight-clips-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding-right: 40px; }
+.spotlight-count { font-size: 0.85rem; color: #9fb3c6; font-variant-numeric: tabular-nums; }
+.spotlight-carousel { position: relative; }
+.carousel-arrow { position: absolute; top: calc(50% - 40px); z-index: 2; width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 1.8rem; line-height: 1; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25); transition: background 150ms, transform 150ms; }
+.carousel-arrow:hover { background: var(--accent); transform: scale(1.08); }
+.carousel-arrow.prev { left: 8px; }
+.carousel-arrow.next { right: 8px; }
+.spotlight-dots { margin: -4px 0 0; }
+.spotlight-dots button { background: rgba(255, 255, 255, 0.25); }
+.spotlight-dots button.active { background: #ffd36b; }
+.spotlight-clips h2 { margin: 0; font-size: 1.1rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.spotlight-clip { margin: 0; }
+.spotlight-clip .video-poster { position: absolute; inset: 0; width: 100%; height: 100%; background: #000; }
+.spotlight-clip figcaption { margin-top: 6px; font-size: 0.82rem; color: #c7d4e0; }
+.spotlight-empty { margin: 0; color: #9fb3c6; }
+.spotlight-more { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 4px; padding: 12px 16px; border-radius: 12px; color: #2a1d00; text-decoration: none; background: linear-gradient(90deg, #ffd36b, #ffb347); font-size: 1.2rem; }
+.spotlight-more strong { display: block; font-size: 0.95rem; }
+.spotlight-more small { display: block; font-size: 0.78rem; opacity: 0.8; }
+.spotlight-more:hover { filter: brightness(1.06); }
+@keyframes spotlight-pop { 0% { opacity: 0; transform: scale(0.7) translateY(30px); } 100% { opacity: 1; transform: none; } }
+@media (max-width: 720px) {
+  .spotlight { align-items: flex-start; }
+  .spotlight-panel { flex-direction: column; align-items: stretch; gap: 20px; padding: 20px 16px; max-height: none; }
+  .spotlight-card-col { flex: none; width: min(300px, 100%); align-self: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spotlight, .spotlight-panel { animation: none; }
+  .spotlight-flip { transition: none; }
+}

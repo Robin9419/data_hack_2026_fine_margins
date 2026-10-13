@@ -31,6 +31,7 @@ export default function CardDetail() {
       </section>
     )
   if (!card) return <p className="muted">Loading card…</p>
+  if (card.type === 'base') return <BaseCardDetail card={card} />
 
   const { player, match } = card
   const moments = card.moments || []
@@ -127,6 +128,73 @@ export default function CardDetail() {
 
       <p className="muted small">
         Source: {card.source} · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
+      </p>
+    </section>
+  )
+}
+
+const age = (iso) => {
+  const born = new Date(iso)
+  const now = new Date()
+  const hadBirthday =
+    now.getMonth() > born.getMonth() || (now.getMonth() === born.getMonth() && now.getDate() >= born.getDate())
+  return now.getFullYear() - born.getFullYear() - (hadBirthday ? 0 : 1)
+}
+
+// A base card has no archetype or game stats, only the player's profile (from Elite Prospects).
+function BaseCardDetail({ card }) {
+  const { player, bio, match } = card
+  const goalie = player.position === 'Goalkeeper'
+  const facts = [
+    ['Position', player.position],
+    ['Born', bio.date_of_birth && `${formatMatchDate(bio.date_of_birth)} (age ${age(bio.date_of_birth)})`],
+    ['Birthplace', bio.place_of_birth],
+    ['Nationality', bio.nationality],
+    ['Height', bio.height_cm && `${bio.height_cm} cm`],
+    ['Weight', bio.weight_kg && `${bio.weight_kg} kg`],
+    [goalie ? 'Catches' : 'Shoots', bio.shoots && (bio.shoots === 'L' ? 'Left' : 'Right')],
+    ['College 2025–26', bio.club],
+    ['Draft', bio.draft],
+  ].filter(([, value]) => value)
+
+  return (
+    <section className="detail">
+      <Link to="/">← Back to collection</Link>
+
+      <header className="detail-header">
+        <PlayerPhoto player={player} className="detail-photo" />
+        <div className="detail-heading">
+          <p className="eyebrow">Base card</p>
+          <h1>
+            #{player.jersey} {player.first_name} {player.last_name}
+          </h1>
+          <p className="muted">{player.team}</p>
+        </div>
+      </header>
+
+      <h2>Player profile</h2>
+      <div className="match-context">
+        {facts.map(([label, value]) => (
+          <div key={label}>
+            <span className="label">{label}</span>
+            {value}
+          </div>
+        ))}
+      </div>
+
+      <p className="muted small">
+        Played in {scoreline(match)} on {formatMatchDate(match.date)}.
+      </p>
+      <p className="muted small">
+        Source:{' '}
+        {card.source_url ? (
+          <a href={card.source_url} target="_blank" rel="noreferrer">
+            {card.source}
+          </a>
+        ) : (
+          card.source
+        )}{' '}
+        · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
       </p>
     </section>
   )

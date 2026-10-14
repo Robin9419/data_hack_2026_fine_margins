@@ -9,6 +9,20 @@ Repository for the Sports Innovation Challenge. Concept: [docs/IDEA.md](docs/IDE
 
 ### Run it
 
+On Linux, WSL, or macOS, start both servers from the repository root:
+
+```bash
+make install   # First setup, or after dependencies change
+make dev
+```
+
+Open http://localhost:5173. Ctrl+C stops both servers. Use `make backend` or
+`make frontend` to start either server separately. `make help` lists the commands.
+Requires Python, Node.js/npm, and Make. The frontend uses port 5173 strictly so
+it cannot silently switch to a port that the backend's CORS configuration rejects.
+
+Alternatively, start the servers manually:
+
 Backend (terminal 1):
 
 ```bash

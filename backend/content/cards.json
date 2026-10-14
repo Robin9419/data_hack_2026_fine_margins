@@ -1,5 +1,5 @@
 {
-  "_comment": "Hand-picked cards. Players are matched to the stats CSV by team + jersey (goalkeepers to stats counted from the events CSV). Attribute values are NOT stored here: the backend reads them from the data so they can't drift. 'title' is the card's archetype, the one thing this player stood for in the game; it is the only stat-like text on the card face. 'position' is not in the dataset; it comes from the public team rosters. 'video' is null until an authorized clip exists. Player photos come from docs/player-images.json, matched by team + jersey. New accounts get a starter pack of 'pack_size' random cards; more cards are unlocked through the trivia (see 'archetypes': the clue shown in each question).",
+  "_comment": "Hand-picked cards. Players are matched to the stats CSV by team + jersey (goalkeepers to stats counted from the events CSV). Attribute values are NOT stored here: the backend reads them from the data so they can't drift. 'title' is the card's archetype, the one thing this player stood for in the game; it is the only stat-like text on the card face. 'position' is not in the dataset; it comes from the public team rosters. 'video' is null until an authorized clip exists. Player photos come from docs/player-images.json, matched by team + jersey. New accounts get a starter pack of 'pack_size' random cards; more cards are unlocked through the trivia (see 'archetypes': the clue shown in each question; 'archetype_metrics': the KPIs behind each archetype).",
   "pack_size": 3,
   "archetypes": {
     "Sniper": "Lives for the goal: scores and shoots to put the puck in the net.",
@@ -11,6 +11,18 @@
     "Workhorse": "Plays the most minutes and skates the farthest.",
     "Go-To Scorer": "The main scoring threat on their team: leads their side in shots and expected goals.",
     "Shot Stopper": "The goalkeeper who makes the most saves."
+  },
+  "archetype_metrics": {
+    "_comment": "The three KPIs that earn a player each archetype (see the definitions in 'archetypes'). The card back shows these, and the clips next to it come from the events behind them.",
+    "Sniper": ["goals", "shots", "xg_sum"],
+    "Playmaker": ["assists", "points", "pass_pct"],
+    "Volume Shooter": ["shots", "xg_sum", "shot_top_speed"],
+    "Chance Creator": ["xg_sum", "shots", "goals"],
+    "Speedster": ["skate_top_speed", "puck_contest_wins", "distance"],
+    "Shot Blocker": ["blocks", "puck_contest_wins", "toi"],
+    "Workhorse": ["toi", "distance", "puck_contest_wins"],
+    "Go-To Scorer": ["shots", "xg_sum", "goals"],
+    "Shot Stopper": ["saves", "save_pct", "shots_on_goal_against"]
   },
   "cards": [
     {

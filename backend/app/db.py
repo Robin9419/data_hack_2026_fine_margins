@@ -54,6 +54,24 @@ def init_db():
         columns = [r["name"] for r in conn.execute("PRAGMA table_info(users)")]
         if "favorite_team" not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN favorite_team TEXT")
+        if "last_daily_claim" not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN last_daily_claim TEXT")
+
+
+def last_daily_claim(user_id: int) -> str | None:
+    with connect() as conn:
+        row = conn.execute("SELECT last_daily_claim FROM users WHERE id = ?", (user_id,)).fetchone()
+        return row["last_daily_claim"] if row else None
+
+
+def claim_daily(user_id: int, today: str) -> bool:
+    """Marks today's daily card as claimed. False if it already was (atomic, so double clicks can't claim twice)."""
+    with connect() as conn:
+        cur = conn.execute(
+            "UPDATE users SET last_daily_claim = ? WHERE id = ? AND (last_daily_claim IS NULL OR last_daily_claim <> ?)",
+            (today, user_id, today),
+        )
+        return cur.rowcount > 0
 
 
 def get_or_create_user(username: str, favorite_team: str | None = None) -> tuple[dict, bool]:

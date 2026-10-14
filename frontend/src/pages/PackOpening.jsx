@@ -31,7 +31,7 @@ export default function PackOpening() {
 
   return (
     <section className="pack-stage">
-      <h1>Your starter pack</h1>
+      <h1>{location.state?.title ?? 'Your starter pack'}</h1>
       <p className="pack-hint">{allRevealed ? 'Nice pull!' : 'Tap a card to find out who you got.'}</p>
 
       <div className="pack-row">
@@ -43,7 +43,7 @@ export default function PackOpening() {
             style={{ '--delay': `${i * 120}ms` }}
             onClick={() => reveal(i)}
             disabled={stages[i] !== 'hidden'}
-            aria-label={`${card.player.first_name} ${card.player.last_name}${stages[i] === 'revealed' ? `, ${card.title}` : ', tap to reveal'}`}
+            aria-label={`${card.player.first_name} ${card.player.last_name}${stages[i] === 'revealed' ? `, ${card.title ?? 'base card'}` : ', tap to reveal'}`}
           >
             <span className="pack-burst" aria-hidden="true" />
             <CardFace card={card} state={stages[i] === 'revealed' ? 'owned' : 'hidden'} />

@@ -42,15 +42,18 @@ def main():
     events = {}
     for card in content.cards.values():
         for m in card["moments"]:
-            events[m["timestamp"]] = clip_window_kind(m["kind"])
+            kind = clip_window_kind(m["kind"])
+            before, after = rec['windows'][kind]
+            previous = events.get(m['timestamp'], (before, after))
+            events[m['timestamp']] = (min(previous[0], before), max(previous[1], after))
 
     def cut(item):
-        ts, window_kind = item
+        ts, window = item
         out, poster = CLIPS_DIR / f"{ts}.mp4", CLIPS_DIR / f"{ts}.jpg"
         if out.exists() and poster.exists() and not force:
             return "skipped"
         at = int(ts) / 1000 - rec["timestamp_offset"]
-        before, after = rec["windows"][window_kind]
+        before, after = window
         base = [ffmpeg, "-hide_banner", "-loglevel", "error", "-y"]
         subprocess.run(
             base + ["-ss", f"{at + before:.2f}", "-i", str(source), "-t", f"{after - before:.2f}",

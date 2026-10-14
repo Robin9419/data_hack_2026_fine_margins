@@ -13,63 +13,63 @@
         {
           "period": 1,
           "match_clock": 675,
-          "_goal": "0–1 Asplund (PP)",
+          "_goal": "0\u20131 Asplund (PP)",
           "start": 3,
           "end": 19
         },
         {
           "period": 1,
           "match_clock": 805,
-          "_goal": "1–1 Walsh",
+          "_goal": "1\u20131 Walsh",
           "start": 19,
           "end": 41
         },
         {
           "period": 1,
           "match_clock": 889,
-          "_goal": "1–2 Tambellini",
+          "_goal": "1\u20132 Tambellini",
           "start": 41,
           "end": 61
         },
         {
           "period": 2,
           "match_clock": 236,
-          "_goal": "2–2 Fink",
+          "_goal": "2\u20132 Fink",
           "start": 61,
           "end": 79
         },
         {
           "period": 2,
           "match_clock": 663,
-          "_goal": "2–3 Tambellini",
+          "_goal": "2\u20133 Tambellini",
           "start": 79,
           "end": 97
         },
         {
           "period": 2,
           "match_clock": 822,
-          "_goal": "3–3 Musa",
+          "_goal": "3\u20133 Musa",
           "start": 97,
           "end": 117
         },
         {
           "period": 3,
           "match_clock": 921,
-          "_goal": "3–4 Zadina",
+          "_goal": "3\u20134 Zadina",
           "start": 117,
           "end": 151
         },
         {
           "period": 3,
           "match_clock": 1008,
-          "_goal": "3–5 Corvi",
+          "_goal": "3\u20135 Corvi",
           "start": 151,
           "end": 185
         },
         {
           "period": 3,
           "match_clock": 1069,
-          "_goal": "3–6 Stransky (empty net)",
+          "_goal": "3\u20136 Stransky (empty net)",
           "start": 185,
           "end": 199
         }
@@ -93,6 +93,10 @@
       ],
       "faceoff": [
         -1,
+        5
+      ],
+      "pass": [
+        -3,
         5
       ]
     }

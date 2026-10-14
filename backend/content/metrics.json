@@ -9,7 +9,7 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many times the player put the puck in the opponent's net.",
-      "source_definition": "G — Number of goals scored by a player",
+      "source_definition": "G \u2014 Number of goals scored by a player",
       "events": [
         "goal"
       ]
@@ -22,7 +22,7 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "Credited when the player passed, shot or touched the puck in a way that set up a teammate's goal.",
-      "source_definition": "A — Number of assists received from shooting, passing or deflecting the puck towards the scoring teammate or touching it in any other way which enabled a goal",
+      "source_definition": "A \u2014 Number of assists received from shooting, passing or deflecting the puck towards the scoring teammate or touching it in any other way which enabled a goal",
       "events": [
         "assist"
       ]
@@ -35,7 +35,7 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "Goals plus assists. The simplest measure of how many goals a player was directly involved in.",
-      "source_definition": "P — Number of points received by a player for goals scored or assists earned",
+      "source_definition": "P \u2014 Number of points received by a player for goals scored or assists earned",
       "events": [
         "goal",
         "assist"
@@ -49,7 +49,7 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many shots the player took. More shots usually means more pressure on the opposing goalkeeper.",
-      "source_definition": "S — Number of a player's shots",
+      "source_definition": "S \u2014 Number of a player's shots",
       "events": [
         "goal",
         "shot"
@@ -63,7 +63,7 @@
       "unit": "km/h",
       "higher_is_better": true,
       "definition": "The speed of the player's fastest shot in the game, measured by puck tracking.",
-      "source_definition": "S TOP — Player's hardest shot",
+      "source_definition": "S TOP \u2014 Player's hardest shot",
       "events": [
         "hardest_shot"
       ]
@@ -76,7 +76,7 @@
       "unit": "xG",
       "higher_is_better": true,
       "definition": "Every shot gets a probability of becoming a goal, based on distance, angle, passes before the shot, screens and the goalkeeper's position. xG adds those up: 0.60 xG means the player's chances were worth about 0.6 goals on average.",
-      "source_definition": "xGsum — Sum of a player's all shot xG values",
+      "source_definition": "xGsum \u2014 Sum of a player's all shot xG values",
       "events": [
         "goal",
         "shot"
@@ -90,7 +90,7 @@
       "unit": "km/h",
       "higher_is_better": true,
       "definition": "The fastest the player skated at any moment in the game.",
-      "source_definition": "SPD TOP — Player's top speed (km/h)"
+      "source_definition": "SPD TOP \u2014 Player's top speed (km/h)"
     },
     {
       "id": "distance",
@@ -100,7 +100,7 @@
       "unit": "km",
       "higher_is_better": true,
       "definition": "The total distance the player skated during the game. It reflects workload and ice time.",
-      "source_definition": "DIST — Total distance a player traveled on the ice (m)"
+      "source_definition": "DIST \u2014 Total distance a player traveled on the ice (m)"
     },
     {
       "id": "toi",
@@ -110,7 +110,7 @@
       "unit": "min",
       "higher_is_better": true,
       "definition": "How long the player was on the ice in total. Coaches give the most ice time to players they trust.",
-      "source_definition": "TOI — Player's time on the ice in total"
+      "source_definition": "TOI \u2014 Player's time on the ice in total"
     },
     {
       "id": "blocks",
@@ -120,7 +120,7 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many opponent shots the player stopped with their body or stick before they reached the goal. It is a defensive sacrifice.",
-      "source_definition": "BKS — Number of shots blocked by a player"
+      "source_definition": "BKS \u2014 Number of shots blocked by a player"
     },
     {
       "id": "faceoff_win_pct",
@@ -132,7 +132,7 @@
       "unit": "%",
       "higher_is_better": true,
       "definition": "Share of faceoffs (the puck drop that restarts play) the player won. Winning the faceoff gives your team the puck.",
-      "source_definition": "FOW% — Faceoff win percentage (per a player's all faceoffs)",
+      "source_definition": "FOW% \u2014 Faceoff win percentage (per a player's all faceoffs)",
       "events": [
         "faceoff_win"
       ]
@@ -147,7 +147,7 @@
       "unit": "%",
       "higher_is_better": true,
       "definition": "Share of the player's passes that reached a teammate.",
-      "source_definition": "Pass% — Percentage of successful passes per a player's all passes"
+      "source_definition": "Pass% \u2014 Percentage of successful passes per a player's all passes"
     },
     {
       "id": "passes",
@@ -157,7 +157,7 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many of the player's passes reached a teammate.",
-      "source_definition": "Passes — Successful passes per a player's all passes"
+      "source_definition": "Passes \u2014 Successful passes per a player's all passes"
     },
     {
       "id": "puck_contest_wins",
@@ -167,7 +167,7 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many times the player won a contested puck, a one-on-one fight for a loose puck.",
-      "source_definition": "PCW — Number of a player's puck contest wins"
+      "source_definition": "PCW \u2014 Number of a player's puck contest wins"
     },
     {
       "id": "saves",
@@ -229,6 +229,48 @@
       "events": [
         "save",
         "goal_against"
+      ]
+    },
+    {
+      "id": "pbp_mean",
+      "label": "Average pass body pressure relief",
+      "derived": "pass_body_pressure",
+      "aggregate": "mean",
+      "format": "decimal2",
+      "unit": "skaters",
+      "higher_is_better": true,
+      "definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "source_definition": "Project-defined PBP using Wisehockey event snapshots; reception time is estimated, not directly observed.",
+      "events": [
+        "pass_pressure"
+      ]
+    },
+    {
+      "id": "pbp_positive_share",
+      "label": "Pressure-reducing passes",
+      "derived": "pass_body_pressure",
+      "aggregate": "positive_share",
+      "format": "pct",
+      "unit": "%",
+      "higher_is_better": true,
+      "definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "source_definition": "Project-defined PBP using Wisehockey event snapshots; reception time is estimated, not directly observed.",
+      "events": [
+        "pass_pressure"
+      ]
+    },
+    {
+      "id": "pbp_evaluated",
+      "label": "Evaluated passes",
+      "derived": "pass_body_pressure",
+      "aggregate": "evaluated_passes",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "source_definition": "Project-defined PBP using Wisehockey event snapshots; reception time is estimated, not directly observed.",
+      "events": [
+        "pass_pressure"
       ]
     }
   ]

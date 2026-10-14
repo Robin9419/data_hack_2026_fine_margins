@@ -7,6 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from .events import MatchEvents
+from .event_kpis import EventAnalysis, pass_body_pressure
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_DIR = ROOT / "backend" / "content"
@@ -70,8 +71,46 @@ class Content:
             self._camera_clip,
         )
         self.goalie_rows = self._load_goalie_stats()
+        goalkeeper_ids = {r['EventSecondaryPlayerId'] for r in self.event_rows
+                          if r['EventType'] == 'Shot' and r['EventSecondaryPlayerId']}
+        self.analysis = EventAnalysis(self.event_rows, goalkeeper_ids)
+        self.derived_kpis = {'pass_body_pressure': pass_body_pressure(self.analysis)}
+        self._add_pass_moments()
         self.player_images = self._load_player_images()
         self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
+        self._add_pressure_card()
+
+    def _add_pass_moments(self):
+        for result in self.derived_kpis['pass_body_pressure']['events']:
+            if result['value'] is None:
+                continue
+            row = self.event_rows[result['source_row'] - 1]
+            moment = self.events._moment(
+                row, 'pass_pressure', 'Pressure-reducing pass' if result['value'] > 0 else 'Successful pass',
+                f"To {self.events.names.get(result['receiver_id'], 'receiver')}. "
+                f"PBP {result['value']:+d}: {result['pbp_pg']} → {result['pbp_pe']} opposing skaters.")
+            moment.update(id=result['id'], kpi=result)
+            self.events.by_player.setdefault(result['passer_id'], []).append(moment)
+        for moments in self.events.by_player.values():
+            moments.sort(key=lambda m: (int(m['timestamp']), m['id']))
+
+    def _add_pressure_card(self):
+        candidates = [(pid, stats) for pid, stats in self.derived_kpis['pass_body_pressure']['players'].items()
+                      if stats['ranking_eligible'] and stats['mean'] > 0]
+        if not candidates:
+            return
+        # Deterministic tie break: more evaluated passes, then player ID.
+        pid, stats = max(candidates, key=lambda item: (item[1]['mean'], item[1]['evaluated_passes'], item[0]))
+        team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
+        self.archetypes['Pressure Reliever'] = ('Highest average reduction in nearby opposing skaters through successful passes, '
+                                               'with at least 10 evaluated passes. Snapshot-based estimate.')
+        cfg = {'id': 'pressure-reliever', 'team': team, 'jersey': jersey, 'position': 'Skater',
+               'title': 'Pressure Reliever', 'attributes': ['pbp_mean', 'pbp_positive_share', 'pbp_evaluated'],
+               'explanation': f"Reduced nearby opponent pressure by {stats['mean']:.2f} skaters per evaluated pass on average. "
+                              f"{stats['evaluated_passes']} of {stats['eligible_passes']} eligible passes could be evaluated. "
+                              'This measures pressure relief, not overall passing or attacking quality.',
+               'achievement': None, 'video': None}
+        self.cards[cfg['id']] = self._build_card(cfg)
 
     def _load_stats(self) -> list[dict]:
         path = DATA_DIR / self.match["stats_file"]
@@ -128,7 +167,11 @@ class Content:
 
     def _rank(self, metric: dict, value) -> int:
         """1-based rank of value within the metric's pool (ties share a rank)."""
-        values = [_to_number(r[metric["column"]]) for r in self._pool(metric)]
+        if metric.get('derived'):
+            values = [s[metric['aggregate']] for s in self.derived_kpis[metric['derived']]['players'].values()
+                      if s['ranking_eligible']]
+        else:
+            values = [_to_number(r[metric["column"]]) for r in self._pool(metric)]
         values = [v for v in values if v is not None]
         if metric["higher_is_better"]:
             return 1 + sum(1 for v in values if v > value)
@@ -136,7 +179,12 @@ class Content:
 
     def _build_attribute(self, metric_id: str, row: dict, moments: list[dict]) -> dict:
         metric = self.metrics[metric_id]
-        value = _to_number(row[metric["column"]])
+        if metric.get('derived'):
+            stats = self.derived_kpis[metric['derived']]['players'].get(
+                self.events.player_id(row['Team'], int(row['Jersey'])), {})
+            value = stats.get(metric['aggregate'])
+        else:
+            value = _to_number(row[metric["column"]])
         attr = {
             "metric_id": metric_id,
             "label": metric["label"],
@@ -147,12 +195,19 @@ class Content:
             "definition": metric["definition"],
             "source_definition": metric["source_definition"],
             "match_rank": self._rank(metric, value) if value is not None else None,
-            "players_in_match": len(self._pool(metric)),
+            "players_in_match": (sum(s['ranking_eligible'] for s in self.derived_kpis[metric['derived']]['players'].values())
+                                 if metric.get('derived') else len(self._pool(metric))),
             "rank_pool": "goalkeepers" if metric.get("goalkeeper") else "players",
         }
         # Ids of the events behind the number (see "events" in metrics.json); None if the
         # metric can't be traced to single events (e.g. time on ice, skating distance).
         attr["moment_ids"] = MatchEvents.select(moments, metric["events"]) if "events" in metric else None
+        if metric.get('derived'):
+            attr['coverage'] = stats.get('coverage')
+            attr['detail'] = f"{stats.get('evaluated_passes', 0)} of {stats.get('eligible_passes', 0)} eligible passes evaluated"
+            attr['moment_ids'] = stats.get('positive_event_ids' if metric['aggregate'] == 'positive_share' else 'event_ids', [])
+            if not stats.get('ranking_eligible'):
+                attr['match_rank'] = None
         if "count_column" in metric:
             attr["detail"] = f'{row[metric["count_column"]]} of {row[metric["total_column"]]}'
         return attr
@@ -227,6 +282,7 @@ class Content:
             of_kind("goal")[:1]
             or of_kind("assist")[:1]
             or sorted(of_kind("save", "shot"), key=lambda m: -(m["xg"] or 0))[:1]
+            or sorted(of_kind('pass_pressure'), key=lambda m: -m['kpi']['value'])[:1]
             or of_kind("faceoff_win")[:1]
         )
         if best:

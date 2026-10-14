@@ -209,3 +209,9 @@ def quiz_answer(question_id: int, body: QuizAnswer, user: dict = Depends(current
     result = db.grant_card(user["id"], question["card_id"], edition)
     card = {**get_content().cards[question["card_id"]], "owned": True, "edition": edition}
     return {"correct": True, "result": result, "card": card, "progress": progress_for(user["id"])}
+
+
+@app.get('/api/analysis/pass-body-pressure')
+def pass_pressure_analysis(user: dict = Depends(current_user)):
+    """Event results, exclusions, coverage and aggregates for every passer."""
+    return get_content().derived_kpis['pass_body_pressure']

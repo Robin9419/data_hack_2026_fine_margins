@@ -28,18 +28,20 @@ export default function PackOpening() {
 
   const allRevealed = stages.every((s) => s === 'revealed')
   const newCardIds = pack.filter((c) => c.is_new).map((c) => c.id)
+  const special = pack.some((c) => c.type === 'special')
+  const fromTrade = location.state?.from === 'trade'
 
   return (
     <section className="pack-stage">
       <h1>{location.state?.title ?? 'Your starter pack'}</h1>
-      <p className="pack-hint">{allRevealed ? 'Nice pull!' : 'Tap a card to find out who you got.'}</p>
+      <p className="pack-hint">{!allRevealed ? 'Tap a card to find out who you got.' : special ? 'A special card!' : 'Nice pull!'}</p>
 
       <div className="pack-row">
         {pack.map((card, i) => (
           <button
             key={card.id}
             type="button"
-            className={`pack-card ${stages[i]}`}
+            className={`pack-card ${stages[i]} ${card.type === 'special' ? 'special' : ''}`}
             style={{ '--delay': `${i * 120}ms` }}
             onClick={() => reveal(i)}
             disabled={stages[i] !== 'hidden'}
@@ -57,9 +59,16 @@ export default function PackOpening() {
 
       <div className="pack-actions">
         {allRevealed ? (
-          <button type="button" className="pack-button" onClick={() => navigate('/', { state: { newCardIds } })}>
-            Go to my collection
-          </button>
+          <>
+            <button type="button" className="pack-button" onClick={() => navigate('/', { state: { newCardIds } })}>
+              Go to my collection
+            </button>
+            {fromTrade && (
+              <button type="button" className="pack-button secondary" onClick={() => navigate('/trade')}>
+                Trade again
+              </button>
+            )}
+          </>
         ) : (
           <button type="button" className="pack-button secondary" onClick={revealAll}>
             Reveal all

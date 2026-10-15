@@ -88,6 +88,7 @@ export default function Gallery() {
   if (!cards) return <p className="muted">Loading cards…</p>
 
   const ownedCount = cards.filter((c) => c.owned).length
+  const spareCount = cards.reduce((n, c) => n + (c.type === 'base' && c.copies > 1 ? c.copies - 1 : 0), 0)
   // Owned cards first, then locked; within each, special cards before base (otherwise API order).
   const shown = cards
     .filter((c) => (team === 'all' || c.player.team === team) && (type === 'all' || c.type === type))
@@ -134,11 +135,23 @@ export default function Gallery() {
         <button type="button" className="quiz-cta" onClick={onClaimDaily}>
           <span>
             <strong>Your daily card is ready</strong>
-            <small>Claim one free base card. A new one is available every day.</small>
+            <small>Claim one free base card. A new one is available every day, duplicates included.</small>
           </span>
           <span aria-hidden="true">→</span>
         </button>
       )}
+
+      <Link to="/trade" className="quiz-cta trade-cta">
+        <span>
+          <strong>Trade in 3 base cards</strong>
+          <small>
+            {spareCount > 0
+              ? `You have ${spareCount} spare ${spareCount === 1 ? 'duplicate' : 'duplicates'}. Swap three for a new card, maybe a special one.`
+              : 'Swap any three base cards for a random new card, maybe a special one.'}
+          </small>
+        </span>
+        <span aria-hidden="true">⇄</span>
+      </Link>
 
       <Link to="/quiz" className="quiz-cta">
         <span>

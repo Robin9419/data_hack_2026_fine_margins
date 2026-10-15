@@ -24,6 +24,7 @@ export default function CardTile({ card, isNew, onOpen }) {
   return (
     <Link to={`/cards/${card.id}`} className="card-tile">
       {isNew && <span className="new-tag">NEW</span>}
+      {card.copies > 1 && <span className="copies-tag" title={`You have ${card.copies} copies`}>×{card.copies}</span>}
       <CardFace card={card} />
     </Link>
   )

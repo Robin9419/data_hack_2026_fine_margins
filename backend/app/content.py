@@ -278,15 +278,18 @@ class Content:
         }
 
     def _build_base_card(self, cfg: dict, doc: dict) -> dict:
-        """A plain card with the player's profile only: no archetype, stats or highlights."""
-        row = self._find_row(cfg["team"], cfg["jersey"])
+        """A plain card with the player's profile only: no archetype, stats or highlights. Players of the two teams
+        in the final are named from the stats CSV; the other teams' cards carry the name themselves and no match."""
+        in_final = cfg["team"] in (self.match["home_team"], self.match["away_team"])
+        row = (self._find_row(cfg["team"], cfg["jersey"]) if in_final
+               else {"FirstName": cfg["first_name"], "LastName": cfg["last_name"]})
         bio_keys = ("date_of_birth", "place_of_birth", "nationality", "height_cm", "weight_kg", "shoots", "draft", "club")
         return {
             "id": cfg["id"],
             "type": "base",
             "player": self._player(cfg, row),
             "title": None,
-            "match": self._match(cfg["team"]),
+            "match": self._match(cfg["team"]) if in_final else None,
             "bio": {k: cfg.get(k) for k in bio_keys},
             "edition": "standard",
             "source": doc["source"],
@@ -402,7 +405,7 @@ class Content:
             "option_ids": option_ids,
             "prompt": prompt,
             "clue": clue,
-            "match": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}',
+            "match": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}' if m else None,
         }
 
     @staticmethod

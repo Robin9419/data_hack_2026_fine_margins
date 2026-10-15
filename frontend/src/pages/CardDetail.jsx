@@ -182,9 +182,11 @@ function BaseCardDetail({ card }) {
         ))}
       </div>
 
-      <p className="muted small">
-        Played in {scoreline(match)} on {formatMatchDate(match.date)}.
-      </p>
+      {match && (
+        <p className="muted small">
+          Played in {scoreline(match)} on {formatMatchDate(match.date)}.
+        </p>
+      )}
       <p className="muted small">
         Source:{' '}
         {card.source_url ? (

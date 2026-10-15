@@ -139,7 +139,7 @@ export default function Quiz() {
         Question {index + 1} of {questions.length} · {venue === 'stadium' ? '🏟 Stadium' : '📺 At home'}
       </p>
       <h1>{question.prompt}</h1>
-      <p className="quiz-match">{question.match}</p>
+      {question.match && <p className="quiz-match">{question.match}</p>}
       <p className="quiz-clue">💡 {question.clue}</p>
       <p className="muted small">
         {question.reward === 'upgrade'

@@ -508,7 +508,9 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .trade-slot.filled:hover .slot-remove, .trade-slot.filled:focus-visible .slot-remove { opacity: 1; }
 @media (hover: none) { .slot-remove { opacity: 1; } }
 
-.trade-warning { margin: 16px auto 0; max-width: 460px; font-size: 0.85rem; color: #ffd36b; }
+.trade-warning { margin: 16px auto 0; max-width: 460px; padding: 10px 14px; font-size: 0.85rem; color: #ffd36b; text-align: left; border: 1px solid #ffd36b; border-radius: 8px; background: rgba(255, 211, 107, 0.1); }
+.trade-warning ul { margin: 6px 0 0; padding-left: 18px; }
+.trade-card.last-copy .trade-count { color: #ffd36b; }
 .trade-error { margin: 16px 0 0; color: #ff9b8f; }
 .trade-actions { margin-top: 24px; }
 .pack-button:disabled { cursor: default; opacity: 0.45; box-shadow: none; }

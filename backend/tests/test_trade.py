@@ -68,6 +68,27 @@ class TradeTests(unittest.TestCase):
         self.assertAlmostEqual(counts['favorite'] / 800, 0.25, delta=0.05)
         self.assertAlmostEqual(counts['special'] / 800, 0.25, delta=0.05)
 
+    def test_trade_never_gives_a_duplicate(self):
+        random.seed(3)
+        user = self.user('HC Davos')
+        for _ in range(200):
+            db.clear_cards(user['id'])
+            # Owns every base card plus two spare copies of the first one, so the trade must use a special card.
+            db.grant_cards(user['id'], self.base + [self.base[0]] * 2)
+            before = set(db.owned_cards(user['id']))
+            card = main.trade(main.TradeRequest(card_ids=[self.base[0]] * 3), user)['pack'][0]
+            self.assertNotIn(card['id'], before)
+            self.assertEqual(card['type'], 'special')
+
+    def test_trade_refuses_when_everything_is_owned(self):
+        user = self.user()
+        cards = list(self.cards)
+        db.grant_cards(user['id'], cards + [self.base[0]] * 2)
+        with self.assertRaises(main.HTTPException) as err:
+            main.trade(main.TradeRequest(card_ids=[self.base[0]] * 3), user)
+        self.assertEqual(err.exception.status_code, 409)
+        self.assertEqual(db.card_copies(user['id'])[self.base[0]], 3)
+
     def test_odds_without_favorite_team(self):
         self.assertEqual([o['chance'] for o in main.trade_odds(None)], [0.75, 0.25])
 

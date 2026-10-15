@@ -112,28 +112,37 @@ def trade_odds(favorite_team: str | None) -> list[dict]:
     ]
 
 
-def roll_trade(user_id: int, favorite_team: str | None) -> tuple[str, dict]:
-    """Rolls the trade-in outcome and grants the card. Returns (outcome id, card as a pack entry). A special card is
-    one the user doesn't own yet; once they own every special card, that roll becomes a base card instead."""
+def tradeable_cards(user_id: int, traded_ids: list[str]) -> list[str]:
+    """Card ids a trade may give: cards the user does not hold and is not trading in. A trade never returns a
+    duplicate, so this is the only pool it draws from."""
+    excluded = set(db.owned_cards(user_id)) | set(traded_ids)
+    return [cid for cid in get_content().cards if cid not in excluded]
+
+
+def roll_trade(user_id: int, favorite_team: str | None, traded_ids: list[str]) -> tuple[str, dict]:
+    """Rolls the trade-in outcome and grants the card. Returns (outcome id, card as a pack entry). The card is always
+    one the user doesn't own. If the rolled pool has nothing left, the card comes from the next best pool (a special
+    falls back to a base card, a favorite-team card to any base card), and the outcome reflects what was drawn."""
     content = get_content()
     odds = trade_odds(favorite_team)
-    outcome = random.choices([o["id"] for o in odds], weights=[o["chance"] for o in odds])[0]
-    if outcome == "special":
-        owned = db.owned_cards(user_id)
-        specials = [cid for cid, card in content.cards.items() if card["type"] == "special" and cid not in owned]
-        if specials:
-            drawn = random.choice(specials)
-            db.grant_card(user_id, drawn, "standard")
-            return outcome, {**content.cards[drawn], "owned": True, "edition": "standard", "is_new": True}
-        outcome = "base"
-    base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
+    rolled = random.choices([o["id"] for o in odds], weights=[o["chance"] for o in odds])[0]
+    available = set(tradeable_cards(user_id, traded_ids))
+    base = [cid for cid in available if content.cards[cid]["type"] == "base"]
+    specials = [cid for cid in available if content.cards[cid]["type"] == "special"]
     pools = {
-        "favorite": [cid for cid in base_ids if content.cards[cid]["player"]["team"] == favorite_team],
-        "other": [cid for cid in base_ids if content.cards[cid]["player"]["team"] != favorite_team],
+        "special": specials,
+        "base": base,
+        "favorite": [cid for cid in base if content.cards[cid]["player"]["team"] == favorite_team],
+        "other": [cid for cid in base if content.cards[cid]["player"]["team"] != favorite_team],
     }
-    drawn = random.choice(pools.get(outcome) or base_ids)
-    new_ids = db.grant_cards(user_id, [drawn])
-    return outcome, {**content.cards[drawn], "owned": True, "is_new": drawn in new_ids}
+    drawn = random.choice(pools[rolled] or base or specials)
+    card = content.cards[drawn]
+    if card["type"] == "special":
+        db.grant_card(user_id, drawn, "standard")
+        return "special", {**card, "owned": True, "edition": "standard", "is_new": True}
+    db.grant_cards(user_id, [drawn])
+    outcome = "base" if not favorite_team else ("favorite" if card["player"]["team"] == favorite_team else "other")
+    return outcome, {**card, "owned": True, "is_new": True}
 
 
 def progress_for(user_id: int) -> dict:
@@ -178,9 +187,11 @@ def trade(body: TradeRequest, user: dict = Depends(current_user)):
     content = get_content()
     if any(content.cards.get(cid, {}).get("type") != "base" for cid in body.card_ids):
         raise HTTPException(400, "Only base cards can be traded in")
+    if not tradeable_cards(user["id"], body.card_ids):
+        raise HTTPException(409, "You already own every card, so there is nothing to trade for")
     if not db.remove_copies(user["id"], body.card_ids):
         raise HTTPException(409, "You don't have those cards to trade")
-    outcome, card = roll_trade(user["id"], user["favorite_team"])
+    outcome, card = roll_trade(user["id"], user["favorite_team"], body.card_ids)
     return {"outcome": outcome, "pack": [card], "progress": progress_for(user["id"])}
 
 

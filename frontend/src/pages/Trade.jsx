@@ -123,10 +123,16 @@ export default function Trade() {
         </div>
 
         {leaving.length > 0 && (
-          <p className="trade-warning">
-            {leaving.map((id) => fullName(byId[id])).join(', ')} {leaving.length === 1 ? 'is your last copy and' : 'are your last copies and'}{' '}
-            will leave your collection.
-          </p>
+          <div className="trade-warning" role="alert">
+            <strong>Heads up: you will no longer own {leaving.length === 1 ? 'this card' : 'these cards'}.</strong>
+            <ul>
+              {leaving.map((id) => (
+                <li key={id}>
+                  {fullName(byId[id])}: you are trading {byId[id].copies === 1 ? 'your only copy' : `all ${byId[id].copies} of your copies`}.
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
         {error && <p className="trade-error">{error}</p>}
 
@@ -166,7 +172,7 @@ export default function Trade() {
               const n = picked(card.id)
               const maxed = n >= card.copies || full
               return (
-                <div key={card.id} className={`trade-card ${n ? 'picked' : ''}`}>
+                <div key={card.id} className={`trade-card ${n ? 'picked' : ''} ${n >= card.copies ? 'last-copy' : ''}`}>
                   <button
                     type="button"
                     className="card-tile"
@@ -181,6 +187,7 @@ export default function Trade() {
                     <div className="trade-count">
                       <span>
                         {n} / {card.copies}
+                        {n >= card.copies && ' ⚠ all'}
                       </span>
                       <button type="button" aria-label={`Take one ${fullName(card)} out of the trade`} onClick={() => removeOne(card.id)}>
                         −

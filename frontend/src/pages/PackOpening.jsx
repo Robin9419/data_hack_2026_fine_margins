@@ -29,23 +29,32 @@ export default function PackOpening() {
   const allRevealed = stages.every((s) => s === 'revealed')
   const newCardIds = pack.filter((c) => c.is_new).map((c) => c.id)
   const special = pack.some((c) => c.type === 'special')
+  const legend = pack.some((c) => c.type === 'legend')
   const fromTrade = location.state?.from === 'trade'
 
   return (
     <section className="pack-stage">
       <h1>{location.state?.title ?? 'Your starter pack'}</h1>
-      <p className="pack-hint">{!allRevealed ? 'Tap a card to find out who you got.' : special ? 'A special card!' : 'Nice pull!'}</p>
+      <p className="pack-hint">{!allRevealed
+          ? legend
+            ? 'You collected enough of a club to earn a legend! Tap a card to find out who you got.'
+            : 'Tap a card to find out who you got.'
+          : legend
+            ? 'A club legend joined your collection!'
+            : special
+              ? 'A special card!'
+              : 'Nice pull!'}</p>
 
       <div className="pack-row">
         {pack.map((card, i) => (
           <button
             key={card.id}
             type="button"
-            className={`pack-card ${stages[i]} ${card.type === 'special' ? 'special' : ''}`}
+            className={`pack-card ${stages[i]} ${card.type === 'base' ? '' : card.type}`}
             style={{ '--delay': `${i * 120}ms` }}
             onClick={() => reveal(i)}
             disabled={stages[i] !== 'hidden'}
-            aria-label={`${card.player.first_name} ${card.player.last_name}${stages[i] === 'revealed' ? `, ${card.title ?? 'base card'}` : ', tap to reveal'}`}
+            aria-label={`${card.player.first_name} ${card.player.last_name}${stages[i] === 'revealed' ? `, ${card.title ?? 'base card'}` : card.type === 'legend' ? ', club legend, tap to reveal' : ', tap to reveal'}`}
           >
             <span className="pack-burst" aria-hidden="true" />
             <CardFace card={card} state={stages[i] === 'revealed' ? 'owned' : 'hidden'} />

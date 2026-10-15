@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
-// Player portrait. Falls back to the jersey number if there is no image or it fails to load.
+// Player portrait. Falls back to the jersey number (a star for a legend without one) if there is no image or it fails
+// to load.
 export default function PlayerPhoto({ player, className = 'card-art' }) {
   const [failed, setFailed] = useState(false)
   const showImage = player.image_url && !failed
@@ -16,7 +17,7 @@ export default function PlayerPhoto({ player, className = 'card-art' }) {
           onError={() => setFailed(true)}
         />
       ) : (
-        <span>#{player.jersey}</span>
+        <span>{player.jersey ? `#${player.jersey}` : '★'}</span>
       )}
     </div>
   )

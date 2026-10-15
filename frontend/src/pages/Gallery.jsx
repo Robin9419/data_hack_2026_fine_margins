@@ -19,9 +19,13 @@ const TEAM_FILTERS = [
 ]
 const TYPE_FILTERS = [
   { value: 'all', label: 'All cards' },
+  { value: 'legend', label: 'Legends' },
   { value: 'special', label: 'Special' },
   { value: 'base', label: 'Base' },
 ]
+
+// Within owned and within locked cards: legends, then special, then base.
+const TYPE_ORDER = ['legend', 'special', 'base']
 
 function FilterSelect({ label, options, value, onChange }) {
   return (
@@ -41,7 +45,7 @@ function FilterSelect({ label, options, value, onChange }) {
 export default function Gallery() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { setProgress } = useAuth()
+  const { progress, setProgress } = useAuth()
   const newCardIds = location.state?.newCardIds ?? []
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
@@ -89,12 +93,13 @@ export default function Gallery() {
 
   const ownedCount = cards.filter((c) => c.owned).length
   const spareCount = cards.reduce((n, c) => n + (c.type === 'base' && c.copies > 1 ? c.copies - 1 : 0), 0)
-  // Owned cards first, then locked; within each, special cards before base (otherwise API order).
+  const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
+  // Owned cards first, then locked; within each, by TYPE_ORDER (otherwise API order).
   const shown = cards
     .filter((c) => (team === 'all' || c.player.team === team) && (type === 'all' || c.type === type))
     .sort((a, b) => {
       if (a.owned !== b.owned) return a.owned ? -1 : 1
-      return a.type === b.type ? 0 : a.type === 'special' ? -1 : 1
+      return TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type)
     })
   const pageCount = Math.max(1, Math.ceil(shown.length / PAGE_SIZE))
   const current = Math.min(page, pageCount - 1)
@@ -178,7 +183,13 @@ export default function Gallery() {
         </button>
         <div className="card-grid" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           {pageCards.map((card) => (
-            <CardTile key={card.id} card={card} isNew={newCardIds.includes(card.id)} onOpen={setSpotlight} />
+            <CardTile
+              key={card.id}
+              card={card}
+              club={clubs[card.player.team]}
+              isNew={newCardIds.includes(card.id)}
+              onOpen={setSpotlight}
+            />
           ))}
         </div>
         <button

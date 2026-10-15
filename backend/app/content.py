@@ -3,6 +3,7 @@ Wisehockey match statistics and events CSVs so card values always come from the 
 
 import csv
 import json
+import math
 from functools import lru_cache
 from pathlib import Path
 
@@ -82,6 +83,9 @@ class Content:
         self._add_pressure_card()
         base_doc = _load_json("base_cards.json")
         self.cards |= {c["id"]: self._build_base_card(c, base_doc) for c in base_doc["cards"]}
+        legends_doc = _load_json("legends.json")
+        self.legend_thresholds = legends_doc["thresholds"]
+        self.cards |= {c["id"]: self._build_legend_card(c, legends_doc) for c in legends_doc["cards"]}
 
     def _add_pass_moments(self):
         for result in self.derived_kpis['pass_body_pressure']['events']:
@@ -297,6 +301,58 @@ class Content:
             "source_url": cfg.get("ep_url"),
         }
 
+    def _build_legend_card(self, cfg: dict, doc: dict) -> dict:
+        """A club legend: not from the 2025 tournament, so no stats or match, only why the player is a legend. Won
+        automatically by collecting a share of the club's cards (see legends_due)."""
+        return {
+            "id": cfg["id"],
+            "type": "legend",
+            "player": {
+                "first_name": cfg["first_name"],
+                "last_name": cfg["last_name"],
+                "jersey": cfg.get("jersey"),
+                "team": cfg["team"],
+                "position": cfg["position"],
+                "image_url": cfg.get("image_url"),
+            },
+            "title": "Legend",
+            "match": None,
+            "legend": {k: cfg.get(k) for k in ("era", "nationality", "summary", "spengler_cup", "honours", "moment",
+                                                "image_credit", "image_source_url", "sources")},
+            "edition": "legend",
+            "source": doc["source"],
+        }
+
+    def club_cards(self, team: str) -> list[str]:
+        """The cards that count towards a club's collection: its base and special cards (not its legends)."""
+        return [cid for cid, c in self.cards.items() if c["type"] != "legend" and c["player"]["team"] == team]
+
+    def legends_due(self, team: str, owned: dict[str, str]) -> int:
+        """How many legends a user has earned for the club: one per threshold (share of club_cards owned) reached."""
+        club = self.club_cards(team)
+        have = sum(cid in owned for cid in club)
+        return sum(have >= math.ceil(t * len(club)) for t in self.legend_thresholds)
+
+    def club_progress(self, owned: dict[str, str]) -> list[dict]:
+        """Per club: cards collected, legends owned and how many cards the next legend needs."""
+        teams = dict.fromkeys(c["player"]["team"] for c in self.cards.values() if c["type"] == "legend")
+        result = []
+        for team in teams:
+            club = self.club_cards(team)
+            have = sum(cid in owned for cid in club)
+            steps = [math.ceil(t * len(club)) for t in self.legend_thresholds]
+            legends = [cid for cid, c in self.cards.items() if c["type"] == "legend" and c["player"]["team"] == team]
+            result.append({
+                "team": team,
+                "owned": have,
+                "total": len(club),
+                "legends_owned": sum(cid in owned for cid in legends),
+                "legends_total": len(legends),
+                "thresholds": steps,
+                "next_at": next((n for n in steps if n > have), None),
+            })
+        return result
+
     def _camera_clip(self, timestamp: str) -> dict | None:
         """The clip cut from the arena recording for this event, if it has been cut
         (scripts/cut_clips.py). Checked once at startup, so restart after cutting."""
@@ -362,14 +418,15 @@ class Content:
         return f'{m["title"]} at {m["clock"]} of the {m["period_label"]}. {m["text"]}'.strip()
 
     def card_summary(self, card: dict) -> dict:
-        """What the gallery shows for a card the user does not own yet: only the (grayed out) photo."""
+        """What the gallery shows for a card the user does not own yet: only the (grayed out) photo. A legend shows
+        nothing but its club, so it stays a surprise."""
         player = card["player"]
         return {
             "id": card["id"],
             "type": card["type"],
             "player": {
-                "image_url": player.get("image_url"),
-                "jersey": player.get("jersey"),
+                "image_url": None if card["type"] == "legend" else player.get("image_url"),
+                "jersey": None if card["type"] == "legend" else player.get("jersey"),
                 "team": player["team"],
                 "first_name": "",
                 "last_name": "",
@@ -387,6 +444,7 @@ class Content:
             "owned_count": len(owned),
             "stadium_count": sum(1 for e in owned.values() if e == "stadium"),
             "total_cards": len(self.cards),
+            "clubs": self.club_progress(owned),
         }
 
     def build_question(self, card_id: str, rng) -> dict:

@@ -32,6 +32,7 @@ export default function CardDetail() {
     )
   if (!card) return <p className="muted">Loading card…</p>
   if (card.type === 'base') return <BaseCardDetail card={card} />
+  if (card.type === 'legend') return <LegendCardDetail card={card} />
 
   const { player, match } = card
   const moments = card.moments || []
@@ -197,6 +198,94 @@ function BaseCardDetail({ card }) {
           card.source
         )}{' '}
         · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
+      </p>
+    </section>
+  )
+}
+
+// A club legend: no game stats, only why the player is a legend, with their Spengler Cup record first.
+function LegendCardDetail({ card }) {
+  const { player, legend } = card
+  const facts = [
+    ['Position', player.position],
+    ['Nationality', legend.nationality],
+    ['Era', legend.era],
+  ].filter(([, value]) => value)
+
+  return (
+    <section className="detail legend-detail">
+      <Link to="/">← Back to collection</Link>
+
+      <header className="detail-header">
+        <figure className="legend-figure">
+          <PlayerPhoto player={player} className="detail-photo legend-photo" />
+          {legend.moment && <figcaption>{legend.moment}</figcaption>}
+        </figure>
+        <div className="detail-heading">
+          <p className="eyebrow legend-eyebrow">★ Club legend · {player.team}</p>
+          <h1>
+            {player.jersey ? `#${player.jersey} ` : ''}
+            {player.first_name} {player.last_name}
+          </h1>
+          <div className="match-context">
+            {facts.map(([label, value]) => (
+              <div key={label}>
+                <span className="label">{label}</span>
+                {value}
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <h2>Why a legend</h2>
+      <p className="explanation">{legend.summary}</p>
+
+      {legend.spengler_cup?.length > 0 && (
+        <>
+          <h2>At the Spengler Cup</h2>
+          <ul className="legend-facts">
+            {legend.spengler_cup.map((fact) => (
+              <li key={fact}>{fact}</li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {legend.honours?.length > 0 && (
+        <>
+          <h2>Career honours</h2>
+          <ul className="legend-facts">
+            {legend.honours.map((fact) => (
+              <li key={fact}>{fact}</li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      <p className="muted small">
+        Earned by collecting {player.team} cards. Photo:{' '}
+        {legend.image_source_url ? (
+          <a href={legend.image_source_url} target="_blank" rel="noreferrer">
+            {legend.image_credit || 'source'}
+          </a>
+        ) : (
+          legend.image_credit || 'none'
+        )}
+        {legend.sources?.length > 0 && (
+          <>
+            {' '}
+            · Sources:{' '}
+            {legend.sources.map((url, i) => (
+              <span key={url}>
+                {i > 0 && ', '}
+                <a href={url} target="_blank" rel="noreferrer">
+                  {new URL(url).hostname.replace(/^www\./, '')}
+                </a>
+              </span>
+            ))}
+          </>
+        )}
       </p>
     </section>
   )

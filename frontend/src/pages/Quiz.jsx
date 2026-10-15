@@ -15,6 +15,7 @@ export default function Quiz() {
   const [index, setIndex] = useState(0)
   const [missed, setMissed] = useState(null) // { chosen, answer } once the current question was answered wrong
   const [unlock, setUnlock] = useState(null) // { card, result, points, progress }
+  const [legends, setLegends] = useState([]) // legends earned by the last answer, shown after its unlock
   const [won, setWon] = useState(0)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
@@ -51,6 +52,7 @@ export default function Quiz() {
           points: data.progress.points - progress.points,
           progress: data.progress,
         })
+        setLegends(data.legends ?? [])
         setWon((n) => n + 1)
       }
     } catch (err) {
@@ -62,6 +64,12 @@ export default function Quiz() {
 
   // The bar fills when the unlock screen is dismissed, so the player sees it move.
   const next = () => {
+    if (legends.length > 0) {
+      const [legend, ...rest] = legends
+      setUnlock({ ...unlock, card: legend, result: 'legend', points: null })
+      setLegends(rest)
+      return
+    }
     if (unlock) setProgress(unlock.progress)
     setUnlock(null)
     setMissed(null)
@@ -181,7 +189,7 @@ export default function Quiz() {
           result={unlock.result}
           points={unlock.points}
           onContinue={next}
-          continueLabel={last ? 'Finish' : 'Next question'}
+          continueLabel={legends.length > 0 ? 'Continue' : last ? 'Finish' : 'Next question'}
         />
       )}
     </section>

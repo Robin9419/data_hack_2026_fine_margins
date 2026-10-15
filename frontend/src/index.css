@@ -537,3 +537,70 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 @media (prefers-reduced-motion: reduce) {
   .trade-slot.filled { animation: none; }
 }
+
+/* Club legends: black-and-gold frame, black and white photo, a slow gold sheen and a ribbon. */
+.card-face.legend {
+  --gold: #e8c46a;
+  background: radial-gradient(circle at 50% 30%, #2b2b2b, #050505 75%);
+  box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 6px #050505, inset 0 0 0 7px rgba(232, 196, 106, 0.55), 0 0 18px rgba(232, 196, 106, 0.35);
+}
+.card-face.legend .card-art { inset: 7px 7px 18% 7px; border-radius: 9px 9px 0 0; overflow: hidden; color: rgba(232, 196, 106, 0.35); }
+.card-face.legend .card-art img, .legend-photo img { filter: grayscale(1) contrast(1.15) brightness(0.95); }
+/* Vignette over the photo, darker at the edges like an old print. */
+.card-face.legend .card-art::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 40px 10px rgba(0, 0, 0, 0.75); pointer-events: none; }
+.card-face.legend::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 226, 150, 0.28) 45%, rgba(255, 248, 220, 0.4) 50%, rgba(255, 226, 150, 0.28) 55%, transparent 70%);
+  background-size: 250% 100%;
+  animation: foil-sweep 6s ease-in-out infinite;
+}
+.card-face.legend .card-archetype { background: linear-gradient(90deg, #b8892b, #f6e2a4, #b8892b); color: #1a1205; }
+.card-face.legend .card-name { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; letter-spacing: 0.04em; color: #f6e2a4; text-shadow: 0 1px 0 #000, 0 0 12px rgba(232, 196, 106, 0.35); }
+.card-face.legend .card-first { font-family: system-ui, sans-serif; color: #fff; }
+.card-face.legend .card-meta { color: #e8c46a; opacity: 0.9; }
+.legend-ribbon { position: absolute; top: 14px; right: 14px; z-index: 3; padding: 3px 10px; border-radius: 999px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: #1a1205; background: linear-gradient(90deg, #b8892b, #f6e2a4, #b8892b); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6); }
+/* Locked legend: no photo or name, only a gold star and the club. */
+.card-face.legend.locked-legend { filter: none; box-shadow: inset 0 0 0 2px rgba(232, 196, 106, 0.45); }
+.card-face.legend.locked-legend::before { animation: none; opacity: 0; }
+.legend-star { position: absolute; inset: 0 0 30% 0; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: rgba(232, 196, 106, 0.35); text-shadow: 0 0 24px rgba(232, 196, 106, 0.25); }
+.card-face.legend.locked-legend .card-archetype { background: rgba(232, 196, 106, 0.18); color: #e8c46a; }
+.card-face.legend.locked-legend .card-name { font-size: 1rem; color: rgba(246, 226, 164, 0.75); }
+.card-face.legend.locked-legend .card-meta { text-transform: none; letter-spacing: 0; }
+
+/* Legend in a pack or unlock: gold glow instead of the rainbow of a special card. */
+.pack-card.revealed.legend .card-face, .unlock.legend .unlock-flip .card-face { box-shadow: inset 0 0 0 3px #e8c46a, inset 0 0 0 6px #050505, inset 0 0 0 7px rgba(232, 196, 106, 0.55), 0 0 40px rgba(232, 196, 106, 0.7), 0 0 90px rgba(232, 196, 106, 0.35); }
+.pack-card.hidden.legend .card-face { box-shadow: 0 0 0 2px #e8c46a, 0 0 30px rgba(232, 196, 106, 0.6); }
+.unlock.legend { background: radial-gradient(ellipse at 50% 40%, rgba(60, 60, 60, 0.96), rgba(0, 0, 0, 0.98) 70%); }
+.unlock.legend .unlock-sparks span { background: #e8c46a; box-shadow: 0 0 10px #e8c46a; }
+
+/* Club legend progress: over a locked legend in the gallery, only on hover or focus. */
+.club-legend { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); }
+.card-tile .club-legend { position: absolute; top: 50%; left: 10px; right: 10px; z-index: 3; transform: translateY(-50%); visibility: hidden; opacity: 0; transition: opacity 150ms; box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.7); }
+.card-tile.locked:hover .club-legend, .card-tile.locked:focus .club-legend { visibility: visible; opacity: 1; }
+.club-legend-head { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9rem; }
+.club-legend-stars span { color: #c3ced8; font-size: 1rem; }
+.club-legend-stars span.on { color: #c9971f; text-shadow: 0 0 6px rgba(232, 196, 106, 0.7); }
+.club-legend-track { position: relative; height: 8px; border-radius: 999px; background: #e3e9ee; }
+.club-legend-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #6b5520, #e8c46a); transition: width 800ms ease-out; }
+.club-legend-step { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: #fff; border: 2px solid #c3ced8; }
+.club-legend-step.reached { border-color: #c9971f; background: #e8c46a; }
+.club-legend-step:last-child { margin-left: -12px; }
+
+/* Legend detail page */
+.legend-figure { margin: 0; width: 220px; flex-shrink: 0; }
+.legend-photo { width: 100%; background: #111; color: #e8c46a; box-shadow: 0 0 0 3px #e8c46a, 0 0 0 6px #111; }
+.legend-figure figcaption { margin-top: 12px; font-size: 0.85rem; font-style: italic; color: var(--muted); }
+.legend-eyebrow { color: #a07a1c; font-weight: 700; }
+.legend-detail h1 { font-family: Georgia, 'Times New Roman', serif; }
+.legend-facts { padding-left: 1.2rem; margin: 0; }
+.legend-facts li { margin: 4px 0; }
+.legend-facts li::marker { content: '★  '; color: #c9971f; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-face.legend::before { animation: none; }
+}

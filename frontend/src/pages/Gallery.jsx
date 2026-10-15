@@ -10,11 +10,11 @@ const SWIPE_PX = 50
 
 const TEAM_FILTERS = [
   { value: 'all', label: 'All teams' },
-  { value: 'SCL Tigers', label: 'SCL Tigers' },
-  { value: 'Adler Mannheim', label: 'Adler Mannheim' },
-  { value: 'Ilves Tampere', label: 'Ilves Tampere' },
+  { value: 'HIFK', label: 'HIFK' },
+  { value: 'Team Canada', label: 'Team Canada' },
   { value: 'HC Davos', label: 'HC Davos' },
-  { value: 'Frölunda HC', label: 'Frölunda HC' },
+  { value: 'HC Sparta Praha', label: 'HC Sparta Praha' },
+  { value: 'HC Fribourg-Gottéron', label: 'HC Fribourg-Gottéron' },
   { value: 'U.S. Collegiate Selects', label: 'U.S. Collegiate Selects' },
 ]
 const TYPE_FILTERS = [

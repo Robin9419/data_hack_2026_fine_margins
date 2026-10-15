@@ -48,11 +48,11 @@ def current_user(authorization: str | None = Header(default=None)) -> dict:
 
 
 TEAMS = [
-    "SCL Tigers",
-    "Adler Mannheim",
-    "Ilves Tampere",
+    "HIFK",
+    "Team Canada",
     "HC Davos",
-    "Frölunda HC",
+    "HC Sparta Praha",
+    "HC Fribourg-Gottéron",
     "U.S. Collegiate Selects",
 ]
 

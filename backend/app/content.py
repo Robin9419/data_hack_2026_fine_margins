@@ -279,10 +279,11 @@ class Content:
 
     def _build_base_card(self, cfg: dict, doc: dict) -> dict:
         """A plain card with the player's profile only: no archetype, stats or highlights. Players of the two teams
-        in the final are named from the stats CSV; the other teams' cards carry the name themselves and no match."""
+        in the final are named from the stats CSV; the other teams' cards, and the final's backup goalkeepers (who
+        have no CSV row), carry the name themselves. Only the two finalists' cards link the match."""
         in_final = cfg["team"] in (self.match["home_team"], self.match["away_team"])
-        row = (self._find_row(cfg["team"], cfg["jersey"]) if in_final
-               else {"FirstName": cfg["first_name"], "LastName": cfg["last_name"]})
+        row = ({"FirstName": cfg["first_name"], "LastName": cfg["last_name"]} if "first_name" in cfg
+               else self._find_row(cfg["team"], cfg["jersey"]))
         bio_keys = ("date_of_birth", "place_of_birth", "nationality", "height_cm", "weight_kg", "shoots", "draft", "club")
         return {
             "id": cfg["id"],

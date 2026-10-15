@@ -72,3 +72,7 @@ The roster is derived from event lineup IDs, including both goaltenders. Source 
 ## HIFK, Team Canada, HC Sparta Praha, HC Fribourg-Gottéron
 
 Added 2026-10-15 for the 60 base cards of these teams (goalkeeper plus 14 skaters with the most total TOI over the 2025 tournament). All 60 images are the official 2025 Spengler Cup portraits (`cdn.spenglercup.ch/sites/default/files/players/<team>/2025/...`), taken from the player data embedded in the official game pages. Rights status: not established.
+
+## Full squads (22 per team)
+
+Added 2026-10-15 when the base cards grew to 20 skaters and 2 goalkeepers per team: 42 more players across all six teams. 30 new entries and the three missing HC Davos images (Simon Knak, Chris Egli, Davyd Barandun) use the official 2025 Spengler Cup portraits (`cdn.spenglercup.ch`), linked to each player's spenglercup.ch page. Existing image choices for the final's players were kept. Rights status: not established.

@@ -331,10 +331,12 @@
       "name": "Davyd Barandun",
       "jersey": 57,
       "team": "HC Davos",
-      "image_url": null,
-      "source_url": null,
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/57_Davyd_Barandun.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/57-barandun_davyd",
       "rights_status": "not established",
-      "notes": []
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
     },
     {
       "entity_id": "345037",
@@ -389,10 +391,12 @@
       "name": "Simon Knak",
       "jersey": 36,
       "team": "HC Davos",
-      "image_url": null,
-      "source_url": null,
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/hcd/2025/36_Simon_Knak.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/36-knak_simon",
       "rights_status": "not established",
-      "notes": []
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
     },
     {
       "entity_id": "309618",
@@ -411,10 +415,12 @@
       "name": "Chris Egli",
       "jersey": 96,
       "team": "HC Davos",
-      "image_url": null,
-      "source_url": null,
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/hcd/2025/96_Chris_Egli.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/96-egli_chris",
       "rights_status": "not established",
-      "notes": []
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
     },
     {
       "entity_id": "888057605",
@@ -1219,6 +1225,366 @@
       "team": "HC Fribourg-Gottéron",
       "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/42_Kyle_Rau.png",
       "source_url": "https://www.spenglercup.ch/en/game-results-2024",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Loic Galley",
+      "jersey": 1,
+      "team": "HC Fribourg-Gottéron",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/fri/2025/1_Loic_Galley.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/1-galley_loic",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Daniel Ljunggren",
+      "jersey": 14,
+      "team": "HC Fribourg-Gottéron",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/14_Daniel_Ljunggren.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/14-ljunggren_daniel",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Julien Sprunger",
+      "jersey": 86,
+      "team": "HC Fribourg-Gottéron",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/fri/2025/86_Julien_Sprunger.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/86-sprunger_julien",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Yannick Rathgeb",
+      "jersey": 27,
+      "team": "HC Fribourg-Gottéron",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/fri/2025/27_Yannick_Rathgeb.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/27-rathgeb_yannick",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Michal Cajkovsky",
+      "jersey": 67,
+      "team": "HC Fribourg-Gottéron",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/67_Michal_Cajkovski.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/67-cajkovsky_michal",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Patrik Nemeth",
+      "jersey": 12,
+      "team": "HC Fribourg-Gottéron",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/fri/2025/12_Patrik_Nemeth.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/12-nemeth_patrik",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Niklas Friman",
+      "jersey": 6,
+      "team": "HC Fribourg-Gottéron",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/6_Niklas_Friman.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/6-friman_niklas",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Luca Hollenstein",
+      "jersey": 51,
+      "team": "HC Davos",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/hcd/2025/51_Luca_Hollenstein.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/51-hollenstein_luca",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Niko Hovinen",
+      "jersey": 92,
+      "team": "HIFK",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/ifk/2025/92_niko_hovinen.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/92-hovinen_niko",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Aatu Karjalainen",
+      "jersey": 82,
+      "team": "HIFK",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/ifk/2025/82_aatu_karjalainen.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/82-karjalainen_aatu",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Kasper Lundell",
+      "jersey": 19,
+      "team": "HIFK",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/ifk/2025/19_kasper_lundell.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/19-lundell_kasper",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Otto Somppi",
+      "jersey": 15,
+      "team": "HIFK",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/ifk/2025/15_otto_somppi.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/15-somppi_otto",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Ilari Melart",
+      "jersey": 11,
+      "team": "HIFK",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/11_Ilari_Melart.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/11-melart_ilari",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Daniel Mäkiaho",
+      "jersey": 71,
+      "team": "HIFK",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/ifk/2025/71_daniel_ma%CC%88kiaho.png",
+      "source_url": "https://www.spenglercup.ch/en/game-results-2024",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Petr Kodýtek",
+      "jersey": 77,
+      "team": "HIFK",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/ifk/2025/77_petr_kody%CC%81tek.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/77-kod%C3%BDtek_petr",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Connor Hughes",
+      "jersey": 31,
+      "team": "Team Canada",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/can/2025/31_Connor_Hughes.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/31-hughes_connor",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Mason Shaw",
+      "jersey": 18,
+      "team": "Team Canada",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/can/2025/18_Mason_Shaw.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/18-shaw_mason",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Tanner Fritz",
+      "jersey": 16,
+      "team": "Team Canada",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/can/2025/16_Tanner_Fritz.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/16-fritz_tanner",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Andy Andreoff",
+      "jersey": 19,
+      "team": "Team Canada",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/can/2025/19_Andy_Andreoff.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/19-andreoff_andy",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Derek Grant",
+      "jersey": 27,
+      "team": "Team Canada",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/can/2025/27_Derek_Grant.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/27-grant_derek",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Jonathan Hazen",
+      "jersey": 4,
+      "team": "Team Canada",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/can/2025/4_Jonathan_Hazen.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/4-hazen_jonathan",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Jesse Graham",
+      "jersey": 64,
+      "team": "Team Canada",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/can/2025/64_Jesse_Graham.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/64-graham_jesse",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Alex Tracy",
+      "jersey": 33,
+      "team": "U.S. Collegiate Selects",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/usc/2025/33_Alex_Tracy.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/33-tracy_alex",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Tomás Volevecký",
+      "jersey": 82,
+      "team": "HC Sparta Praha",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/82_Tomas_Volevecky.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/82-voleveck%C3%BD_tom%C3%A1s",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Michal Vitouch",
+      "jersey": 37,
+      "team": "HC Sparta Praha",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/prg/2025/37_Michal_Vitouch.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/37-vitouch_michal",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Ondrej Hrabík",
+      "jersey": 19,
+      "team": "HC Sparta Praha",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/19_Ondrej_Hrabik.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/19-hrab%C3%ADk_ondrej",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Jan Eberle",
+      "jersey": 20,
+      "team": "HC Sparta Praha",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/prg/2025/20_Jan_Eberle.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/20-eberle_jan",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Krystof Hrabík",
+      "jersey": 11,
+      "team": "HC Sparta Praha",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/prg/2025/11_Krystof_Hrabik.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/11-hrab%C3%ADk_krystof",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "David Nemecek",
+      "jersey": 77,
+      "team": "HC Sparta Praha",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/players/prg/2025/77_David_Nemecek.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/77-nemecek_david",
+      "rights_status": "not established",
+      "notes": [
+        "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."
+      ]
+    },
+    {
+      "entity_id": null,
+      "name": "Jirí Pospísil",
+      "jersey": 92,
+      "team": "HC Sparta Praha",
+      "image_url": "https://cdn.spenglercup.ch/sites/default/files/2025-12/92_Jiri_Pospisil.png",
+      "source_url": "https://www.spenglercup.ch/en/spieler/92-posp%C3%ADsil_jir%C3%AD",
       "rights_status": "not established",
       "notes": [
         "Official Spengler Cup 2025 player portrait (cdn.spenglercup.ch)."

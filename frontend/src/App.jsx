@@ -5,6 +5,7 @@ import Gallery from './pages/Gallery'
 import CardDetail from './pages/CardDetail'
 import PackOpening from './pages/PackOpening'
 import Quiz from './pages/Quiz'
+import Admin from './pages/Admin'
 import RewardBar from './components/RewardBar'
 
 function RequireAuth({ children }) {
@@ -25,6 +26,7 @@ export default function App() {
         {user && (
           <div className="topbar-user">
             <span>{user.username}</span>
+            <Link to="/admin">Admin</Link>
             <button className="link-button" onClick={logout}>
               Sign out
             </button>
@@ -66,6 +68,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <CardDetail />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth>
+                <Admin />
               </RequireAuth>
             }
           />

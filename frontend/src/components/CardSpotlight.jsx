@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ordinal, teamClass } from '../format'
+import { ordinal } from '../format'
+import { teamStyle } from '../teams'
 import CardFace from './CardFace'
 
 const MAX_CLIPS = 3
@@ -30,7 +31,7 @@ function pickClips(card) {
 
 // Pop-out view of a special card from the gallery. It opens on the card's back, which shows the KPIs that earned
 // the player this archetype, next to clips that show it. Links on to the full card page.
-export default function CardSpotlight({ card, onClose }) {
+export default function CardSpotlight({ card, onClose, hideLink = false }) {
   const [flipped, setFlipped] = useState(true)
   const [clipIndex, setClipIndex] = useState(0)
   const closeRef = useRef(null)
@@ -121,13 +122,15 @@ export default function CardSpotlight({ card, onClose }) {
               ))}
             </div>
           )}
-          <Link to={`/cards/${card.id}`} className="spotlight-more">
-            <span>
-              <strong>See the full card</strong>
-              <small>Every stat, how it ranks and all game events</small>
-            </span>
-            <span aria-hidden="true">→</span>
-          </Link>
+          {!hideLink && (
+            <Link to={`/cards/${card.id}`} className="spotlight-more">
+              <span>
+                <strong>See the full card</strong>
+                <small>Every stat, how it ranks and all game events</small>
+              </span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          )}
         </div>
       </div>
     </div>
@@ -145,7 +148,7 @@ function rankText(kpi) {
 // The back holds only the archetype and the three KPIs that earned it.
 function CardBack({ card }) {
   return (
-    <span className={`spotlight-back card-face ${teamClass(card.player.team)}`}>
+    <span className="spotlight-back card-face" style={teamStyle(card.player.team)}>
       <span className="back-title">{card.title}</span>
       <span className="back-kpis">
         {kpisOf(card).map((kpi) => (

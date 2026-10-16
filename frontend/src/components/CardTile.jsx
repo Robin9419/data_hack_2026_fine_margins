@@ -4,8 +4,12 @@ import CardFace from './CardFace'
 // onOpen: when given, an owned special card opens in place (the spotlight) instead of going to its page.
 export default function CardTile({ card, isNew, onOpen }) {
   if (!card.owned) {
+    const reward = card.type === 'reward'
     return (
-      <div className="card-tile locked" aria-label="Locked card. Answer trivia questions to unlock it.">
+      <div
+        className="card-tile locked"
+        aria-label={reward ? `Locked card. ${card.unlock}.` : 'Locked card. Answer trivia questions to unlock it.'}
+      >
         <CardFace card={card} state="locked" />
         <span className="lock-chip">🔒 Locked</span>
       </div>
@@ -16,6 +20,7 @@ export default function CardTile({ card, isNew, onOpen }) {
     return (
       <button type="button" className="card-tile" onClick={() => onOpen(card)}>
         {isNew && <span className="new-tag">NEW</span>}
+        {card.test && <span className="test-tag">TEST</span>}
         <CardFace card={card} />
       </button>
     )

@@ -6,6 +6,8 @@
   --muted: #5b6b7a;
   --accent: #0b5cad;
   --border: #d9e0e6;
+  --display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -104,21 +106,24 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
   border-radius: 14px;
   overflow: hidden;
   color: #fff;
+  container-type: inline-size; /* text on the card scales with its width (cqw) */
   background:
     radial-gradient(circle at 70% 20%, color-mix(in srgb, var(--c2) 30%, transparent), transparent 60%),
     linear-gradient(180deg, var(--c1), #02040a 115%);
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c2) 55%, transparent);
   transition: filter 700ms ease-out;
 }
-.card-art { position: absolute; inset: 0 0 18% 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: rgba(255, 255, 255, 0.25); }
+.card-art { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: rgba(255, 255, 255, 0.25); }
 .card-art img, .detail-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.card-art span { align-self: flex-start; margin-top: 18cqw; font-family: var(--display); font-size: 40cqw; line-height: 1; color: transparent; -webkit-text-stroke: 2px color-mix(in srgb, var(--c2) 55%, transparent); }
 .card-face::after { content: ''; position: absolute; inset: 40% 0 0; background: linear-gradient(180deg, transparent, rgba(2, 4, 10, 0.85) 45%, #02040a); pointer-events: none; }
-.card-info { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 0 14px 14px; text-align: left; }
+.card-info { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 0 max(8px, 5.7cqw) max(8px, 4cqw); text-align: left; }
 .card-info p { margin: 0; }
 .card-info .card-archetype { display: inline-block; margin-bottom: 8px; padding: 3px 10px; border-radius: 999px; background: var(--c2); color: var(--c1); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-.card-name { font-size: 1.35rem; font-weight: 800; line-height: 1.05; text-transform: uppercase; letter-spacing: 0.02em; overflow-wrap: anywhere; }
-.card-first { display: block; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em; opacity: 0.8; }
-.card-info .card-meta { margin-top: 6px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.75; }
+.card-name { font-family: var(--display); font-size: max(18px, 10.7cqw); font-weight: 800; line-height: 1; text-transform: uppercase; letter-spacing: 0.02em; overflow-wrap: anywhere; }
+.card-info .card-name[style*="--nlen"] { font-size: max(14px, min(10.7cqw, calc(64cqw / (var(--nlen, 8) * 0.5)))); white-space: nowrap; }
+.card-first { display: block; margin-bottom: max(1px, 0.8cqw); font-family: var(--body); font-size: max(8px, 3.6cqw); font-weight: 600; line-height: 1; letter-spacing: 0.14em; opacity: 0.8; }
+.card-info .card-meta { margin-bottom: 2px; font-size: max(8px, 3.9cqw); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Greyed out: cards not collected yet, and pack cards before the reveal */
 .card-face.locked { filter: grayscale(1) brightness(0.7); }
@@ -128,9 +133,38 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .new-tag, .dup-tag { position: absolute; top: 10px; left: 10px; z-index: 3; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 999px; }
 .new-tag { background: #ffd36b; color: #2a1d00; }
 .dup-tag { background: #5b6b7a; color: #fff; }
+.test-tag { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 3; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 999px; background: #1d2b3a; color: #9fd3ff; border: 1px solid #9fd3ff; }
 .reset { font-size: 0.85rem; }
 
-/* Base cards: muted pill instead of the archetype colour */
+/* Admin: overview of every card */
+.admin-counts { border-collapse: collapse; margin: 12px 0 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 0.9rem; }
+.admin-counts th, .admin-counts td { padding: 6px 14px; text-align: right; border-bottom: 1px solid var(--border); }
+.admin-counts thead th, .admin-counts tbody th { text-align: left; font-weight: 600; }
+.admin-counts .total { font-weight: 700; background: var(--bg); }
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px 16px; margin: 12px 0 24px; }
+.admin-cell { margin: 0; display: grid; gap: 8px; align-content: start; }
+.admin-cell .card-tile { width: 100%; padding: 0; border: 0; background: none; cursor: default; }
+.admin-cell button.card-tile { cursor: pointer; }
+.admin-cell figcaption { display: grid; gap: 1px; font-size: 0.85rem; }
+.admin-cell figcaption small { font-size: 0.75rem; }
+
+/* Test data panel: switch the other games of the 2025 Spengler Cup on */
+.testdata { margin: 16px 0 0; padding: 12px 16px; background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; }
+.testdata summary { cursor: pointer; font-weight: 600; }
+.testdata-actions { display: flex; gap: 8px; margin: 8px 0; }
+.testgames { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.testgames li { border: 1px solid var(--border); border-radius: 8px; }
+.testgames li.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.testgames label { display: grid; grid-template-columns: auto minmax(110px, 1fr) auto minmax(70px, auto); align-items: center; gap: 12px; padding: 8px 10px; cursor: pointer; }
+.testgames input:disabled ~ * { opacity: 0.7; }
+.tg-when small { display: block; color: var(--muted); font-weight: 400; font-size: 0.75rem; }
+.tg-teams { display: flex; align-items: center; gap: 8px; }
+.tg-team { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; }
+.tg-team img { width: 22px; height: 22px; object-fit: contain; }
+.tg-cards { font-size: 0.75rem; text-align: right; }
+@media (max-width: 560px) { .testgames label { grid-template-columns: auto 1fr; } .tg-cards { text-align: left; grid-column: 2; } }
+
+/* Base cards: plain team-colour frame, muted label */
 .card-face.base .card-archetype { background: rgba(255, 255, 255, 0.16); color: #fff; }
 
 /* Gallery filters and pages of 8 cards */
@@ -305,8 +339,246 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
   background-size: 250% 100%;
   animation: foil-sweep 4s ease-in-out infinite;
 }
-.edition-badge { position: absolute; top: 10px; right: 10px; z-index: 3; padding: 2px 8px; border-radius: 999px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1d00; background: linear-gradient(90deg, #ffd36b, #fff1b8, #ffd36b); }
+.edition-badge { position: absolute; top: calc(max(24px, 12.9cqw) + max(14px, 19cqw)); right: max(8px, 7cqw); z-index: 3; padding: 2px 8px; border-radius: 999px; font-size: max(7px, 3cqw); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1d00; background: linear-gradient(90deg, #ffd36b, #fff1b8, #ffd36b); }
 @keyframes foil-sweep { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+
+/* ---------- Card kinds, tiers, specials and finishes (docs/CARD_TYPES.md) ---------- */
+@property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes card-spin { to { --angle: 360deg; } }
+@keyframes card-twinkle { from { opacity: 0.3; } to { opacity: 0.7; } }
+
+/* An owned card is a frame (--frame) around the card-inner; no frame colour set means a thin team-colour line. */
+.card-face.owned { padding: 3px; background: var(--frame, color-mix(in srgb, var(--c2) 70%, #000)); box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.7); }
+.card-face.owned::after { display: none; }
+.card-face.base { padding: 2px; }
+.card-inner {
+  position: relative;
+  height: 100%;
+  border-radius: 11px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 70% 20%, color-mix(in srgb, var(--c2) 30%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--c1), #02040a 115%);
+}
+.card-inner::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(2, 4, 10, 0.5) 0%, transparent 22%, transparent 52%, rgba(2, 4, 10, 0.82) 68%, #02040a 80%); }
+
+.card-rating { position: absolute; left: max(10px, 8cqw); top: max(8px, 6.6cqw); z-index: 2; display: flex; flex-direction: column; align-items: flex-start; gap: max(3px, 1.8cqw); line-height: 1; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7); }
+.card-tier { padding: 2px 7px; border-radius: 999px; background: var(--frame); color: var(--ink, #0b0b0b); font-size: max(7px, 3.2cqw); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; text-shadow: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); }
+.card-mr { font-family: var(--display); font-size: max(22px, 15.7cqw); font-weight: 800; }
+.card-pos { font-family: var(--display); font-size: max(10px, 5.4cqw); font-weight: 800; line-height: 1; letter-spacing: 0.12em; text-indent: 0.12em; text-transform: uppercase; white-space: nowrap; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7); }
+.card-corner { position: absolute; right: max(8px, 7cqw); top: max(7px, 6cqw); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: max(3px, 1.8cqw); }
+
+/* The tag (Sniper, Base, ...): one calm dark capsule in the top left corner, icon on top and the name below it. */
+.card-tag { position: absolute; left: max(10px, 8cqw); top: max(8px, 6.6cqw); z-index: 3; width: max(22px, 12.9cqw); aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; background: rgba(8, 12, 22, 0.72); box-shadow: 0 0 0 1px color-mix(in srgb, var(--tc) 55%, transparent), 0 3px 10px rgba(0, 0, 0, 0.4); backdrop-filter: blur(3px); }
+.card-tag-icon { display: grid; place-items: center; width: 100%; height: 100%; }
+.card-tag-icon .card-icon { width: 56%; height: 56%; color: var(--tc); }
+/* The tag name as a line above the player name, in the tag colour */
+.card-info .card-tagline { display: flex; align-items: center; gap: max(4px, 2cqw); margin-bottom: max(4px, 2.8cqw); font-family: var(--display); font-size: max(11px, 5.8cqw); font-weight: 700; letter-spacing: 0.16em; line-height: 1; text-transform: uppercase; color: var(--tc); }
+.card-tagline .card-icon { width: 1.05em; height: 1.05em; color: var(--tc); }
+.card-tagline::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, color-mix(in srgb, var(--tc) 55%, transparent), transparent); }
+.card-game { position: relative; display: inline-flex; align-items: center; gap: max(3px, 1.5cqw); padding: max(1px, 0.7cqw) max(5px, 2.4cqw) max(1px, 0.7cqw) max(1px, 0.7cqw); border-radius: 999px; background: rgba(0, 0, 0, 0.5); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18); }
+.card-game b { font-family: var(--display); font-size: max(9px, 4.6cqw); font-weight: 800; letter-spacing: 0.06em; }
+.card-gl { display: grid; place-items: center; width: max(13px, 6.4cqw); aspect-ratio: 1; border-radius: 50%; background: rgba(255, 255, 255, 0.92); }
+.card-gl img { width: 80%; height: 80%; object-fit: contain; }
+
+/* Game tooltip: opens upwards from the game pill */
+.card-info .card-meta { overflow: visible; }
+.card-info:has(.card-game:hover) { z-index: 6; }
+.card-game-tip { position: absolute; left: 0; bottom: calc(100% + 2.6cqw); z-index: 5; display: grid; gap: max(3px, 1.4cqw); min-width: 58cqw; padding: max(6px, 2.8cqw) max(8px, 3.4cqw); border-radius: max(6px, 3cqw); background: rgba(7, 11, 20, 0.97); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 10px 24px rgba(0, 0, 0, 0.6); text-shadow: none; text-transform: none; letter-spacing: 0; opacity: 0; visibility: hidden; transform: translateY(1.6cqw); transition: opacity 0.18s, transform 0.18s, visibility 0.18s; pointer-events: none; }
+.card-game-tip::after { content: ''; position: absolute; left: max(14px, 7cqw); top: 100%; width: max(8px, 3.4cqw); height: max(8px, 3.4cqw); margin-top: calc(max(8px, 3.4cqw) / -2); transform: rotate(45deg); background: rgba(7, 11, 20, 0.97); box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.16); }
+.card-game:hover .card-game-tip { opacity: 1; visibility: visible; transform: none; }
+.tip-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: max(5px, 2.4cqw); font-size: max(9px, 4cqw); font-weight: 600; color: rgba(255, 255, 255, 0.62); white-space: nowrap; }
+.tip-row.won { color: #fff; font-weight: 800; }
+.tip-row b { font-family: var(--display); font-size: max(13px, 6cqw); font-weight: 800; min-width: 1.2em; text-align: right; }
+.card-game-tip small { margin-top: max(1px, 0.6cqw); padding-top: max(3px, 1.6cqw); border-top: 1px solid rgba(255, 255, 255, 0.14); font-size: max(8px, 3.3cqw); font-weight: 600; letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.5); }
+.card-logo { position: relative; z-index: 2; display: grid; place-items: center; width: max(24px, 12.9cqw); aspect-ratio: 1; border-radius: 50%; background: rgba(255, 255, 255, 0.92); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); }
+.card-logo img { width: 82%; height: 82%; object-fit: contain; }
+
+.card-info .card-archetype { font-size: max(8px, 3.9cqw); margin-bottom: max(4px, 2.5cqw); }
+.card-info .card-archetype.chip { display: inline-flex; align-items: center; gap: 5px; padding: max(2px, 1cqw) max(8px, 3.2cqw) max(2px, 1cqw) max(6px, 2.6cqw); background: var(--tc, #fff); border: 0; color: #0b0b0b; font-size: max(9px, 4.7cqw); letter-spacing: 0.08em; text-shadow: none; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45); }
+.card-info .card-archetype.chip .card-icon { color: currentColor; }
+.card-icon { width: 1.2em; height: 1.2em; flex: none; color: var(--tc, currentColor); }
+.card-info .card-foot { display: flex; justify-content: space-between; gap: 8px; margin-top: max(4px, 2.5cqw); font-size: max(7px, 3.2cqw); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.85; }
+.card-rarity { color: var(--rar, #ffd76a); letter-spacing: 0; }
+.card-foot .card-rarity.faint { color: rgba(255, 255, 255, 0.6); }
+/* Footer, centred in the shield's point: match (or count), rarity of the card, trophy */
+.card-info .card-foot { flex-direction: column; align-items: center; justify-content: flex-end; gap: max(2px, 1cqw); margin: max(1px, 0.6cqw) calc(var(--pr, max(8px, 5.7cqw)) * -1) 0 calc(max(8px, 5.7cqw) * -1); text-align: center; opacity: 1; }
+.card-foot .card-rarity { display: flex; align-items: center; justify-content: center; height: max(11px, 5.8cqw); font-size: max(10px, 5.4cqw); line-height: 1; }
+.card-foot .card-icon { width: max(12px, 6.6cqw); height: max(12px, 6.6cqw); color: var(--rar, #ffd76a); opacity: 0.9; }
+.card-face.base .card-foot .card-icon { color: rgba(255, 255, 255, 0.6); }
+.card-info { padding-bottom: max(5px, 3.4cqw); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.75); }
+.card-flag { display: inline-block; width: max(14px, 6.4cqw); height: max(10px, 4.4cqw); margin-left: max(5px, 2.4cqw); vertical-align: 0.12em; object-fit: cover; border-radius: 0.6cqw; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55); }
+/* Square portraits (the official Spengler Cup ones) would be blown up to the card height: keep them full width at the top. */
+.card-art img.square { height: auto; aspect-ratio: 1; align-self: flex-start; }
+
+/* Card shape: chamfered shoulders and a pointed foot, for every card. The mask is an SVG that scales with the card
+   (viewBox 100 x 140, the 5:7 card). Shadows and glows go on the wrapper, because the mask cuts them off. */
+:root { --shape-shield: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cpath d='M13 0H87L100 11V121Q100 127 92 129L56 138Q50 140 44 138L8 129Q0 127 0 121V11Z'/%3E%3C/svg%3E"); }
+.card-face, .card-inner { border-radius: 0; -webkit-mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; }
+
+/* Ice hockey graphic: centre ice and skate scratches, faint, in the middle of the card */
+.card-rink { position: absolute; inset: 0; pointer-events: none; opacity: 0.16; mix-blend-mode: screen; }
+.card-rink svg { width: 100%; height: 100%; }
+.card-scratch { position: absolute; inset: 0; pointer-events: none; opacity: 0.35; mix-blend-mode: soft-light; background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.55) 38.3%, transparent 38.8%), linear-gradient(102deg, transparent 58%, rgba(255, 255, 255, 0.4) 58.2%, transparent 58.6%), linear-gradient(128deg, transparent 22%, rgba(255, 255, 255, 0.35) 22.3%, transparent 22.7%); }
+.card-tile { filter: drop-shadow(0 8px 8px rgba(10, 30, 60, 0.35)); }
+a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shadow(0 14px 14px rgba(10, 30, 60, 0.5)); }
+.pack-card.hidden { filter: drop-shadow(0 0 12px rgba(124, 196, 255, 0.35)); }
+.pack-card.charging, .pack-card.revealed { filter: drop-shadow(0 0 20px rgba(255, 211, 107, 0.7)); }
+
+/* Jersey number plate next to the team, the same on every card */
+.card-info .card-meta { display: flex; align-items: center; gap: max(5px, 2.6cqw); margin: max(3px, 1.6cqw) 0 0; opacity: 1; }
+.card-no { flex: none; display: inline-grid; place-items: center; min-width: max(16px, 9cqw); height: max(14px, 7.2cqw); padding: 0 max(3px, 1.6cqw); border-radius: max(2px, 0.9cqw); transform: skewX(-12deg); background: var(--c2); color: var(--c1); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3), 2px 2px 0 rgba(0, 0, 0, 0.35); }
+.card-no span { transform: skewX(12deg); font-family: var(--display); font-size: max(10px, 5.2cqw); font-weight: 800; line-height: 1; letter-spacing: 0.02em; }
+.card-no small { margin-right: 0.08em; font-size: 0.62em; font-weight: 700; opacity: 0.75; vertical-align: 0.18em; }
+.card-team { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: max(8px, 3.6cqw); letter-spacing: 0.06em; opacity: 0.85; }
+
+/* Base card: plain pill in the team colour at the top left, where the other kinds show their tier */
+.card-face.base { --rar: rgba(255, 255, 255, 0.75); }
+.card-face.base .card-tier { background: var(--c2); color: var(--c1); }
+.card-face.road.performance .card-tier { background: linear-gradient(150deg, #fbe7a0, #c9a03a 35%, #fff3c4 55%, #a37a1f 80%, #f0d27a); color: #2a1d00; }
+
+/* Tier frames (profile cards) */
+.tier-bronze { --frame: linear-gradient(150deg, #f3c39a, #9a5b2e 35%, #f7d2b0 55%, #7a431d 80%, #d9a272); --ink: #2b1607; }
+.tier-silver { --frame: linear-gradient(150deg, #ffffff, #9aa4b1 35%, #f4f7fb 55%, #7b8592 80%, #d5dbe3); --ink: #161b22; }
+.tier-gold { --frame: linear-gradient(150deg, #fbe7a0, #c9a03a 35%, #fff3c4 55%, #a37a1f 80%, #f0d27a); --ink: #2a1d00; }
+.tier-elite { --frame: conic-gradient(from var(--angle), #8ff6ff, #ffffff, #c9a7ff, #ffe58a, #8ff6ff); --ink: #0b0b0b; animation: card-spin 5s linear infinite; }
+
+/* Road to Final: rating per game as bars (on the card and on the detail page) */
+.form { display: grid; gap: 3px; margin: 0 0 max(4px, 2.5cqw); }
+.form-head { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85; }
+.form-bars { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 6px; align-items: end; height: 80px; }
+.form-bars .b { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+.form-bars .b i { display: block; width: 100%; height: var(--h); border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #ffd76a, color-mix(in srgb, #ffd76a 30%, transparent)); }
+.form-bars .b.empty i { background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0 4px, transparent 4px 8px); border: 1px dashed rgba(255, 255, 255, 0.25); border-bottom: 0; }
+.form-bars .b span { margin-bottom: 3px; font-family: var(--display); font-size: 16px; font-weight: 800; line-height: 1; }
+.form-labels { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 6px; text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; }
+.trend { padding: 1px 8px; border-radius: 999px; background: rgba(69, 255, 146, 0.18); color: #7dffb3; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; }
+.trend.down { background: rgba(255, 106, 74, 0.18); color: #ff9a83; }
+.card-face .form-head { font-size: max(6px, 2.8cqw); }
+.card-face .trend { padding: 0 max(4px, 2cqw); font-size: max(6px, 2.8cqw); }
+.card-face .form-bars { height: 14cqw; gap: 2cqw; }
+.card-face .form-bars .b span { margin-bottom: 1px; font-size: max(8px, 4cqw); }
+.card-face .form-labels { gap: 2cqw; font-size: max(6px, 2.5cqw); }
+.card-face.road .card-info .card-archetype.chip { margin-bottom: max(3px, 1.8cqw); }
+.road-detail { background: #0b1220; color: #fff; border-radius: 12px; padding: 16px; display: grid; gap: 16px; }
+.road-detail .form-bars { height: 110px; }
+.road-stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.road-stages li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; opacity: 0.45; }
+.road-stages li.reached { opacity: 1; }
+.road-stages .dot { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #04070f; background: #5b6b7a; }
+.road-stages li.reached .dot { background: linear-gradient(150deg, #fbe7a0, #c9a03a); }
+.road-stages strong { display: block; }
+.road-stages small { display: block; color: #b8c4d0; }
+
+/* Performance specials: darker, glitter, surname along the right edge, label along the left edge */
+.card-face.performance { --s1: #ffd76a; --s2: #fff6d1; --rar: var(--s1); --frame: linear-gradient(150deg, var(--s1), #141414 28%, var(--s2) 50%, #0b0b0b 72%, var(--s1)); }
+.card-face.special-motm { --s1: #ffd76a; --s2: #fff6d1; }
+.card-face.special-gamewinner { --s1: #ff6a4a; --s2: #ffd9cc; }
+.card-face.special-wall { --s1: #7cc4ff; --s2: #e6f4ff; }
+.card-face.special-recordbreaker { --s1: #19e6ff; --s2: #e6fbff; }
+.card-face.special-champion { --s1: #ffd76a; --s2: #ffffff; }
+.card-face.performance .card-inner { background: #010204; }
+.card-face.performance .card-art img { filter: saturate(0.85) brightness(0.82) contrast(1.08); }
+.card-face.performance .card-inner::after { background: radial-gradient(120% 80% at 50% 20%, transparent 40%, rgba(0, 0, 0, 0.55)), linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, transparent 22%, transparent 46%, rgba(1, 2, 4, 0.9) 62%, #010204 76%); }
+.card-face.performance .card-mr { color: var(--s2); text-shadow: 0 0 14px color-mix(in srgb, var(--s1) 70%, transparent), 0 2px 8px rgba(0, 0, 0, 0.8); }
+.card-face.performance .card-info { --pr: max(24px, 11cqw); padding-right: var(--pr); }
+/* The special label has one size for all specials; it starts above the badge and only its far end varies. */
+.card-inner { --tsize: 8.8cqw; }
+/* Optional action photo or looping clip of the player: replaces the portrait on full art cards. */
+.card-action { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; pointer-events: none; }
+.card-sidelabel { position: absolute; z-index: 2; right: calc(max(8px, 7cqw) + max(12px, 6.45cqw)); top: 31cqw; bottom: 36cqw; width: calc(var(--tsize) * 1.1); display: flex; align-items: center; justify-content: flex-start; gap: 8px; writing-mode: vertical-rl; transform: translateX(50%) rotate(180deg); font-family: var(--display); font-size: var(--tsize); font-weight: 800; letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap; color: transparent; -webkit-text-stroke: 1.5px var(--s1); opacity: 0.9; pointer-events: none; }
+.card-sidelabel .card-icon { transform: rotate(180deg); color: var(--s1); -webkit-text-stroke: 0; }
+
+/* Frames: in the tag colour; base cards are plain dark. */
+.card-face.profile, .card-face.road { --frame: linear-gradient(150deg, color-mix(in srgb, var(--tc) 80%, #fff), var(--tc) 45%, color-mix(in srgb, var(--tc) 55%, #000)); }
+.card-face.base { --frame: linear-gradient(150deg, #3a4250, #161b24 60%, #2a313c); }
+
+/* Full art specials: the photo runs across the whole card, in a thin accent frame, with a slow drift. A blurred
+   copy fills what a square portrait does not cover. */
+.card-face.fa { padding: 2px; }
+.card-face.fa .card-inner { background: #010204; }
+.card-face.fa .card-art::before { content: ''; position: absolute; inset: -12%; background: var(--photo) center / cover no-repeat; filter: blur(22px) saturate(1.4) brightness(0.7); }
+.card-face.fa .card-art img { position: relative; z-index: 1; filter: saturate(1.08) contrast(1.06); animation: fa-drift 16s ease-in-out infinite alternate; }
+/* The shading sits above the action photo (z 1) and below all text (z 2+). The right strip carries the side label. */
+.card-face.fa .card-inner::after { z-index: 1; background: linear-gradient(270deg, rgba(0, 0, 0, 0.5), transparent 26%), linear-gradient(90deg, rgba(0, 0, 0, 0.6), transparent 34%), linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, transparent 16%, transparent 66%, rgba(1, 2, 4, 0.65) 82%, rgba(1, 2, 4, 0.92) 100%); }
+.card-face.fa .card-tag, .card-face.fa .card-corner, .card-face.fa .card-sidelabel { z-index: 2; }
+.card-face.fa .card-info { --pr: max(8px, 5.7cqw); z-index: 3; text-align: center; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 14px rgba(0, 0, 0, 0.85); }
+/* The name runs up the left edge, surname big; the match sits small above the stars in the point. */
+/* The same badge as top left, under the label on the right. */
+.card-tag-end { left: auto; top: auto; right: max(8px, 7cqw); bottom: 19cqw; }
+.card-vname { position: absolute; z-index: 3; left: 0; width: 28.9cqw; top: 24cqw; bottom: 21cqw; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: max(3px, 1.6cqw); pointer-events: none; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 12px rgba(0, 0, 0, 0.8); }
+.card-vname .card-flag { margin: 1cqw 0; transform: rotate(-90deg); }
+.card-vtext { position: relative; writing-mode: vertical-rl; transform: rotate(180deg); line-height: 1; text-transform: uppercase; }
+/* Hangs off the left of the surname, so the surname alone sits on the axis of the top icon. */
+.card-vtext small { position: absolute; top: 0; left: 100%; margin-left: 0.8cqw; font-size: max(8px, 3.6cqw); font-weight: 700; letter-spacing: 0.14em; white-space: nowrap; }
+.card-vtext small i { font-style: normal; font-weight: 800; color: var(--s1); }
+.card-vtext b { display: block; font-family: var(--display); font-size: max(18px, min(14cqw, calc(86cqw / (var(--nlen, 8) * 0.5)))); font-weight: 800; letter-spacing: 0.02em; white-space: nowrap; }
+.card-face.fa .card-meta { justify-content: center; margin: 0; }
+.card-face.fa .card-game { padding-right: max(4px, 2cqw); }
+.card-face.fa .card-game b { font-size: max(8px, 3.8cqw); }
+.card-face.fa .card-gl { width: max(11px, 5cqw); }
+.card-face.fa .card-game-tip { left: 50%; margin-left: -29cqw; }
+.card-face.fa .card-game-tip::after { left: 50%; margin-left: calc(max(8px, 3.4cqw) / -2); }
+/* Alternative layout: the same name, turned upright, above the match. */
+.card-hname { position: absolute; z-index: 3; left: 8cqw; bottom: 26cqw; pointer-events: none; line-height: 1; text-transform: uppercase; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 12px rgba(0, 0, 0, 0.85); }
+.card-hname small { display: block; margin-bottom: 1cqw; font-size: max(8px, 3.6cqw); font-weight: 700; letter-spacing: 0.14em; white-space: nowrap; }
+.card-hname small i { font-style: normal; font-weight: 800; color: var(--s1); }
+.card-hname b { display: flex; align-items: center; gap: 2cqw; font-family: var(--display); font-size: max(18px, min(14cqw, calc(60cqw / (var(--nlen, 8) * 0.48)))); font-weight: 800; letter-spacing: 0.02em; white-space: nowrap; }
+.card-hname .card-flag { margin: 0; }
+.card-face.fa .card-first { opacity: 1; color: #fff; }
+.card-face.fa .card-sidelabel { color: color-mix(in srgb, var(--s1) 26%, transparent); opacity: 1; filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.9)); }
+.card-face.fa .card-corner { filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.7)); }
+@keyframes fa-drift { from { transform: scale(1); } to { transform: scale(1.07) translate(-1%, -1.5%); } }
+@media (prefers-reduced-motion: reduce) { .card-face.fa .card-art img { animation: none; } }
+.card-glitter {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: screen; opacity: 0.55;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 0.7px, transparent 1.3px),
+    radial-gradient(circle, color-mix(in srgb, var(--s1) 90%, transparent) 0 0.8px, transparent 1.5px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.8) 0 1px, transparent 1.8px);
+  background-size: 23px 29px, 37px 31px, 61px 53px;
+  background-position: 4px 6px, 12px 7px, 11px 20px;
+  mask: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0.6) 100%);
+  animation: card-twinkle 2.8s ease-in-out infinite alternate;
+}
+
+/* Stadium edition on an owned card: the foil is the frame */
+.card-face.owned.edition-stadium { --frame: linear-gradient(135deg, #ffd36b, #fff1b8 45%, #ffd36b 60%, #b8860b); box-shadow: 0 0 22px rgba(255, 211, 107, 0.45); }
+
+/* Print finishes (cosmetic, independent of kind and tier) */
+.card-layer { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.card-face.finish-fullart { padding: 0; --frame: #000; }
+.finish-fullart .card-inner { border-radius: 14px; }
+.finish-fullart .card-inner::after { background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, transparent 18%, transparent 46%, rgba(0, 0, 0, 0.55) 64%, rgba(0, 0, 0, 0.85) 100%); }
+.finish-fullart .card-info { text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85); }
+.finish-fullart .card-layer { inset: 3cqw; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 12px; background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 5px); mix-blend-mode: overlay; }
+.card-face.finish-ice { --frame: linear-gradient(150deg, #e8f7ff, #7fb6d6 30%, #ffffff 50%, #6aa3c8 75%, #d4f0ff); --rar: #bfeaff; }
+.finish-ice .card-art img { filter: saturate(0.55) brightness(0.9) contrast(1.05); }
+.finish-ice .card-layer {
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 150' preserveAspectRatio='none'><g fill='none' stroke='rgba(225,245,255,.7)' stroke-width='.5'><path d='M8 14l32 16-6 14M60 6l-14 30 20 8M92 22l-26 22M4 62l30-10 14 22-12 18M70 58l24 14-10 26M52 84l-8 30 22 12M12 108l26 8 4 22M88 112l-22 14M30 140l14-14 24 10M96 140l-18-12'/></g><g fill='none' stroke='rgba(255,255,255,.5)' stroke-width='.3'><path d='M20 40l10 26M78 8l8 30M46 60l24-8M16 90l20 6M84 90l-12 30M56 118l-18 14'/></g></svg>") center / 100% 100%,
+    linear-gradient(180deg, rgba(150, 215, 255, 0.28), transparent 60%);
+  mix-blend-mode: screen;
+  opacity: 0.8;
+}
+.card-face.finish-gold { --frame: linear-gradient(150deg, #fbe7a0, #b8892a 30%, #fff3c4 52%, #8f6a17 75%, #f0d27a); --rar: #ffd76a; }
+.finish-gold .card-inner { background: #120d03; }
+.finish-gold .card-art img { filter: grayscale(1) sepia(1) saturate(1.9) hue-rotate(-10deg) brightness(0.88) contrast(1.15); }
+.finish-gold .card-inner::after { background: linear-gradient(180deg, rgba(18, 13, 3, 0.4) 0%, transparent 22%, transparent 48%, rgba(18, 13, 3, 0.9) 64%, #120d03 78%); }
+.finish-gold .card-name { background: linear-gradient(180deg, #fff3c9, #d9b04a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.finish-gold .card-layer { background: repeating-linear-gradient(135deg, rgba(255, 215, 106, 0.07) 0 1px, transparent 1px 4px); mix-blend-mode: screen; }
+
+/* Reward cards: collector (gold, glitter) and context cards (moment, stadium, trophy) */
+.card-face.collector { --s1: #ffd400; --rar: #ffd76a; }
+.card-face.ctx-trophy { --s1: #ffd76a; }
+.card-label { position: absolute; left: max(9px, 7.5cqw); top: max(8px, 6.6cqw); z-index: 2; display: inline-flex; align-items: center; gap: 5px; margin: 0; padding: 3px 10px 3px 8px; border-radius: 999px; background: var(--frame); color: var(--ink, #0b0b0b); font-size: max(8px, 3.6cqw); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); }
+.card-label .card-icon { color: inherit; }
+.card-bigscore { position: absolute; z-index: 1; left: 0; right: 0; top: 18cqw; margin: 0; text-align: center; font-family: var(--display); font-size: 34cqw; font-weight: 800; line-height: 0.9; text-shadow: 0 6px 30px rgba(0, 0, 0, 0.7); }
+.card-info .card-meta.unlock-rule { margin-top: 4px; white-space: normal; text-transform: none; letter-spacing: 0; font-weight: 600; opacity: 0.9; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tier-elite, .card-glitter { animation: none; }
+}
 
 /* Reward bar */
 .reward-bar { margin: 0 0 20px; padding: 12px 16px 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
@@ -412,11 +684,11 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .spotlight-close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 1rem; cursor: pointer; }
 .spotlight-close:hover { background: rgba(255, 255, 255, 0.2); }
 .spotlight-card-col { flex: 0 0 300px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.spotlight-card { display: block; width: 100%; aspect-ratio: 5 / 7; padding: 0; border: none; background: none; font: inherit; text-align: left; cursor: pointer; perspective: 1200px; }
+.spotlight-card { display: block; width: 100%; aspect-ratio: 5 / 7; padding: 0; border: none; background: none; font: inherit; text-align: left; cursor: pointer; perspective: 1200px; filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.5)); }
 .spotlight-flip { position: relative; display: block; height: 100%; transform-style: preserve-3d; transition: transform 700ms cubic-bezier(0.3, 0.9, 0.3, 1.05); }
 .spotlight-card.flipped .spotlight-flip { transform: rotateY(180deg); }
 /* No filter on the flipping element: it would flatten the 3D and show the front through the back. */
-.spotlight-front, .spotlight-back { position: absolute; inset: 0; border-radius: 14px; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5); }
+.spotlight-front, .spotlight-back { position: absolute; inset: 0; border-radius: 14px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .spotlight-front { display: block; }
 .spotlight-hint { margin: 0; font-size: 0.75rem; color: #9fb3c6; }
 

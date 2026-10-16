@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import AttributeRow from '../components/AttributeRow'
+import FormBars from '../components/FormBars'
 import MomentList from '../components/MomentList'
 import PlayerPhoto from '../components/PlayerPhoto'
 import VideoSlot from '../components/VideoSlot'
@@ -32,6 +33,7 @@ export default function CardDetail() {
     )
   if (!card) return <p className="muted">Loading card…</p>
   if (card.type === 'base') return <BaseCardDetail card={card} />
+  if (card.type === 'reward') return <RewardCardDetail card={card} />
 
   const { player, match } = card
   const moments = card.moments || []
@@ -48,6 +50,13 @@ export default function CardDetail() {
   return (
     <section className="detail">
       <Link to="/">← Back to collection</Link>
+
+      {card.test && (
+        <div className="banner">
+          Test data: this card comes from the official statistics of another game of the 2025 Spengler Cup. Its match
+          rating is made up and it does not count towards your progress.
+        </div>
+      )}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
@@ -93,6 +102,7 @@ export default function CardDetail() {
       </div>
 
       <h2>Performance</h2>
+      {card.road && <RoadDetail road={card.road} />}
       <ul className="attributes">
         {card.attributes.map((attr) => (
           <AttributeRow key={attr.metric_id} attr={attr} moments={linked(attr)} onPlay={play} />
@@ -128,6 +138,76 @@ export default function CardDetail() {
 
       <p className="muted small">
         Source: {card.source} · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
+      </p>
+    </section>
+  )
+}
+
+// The stages of a Road to Final card and the rating per game; later stages are greyed out until they are unlocked.
+function RoadDetail({ road }) {
+  return (
+    <div className="road-detail">
+      <FormBars road={road} />
+      <ol className="road-stages">
+        {road.stages.map((s) => (
+          <li key={s.n} className={s.reached ? 'reached' : ''}>
+            <span className="dot">{s.n}</span>
+            <span>
+              <strong>
+                {s.name} <small>{s.when}</small>
+              </strong>
+              <small>{s.trigger}</small>
+              <small>New on the card: {s.change}</small>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+const REWARD_LABEL = { collector: 'Collector card', moment: 'Moment card', stadium: 'Stadium card', trophy: 'Trophy card' }
+
+// Reward cards are earned by owning other cards, not won in the trivia.
+function RewardCardDetail({ card }) {
+  const { player, match } = card
+  return (
+    <section className="detail">
+      <Link to="/">← Back to collection</Link>
+
+      <header className="detail-header">
+        {card.image_url ? (
+          <div className="detail-photo">
+            <img src={card.image_url} alt={card.image_alt} referrerPolicy="no-referrer" />
+          </div>
+        ) : (
+          <PlayerPhoto player={player} className="detail-photo" />
+        )}
+        <div className="detail-heading">
+          <p className="eyebrow">{REWARD_LABEL[card.context_type ?? card.kind]}</p>
+          <h1>{card.kind === 'collector' ? `${player.first_name} ${player.last_name}` : card.title}</h1>
+          <p className="muted">{card.headline ?? card.title}</p>
+        </div>
+      </header>
+
+      <p className="explanation">{card.text ?? card.explanation}</p>
+      <div className="match-context">
+        <div>
+          <span className="label">How you earned it</span>
+          {card.unlock}
+        </div>
+        <div>
+          <span className="label">Match</span>
+          {scoreline(match)}
+        </div>
+        <div>
+          <span className="label">Date</span>
+          {formatMatchDate(match.date)}
+        </div>
+      </div>
+      <p className="muted small">
+        Source: {card.source}
+        {card.credit ? ` · Image: ${card.credit}` : ''}
       </p>
     </section>
   )

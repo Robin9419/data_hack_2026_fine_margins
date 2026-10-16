@@ -1,27 +1,38 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { api } from '../api'
+import { api, TEST_GAMES_KEY } from '../api'
 import { useAuth } from '../auth'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
+import TestDataPanel from '../components/TestDataPanel'
+import { TEAMS, TEAMS_2025 } from '../teams'
 
 const PAGE_SIZE = 8
 const SWIPE_PX = 50
 
-const TEAM_FILTERS = [
+const loadTestGames = () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(TEST_GAMES_KEY))
+    return Array.isArray(saved) ? saved : []
+  } catch {
+    return []
+  }
+}
+
+const teamFilters = (withTest) => [
   { value: 'all', label: 'All teams' },
-  { value: 'SCL Tigers', label: 'SCL Tigers' },
-  { value: 'Adler Mannheim', label: 'Adler Mannheim' },
-  { value: 'Ilves Tampere', label: 'Ilves Tampere' },
-  { value: 'HC Davos', label: 'HC Davos' },
-  { value: 'Frölunda HC', label: 'Frölunda HC' },
-  { value: 'U.S. Collegiate Selects', label: 'U.S. Collegiate Selects' },
+  ...[...TEAMS, ...(withTest ? TEAMS_2025 : [])].map((t) => ({ value: t.name, label: t.name })),
 ]
 const TYPE_FILTERS = [
   { value: 'all', label: 'All cards' },
-  { value: 'special', label: 'Special' },
   { value: 'base', label: 'Base' },
+  { value: 'profile', label: 'Profile specials' },
+  { value: 'performance', label: 'Performance specials' },
+  { value: 'road', label: 'Road to Final' },
+  { value: 'collector', label: 'Collector' },
+  { value: 'context', label: 'Moment, stadium, trophy' },
 ]
+const TYPE_ORDER = { special: 0, reward: 1, base: 2 }
 
 function FilterSelect({ label, options, value, onChange }) {
   return (
@@ -49,13 +60,15 @@ export default function Gallery() {
   const [type, setType] = useState('all')
   const [page, setPage] = useState(0)
   const [dailyAvailable, setDailyAvailable] = useState(false)
+  const [testGames, setTestGames] = useState(loadTestGames)
+  const [testData, setTestData] = useState(null) // the games that can be switched on
   const [spotlight, setSpotlight] = useState(null) // special card popped out of the grid
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
   const touchStartX = useRef(null)
 
   const load = () =>
     api
-      .cards()
+      .cards(testGames)
       .then((data) => {
         setCards(data.cards)
         setProgress(data.progress)
@@ -64,8 +77,18 @@ export default function Gallery() {
 
   useEffect(() => {
     load()
+  }, [testGames])
+
+  useEffect(() => {
     api.dailyStatus().then((d) => setDailyAvailable(d.available)).catch(() => {})
+    api.testdata().then((d) => setTestData(d.games)).catch(() => {})
   }, [])
+
+  const changeTestGames = (ids) => {
+    localStorage.setItem(TEST_GAMES_KEY, JSON.stringify(ids))
+    setTestGames(ids)
+    setPage(0)
+  }
 
   const onReset = async () => {
     const data = await api.reset()
@@ -87,13 +110,14 @@ export default function Gallery() {
   if (error) return <p className="error">{error}</p>
   if (!cards) return <p className="muted">Loading cards…</p>
 
-  const ownedCount = cards.filter((c) => c.owned).length
-  // Owned cards first, then locked; within each, special cards before base (otherwise API order).
+  const realCards = cards.filter((c) => !c.test)
+  const ownedCount = realCards.filter((c) => c.owned).length
+  // Owned cards first, then locked; within each, special cards, then reward cards, then base (otherwise API order).
   const shown = cards
-    .filter((c) => (team === 'all' || c.player.team === team) && (type === 'all' || c.type === type))
+    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || c.kind === type))
     .sort((a, b) => {
       if (a.owned !== b.owned) return a.owned ? -1 : 1
-      return a.type === b.type ? 0 : a.type === 'special' ? -1 : 1
+      return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]
     })
   const pageCount = Math.max(1, Math.ceil(shown.length / PAGE_SIZE))
   const current = Math.min(page, pageCount - 1)
@@ -126,7 +150,7 @@ export default function Gallery() {
       <div className="gallery-header">
         <h1>Your collection</h1>
         <span className="progress">
-          {ownedCount} / {cards.length} collected
+          {ownedCount} / {realCards.length} collected
         </span>
       </div>
 
@@ -148,8 +172,10 @@ export default function Gallery() {
         <span aria-hidden="true">→</span>
       </Link>
 
+      {testData && <TestDataPanel games={testData} selected={testGames} onChange={changeTestGames} />}
+
       <div className="gallery-filters">
-        <FilterSelect label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />
+        <FilterSelect label="Team" options={teamFilters(testGames.length > 0)} value={team} onChange={filterBy(setTeam)} />
         <FilterSelect label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
       </div>
 

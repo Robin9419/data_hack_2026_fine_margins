@@ -4,13 +4,15 @@ const SPARKS = 16
 
 // Full-screen "card unlocked" moment: dimmed backdrop, light burst, the card flips in and
 // sparks fly out. Stadium editions get gold confetti and a foil card (see CardFace).
-// result: 'new' (first time owned) or 'upgraded' (home edition became stadium edition).
+// result: 'new' (first time owned), 'upgraded' (home edition became stadium edition) or 'legend' (a club legend earned
+// by collecting the club's cards; points is then null).
 export default function CardUnlock({ card, result, points, onContinue, continueLabel = 'Continue' }) {
   const stadium = card.edition === 'stadium'
-  const headline = result === 'upgraded' ? 'Card upgraded!' : 'New card unlocked!'
+  const legend = result === 'legend'
+  const headline = legend ? 'Club legend earned!' : result === 'upgraded' ? 'Card upgraded!' : 'New card unlocked!'
 
   return (
-    <div className={`unlock ${stadium ? 'stadium' : ''}`} role="dialog" aria-modal="true" aria-label={headline}>
+    <div className={`unlock ${stadium || legend ? 'stadium' : ''} ${legend ? 'legend' : ''}`} role="dialog" aria-modal="true" aria-label={headline}>
       <div className="unlock-burst" aria-hidden="true" />
       <h2 className="unlock-title">{headline}</h2>
       <div className="unlock-card">
@@ -23,7 +25,9 @@ export default function CardUnlock({ card, result, points, onContinue, continueL
           <CardFace card={card} />
         </div>
       </div>
-      <p className="unlock-points">+{points} pts{stadium ? ' · Stadium bonus' : ''}</p>
+      <p className="unlock-points">
+        {legend ? `You collected enough ${card.player.team} cards` : `+${points} pts${stadium ? ' · Stadium bonus' : ''}`}
+      </p>
       <button type="button" className="pack-button" onClick={onContinue}>
         {continueLabel}
       </button>

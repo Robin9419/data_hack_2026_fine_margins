@@ -36,6 +36,13 @@ STAT_KEYS = {
 }
 
 
+CLUB_NAMES = {"IFK Helsinki": "HIFK"}  # the card set (backend/content/base_cards.json) uses HIFK
+
+
+def club(name: str) -> str:
+    return CLUB_NAMES.get(name, name)
+
+
 def fetch(url: str) -> str:
     request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     return urllib.request.urlopen(request, timeout=60).read().decode("utf-8", "ignore")
@@ -80,7 +87,7 @@ def toi_seconds(value) -> int:
 
 def build_game(stage: str, path: str) -> dict:
     obj = game_object(fetch(BASE + path))
-    teams = {obj["teamhome"]["team_id"]: obj["teamhome"]["name"], obj["teamaway"]["team_id"]: obj["teamaway"]["name"]}
+    teams = {obj["teamhome"]["team_id"]: club(obj["teamhome"]["name"]), obj["teamaway"]["team_id"]: club(obj["teamaway"]["name"])}
     start = datetime.fromisoformat(obj["time"]) + timedelta(hours=1)  # the feed is UTC, Davos is UTC+1 in winter
     goals, penalties = [], []
     for e in sorted(obj["ticker"], key=lambda e: int(e["index_overall"] or 0)):
@@ -111,12 +118,12 @@ def build_game(stage: str, path: str) -> dict:
     return {
         "id": path.split("/")[-1], "url": BASE + path, "stage": stage, "date": start.date().isoformat(),
         "start": start.strftime("%H:%M"), "arena": obj["arena"].split(",")[0],
-        "home_team": obj["teamhome"]["name"], "away_team": obj["teamaway"]["name"],
+        "home_team": club(obj["teamhome"]["name"]), "away_team": club(obj["teamaway"]["name"]),
         "home_score": int(obj["scorehome"]), "away_score": int(obj["scoreaway"]),
         "periods": [[int(obj[f"scorehome_{p}"] or 0), int(obj[f"scoreaway_{p}"] or 0)] for p in ("one", "two", "three")],
         "overtime": bool(obj["overtime_home"] or obj["overtime_away"] or obj["penalty_home"] or obj["penalty_away"]),
         "has_wisehockey": path.endswith(FINAL_ID), "goals": goals, "penalties": penalties, "players": players,
-        "logos": {obj["teamhome"]["name"]: obj["teamhome"]["logo"], obj["teamaway"]["name"]: obj["teamaway"]["logo"]},
+        "logos": {club(obj["teamhome"]["name"]): obj["teamhome"]["logo"], club(obj["teamaway"]["name"]): obj["teamaway"]["logo"]},
     }
 
 

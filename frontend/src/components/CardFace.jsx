@@ -15,6 +15,7 @@ import PlayerPhoto from './PlayerPhoto'
 // state: 'owned' (full colour), 'locked' (gallery: grayed out photo only, no info) or 'hidden' (a mystery card in
 // a pack: no photo, name or archetype, so nothing leaks before it is revealed).
 // Editions: 'stadium' gets the foil frame; 'fullart', 'ice' and 'gold' are print finishes.
+// A legend has its own black-and-gold design with a black and white photo; a locked legend shows only its club.
 
 const FINISHES = ['fullart', 'ice', 'gold']
 const BASE_SYMBOL = '●' // the basic rarity: a lightly filled dot, no tier, no special
@@ -104,6 +105,8 @@ function LockedReward({ card }) {
 }
 
 export default function CardFace({ card, state = 'owned', nameLayout = 'vertical' }) {
+  if (card.type === 'legend' && state !== 'hidden') return <LegendFace card={card} locked={state === 'locked'} />
+
   if (state === 'locked') {
     if (card.type === 'reward') return <LockedReward card={card} />
     return (
@@ -312,6 +315,36 @@ function ContextFace({ card }) {
             <CardIcon name="trophy" />
           </p>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function LegendFace({ card, locked }) {
+  const { player } = card
+  if (locked) {
+    return (
+      <div className="card-face legend locked-legend">
+        <span className="legend-star" aria-hidden="true">★</span>
+        <div className="card-info">
+          <p className="card-archetype">Club legend</p>
+          <p className="card-name">{player.team}</p>
+          <p className="card-meta">Collect the club's cards to unlock</p>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div className="card-face legend">
+      <PlayerPhoto player={player} className="card-art" />
+      <span className="legend-ribbon">★ Legend</span>
+      <div className="card-info">
+        <p className="card-archetype">Club legend</p>
+        <p className="card-name">
+          <span className="card-first">{player.first_name}</span>
+          {player.last_name}
+        </p>
+        <p className="card-meta">{player.team}</p>
       </div>
     </div>
   )

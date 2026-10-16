@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS owned_cards (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     card_id TEXT NOT NULL,
     edition TEXT NOT NULL DEFAULT 'standard',
+    copies INTEGER NOT NULL DEFAULT 1,
     acquired_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, card_id)
 );
@@ -56,6 +57,9 @@ def init_db():
             conn.execute("ALTER TABLE users ADD COLUMN favorite_team TEXT")
         if "last_daily_claim" not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN last_daily_claim TEXT")
+        card_columns = [r["name"] for r in conn.execute("PRAGMA table_info(owned_cards)")]
+        if "copies" not in card_columns:
+            conn.execute("ALTER TABLE owned_cards ADD COLUMN copies INTEGER NOT NULL DEFAULT 1")
 
 
 def last_daily_claim(user_id: int) -> str | None:
@@ -114,9 +118,16 @@ def owned_cards(user_id: int) -> dict[str, str]:
         return {r["card_id"]: r["edition"] for r in rows}
 
 
+def card_copies(user_id: int) -> dict[str, int]:
+    """card_id -> how many copies the user holds (more than 1 only for duplicate base cards)."""
+    with connect() as conn:
+        rows = conn.execute("SELECT card_id, copies FROM owned_cards WHERE user_id = ?", (user_id,)).fetchall()
+        return {r["card_id"]: r["copies"] for r in rows}
+
+
 def grant_cards(user_id: int, card_ids: list[str]) -> set[str]:
-    """Adds free starter-pack cards (edition 'starter', worth no reward points). Returns the ids
-    the user did not own before."""
+    """Adds free base cards (edition 'starter', worth no reward points). A card the user already owns becomes one
+    more copy, which can be traded in later. Returns the ids the user did not own before."""
     with connect() as conn:
         new_ids = set()
         for cid in card_ids:
@@ -126,7 +137,28 @@ def grant_cards(user_id: int, card_ids: list[str]) -> set[str]:
             )
             if cur.rowcount:
                 new_ids.add(cid)
+            else:
+                conn.execute(
+                    "UPDATE owned_cards SET copies = copies + 1 WHERE user_id = ? AND card_id = ?", (user_id, cid)
+                )
         return new_ids
+
+
+def remove_copies(user_id: int, card_ids: list[str]) -> bool:
+    """Takes one copy per id in card_ids (an id may repeat to take several copies of the same card). A card whose
+    last copy goes leaves the collection. All or nothing: False, and nothing changes, if the user is short of any."""
+    wanted = {cid: card_ids.count(cid) for cid in set(card_ids)}
+    with connect() as conn:
+        for cid, n in wanted.items():
+            cur = conn.execute(
+                "UPDATE owned_cards SET copies = copies - ? WHERE user_id = ? AND card_id = ? AND copies >= ?",
+                (n, user_id, cid, n),
+            )
+            if not cur.rowcount:
+                conn.rollback()
+                return False
+        conn.execute("DELETE FROM owned_cards WHERE user_id = ? AND copies <= 0", (user_id,))
+        return True
 
 
 def grant_card(user_id: int, card_id: str, edition: str) -> str | None:

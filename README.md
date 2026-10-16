@@ -60,8 +60,10 @@ Open http://localhost:5173. Vite forwards `/api` to the backend on port 8000. AP
 | Match metadata (teams, score, date) | `backend/content/match.json` |
 | Quiz clue per archetype (`archetypes`) | `backend/content/cards.json` |
 | Reward milestones and points per card edition | `backend/content/rewards.json` |
+| Trade-in page (pick 3 base cards, odds, slots) | `frontend/src/pages/Trade.jsx`, `.trade-*` in `index.css`; odds in `trade_odds` in `backend/app/main.py` |
 | Quiz page and unlock animation | `frontend/src/pages/Quiz.jsx`, `frontend/src/components/CardUnlock.jsx`, `.unlock-*` in `index.css` |
 | Achievements | `backend/content/achievements.json` |
+| Club legends (3 per team: facts, Spengler Cup record, photo, sources) and the 50/75/100% thresholds | `backend/content/legends.json`; awarding in `award_legends` in `backend/app/main.py` |
 | Video sources: full-game recording (sync offset, clip windows) and YouTube clip times per goal | `backend/content/videos.json` |
 | Cutting the event clips out of the recording | `backend/scripts/cut_clips.py` → `backend/media/clips/` |
 | Game events per player (goals, assists, shots, saves, faceoff wins) and their clips | `backend/app/events.py` |
@@ -78,6 +80,14 @@ The card face shows only the photo, the archetype (`title`, e.g. Sniper, Workhor
 ### Trivia and rewards
 
 A new account gets a starter pack of 3 random cards. After that cards are only won through trivia: a round is 3 questions, each "Who was the *Sniper* in this game?" (the card's archetype) with four player options and a clue. A wrong answer can be retried; a right one unlocks the card with an animation. The player says where they watch (self-reported in the demo; a real product would verify a ticket or location): **at home** gives the standard card (10 pts), **at the stadium** gives the foil Stadium edition (25 pts, purely cosmetic otherwise) and upgrades a card already owned as standard. The reward bar at the top shows the points and the milestones in `rewards.json` (illustrative rewards only).
+
+### Daily cards, duplicates and trade-ins
+
+The daily card is a random base card and can be a duplicate. Duplicates stack (`copies` in `owned_cards`) and show as ×2, ×3 on the card. On the trade-in page you give up any 3 base card copies, duplicates or your last copy of a card, for one random card: with a favorite team it is 50% a base card from another team, 25% a base card from the favorite team and 25% a special card (one you don't own yet, in the standard edition); without a favorite team it is 75% any base card and 25% a special card. Once you own every special card, a special roll gives a base card instead.
+
+### Club legends
+
+Every club has three legend cards (`legends.json`). They are never drawn, traded or won in trivia: collecting 50%, 75% and 100% of a club's base and special cards each earns one random legend of that club, so a complete club holds all three. A legend shows up in the pack after the card that earned it (daily card, trade-in, starter pack) or as an extra unlock screen after a trivia answer, and it stays if a trade later takes the club back under a threshold. The gallery shows each club's progress towards its next legend. Legend cards have a black-and-gold design with the photo in black and white; the card page explains why the player is a legend and lists their Spengler Cup record. The HIFK legends never played a Spengler Cup (HIFK first went in 1994), and the U.S. Collegiate Selects legends are NCAA greats (Hobey Baker winners) because that team first played in 2025, so their cards list career honours instead. Several legend photos are press photos with no reuse rights established (`image_credit`).
 
 ### Open items
 

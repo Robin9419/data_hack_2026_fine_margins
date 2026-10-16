@@ -4,6 +4,7 @@ import { api } from '../api'
 import { useAuth } from '../auth'
 import { TEAMS } from '../teams'
 
+
 const STEPS = [
   { icon: '🎁', title: 'Open your starter pack', text: 'Three free cards, each one a player’s performance in the match.' },
   { icon: '🧠', title: 'Answer the trivia', text: 'Work out who made the difference from the clues and win more cards.' },

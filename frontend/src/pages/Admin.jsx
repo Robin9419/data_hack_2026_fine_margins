@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../api'
 import CardFace from '../components/CardFace'
 import CardSpotlight from '../components/CardSpotlight'
-import { TEAMS, TEAMS_2025 } from '../teams'
+import { TEAMS } from '../teams'
 
 const KINDS = [
+  ['legend', 'Legends'],
   ['base', 'Base'],
   ['profile', 'Profile specials'],
   ['performance', 'Performance specials'],
@@ -19,7 +20,7 @@ const SOURCES = [
   { value: 'real', label: 'Real data only' },
   { value: 'test', label: 'Test data only' },
 ]
-const ALL_TEAMS = [...TEAMS, ...TEAMS_2025]
+const ALL_TEAMS = TEAMS
 const PHOTOS = [
   { value: 'all', label: 'All cards' },
   { value: 'action', label: 'Action photos only' },
@@ -33,6 +34,8 @@ const NAME_LAYOUT = [
   { value: 'horizontal', label: 'Horizontal' },
 ]
 const hasActionPhoto = (c) => c.kind === 'performance' && Boolean(c.player?.action_image_url)
+
+const kindOf = (c) => c.kind ?? c.type
 
 const caption = (card) => {
   const player = card.player ? `#${card.player.jersey} ${card.player.first_name} ${card.player.last_name}` : card.title
@@ -77,7 +80,7 @@ export default function Admin() {
 
   const counts = useMemo(() => {
     const rows = Object.fromEntries(KINDS.map(([k]) => [k, { real: 0, test: 0 }]))
-    for (const c of cards ?? []) rows[c.kind ?? 'base'][c.test ? 'test' : 'real'] += 1
+    for (const c of cards ?? []) rows[kindOf(c)][c.test ? 'test' : 'real'] += 1
     return rows
   }, [cards])
 
@@ -87,14 +90,14 @@ export default function Admin() {
   const shown = cards
     .filter(
       (c) =>
-        (kind === 'all' || c.kind === kind) &&
+        (kind === 'all' || kindOf(c) === kind) &&
         (team === 'all' || c.player?.team === team) &&
         (source === 'all' || (source === 'test') === Boolean(c.test)) &&
         (photos === 'all' || hasActionPhoto(c)),
     )
     .sort(
       (a, b) =>
-        KIND_ORDER[a.kind] - KIND_ORDER[b.kind] ||
+        KIND_ORDER[kindOf(a)] - KIND_ORDER[kindOf(b)] ||
         (a.player?.team ?? '').localeCompare(b.player?.team ?? '') ||
         (a.player?.jersey ?? 0) - (b.player?.jersey ?? 0),
     )
@@ -169,7 +172,7 @@ export default function Admin() {
                 <strong>{what}</strong>
                 <span>{player}</span>
                 <small className="muted">
-                  {KIND_LABEL[card.kind]}
+                  {KIND_LABEL[kindOf(card)]}
                   {game ? ` · ${game}` : ''}
                 </small>
               </figcaption>

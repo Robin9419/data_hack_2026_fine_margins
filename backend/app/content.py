@@ -3,6 +3,7 @@ Wisehockey match statistics and events CSVs so card values always come from the 
 
 import csv
 import json
+import math
 import re
 from functools import lru_cache
 from pathlib import Path
@@ -89,6 +90,7 @@ class Content:
         self.nationalities = {(c["team"], c["jersey"]): c["nationality"].split(" / ")[0]
                               for c in base_doc["cards"] if c.get("nationality")}
         self.action_media = {(m["team"], m["jersey"]): m for m in _load_json("action_media.json")["players"]}
+        self.card_images = _load_json("card_images.json")
         self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
         self._add_pressure_card()
         self.cards |= {c["id"]: self._build_base_card(c, base_doc) for c in base_doc["cards"]}
@@ -100,6 +102,9 @@ class Content:
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
                                  self.nationalities, self.action_media)
         self.road_to_final = RoadToFinal(self.testdata, positions)
+        legends_doc = _load_json("legends.json")
+        self.legend_thresholds = legends_doc["thresholds"]
+        self.cards |= {c["id"]: self._build_legend_card(c, legends_doc) for c in legends_doc["cards"]}
 
     def _add_pass_moments(self):
         for result in self.derived_kpis['pass_body_pressure']['events']:
@@ -427,7 +432,7 @@ class Content:
             "jersey": cfg["jersey"],
             "team": cfg["team"],
             "position": cfg["position"],
-            "image_url": self.player_images.get((cfg["team"], cfg["jersey"])),
+            "image_url": self.card_images.get(cfg.get("id")) or self.player_images.get((cfg["team"], cfg["jersey"])),
             "nationality": self.nationalities.get((cfg["team"], cfg["jersey"])),
             **self._action_media(cfg["team"], cfg["jersey"]),
         }
@@ -446,8 +451,12 @@ class Content:
         }
 
     def _build_base_card(self, cfg: dict, doc: dict) -> dict:
-        """A plain card with the player's profile only: no archetype, stats or highlights."""
-        row = self._find_row(cfg["team"], cfg["jersey"])
+        """A plain card with the player's profile only: no archetype, stats or highlights. Players of the two teams
+        in the final are named from the stats CSV; the other teams' cards, and the final's backup goalkeepers (who
+        have no CSV row), carry the name themselves. Only the two finalists' cards link the match."""
+        in_final = cfg["team"] in (self.match["home_team"], self.match["away_team"])
+        row = ({"FirstName": cfg["first_name"], "LastName": cfg["last_name"]} if "first_name" in cfg
+               else self._find_row(cfg["team"], cfg["jersey"]))
         bio_keys = ("date_of_birth", "place_of_birth", "nationality", "height_cm", "weight_kg", "shoots", "draft", "club")
         return {
             "id": cfg["id"],
@@ -457,12 +466,64 @@ class Content:
             "rating": None,
             "player": self._player(cfg, row),
             "title": None,
-            "match": self._match(cfg["team"]),
+            "match": self._match(cfg["team"]) if in_final else None,
             "bio": {k: cfg.get(k) for k in bio_keys},
             "edition": "standard",
             "source": doc["source"],
             "source_url": cfg.get("ep_url"),
         }
+
+    def _build_legend_card(self, cfg: dict, doc: dict) -> dict:
+        """A club legend: not from the 2025 tournament, so no stats or match, only why the player is a legend. Won
+        automatically by collecting a share of the club's cards (see legends_due)."""
+        return {
+            "id": cfg["id"],
+            "type": "legend",
+            "player": {
+                "first_name": cfg["first_name"],
+                "last_name": cfg["last_name"],
+                "jersey": cfg.get("jersey"),
+                "team": cfg["team"],
+                "position": cfg["position"],
+                "image_url": cfg.get("image_url"),
+            },
+            "title": "Legend",
+            "match": None,
+            "legend": {k: cfg.get(k) for k in ("era", "nationality", "summary", "spengler_cup", "honours", "moment",
+                                                "image_credit", "image_source_url", "sources")},
+            "edition": "legend",
+            "source": doc["source"],
+        }
+
+    def club_cards(self, team: str) -> list[str]:
+        """The cards that count towards a club's collection: its base and special cards (not its legends)."""
+        return [cid for cid, c in self.cards.items() if c["type"] in ("base", "special") and c["player"]["team"] == team]
+
+    def legends_due(self, team: str, owned: dict[str, str]) -> int:
+        """How many legends a user has earned for the club: one per threshold (share of club_cards owned) reached."""
+        club = self.club_cards(team)
+        have = sum(cid in owned for cid in club)
+        return sum(have >= math.ceil(t * len(club)) for t in self.legend_thresholds)
+
+    def club_progress(self, owned: dict[str, str]) -> list[dict]:
+        """Per club: cards collected, legends owned and how many cards the next legend needs."""
+        teams = dict.fromkeys(c["player"]["team"] for c in self.cards.values() if c["type"] == "legend")
+        result = []
+        for team in teams:
+            club = self.club_cards(team)
+            have = sum(cid in owned for cid in club)
+            steps = [math.ceil(t * len(club)) for t in self.legend_thresholds]
+            legends = [cid for cid, c in self.cards.items() if c["type"] == "legend" and c["player"]["team"] == team]
+            result.append({
+                "team": team,
+                "owned": have,
+                "total": len(club),
+                "legends_owned": sum(cid in owned for cid in legends),
+                "legends_total": len(legends),
+                "thresholds": steps,
+                "next_at": next((n for n in steps if n > have), None),
+            })
+        return result
 
     def _camera_clip(self, timestamp: str) -> dict | None:
         """The clip cut from the arena recording for this event, if it has been cut
@@ -529,19 +590,23 @@ class Content:
         return f'{m["title"]} at {m["clock"]} of the {m["period_label"]}. {m["text"]}'.strip()
 
     def card_summary(self, card: dict) -> dict:
-        """What the gallery shows for a card the user does not own yet: only the (grayed out) photo. Reward cards
-        show what unlocks them instead, which is not a secret."""
+        """What the gallery shows for a card the user does not own yet: only the (grayed out) photo. A legend shows
+        nothing but its club, so it stays a surprise. Reward cards show what unlocks them instead, which is not a
+        secret."""
         if card["type"] == "reward":
             keys = ("id", "type", "kind", "context_type", "title", "unlock", "requires")
             player = self._photo_only(card["player"]) if card["kind"] == "collector" else None
             return {**{k: card[k] for k in keys if k in card}, "player": player}
-        return {"id": card["id"], "type": card["type"], "kind": card["kind"], "player": self._photo_only(card["player"])}
+        summary = {"id": card["id"], "type": card["type"], "player": self._photo_only(card["player"], card["type"] == "legend")}
+        if "kind" in card:
+            summary["kind"] = card["kind"]
+        return summary
 
     @staticmethod
-    def _photo_only(player: dict) -> dict:
+    def _photo_only(player: dict, hide_identity: bool = False) -> dict:
         return {
-            "image_url": player.get("image_url"),
-            "jersey": player.get("jersey"),
+            "image_url": None if hide_identity else player.get("image_url"),
+            "jersey": None if hide_identity else player.get("jersey"),
             "team": player["team"],
             "first_name": "",
             "last_name": "",
@@ -558,6 +623,7 @@ class Content:
             "owned_count": len(owned),
             "stadium_count": sum(1 for e in owned.values() if e == "stadium"),
             "total_cards": len(self.cards),
+            "clubs": self.club_progress(owned),
         }
 
     def build_question(self, card_id: str, rng) -> dict:
@@ -585,7 +651,7 @@ class Content:
             "option_ids": option_ids,
             "prompt": prompt,
             "clue": clue,
-            "match": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}',
+            "match": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}' if m else None,
         }
 
     @staticmethod

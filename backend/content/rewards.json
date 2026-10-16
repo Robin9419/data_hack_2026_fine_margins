@@ -1,6 +1,6 @@
 {
   "_comment": "Illustrative reward milestones (simulated, nothing is actually redeemable). Points per card come from 'card_points': a stadium edition is worth more than a home edition, so stadium fans progress faster while home fans still unlock every card.",
-  "card_points": { "starter": 0, "standard": 10, "stadium": 25 },
+  "card_points": { "starter": 0, "standard": 10, "stadium": 25, "legend": 25 },
   "rewards": [
     { "id": "soda", "title": "Free soda", "points": 30, "icon": "🥤" },
     { "id": "merch", "title": "10% off fan shop", "points": 70, "icon": "🧢" },

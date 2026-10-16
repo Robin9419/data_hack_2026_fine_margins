@@ -5,7 +5,7 @@ import { useAuth } from '../auth'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
 import TestDataPanel from '../components/TestDataPanel'
-import { TEAMS, TEAMS_2025 } from '../teams'
+import { TEAMS } from '../teams'
 
 const PAGE_SIZE = 8
 const SWIPE_PX = 50
@@ -19,12 +19,13 @@ const loadTestGames = () => {
   }
 }
 
-const teamFilters = (withTest) => [
+const TEAM_FILTERS = [
   { value: 'all', label: 'All teams' },
-  ...[...TEAMS, ...(withTest ? TEAMS_2025 : [])].map((t) => ({ value: t.name, label: t.name })),
+  ...TEAMS.map((t) => ({ value: t.name, label: t.name })),
 ]
 const TYPE_FILTERS = [
   { value: 'all', label: 'All cards' },
+  { value: 'legend', label: 'Legends' },
   { value: 'base', label: 'Base' },
   { value: 'profile', label: 'Profile specials' },
   { value: 'performance', label: 'Performance specials' },
@@ -32,7 +33,8 @@ const TYPE_FILTERS = [
   { value: 'collector', label: 'Collector' },
   { value: 'context', label: 'Moment, stadium, trophy' },
 ]
-const TYPE_ORDER = { special: 0, reward: 1, base: 2 }
+// Within owned and within locked cards: legends, then special, then reward, then base.
+const TYPE_ORDER = { legend: 0, special: 1, reward: 2, base: 3 }
 
 function FilterSelect({ label, options, value, onChange }) {
   return (
@@ -52,7 +54,7 @@ function FilterSelect({ label, options, value, onChange }) {
 export default function Gallery() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { setProgress } = useAuth()
+  const { progress, setProgress } = useAuth()
   const newCardIds = location.state?.newCardIds ?? []
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
@@ -112,9 +114,11 @@ export default function Gallery() {
 
   const realCards = cards.filter((c) => !c.test)
   const ownedCount = realCards.filter((c) => c.owned).length
-  // Owned cards first, then locked; within each, special cards, then reward cards, then base (otherwise API order).
+  const spareCount = realCards.reduce((n, c) => n + (c.type === 'base' && c.copies > 1 ? c.copies - 1 : 0), 0)
+  const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
+  // Owned cards first, then locked; within each, by TYPE_ORDER (otherwise API order).
   const shown = cards
-    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || c.kind === type))
+    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || (c.kind ?? c.type) === type))
     .sort((a, b) => {
       if (a.owned !== b.owned) return a.owned ? -1 : 1
       return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]
@@ -158,11 +162,23 @@ export default function Gallery() {
         <button type="button" className="quiz-cta" onClick={onClaimDaily}>
           <span>
             <strong>Your daily card is ready</strong>
-            <small>Claim one free base card. A new one is available every day.</small>
+            <small>Claim one free base card. A new one is available every day, duplicates included.</small>
           </span>
           <span aria-hidden="true">→</span>
         </button>
       )}
+
+      <Link to="/trade" className="quiz-cta trade-cta">
+        <span>
+          <strong>Trade in 3 base cards</strong>
+          <small>
+            {spareCount > 0
+              ? `You have ${spareCount} spare ${spareCount === 1 ? 'duplicate' : 'duplicates'}. Swap three for a new card, maybe a special one.`
+              : 'Swap any three base cards for a random new card, maybe a special one.'}
+          </small>
+        </span>
+        <span aria-hidden="true">⇄</span>
+      </Link>
 
       <Link to="/quiz" className="quiz-cta">
         <span>
@@ -175,7 +191,7 @@ export default function Gallery() {
       {testData && <TestDataPanel games={testData} selected={testGames} onChange={changeTestGames} />}
 
       <div className="gallery-filters">
-        <FilterSelect label="Team" options={teamFilters(testGames.length > 0)} value={team} onChange={filterBy(setTeam)} />
+        <FilterSelect label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />
         <FilterSelect label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
       </div>
 
@@ -191,7 +207,13 @@ export default function Gallery() {
         </button>
         <div className="card-grid" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           {pageCards.map((card) => (
-            <CardTile key={card.id} card={card} isNew={newCardIds.includes(card.id)} onOpen={setSpotlight} />
+            <CardTile
+              key={card.id}
+              card={card}
+              club={clubs[card.player.team]}
+              isNew={newCardIds.includes(card.id)}
+              onOpen={setSpotlight}
+            />
           ))}
         </div>
         <button

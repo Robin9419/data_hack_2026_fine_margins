@@ -1868,7 +1868,7 @@
    "date": "2025-12-27",
    "start": "15:10",
    "arena": "zondacrypto-Arena",
-   "home_team": "IFK Helsinki",
+   "home_team": "HIFK",
    "away_team": "HC Sparta Praha",
    "home_score": 1,
    "away_score": 4,
@@ -1939,7 +1939,7 @@
     },
     {
      "clock": "38:00",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "home_score": 1,
      "away_score": 2,
      "strength": null,
@@ -2016,7 +2016,7 @@
     },
     {
      "clock": "06:29",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Jakob",
       "last_name": "Ragnarsson",
@@ -2028,7 +2028,7 @@
     },
     {
      "clock": "13:01",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Lauri",
       "last_name": "Sinivuori",
@@ -2052,7 +2052,7 @@
     },
     {
      "clock": "48:24",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Joshua",
       "last_name": "Fahrni",
@@ -2064,7 +2064,7 @@
     },
     {
      "clock": "59:14",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Kalle",
       "last_name": "Ervasti",
@@ -2405,7 +2405,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Rocco",
      "last_name": "Pezzullo",
      "jersey": 76,
@@ -2421,7 +2421,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Joshua",
      "last_name": "Fahrni",
      "jersey": 96,
@@ -2436,7 +2436,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Eric",
      "last_name": "Schneller",
      "jersey": 65,
@@ -2450,7 +2450,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jason",
      "last_name": "Akeson",
      "jersey": 91,
@@ -2464,7 +2464,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Kasper",
      "last_name": "Lundell",
      "jersey": 19,
@@ -2478,7 +2478,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Petrus",
      "last_name": "Palmu",
      "jersey": 52,
@@ -2492,7 +2492,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Niko",
      "last_name": "Hovinen",
      "jersey": 92,
@@ -2506,7 +2506,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Hugo",
      "last_name": "Alnefelt",
      "jersey": 60,
@@ -2521,7 +2521,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jakob",
      "last_name": "Ragnarsson",
      "jersey": 10,
@@ -2536,7 +2536,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Kalle",
      "last_name": "Ervasti",
      "jersey": 28,
@@ -2551,7 +2551,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Saku",
      "last_name": "Salmela",
      "jersey": 90,
@@ -2565,7 +2565,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Oliver",
      "last_name": "Larsen",
      "jersey": 98,
@@ -2579,7 +2579,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Viljami",
      "last_name": "Savolainen",
      "jersey": 74,
@@ -2593,7 +2593,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Otto",
      "last_name": "Somppi",
      "jersey": 15,
@@ -2606,7 +2606,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Tristan",
      "last_name": "Ashbrook",
      "jersey": 47,
@@ -2620,7 +2620,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jere",
      "last_name": "Somervuori",
      "jersey": 54,
@@ -2634,7 +2634,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Lauri",
      "last_name": "Sinivuori",
      "jersey": 42,
@@ -2649,7 +2649,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Sean",
      "last_name": "Josling",
      "jersey": 27,
@@ -2663,7 +2663,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Aatu",
      "last_name": "Karjalainen",
      "jersey": 82,
@@ -2676,7 +2676,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Petr",
      "last_name": "Kodýtek",
      "jersey": 77,
@@ -2690,7 +2690,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Vincent",
      "last_name": "Marleau",
      "jersey": 43,
@@ -2704,7 +2704,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Daniel",
      "last_name": "Mäkiaho",
      "jersey": 71,
@@ -2721,7 +2721,7 @@
     }
    ],
    "logos": {
-    "IFK Helsinki": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2025-05/HIFK_SM-Liiga-Logot.png.png.webp?itok=wmRBGPOF",
+    "HIFK": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2025-05/HIFK_SM-Liiga-Logot.png.png.webp?itok=wmRBGPOF",
     "HC Sparta Praha": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2025-05/SPARTA%20-%20POS_RED_RGB.png.webp?itok=I4PZAo5x"
    }
   },
@@ -3688,7 +3688,7 @@
    "start": "15:10",
    "arena": "zondacrypto-Arena",
    "home_team": "HC Fribourg-Gottéron",
-   "away_team": "IFK Helsinki",
+   "away_team": "HIFK",
    "home_score": 4,
    "away_score": 3,
    "periods": [
@@ -3710,7 +3710,7 @@
    "goals": [
     {
      "clock": "01:01",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "home_score": 0,
      "away_score": 1,
      "strength": null,
@@ -3752,7 +3752,7 @@
     },
     {
      "clock": "09:13",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "home_score": 1,
      "away_score": 2,
      "strength": "PP1",
@@ -3835,7 +3835,7 @@
     },
     {
      "clock": "56:34",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "home_score": 4,
      "away_score": 3,
      "strength": null,
@@ -3858,7 +3858,7 @@
    "penalties": [
     {
      "clock": "02:34",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Kalle",
       "last_name": "Ervasti",
@@ -3882,7 +3882,7 @@
     },
     {
      "clock": "03:55",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Rocco",
       "last_name": "Pezzullo",
@@ -3918,7 +3918,7 @@
     },
     {
      "clock": "23:00",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Tristan",
       "last_name": "Ashbrook",
@@ -3954,7 +3954,7 @@
     },
     {
      "clock": "29:25",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Otto",
       "last_name": "Somppi",
@@ -3966,7 +3966,7 @@
     },
     {
      "clock": "29:25",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Otto",
       "last_name": "Somppi",
@@ -4014,7 +4014,7 @@
     },
     {
      "clock": "33:44",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Petrus",
       "last_name": "Palmu",
@@ -4026,7 +4026,7 @@
     },
     {
      "clock": "43:03",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Aatu",
       "last_name": "Karjalainen",
@@ -4038,7 +4038,7 @@
     },
     {
      "clock": "44:46",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Kalle",
       "last_name": "Ervasti",
@@ -4394,7 +4394,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Rocco",
      "last_name": "Pezzullo",
      "jersey": 76,
@@ -4408,7 +4408,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Joshua",
      "last_name": "Fahrni",
      "jersey": 96,
@@ -4422,7 +4422,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jason",
      "last_name": "Akeson",
      "jersey": 91,
@@ -4436,7 +4436,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Kasper",
      "last_name": "Lundell",
      "jersey": 19,
@@ -4450,7 +4450,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Petrus",
      "last_name": "Palmu",
      "jersey": 52,
@@ -4467,7 +4467,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Niko",
      "last_name": "Hovinen",
      "jersey": 92,
@@ -4482,7 +4482,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Hugo",
      "last_name": "Alnefelt",
      "jersey": 60,
@@ -4496,7 +4496,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jakob",
      "last_name": "Ragnarsson",
      "jersey": 10,
@@ -4512,7 +4512,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Ilari",
      "last_name": "Melart",
      "jersey": 11,
@@ -4528,7 +4528,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Kalle",
      "last_name": "Ervasti",
      "jersey": 28,
@@ -4543,7 +4543,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Saku",
      "last_name": "Salmela",
      "jersey": 90,
@@ -4556,7 +4556,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Oliver",
      "last_name": "Larsen",
      "jersey": 98,
@@ -4572,7 +4572,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Otto",
      "last_name": "Somppi",
      "jersey": 15,
@@ -4589,7 +4589,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Tristan",
      "last_name": "Ashbrook",
      "jersey": 47,
@@ -4604,7 +4604,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jere",
      "last_name": "Somervuori",
      "jersey": 54,
@@ -4618,7 +4618,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Lauri",
      "last_name": "Sinivuori",
      "jersey": 42,
@@ -4631,7 +4631,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Santeri",
      "last_name": "Hartikainen",
      "jersey": 79,
@@ -4645,7 +4645,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jesse",
      "last_name": "Seppälä",
      "jersey": 78,
@@ -4659,7 +4659,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Sean",
      "last_name": "Josling",
      "jersey": 27,
@@ -4673,7 +4673,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Aatu",
      "last_name": "Karjalainen",
      "jersey": 82,
@@ -4689,7 +4689,7 @@
    ],
    "logos": {
     "HC Fribourg-Gottéron": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2024-11/Fribourg_Logo_600x600px.png.webp?itok=aImMI_ND",
-    "IFK Helsinki": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2025-05/HIFK_SM-Liiga-Logot.png.png.webp?itok=wmRBGPOF"
+    "HIFK": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2025-05/HIFK_SM-Liiga-Logot.png.png.webp?itok=wmRBGPOF"
    }
   },
   {
@@ -6421,7 +6421,7 @@
    "start": "20:15",
    "arena": "zondacrypto-Arena",
    "home_team": "HC Davos",
-   "away_team": "IFK Helsinki",
+   "away_team": "HIFK",
    "home_score": 3,
    "away_score": 0,
    "periods": [
@@ -6526,7 +6526,7 @@
    "penalties": [
     {
      "clock": "01:06",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Tristan",
       "last_name": "Ashbrook",
@@ -6538,7 +6538,7 @@
     },
     {
      "clock": "27:49",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Tristan",
       "last_name": "Ashbrook",
@@ -6562,7 +6562,7 @@
     },
     {
      "clock": "44:17",
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "player": {
       "first_name": "Jason",
       "last_name": "Akeson",
@@ -6883,7 +6883,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Rocco",
      "last_name": "Pezzullo",
      "jersey": 76,
@@ -6897,7 +6897,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Joshua",
      "last_name": "Fahrni",
      "jersey": 96,
@@ -6911,7 +6911,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Eric",
      "last_name": "Schneller",
      "jersey": 65,
@@ -6925,7 +6925,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jason",
      "last_name": "Akeson",
      "jersey": 91,
@@ -6940,7 +6940,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Kasper",
      "last_name": "Lundell",
      "jersey": 19,
@@ -6954,7 +6954,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Petrus",
      "last_name": "Palmu",
      "jersey": 52,
@@ -6968,7 +6968,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Niko",
      "last_name": "Hovinen",
      "jersey": 92,
@@ -6982,7 +6982,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Hugo",
      "last_name": "Alnefelt",
      "jersey": 60,
@@ -6997,7 +6997,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jakob",
      "last_name": "Ragnarsson",
      "jersey": 10,
@@ -7010,7 +7010,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Ilari",
      "last_name": "Melart",
      "jersey": 11,
@@ -7024,7 +7024,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Kalle",
      "last_name": "Ervasti",
      "jersey": 28,
@@ -7038,7 +7038,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Saku",
      "last_name": "Salmela",
      "jersey": 90,
@@ -7052,7 +7052,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Oliver",
      "last_name": "Larsen",
      "jersey": 98,
@@ -7066,7 +7066,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Tristan",
      "last_name": "Ashbrook",
      "jersey": 47,
@@ -7081,7 +7081,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jere",
      "last_name": "Somervuori",
      "jersey": 54,
@@ -7095,7 +7095,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Lauri",
      "last_name": "Sinivuori",
      "jersey": 42,
@@ -7109,7 +7109,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Jesse",
      "last_name": "Seppälä",
      "jersey": 78,
@@ -7123,7 +7123,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Sean",
      "last_name": "Josling",
      "jersey": 27,
@@ -7137,7 +7137,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Aatu",
      "last_name": "Karjalainen",
      "jersey": 82,
@@ -7150,7 +7150,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Petr",
      "last_name": "Kodýtek",
      "jersey": 77,
@@ -7164,7 +7164,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Vincent",
      "last_name": "Marleau",
      "jersey": 43,
@@ -7178,7 +7178,7 @@
      }
     },
     {
-     "team": "IFK Helsinki",
+     "team": "HIFK",
      "first_name": "Daniel",
      "last_name": "Mäkiaho",
      "jersey": 71,
@@ -7194,7 +7194,7 @@
    ],
    "logos": {
     "HC Davos": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2024-11/HCD_Logo_600x600px.png.webp?itok=EtjHSCdr",
-    "IFK Helsinki": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2025-05/HIFK_SM-Liiga-Logot.png.png.webp?itok=wmRBGPOF"
+    "HIFK": "https://cdn.spenglercup.ch/sites/default/files/styles/spielplan_logos/public/team/2025-05/HIFK_SM-Liiga-Logot.png.png.webp?itok=wmRBGPOF"
    }
   },
   {

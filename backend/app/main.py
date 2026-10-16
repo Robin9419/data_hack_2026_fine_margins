@@ -48,11 +48,11 @@ def current_user(authorization: str | None = Header(default=None)) -> dict:
 
 
 TEAMS = [
-    "SCL Tigers",
-    "Adler Mannheim",
-    "Ilves Tampere",
+    "HIFK",
+    "Team Canada",
     "HC Davos",
-    "Frölunda HC",
+    "HC Sparta Praha",
+    "HC Fribourg-Gottéron",
     "U.S. Collegiate Selects",
 ]
 
@@ -87,12 +87,10 @@ def _today() -> str:
 
 
 def open_daily_card(user_id: int) -> list[dict]:
-    """One base card, preferring one the user doesn't own yet (a duplicate only once they own all of them)."""
+    """One random base card. It can be a duplicate: a second copy is kept and can be traded in."""
     content = get_content()
     base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
-    owned = db.owned_cards(user_id)
-    candidates = [cid for cid in base_ids if cid not in owned] or base_ids
-    drawn = random.choice(candidates)
+    drawn = random.choice(base_ids)
     new_ids = db.grant_cards(user_id, [drawn])
     return [{**content.cards[drawn], "owned": True, "is_new": drawn in new_ids}]
 
@@ -100,6 +98,73 @@ def open_daily_card(user_id: int) -> list[dict]:
 def with_rewards(owned: dict[str, str]) -> dict[str, str]:
     """The owned cards plus the reward cards they earn (collector and context cards)."""
     return owned | get_content().earned_cards(owned)
+
+
+# Trade-in: give up TRADE_COST base cards (any mix, duplicates or not) for one random card. With a favorite team the
+# roll is 50% a base card from another team, 25% a base card from the favorite team and 25% a special card; without
+# one it is 75% any base card and 25% a special card.
+TRADE_COST = 3
+
+
+def trade_odds(favorite_team: str | None) -> list[dict]:
+    special = {"id": "special", "label": "Special card", "chance": 0.25}
+    if not favorite_team:
+        return [{"id": "base", "label": "Base card, any team", "chance": 0.75}, special]
+    return [
+        {"id": "other", "label": "Base card, another team", "chance": 0.5},
+        {"id": "favorite", "label": f"Base card, {favorite_team}", "chance": 0.25},
+        special,
+    ]
+
+
+def tradeable_cards(user_id: int, traded_ids: list[str]) -> list[str]:
+    """Card ids a trade may give: base and special cards the user does not hold and is not trading in. A trade never
+    returns a duplicate, so this is the only pool it draws from. Legends are only earned (see award_legends)."""
+    excluded = set(db.owned_cards(user_id)) | set(traded_ids)
+    return [cid for cid, c in get_content().cards.items() if c["type"] in ("base", "special") and cid not in excluded]
+
+
+def roll_trade(user_id: int, favorite_team: str | None, traded_ids: list[str]) -> tuple[str, dict]:
+    """Rolls the trade-in outcome and grants the card. Returns (outcome id, card as a pack entry). The card is always
+    one the user doesn't own. If the rolled pool has nothing left, the card comes from the next best pool (a special
+    falls back to a base card, a favorite-team card to any base card), and the outcome reflects what was drawn."""
+    content = get_content()
+    odds = trade_odds(favorite_team)
+    rolled = random.choices([o["id"] for o in odds], weights=[o["chance"] for o in odds])[0]
+    available = set(tradeable_cards(user_id, traded_ids))
+    base = [cid for cid in available if content.cards[cid]["type"] == "base"]
+    specials = [cid for cid in available if content.cards[cid]["type"] == "special"]
+    pools = {
+        "special": specials,
+        "base": base,
+        "favorite": [cid for cid in base if content.cards[cid]["player"]["team"] == favorite_team],
+        "other": [cid for cid in base if content.cards[cid]["player"]["team"] != favorite_team],
+    }
+    drawn = random.choice(pools[rolled] or base or specials)
+    card = content.cards[drawn]
+    if card["type"] == "special":
+        db.grant_card(user_id, drawn, "standard")
+        return "special", {**card, "owned": True, "edition": "standard", "is_new": True}
+    db.grant_cards(user_id, [drawn])
+    outcome = "base" if not favorite_team else ("favorite" if card["player"]["team"] == favorite_team else "other")
+    return outcome, {**card, "owned": True, "is_new": True}
+
+
+def award_legends(user_id: int) -> list[dict]:
+    """Club legends are earned, not drawn: one random legend of a club for each of 50%, 75% and 100% of the club's
+    cards collected (thresholds in legends.json), so a complete club holds all its legends. Legends are kept if the
+    collection later shrinks through a trade. Grants the legends now due and returns them as pack entries."""
+    content = get_content()
+    owned = db.owned_cards(user_id)
+    granted = []
+    for team in {c["player"]["team"] for c in content.cards.values() if c["type"] == "legend"}:
+        legends = [cid for cid, c in content.cards.items() if c["type"] == "legend" and c["player"]["team"] == team]
+        missing = [cid for cid in legends if cid not in owned]
+        due = content.legends_due(team, owned) - (len(legends) - len(missing))
+        for cid in random.sample(missing, max(0, min(due, len(missing)))):
+            db.grant_card(user_id, cid, "legend")
+            granted.append({**content.cards[cid], "owned": True, "is_new": True})
+    return granted
 
 
 def progress_for(user_id: int) -> dict:
@@ -111,7 +176,7 @@ def login(body: LoginRequest):
     """Dummy sign-in: any username works. Only a brand new account gets a starter pack."""
     user, created = db.get_or_create_user(body.username.strip(), body.favorite_team)
     token = db.create_session(user["id"])
-    pack = open_pack(user["id"], user["favorite_team"]) if created else None
+    pack = open_pack(user["id"], user["favorite_team"]) + award_legends(user["id"]) if created else None
     return {"token": token, "user": user, "new_user": created, "pack": pack}
 
 
@@ -125,13 +190,37 @@ def daily_claim(user: dict = Depends(current_user)):
     """One free base card per (UTC) day, unless the limit is switched off for the demo."""
     if ENFORCE_DAILY_LIMIT and not db.claim_daily(user["id"], _today()):
         raise HTTPException(409, "You already claimed today's card. Come back tomorrow!")
-    return {"pack": open_daily_card(user["id"]), "progress": progress_for(user["id"])}
+    return {"pack": open_daily_card(user["id"]) + award_legends(user["id"]), "progress": progress_for(user["id"])}
+
+
+class TradeRequest(BaseModel):
+    # One entry per copy given up, so the same card id can appear more than once.
+    card_ids: list[str] = Field(min_length=TRADE_COST, max_length=TRADE_COST)
+
+
+@app.get("/api/trade")
+def trade_info(user: dict = Depends(current_user)):
+    return {"cost": TRADE_COST, "odds": trade_odds(user["favorite_team"])}
+
+
+@app.post("/api/trade")
+def trade(body: TradeRequest, user: dict = Depends(current_user)):
+    """Trade in three base card copies for one random card (see trade_odds)."""
+    content = get_content()
+    if any(content.cards.get(cid, {}).get("type") != "base" for cid in body.card_ids):
+        raise HTTPException(400, "Only base cards can be traded in")
+    if not tradeable_cards(user["id"], body.card_ids):
+        raise HTTPException(409, "You already own every card, so there is nothing to trade for")
+    if not db.remove_copies(user["id"], body.card_ids):
+        raise HTTPException(409, "You don't have those cards to trade")
+    outcome, card = roll_trade(user["id"], user["favorite_team"], body.card_ids)
+    return {"outcome": outcome, "pack": [card] + award_legends(user["id"]), "progress": progress_for(user["id"])}
 
 
 @app.get("/api/teams")
 def list_teams():
-    """The selectable favorite teams and how many cards the set has for each."""
-    cards = [c for c in get_content().cards.values() if c["type"] != "reward"]
+    """The selectable favorite teams and how many collectable cards (not legends or rewards) the set has for each."""
+    cards = [c for c in get_content().cards.values() if c["type"] not in ("legend", "reward")]
     return {"teams": [{"name": t, "cards": sum(c["player"]["team"] == t for c in cards)} for t in TEAMS]}
 
 
@@ -159,10 +248,11 @@ def list_cards(test_games: str = "", user: dict = Depends(current_user)):
     ids from /api/testdata) adds the test cards of those games as owned preview cards; they never count in the progress."""
     content = get_content()
     owned = with_rewards(db.owned_cards(user["id"]))
+    copies = db.card_copies(user["id"])
     result = []
     for card_id, card in content.cards.items():
         if card_id in owned:
-            result.append({**card, "owned": True, "edition": owned[card_id]})
+            result.append({**card, "owned": True, "edition": owned[card_id], "copies": copies.get(card_id, 1)})
         else:
             result.append({**content.card_summary(card), "owned": False})
     ids = [g for g in test_games.split(",") if g]
@@ -208,7 +298,8 @@ def list_metrics():
 def reset(user: dict = Depends(current_user)):
     """Empty the user's collection and open a fresh starter pack (for demos/testing)."""
     db.clear_cards(user["id"])
-    return {"pack": open_pack(user["id"], user["favorite_team"]), "progress": progress_for(user["id"])}
+    pack = open_pack(user["id"], user["favorite_team"]) + award_legends(user["id"])
+    return {"pack": pack, "progress": progress_for(user["id"])}
 
 
 QUESTIONS_PER_ROUND = 3
@@ -281,7 +372,8 @@ def quiz_answer(question_id: int, body: QuizAnswer, user: dict = Depends(current
     edition = _edition(question["venue"])
     result = db.grant_card(user["id"], question["card_id"], edition)
     card = {**get_content().cards[question["card_id"]], "owned": True, "edition": edition}
-    return {"correct": True, "result": result, "card": card, "progress": progress_for(user["id"])}
+    legends = award_legends(user["id"])
+    return {"correct": True, "result": result, "card": card, "legends": legends, "progress": progress_for(user["id"])}
 
 
 @app.get('/api/analysis/pass-body-pressure')

@@ -6,6 +6,7 @@ import CardDetail from './pages/CardDetail'
 import PackOpening from './pages/PackOpening'
 import Quiz from './pages/Quiz'
 import Admin from './pages/Admin'
+import Trade from './pages/Trade'
 import RewardBar from './components/RewardBar'
 
 function RequireAuth({ children }) {
@@ -60,6 +61,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <Quiz />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trade"
+            element={
+              <RequireAuth>
+                <Trade />
               </RequireAuth>
             }
           />

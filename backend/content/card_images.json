@@ -1,0 +1,16 @@
+{
+  "_comment": "Local card images (frontend/public/players), keyed by card id; they override the portrait from docs/player-images.json. Special cards get the flashier '-special' artwork; a player's base card keeps the standard portrait unless listed here. Players without a special card use the supplied artwork on the base card. Muldowney's special card is the generated 'pressure-reliever' card.",
+  "gajan": "/players/gajan-special.jpg",
+  "tambellini": "/players/tambellini-special.jpg",
+  "fink": "/players/fink-special.jpg",
+  "corvi": "/players/corvi-special.jpg",
+  "pohlkamp": "/players/pohlkamp-special.jpg",
+  "zadina": "/players/zadina-special.jpg",
+  "mccartthy": "/players/mccartthy-special.jpg",
+  "nussbaumer": "/players/nussbaumer-special.jpg",
+  "pressure-reliever": "/players/muldowney-special.jpg",
+  "base-hcd-12": "/players/guebey.png",
+  "base-hcd-6": "/players/dahlbeck.png",
+  "base-hcd-47": "/players/komarov.png",
+  "base-hcd-44": "/players/stransky.png"
+}

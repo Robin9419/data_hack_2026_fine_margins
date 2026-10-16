@@ -79,6 +79,7 @@ class Content:
         self.derived_kpis = {'pass_body_pressure': pass_body_pressure(self.analysis)}
         self._add_pass_moments()
         self.player_images = self._load_player_images()
+        self.card_images = _load_json("card_images.json")
         self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
         self._add_pressure_card()
         base_doc = _load_json("base_cards.json")
@@ -265,7 +266,7 @@ class Content:
             "jersey": cfg["jersey"],
             "team": cfg["team"],
             "position": cfg["position"],
-            "image_url": self.player_images.get((cfg["team"], cfg["jersey"])),
+            "image_url": self.card_images.get(cfg["id"]) or self.player_images.get((cfg["team"], cfg["jersey"])),
         }
 
     def _match(self, team: str) -> dict:

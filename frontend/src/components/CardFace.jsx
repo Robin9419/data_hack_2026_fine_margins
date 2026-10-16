@@ -219,11 +219,11 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
             <small>
               <i>#{player.jersey}</i> {player.first_name}
             </small>
-            <b>
-              {player.last_name}
-              {nation && <img className="card-flag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />}
-            </b>
+            <b>{player.last_name}</b>
           </div>
+        )}
+        {dark && !vertical && nation && (
+          <img className="card-flag card-hflag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />
         )}
         {vertical && (
           <div className="card-vname">
@@ -247,14 +247,17 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
           )}
           {!dark && (
             <p className="card-name" style={{ '--nlen': player.last_name.length }}>
-              <span className="card-first">{player.first_name}</span>
+              <span className="card-first">
+                {kind === 'profile' && <i>#{player.jersey} </i>}
+                {player.first_name}
+              </span>
               {player.last_name}
               {nation && <img className="card-flag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />}
             </p>
           )}
-          {(!dark || game) && (
+          {(!(dark || kind === 'profile') || game) && (
             <p className="card-meta">
-              {!dark && (
+              {!dark && kind !== 'profile' && (
                 <span className="card-no">
                   <span>
                     <small>#</small>
@@ -334,17 +337,54 @@ function LegendFace({ card, locked }) {
       </div>
     )
   }
+  const team = teamOf(player.team)
+  const nation = nationOf(card.legend?.nationality)
+  const pos = POS_SHORT[player.position]
+  const years = card.legend?.era?.match(/\d{4}(?:[–-]\d{2,4})?/)?.[0]
+  const star = (
+    <span className="card-tag-icon">
+      <CardIcon name="star" />
+    </span>
+  )
   return (
-    <div className="card-face legend">
-      <PlayerPhoto player={player} className="card-art" />
-      <span className="legend-ribbon">★ Legend</span>
-      <div className="card-info">
-        <p className="card-archetype">Club legend</p>
-        <p className="card-name">
-          <span className="card-first">{player.first_name}</span>
-          {player.last_name}
-        </p>
-        <p className="card-meta">{player.team}</p>
+    <div className="card-face owned legend fa" style={{ ...teamStyle(player.team), '--tc': 'var(--s1)' }}>
+      <div className="card-inner">
+        <PlayerPhoto player={player} className="card-art" />
+        <div className="card-glitter" aria-hidden="true" />
+        <div className="card-tag">{star}</div>
+        <div className="card-corner">
+          {team.logo && (
+            <span className="card-logo">
+              <img src={team.logo} alt={team.name} />
+            </span>
+          )}
+          {pos && <span className="card-pos">{pos}</span>}
+        </div>
+        <span className="card-sidelabel">Legend</span>
+        <div className="card-tag card-tag-end">{star}</div>
+        <div className="card-hname" style={{ '--nlen': player.last_name.length }}>
+          <small>
+            {player.jersey != null && <i>#{player.jersey} </i>}
+            {player.first_name}
+          </small>
+          <b>{player.last_name}</b>
+        </div>
+        {nation && (
+          <img className="card-flag card-hflag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={card.legend.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />
+        )}
+        <div className="card-info">
+          {years && (
+            <p className="card-meta">
+              <span className="card-game">
+                <b>{years}</b>
+              </span>
+            </p>
+          )}
+          <p className="card-foot">
+            <span className="card-rarity">★★★</span>
+            <CardIcon name="trophy" />
+          </p>
+        </div>
       </div>
     </div>
   )

@@ -6,6 +6,7 @@ const NATIONS = {
   Canada: { iso: 'ca', code: 'CAN' },
   Slovakia: { iso: 'sk', code: 'SVK' },
   USA: { iso: 'us', code: 'USA' },
+  Finland: { iso: 'fi', code: 'FIN' },
 }
 
 export const nationOf = (name) => (name ? NATIONS[name] ?? null : null)

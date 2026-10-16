@@ -1,13 +1,13 @@
 import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './auth'
-import Login from './pages/Login'
-import Gallery from './pages/Gallery'
+import RewardBar from './components/RewardBar'
+import Admin from './pages/Admin'
 import CardDetail from './pages/CardDetail'
+import Gallery from './pages/Gallery'
+import Login from './pages/Login'
 import PackOpening from './pages/PackOpening'
 import Quiz from './pages/Quiz'
-import Admin from './pages/Admin'
 import Trade from './pages/Trade'
-import RewardBar from './components/RewardBar'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()

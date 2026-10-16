@@ -1,0 +1,158 @@
+"""Road to Final: one evolving card per star player that grows while the tournament goes on.
+
+The card is built from the games switched on in the gallery (plus the final, which is real data), so it shows what the
+player's tournament looks like up to that point: the rating per game as bars, an average rating and a stage.
+See docs/CARD_TYPES.md. The game ratings are the made-up test ratings of testdata.py."""
+
+import re
+
+from .ratings import tier_of
+from .testdata import SOURCE, TestData, _key, _skater_rating
+
+STAGES = [
+    {"n": 1, "name": "Debut", "when": "After the first game", "trigger": "The player plays his first tournament game.",
+     "change": "A card in the tier of that game's rating."},
+    {"n": 2, "name": "In Form", "when": "After the second game",
+     "trigger": "Every further game. The card rating is the average of all tournament games.",
+     "change": "The rating follows the average, a trend arrow and the form chart are added."},
+    {"n": 3, "name": "Finalist", "when": "After the semi-final",
+     "trigger": "The player's team wins its semi-final and reaches the final.",
+     "change": "One tier up and fine glitter."},
+    {"n": 4, "name": "Champion", "when": "After the final", "trigger": "The player's team wins the Spengler Cup.",
+     "change": "Champion look: dark gold, surname on the side, champion label."},
+]
+TIER_ORDER = ["bronze", "silver", "gold", "elite"]
+STARS_PER_TEAM = 2
+MIN_GAMES = 3  # to be a star of the tournament: played at least this many of his team's games
+
+
+def _won(team: str, game: dict) -> bool:
+    own, other = (game["home_score"], game["away_score"]) if game["home_team"] == team else (game["away_score"], game["home_score"])
+    return own > other
+
+
+class RoadToFinal:
+    def __init__(self, testdata: TestData, positions: dict):
+        self._td = testdata
+        self._positions = positions
+        self._player = {}  # (game id, (team, jersey)) -> the player's entry in that game
+        self._rating = {}  # same key -> made-up match rating, only for skaters who got ice time
+        for game in testdata.games:
+            for p in game["players"]:
+                self._player[(game["id"], _key(p))] = p
+                if not p["goalkeeper"] and p["stats"].get("toi"):
+                    self._rating[(game["id"], _key(p))] = _skater_rating(p["stats"])
+        self.team_games: dict[str, list[dict]] = {}
+        for game in testdata.games:
+            for team in (game["home_team"], game["away_team"]):
+                self.team_games.setdefault(team, []).append(game)
+        self.stars = self._stars()
+
+    def _stars(self) -> list[tuple[str, int]]:
+        """The best skaters of each team by their average rating over all of the team's games."""
+        stars = []
+        for team, games in self.team_games.items():
+            averages = {}
+            for key in {k for (gid, k) in self._rating if k[0] == team}:
+                ratings = [self._rating[(g["id"], key)] for g in games if (g["id"], key) in self._rating]
+                if len(ratings) >= MIN_GAMES:
+                    averages[key] = sum(ratings) / len(ratings)
+            stars += sorted(averages, key=lambda k: (-averages[k], k[1]))[:STARS_PER_TEAM]
+        return stars
+
+    def cards_for(self, game_ids: list[str]) -> list[dict]:
+        """A card per star whose team has at least one of the switched-on games."""
+        on = {g for g in game_ids if g in self._td.by_id and not self._td.by_id[g]["has_wisehockey"]}
+        included = on | {g["id"] for g in self._td.games if g["has_wisehockey"]}
+        cards = []
+        for key in self.stars:
+            if any(g["id"] in on for g in self.team_games[key[0]]):
+                card = self._card(key, included)
+                if card:
+                    cards.append(card)
+        return cards
+
+    @staticmethod
+    def _label(game: dict, index: int) -> str:
+        return {"Quarterfinal": "QF", "Semifinal": "Semi", "Final": "Final"}.get(game["stage"], f"G{index + 1}")
+
+    def _card(self, key: tuple[str, int], included: set[str]) -> dict | None:
+        team = key[0]
+        games = self.team_games[team]
+        slots, played = [], []
+        for i, game in enumerate(games):
+            mr = self._rating.get((game["id"], key)) if game["id"] in included else None
+            opponent = game["away_team"] if game["home_team"] == team else game["home_team"]
+            slots.append({"label": self._label(game, i), "mr": mr, "game_id": game["id"], "opponent": opponent,
+                          "result": f'{game["home_score"]}–{game["away_score"]}', "date": game["date"]})
+            if mr is not None:
+                played.append((game, slots[-1]))
+
+        n = len(played)
+        if n == 0:
+            return None
+        stage = 1 if n == 1 else 2
+        semi = next((g for g, _ in played if g["stage"] == "Semifinal"), None)
+        final = next((g for g, _ in played if g["stage"] == "Final"), None)
+        if stage == 2 and semi and _won(team, semi):
+            stage = 3
+            if final and _won(team, final):
+                stage = 4
+        average = int(sum(s["mr"] for _, s in played) / n + 0.5)
+        tier = tier_of(average)
+        if stage >= 3:
+            tier = TIER_ORDER[min(TIER_ORDER.index(tier) + 1, len(TIER_ORDER) - 1)]
+        trend = average - played[0][1]["mr"] if n >= 2 else None
+
+        entry = self._player[(played[-1][0]["id"], key)]
+        moments = []
+        for game, slot in played:
+            for m in self._td._moments(game, entry):
+                moments.append({**m, "text": f'{slot["label"]} vs {slot["opponent"]}. {m["text"]}'})
+        last = played[-1][0]
+        info = STAGES[stage - 1]
+        goals = sum(self._player[(g["id"], key)]["stats"].get("goals", 0) for g, _ in played)
+        assists = sum(self._player[(g["id"], key)]["stats"].get("assists", 0) for g, _ in played)
+        return {
+            "id": f'test-road-{re.sub(r"[^a-z]+", "-", team.lower().replace("ö", "o")).strip("-")}-{key[1]}', "type": "special",
+            "kind": "road", "special_type": None, "test": True, "test_game": None,
+            "rating": {"mr": average, "tier": tier},
+            "player": {
+                "first_name": entry["first_name"], "last_name": entry["last_name"], "jersey": key[1], "team": team,
+                "position": self._positions.get(key, "Skater"),
+                "image_url": self._td._images.get(key) or entry["image_url"],
+                "nationality": self._td._nationalities.get(key),
+                **self._td.action_of(key),
+            },
+            "title": "Spengler Cup Champion" if stage == 4 else info["name"],
+            "archetype": "An evolving card: it grows with every game of the tournament the player plays.",
+            "archetype_kpis": None,
+            "match": {
+                "id": last["id"], "date": last["date"], "stage": last["stage"], "home_team": last["home_team"],
+                "away_team": last["away_team"], "home_score": last["home_score"], "away_score": last["away_score"],
+                "opponent": last["away_team"] if last["home_team"] == team else last["home_team"],
+            },
+            "attributes": [
+                self._total("goals", goals, moments), self._total("assists", assists, moments),
+                self._total("points", goals + assists, moments),
+            ],
+            "explanation": (f'Stage {stage}, {info["name"]}: {n} {"game" if n == 1 else "games"} played, average match '
+                            f"rating {average}. {info['trigger']}"),
+            "achievement": None, "video": None, "video_sources": [], "moments": moments, "edition": "standard",
+            "source": SOURCE,
+            "road": {
+                "stage": stage, "stage_name": info["name"], "games": slots, "trend": trend, "played": n,
+                "stages": [{**s, "reached": s["n"] <= stage} for s in STAGES],
+            },
+        }
+
+    def _total(self, metric_id: str, value: int, moments: list[dict]) -> dict:
+        metric = self._td._metrics[metric_id]
+        kinds = {"goals": ("goal",), "assists": ("assist",), "points": ("goal", "assist")}[metric_id]
+        return {
+            "metric_id": metric_id, "label": metric["label"], "value": value, "display_value": str(value),
+            "unit": "", "higher_is_better": True, "definition": f'{metric["definition"]} Total over the games shown.',
+            "source_definition": "Official game statistics of the Spengler Cup (spenglercup.ch)",
+            "match_rank": None, "team_rank": None, "players_in_match": None, "rank_pool": "players",
+            "moment_ids": [m["id"] for m in moments if m["kind"] in kinds],
+        }

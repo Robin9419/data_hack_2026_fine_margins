@@ -1,0 +1,40 @@
+{
+  "_comment": "Optional action media for the full art specials (Player of the Match etc.): a photo or a short looping clip of the player skating or celebrating. Each entry needs team and jersey as in the stats CSV and at least one of image_url (a photo, JPG/PNG/WebP) or video_url (a silent loop, MP4/WebM; image_url is then its poster). Optional: focus (CSS object-position, e.g. '60% 40%') to keep the player in frame; credit/source/license document the attribution. URLs can point to files under frontend/public (e.g. /action/davos-19.mp4) or to hosted files. Only use media the club or the organiser has cleared. Without an entry the card shows the portrait. The photos below are placeholders: the same players, but from other games and seasons (Wikimedia Commons, not the Spengler Cup 2025).",
+  "players": [
+    {
+      "team": "HC Fribourg-Gottéron", "jersey": 20, "image_url": "/action/berra-fri-20.jpg", "focus": "46% 50%",
+      "credit": "Fanny Schertzer", "license": "CC BY 3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Reto_Berra_-_Switzerland_vs._Canada,_29th_April_2012.jpg"
+    },
+    {
+      "team": "HC Fribourg-Gottéron", "jersey": 21, "image_url": "/action/borgstrom-fri-21.jpg", "focus": "66% 50%",
+      "credit": "TheAHL (Mike Zitek/AHL)", "license": "CC BY 2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Henrik_Borgstr%C3%B6m_2023.jpg"
+    },
+    {
+      "team": "HC Fribourg-Gottéron", "jersey": 95, "image_url": "/action/delarose-fri-95.jpg", "focus": "35% 40%",
+      "credit": "Calle Eklund / V-wolf", "license": "CC BY-SA 3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Jakob_De_la_Rose_2012-03-31_03.jpg"
+    },
+    {
+      "team": "HC Davos", "jersey": 19, "image_url": "/action/tambellini-davos-19.jpg", "focus": "50% 40%",
+      "credit": "TheAHL (Chris Rutsch)", "license": "CC BY 2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Adam_Tambellini_22845650106_o_(50573164366).jpg"
+    },
+    {
+      "team": "Team Canada", "jersey": 5, "image_url": "/action/hicketts-ca-5.jpg", "focus": "68% 50%",
+      "credit": "TheAHL (Scott Thomas)", "license": "CC BY 2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Stp_20170607_198-2_34814446090_o_(26713160638).jpg"
+    },
+    {
+      "team": "Team Canada", "jersey": 47, "image_url": "/action/reimer-ca-47.jpg", "focus": "52% 50%",
+      "credit": "davidgsteadman", "license": "CC BY 2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Toronto_Marlies_James_Reimer.jpg"
+    },
+    {
+      "team": "IFK Helsinki", "jersey": 92, "image_url": "/action/hovinen-ifk-92.jpg", "focus": "45% 50%",
+      "credit": "Ross Bonander", "license": "CC BY 2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Niko_Hovinen_-_OKC_Barons_(1).jpg"
+    }
+  ]
+}

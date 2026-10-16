@@ -97,8 +97,13 @@ def open_daily_card(user_id: int) -> list[dict]:
     return [{**content.cards[drawn], "owned": True, "is_new": drawn in new_ids}]
 
 
+def with_rewards(owned: dict[str, str]) -> dict[str, str]:
+    """The owned cards plus the reward cards they earn (collector and context cards)."""
+    return owned | get_content().earned_cards(owned)
+
+
 def progress_for(user_id: int) -> dict:
-    return get_content().progress(db.owned_cards(user_id))
+    return get_content().progress(with_rewards(db.owned_cards(user_id)))
 
 
 @app.post("/api/login")
@@ -126,7 +131,7 @@ def daily_claim(user: dict = Depends(current_user)):
 @app.get("/api/teams")
 def list_teams():
     """The selectable favorite teams and how many cards the set has for each."""
-    cards = get_content().cards.values()
+    cards = [c for c in get_content().cards.values() if c["type"] != "reward"]
     return {"teams": [{"name": t, "cards": sum(c["player"]["team"] == t for c in cards)} for t in TEAMS]}
 
 
@@ -141,27 +146,54 @@ def me(user: dict = Depends(current_user)):
     return {"user": user, "progress": progress_for(user["id"])}
 
 
+@app.get("/api/testdata")
+def testdata_games(user: dict = Depends(current_user)):
+    """The 2025 games with test data that can be switched on (see testdata.py) and how many cards each adds."""
+    testdata = get_content().testdata
+    return {"games": testdata.summaries(), "source": testdata.source_note}
+
+
 @app.get("/api/cards")
-def list_cards(user: dict = Depends(current_user)):
-    """All cards in the set. Owned cards are full; locked cards only show a teaser."""
+def list_cards(test_games: str = "", user: dict = Depends(current_user)):
+    """All cards in the set. Owned cards are full; locked cards only show a teaser. test_games (comma separated game
+    ids from /api/testdata) adds the test cards of those games as owned preview cards; they never count in the progress."""
     content = get_content()
-    owned = db.owned_cards(user["id"])
+    owned = with_rewards(db.owned_cards(user["id"]))
     result = []
     for card_id, card in content.cards.items():
         if card_id in owned:
             result.append({**card, "owned": True, "edition": owned[card_id]})
         else:
             result.append({**content.card_summary(card), "owned": False})
-    return {"cards": result, "progress": content.progress(owned)}
+    ids = [g for g in test_games.split(",") if g]
+    extra = content.testdata.cards_for(ids) + (content.road_to_final.cards_for(ids) if ids else [])
+    return {"cards": result + [{**card, "owned": True} for card in extra], "progress": content.progress(owned)}
+
+
+@app.get("/api/admin/cards")
+def admin_cards(user: dict = Depends(current_user)):
+    """Every card that exists, owned or not: the card set plus the test cards of all games. The demo has no roles, so
+    any signed-in user may open this."""
+    content = get_content()
+    all_games = [g["id"] for g in content.testdata.games]
+    test = content.testdata.cards_for(all_games) + content.road_to_final.cards_for(all_games)
+    return {"cards": [{**c, "owned": True} for c in [*content.cards.values(), *test]]}
 
 
 @app.get("/api/cards/{card_id}")
-def get_card(card_id: str, user: dict = Depends(current_user)):
+def get_card(card_id: str, test_games: str = "", user: dict = Depends(current_user)):
     content = get_content()
+    if card_id in content.testdata.cards:
+        return {**content.testdata.cards[card_id], "owned": True}
+    if card_id.startswith("test-road-"):
+        road = {c["id"]: c for c in content.road_to_final.cards_for([g for g in test_games.split(",") if g])}
+        if card_id in road:
+            return {**road[card_id], "owned": True}
+        raise HTTPException(404, "Switch on a game of this player's team to see the card")
     card = content.cards.get(card_id)
     if not card:
         raise HTTPException(404, "Card not found")
-    owned = db.owned_cards(user["id"])
+    owned = with_rewards(db.owned_cards(user["id"]))
     if card_id not in owned:
         raise HTTPException(403, "You don't own this card yet")
     return {**card, "owned": True, "edition": owned[card_id]}

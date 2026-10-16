@@ -24,6 +24,33 @@
     "Go-To Scorer": ["shots", "xg_sum", "goals"],
     "Shot Stopper": ["saves", "save_pct", "shots_on_goal_against"]
   },
+  "performance_specials": {
+    "_comment": "Specials awarded by a fixed rule from the match data (see _add_performance_cards in content.py). 'rule' is the plain-language qualification shown as the quiz clue; 'attributes' are the KPIs on the card back.",
+    "motm": {
+      "id": "player-of-the-match",
+      "title": "Man of the Match",
+      "rule": "Most points on the winning team. Ties are broken by goals.",
+      "attributes": ["goals", "assists", "points"]
+    },
+    "gamewinner": {
+      "id": "game-winner",
+      "title": "Game Winner",
+      "rule": "Scored the game-winning goal: the goal after which the opponent never drew level again.",
+      "attributes": ["goals", "points", "shots"]
+    },
+    "wall": {
+      "id": "brick-wall",
+      "title": "Brick Wall",
+      "rule": "The goalkeeper who stopped the most high-danger chances (shots worth at least 0.15 expected goals), even if his team lost.",
+      "attributes": ["saves", "save_pct", "shots_on_goal_against"]
+    },
+    "recordbreaker": {
+      "id": "record-breaker",
+      "title": "Record Breaker",
+      "rule": "A new tournament best: the hardest shot of the Spengler Cup so far. Needs the games before it, so it only exists with test data.",
+      "attributes": ["shot_top_speed", "shots", "toi"]
+    }
+  },
   "cards": [
     {
       "id": "tambellini",

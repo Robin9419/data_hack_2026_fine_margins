@@ -1,0 +1,40 @@
+{
+  "_comment": "Reward cards are never drawn or won in the trivia: they are earned by what the user already owns (see earned_cards in content.py). 'collector' = every card of one player; 'context' cards are about the match and the tournament. Images are free-licence Wikimedia Commons files, for the demo only.",
+  "collector": {
+    "title": "Complete player",
+    "min_cards": 3,
+    "unlock": "Own every card of this player"
+  },
+  "context": [
+    {
+      "id": "moment-last-goal",
+      "context_type": "moment",
+      "title": "Final goal",
+      "unlock": "Own a card of the player who scored the last goal of the game"
+    },
+    {
+      "id": "stadium-davos",
+      "context_type": "stadium",
+      "title": "Davos Ice Stadium",
+      "headline": "Davos",
+      "text": "Home of HC Davos and venue of the Spengler Cup.",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Innenaufnahme_Vaillant_Arena_Davos.JPG/960px-Innenaufnahme_Vaillant_Arena_Davos.JPG",
+      "image_alt": "Inside the ice stadium in Davos with its wooden roof",
+      "image_position": "50% 40%",
+      "credit": "Michael Petri, CC BY-SA 2.0 DE (Wikimedia Commons)",
+      "unlock": "Win a card at the stadium (Stadium edition)"
+    },
+    {
+      "id": "trophy-spengler",
+      "context_type": "trophy",
+      "title": "Spengler Cup",
+      "headline": "in Davos since 1923",
+      "text": "One of the most traditional ice hockey tournaments.",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Spengler_Cup.JPG/960px-Spengler_Cup.JPG",
+      "image_alt": "The Spengler Cup trophy",
+      "image_position": "50% 35%",
+      "credit": "Alaney2k, CC BY 3.0 (Wikimedia Commons)",
+      "unlock": "Collect every special card of the match"
+    }
+  ]
+}

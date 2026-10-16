@@ -3,11 +3,15 @@ Wisehockey match statistics and events CSVs so card values always come from the 
 
 import csv
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 
-from .events import MatchEvents
+from .events import ORDINALS, PERIOD_SECONDS, MatchEvents, _clock
 from .event_kpis import EventAnalysis, pass_body_pressure
+from .ratings import HIGH_DANGER_XG, compute_ratings, goalie_stats
+from .road_to_final import RoadToFinal
+from .testdata import TestData
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_DIR = ROOT / "backend" / "content"
@@ -71,6 +75,8 @@ class Content:
             list(self.videos.values()),
             self._camera_clip,
         )
+        self.sides = {"Home": self.match["home_team"], "Away": self.match["away_team"]}
+        self.ratings = compute_ratings(self.rows, self.event_rows, self.sides)
         self.goalie_rows = self._load_goalie_stats()
         goalkeeper_ids = {r['EventSecondaryPlayerId'] for r in self.event_rows
                           if r['EventType'] == 'Shot' and r['EventSecondaryPlayerId']}
@@ -78,10 +84,22 @@ class Content:
         self.derived_kpis = {'pass_body_pressure': pass_body_pressure(self.analysis)}
         self._add_pass_moments()
         self.player_images = self._load_player_images()
+        base_doc = _load_json("base_cards.json")
+        # Dual nationalities ("Canada / USA") show the first one on the card.
+        self.nationalities = {(c["team"], c["jersey"]): c["nationality"].split(" / ")[0]
+                              for c in base_doc["cards"] if c.get("nationality")}
+        self.action_media = {(m["team"], m["jersey"]): m for m in _load_json("action_media.json")["players"]}
         self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
         self._add_pressure_card()
-        base_doc = _load_json("base_cards.json")
         self.cards |= {c["id"]: self._build_base_card(c, base_doc) for c in base_doc["cards"]}
+        self._add_performance_cards(cards_doc["performance_specials"])
+        self.reward_rules = {}  # reward card id -> function(owned card ids -> editions) saying whether it is earned
+        self._add_reward_cards(_load_json("reward_cards.json"))
+        positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"]
+                     for c in self.cards.values() if c["player"]}
+        self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
+                                 self.nationalities, self.action_media)
+        self.road_to_final = RoadToFinal(self.testdata, positions)
 
     def _add_pass_moments(self):
         for result in self.derived_kpis['pass_body_pressure']['events']:
@@ -238,6 +256,9 @@ class Content:
         return {
             "id": cfg["id"],
             "type": "special",
+            "kind": cfg.get("kind", "profile"),
+            "special_type": cfg.get("special_type"),
+            "rating": self._rating(cfg["team"], cfg["jersey"]),
             "player": self._player(cfg, row),
             "title": cfg["title"],
             "archetype": self.archetypes.get(cfg["title"]),
@@ -254,6 +275,151 @@ class Content:
             "source": m["events_source"] if cfg["position"] == "Goalkeeper" else m["source"],
         }
 
+    def _rating(self, team: str, jersey: int) -> dict | None:
+        """Match rating and tier of the player in this game (see ratings.py)."""
+        rating = self.ratings.get((team, jersey))
+        return {"mr": rating["mr"], "tier": rating["tier"]} if rating else None
+
+    def _add_performance_cards(self, specs: dict):
+        """Specials awarded by a fixed rule from the match data: Player of the Match, Game Winner, Brick Wall."""
+        m = self.match
+        home_wins = m["home_score"] > m["away_score"]
+        winner, loser = (m["home_team"], m["away_team"]) if home_wins else (m["away_team"], m["home_team"])
+        winner_goals, loser_goals = max(m["home_score"], m["away_score"]), min(m["home_score"], m["away_score"])
+
+        def number(row: dict, column: str):
+            return _to_number(row[column]) or 0
+
+        def plural(n, word: str) -> str:
+            return f"{n} {word}{'' if n == 1 else 's'}"
+
+        def team_and_jersey(player_id: str) -> tuple[str, int]:
+            return next(key for key, value in self.events.ids.items() if value == player_id)
+
+        picks = {}
+        star = max((r for r in self.rows if r["Team"] == winner), key=lambda r: (number(r, "P"), number(r, "G")))
+        picks["motm"] = (
+            (star["Team"], int(star["Jersey"])),
+            f"{plural(number(star, 'G'), 'goal')} and {plural(number(star, 'A'), 'assist')}: "
+            f"the most points on the winning team in the {winner} win.",
+        )
+
+        score = {"Home": 0, "Away": 0}
+        won_goals = 0
+        for r in self.event_rows:
+            if r["EventType"] != "Goal":
+                continue
+            score[r["EventPrimaryTeam"]] += 1
+            if self.sides[r["EventPrimaryTeam"]] != winner:
+                continue
+            won_goals += 1
+            if won_goals == loser_goals + 1:
+                period, clock = int(r["Period"]), int(r["MatchClock"])
+                picks["gamewinner"] = (
+                    team_and_jersey(r["EventPrimaryPlayerId"]),
+                    f"Scored the goal that made it {won_goals}–{sum(score.values()) - won_goals} for {winner} at "
+                    f"{_clock((period - 1) * PERIOD_SECONDS + clock)} ({ORDINALS.get(period, period)} period). "
+                    f"{loser} never drew level again.",
+                )
+                break
+
+        goalies = goalie_stats(self.event_rows, self.sides)
+        if goalies:
+            key, g = max(goalies.items(), key=lambda item: (item[1]["hd_saves"], item[1]["saves"]))
+            picks["wall"] = (
+                key,
+                f"Stopped {g['hd_saves']} of {g['hd_shots']} high-danger chances (shots worth at least "
+                f"{HIGH_DANGER_XG} expected goals), the most of any goalkeeper in the game.",
+            )
+
+        positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"] for c in self.cards.values()}
+        for special_type, (key, explanation) in picks.items():
+            spec = specs[special_type]
+            self.archetypes[spec["title"]] = spec["rule"]
+            self.archetype_metrics[spec["title"]] = spec["attributes"]
+            cfg = {
+                "id": spec["id"], "kind": "performance", "special_type": special_type,
+                "team": key[0], "jersey": key[1], "position": positions.get(key, "Skater"),
+                "title": spec["title"], "attributes": spec["attributes"], "explanation": explanation,
+                "achievement": None, "video": None,
+            }
+            self.cards[cfg["id"]] = self._build_card(cfg)
+
+    def _add_reward_cards(self, doc: dict):
+        """Cards earned from what the user owns: a collector card per player with enough cards, plus context cards."""
+        match = self._match(self.match["home_team"])
+        by_player: dict[tuple[str, int], list[str]] = {}
+        for cid, card in self.cards.items():
+            by_player.setdefault((card["player"]["team"], card["player"]["jersey"]), []).append(cid)
+
+        collector = doc["collector"]
+        for (team, jersey), ids in by_player.items():
+            if len(ids) < collector["min_cards"]:
+                continue
+            player = self.cards[ids[0]]["player"]
+            name = f'{player["first_name"]} {player["last_name"]}'
+            card_id = "collector-" + re.sub(r"\W+", "-", team.lower()) + f"-{jersey}"
+            self.cards[card_id] = {
+                "id": card_id, "type": "reward", "kind": "collector", "special_type": None, "rating": None,
+                "player": player, "title": collector["title"], "match": self._match(team), "edition": "reward",
+                "requires": ids, "unlock": collector["unlock"],
+                "explanation": f"All {len(ids)} cards of {name} in one collection.",
+                "source": self.match["source"],
+            }
+            self.reward_rules[card_id] = lambda owned, ids=ids: all(i in owned for i in ids)
+
+        special_ids = [cid for cid, c in self.cards.items() if c["type"] == "special"]
+        for cfg in doc["context"]:
+            card = {
+                "id": cfg["id"], "type": "reward", "kind": "context", "context_type": cfg["context_type"],
+                "special_type": None, "rating": None, "player": None, "title": cfg["title"], "match": match,
+                "edition": "reward", "unlock": cfg["unlock"], "source": self.match["source"],
+                **{k: cfg[k] for k in ("headline", "text", "image_url", "image_alt", "image_position", "credit") if k in cfg},
+            }
+            if cfg["context_type"] == "moment":
+                scorer = self._add_moment_facts(card)
+                self.reward_rules[cfg["id"]] = lambda owned, who=scorer: any(
+                    (self.cards[c]["player"] or {}).get("team") == who[0] and (self.cards[c]["player"] or {}).get("jersey") == who[1]
+                    for c in owned if c in self.cards and self.cards[c]["type"] != "reward"
+                )
+            elif cfg["context_type"] == "stadium":
+                self.reward_rules[cfg["id"]] = lambda owned: "stadium" in owned.values()
+            else:
+                self.reward_rules[cfg["id"]] = lambda owned: all(i in owned for i in special_ids)
+            self.cards[cfg["id"]] = card
+
+    def _add_moment_facts(self, card: dict) -> tuple[str, int]:
+        """Fills the moment card from the last goal of the game and returns the scorer as (team, jersey)."""
+        score = {"Home": 0, "Away": 0}
+        last = None
+        for r in self.event_rows:
+            if r["EventType"] == "Goal":
+                score[r["EventPrimaryTeam"]] += 1
+                last = r
+        team, jersey = next(k for k, v in self.events.ids.items() if v == last["EventPrimaryPlayerId"])
+        period, clock = int(last["Period"]), int(last["MatchClock"])
+        assists = [re.sub(r"^#\d+ ", "", self.events.names.get(a, "unknown")) for a in (last["GoalAssist1Id"], last["GoalAssist2Id"]) if a]
+        positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"]
+                     for c in self.cards.values() if c["player"]}
+        row = self._find_row(team, jersey)
+        card["player"] = self._player({"team": team, "jersey": jersey, "position": positions.get((team, jersey), "Skater")}, row)
+        card["headline"] = f'{score["Home"]}–{score["Away"]}'
+        assist_text = f" Assisted by {' and '.join(assists)}." if assists else " Unassisted."
+        card["text"] = (
+            f'{row["FirstName"]} {row["LastName"]} scored the last goal at {_clock((period - 1) * PERIOD_SECONDS + clock)}'
+            f" ({ORDINALS.get(period, period)} period)." + assist_text
+        )
+        return team, jersey
+
+    def earned_cards(self, owned: dict[str, str]) -> dict[str, str]:
+        """Reward cards the user has earned from the cards they own (card id -> edition)."""
+        return {cid: "reward" for cid, rule in self.reward_rules.items() if rule(owned)}
+
+    def _action_media(self, team: str, jersey: int) -> dict:
+        media = self.action_media.get((team, jersey), {})
+        return {"action_image_url": media.get("image_url"), "action_video_url": media.get("video_url"),
+                "action_focus": media.get("focus")}
+
     def _player(self, cfg: dict, row: dict) -> dict:
         return {
             "first_name": row["FirstName"],
@@ -262,6 +428,8 @@ class Content:
             "team": cfg["team"],
             "position": cfg["position"],
             "image_url": self.player_images.get((cfg["team"], cfg["jersey"])),
+            "nationality": self.nationalities.get((cfg["team"], cfg["jersey"])),
+            **self._action_media(cfg["team"], cfg["jersey"]),
         }
 
     def _match(self, team: str) -> dict:
@@ -284,6 +452,9 @@ class Content:
         return {
             "id": cfg["id"],
             "type": "base",
+            "kind": "base",
+            "special_type": None,
+            "rating": None,
             "player": self._player(cfg, row),
             "title": None,
             "match": self._match(cfg["team"]),
@@ -358,18 +529,22 @@ class Content:
         return f'{m["title"]} at {m["clock"]} of the {m["period_label"]}. {m["text"]}'.strip()
 
     def card_summary(self, card: dict) -> dict:
-        """What the gallery shows for a card the user does not own yet: only the (grayed out) photo."""
-        player = card["player"]
+        """What the gallery shows for a card the user does not own yet: only the (grayed out) photo. Reward cards
+        show what unlocks them instead, which is not a secret."""
+        if card["type"] == "reward":
+            keys = ("id", "type", "kind", "context_type", "title", "unlock", "requires")
+            player = self._photo_only(card["player"]) if card["kind"] == "collector" else None
+            return {**{k: card[k] for k in keys if k in card}, "player": player}
+        return {"id": card["id"], "type": card["type"], "kind": card["kind"], "player": self._photo_only(card["player"])}
+
+    @staticmethod
+    def _photo_only(player: dict) -> dict:
         return {
-            "id": card["id"],
-            "type": card["type"],
-            "player": {
-                "image_url": player.get("image_url"),
-                "jersey": player.get("jersey"),
-                "team": player["team"],
-                "first_name": "",
-                "last_name": "",
-            },
+            "image_url": player.get("image_url"),
+            "jersey": player.get("jersey"),
+            "team": player["team"],
+            "first_name": "",
+            "last_name": "",
         }
 
     def progress(self, owned: dict[str, str]) -> dict:
@@ -390,7 +565,15 @@ class Content:
         type (so a player never shows up twice), shuffled. option_ids are card ids. Special cards
         ask 'who was the <archetype>?', base cards 'who is this player?' with a profile clue."""
         card = self.cards[card_id]
-        others = [c for c, other in self.cards.items() if c != card_id and other["type"] == card["type"]]
+        player = (card["player"]["team"], card["player"]["jersey"])
+        others = [
+            c
+            for c, other in self.cards.items()
+            if other["type"] == card["type"] and (other["player"]["team"], other["player"]["jersey"]) != player
+        ]
+        # One option per player, so a player with two cards of this type is not listed twice.
+        distinct = {(self.cards[c]["player"]["team"], self.cards[c]["player"]["jersey"]): c for c in others}
+        others = list(distinct.values())
         option_ids = rng.sample(others, min(2, len(others))) + [card_id]
         rng.shuffle(option_ids)
         m = card["match"]

@@ -48,6 +48,11 @@ Open http://localhost:5173. Vite forwards `/api` to the backend on port 8000. AP
 | What | File |
 |---|---|
 | Cards (player, position, archetype title, which 3 KPIs, explanation, video) | `backend/content/cards.json` |
+| Card kinds, tiers, editions and their design rules | `docs/CARD_TYPES.md`, mockup `docs/mockups/player-cards-photo.html` |
+| Match rating (MR) and tier per player | `backend/app/ratings.py` |
+| Performance specials (Player of the Match, Game Winner, Brick Wall) | `performance_specials` in `backend/content/cards.json`, rules in `backend/app/content.py` |
+| Card front (all kinds, tier frames, finishes) | `frontend/src/components/CardFace.jsx`, `.card-*` in `frontend/src/index.css` |
+| Team logos and colours | `frontend/src/teams.js` |
 | Pack size (starter cards for a new account) | `pack_size` in `backend/content/cards.json` |
 | Player photos (matched to cards by team + jersey) | `docs/player-images.json` |
 | Pack opening page and animation | `frontend/src/pages/PackOpening.jsx`, `.pack-*` in `frontend/src/index.css` |

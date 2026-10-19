@@ -61,7 +61,7 @@ Awarded by a fixed rule from the match data, for a performance that stands out. 
 
 - Shows: MR, position, label on the side edge, no tier. Rarity symbol: ★★★.
 - Obtained: trivia or live drop.
-- Status: Player of the Match, Game Winner and Brick Wall **in app**; Record Breaker **in app with test data only** (needs earlier games). The gallery can switch on the other ten 2025 games (official results and statistics, see `backend/app/testdata.py`); they add these specials marked TEST, with made-up match ratings, and Brick Wall there counts all saves because there is no xG.
+- Status: Player of the Match, Game Winner and Brick Wall **in app**; Record Breaker **in app with test data only** (needs earlier games). The other ten 2025 games (official results and statistics, see `backend/app/testdata.py`) add these specials marked TEST once they are played on the tournament timeline, with made-up match ratings; Brick Wall there counts all saves because there is no xG.
 - "Team Leader" (highest xG on the losing team) is the Go-To Scorer profile card, so there is no separate type.
 
 ### 4. Road to Final (evolving)
@@ -72,7 +72,7 @@ One card per player that grows during the tournament. Starts as a normal profile
 - Rarity symbol: ★★★.
 - Needs several games. Game 1 is real data, later games are a fictional example in the mockup.
 - Stages in the app: 1 Debut (first game), 2 In Form (every further game, MR is the average, trend arrow), 3 Finalist (the team wins its semi-final: one tier up and glitter), 4 Champion (the team wins the final: dark gold look with the surname on the side). The mockup's "Hot Streak" (three games with MR 90 or more) is replaced by Finalist because the test ratings rarely reach it.
-- Status: **in app with test data** (`backend/app/road_to_final.py`). The cards of the two best skaters of each team grow with every test game switched on in the gallery; the final counts as real data.
+- Status: **in app with test data** (`backend/app/road_to_final.py`). The cards of the two best skaters of each team grow with every game played on the tournament timeline; the final uses the real data.
 
 ### 5. Collector card
 

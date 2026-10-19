@@ -3,7 +3,7 @@
 Only the final has Wisehockey data. The other ten games come from the official game pages (see
 scripts/fetch_testdata.py) and give goals, assists, penalties, time on ice, shots, hardest shot and goalkeeper saves.
 From these the module builds the performance specials (Player of the Match, Game Winner, Brick Wall, Record Breaker)
-per game. The cards are not part of the card set: the user switches single games on to preview them (see /api/testdata).
+per game. They join the card set once their game is played on the user's tournament timeline (see tournament.py).
 Match ratings are made up from a simple formula, so every card is flagged `test`."""
 
 import json
@@ -68,19 +68,10 @@ class TestData:
         self.game_cards: dict[str, list[str]] = {g["id"]: [] for g in self.games}
         self._build()
 
-    def summaries(self) -> list[dict]:
-        keys = ("id", "date", "start", "stage", "arena", "home_team", "away_team", "home_score", "away_score",
-                "periods", "overtime", "has_wisehockey")
-        return [{**{k: g[k] for k in keys}, "cards": len(self.game_cards[g["id"]]), "goals": len(g["goals"])}
-                for g in self.games]
-
     def action_of(self, key: tuple[str, int]) -> dict:
         media = self._action_media.get(key, {})
         return {"action_image_url": media.get("image_url"), "action_video_url": media.get("video_url"),
                 "action_focus": media.get("focus")}
-
-    def cards_for(self, game_ids: list[str]) -> list[dict]:
-        return [self.cards[cid] for gid in game_ids for cid in self.game_cards.get(gid, [])]
 
     def _build(self):
         record = None  # (speed, player, game) best hardest shot of the games so far

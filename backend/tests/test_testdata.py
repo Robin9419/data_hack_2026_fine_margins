@@ -12,7 +12,7 @@ class TestDataTests(unittest.TestCase):
         return self.testdata.cards.get(f"test-{special_type}-{game_id}")
 
     def test_all_eleven_games_and_results(self):
-        games = {g["id"]: g for g in self.testdata.summaries()}
+        games = self.testdata.by_id
         self.assertEqual(len(games), 11)
         final = games["2025-12-31_us-collegiate-selects_hc-davos"]
         self.assertEqual((final["home_score"], final["away_score"], final["has_wisehockey"]), (3, 6, True))
@@ -36,12 +36,13 @@ class TestDataTests(unittest.TestCase):
         self.assertEqual(card["player"]["last_name"], "Pohlkamp")
         self.assertEqual(card["attributes"][0]["display_value"], "164.3")
 
-    def test_final_only_gets_a_record_breaker_and_test_cards_stay_out_of_the_set(self):
+    def test_final_has_no_test_cards_and_test_cards_join_the_set_with_their_game(self):
         final = "2025-12-31_us-collegiate-selects_hc-davos"
-        self.assertEqual([c["special_type"] for c in self.testdata.cards_for([final])], [])
+        self.assertEqual(self.testdata.game_cards[final], [])
         content = get_content()
-        self.assertFalse(set(self.testdata.cards) & set(content.cards))
+        self.assertTrue(set(self.testdata.cards) <= set(content.cards))
         self.assertTrue(all(c["test"] for c in self.testdata.cards.values()))
+        self.assertTrue(all(content.card_game[cid] == c["test_game"] for cid, c in self.testdata.cards.items()))
 
     def test_goalkeeper_card_is_ranked_among_goalkeepers(self):
         wall = next(c for c in self.testdata.cards.values() if c["special_type"] == "wall")
@@ -58,7 +59,7 @@ class RoadToFinalTests(unittest.TestCase):
     def stages(self, game_ids):
         return {c["player"]["team"]: c["road"]["stage"] for c in self.road.cards_for(game_ids)}
 
-    def test_nothing_without_a_switched_on_game(self):
+    def test_nothing_before_the_first_game(self):
         self.assertEqual(self.road.cards_for([]), [])
 
     def test_stage_follows_how_far_the_team_got(self):
@@ -68,7 +69,7 @@ class RoadToFinalTests(unittest.TestCase):
         self.assertEqual(stages["HC Fribourg-Gottéron"], 2)  # lost the semi-final
         self.assertEqual(stages["Team Canada"], 2)
 
-    def test_card_only_for_teams_of_switched_on_games(self):
+    def test_card_only_for_teams_that_have_played(self):
         first = self.all_games[0]  # Fribourg - Sparta
         cards = self.road.cards_for([first])
         self.assertEqual({c["player"]["team"] for c in cards}, {"HC Fribourg-Gottéron", "HC Sparta Praha"})
@@ -76,7 +77,7 @@ class RoadToFinalTests(unittest.TestCase):
 
     def test_form_chart_has_a_slot_per_team_game_and_the_card_grows(self):
         davos = lambda ids: next(c for c in self.road.cards_for(ids) if c["player"]["team"] == "HC Davos")
-        few = davos([g for g in self.all_games if "hc-davos_us-collegiate-selects" in g])
+        few = davos([g for g in self.all_games if "hc-davos_us-collegiate-selects" in g or "us-collegiate-selects_hc-davos" in g])
         many = davos(self.all_games)
         self.assertEqual(len(few["road"]["games"]), 5)
         self.assertEqual([s["mr"] is not None for s in few["road"]["games"]].count(True), 2)  # that game and the final

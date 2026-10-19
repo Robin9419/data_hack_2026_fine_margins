@@ -13,6 +13,7 @@ from .event_kpis import EventAnalysis, pass_body_pressure
 from .ratings import HIGH_DANGER_XG, compute_ratings, goalie_stats
 from .road_to_final import RoadToFinal
 from .testdata import TestData
+from .tournament import Tournament
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_DIR = ROOT / "backend" / "content"
@@ -102,6 +103,14 @@ class Content:
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
                                  self.nationalities, self.action_media)
         self.road_to_final = RoadToFinal(self.testdata, positions)
+        self.tournament = Tournament(self.testdata)
+        # The game a card comes from (None: not tied to a game). Such a card only exists once its game is played on
+        # the user's timeline. The cards built from the Wisehockey data, and the reward cards about them, are the final.
+        final_id = self.tournament.final["id"]
+        self.card_game = {cid: final_id for cid, c in self.cards.items()
+                          if c["type"] == "special" or c.get("kind") == "collector" or c.get("context_type") in ("moment", "trophy")}
+        self.cards |= self.testdata.cards  # the specials of the other games (official game statistics)
+        self.card_game |= {cid: c["test_game"] for cid, c in self.testdata.cards.items()}
         legends_doc = _load_json("legends.json")
         self.legend_thresholds = legends_doc["thresholds"]
         self.cards |= {c["id"]: self._build_legend_card(c, legends_doc) for c in legends_doc["cards"]}
@@ -495,22 +504,32 @@ class Content:
             "source": doc["source"],
         }
 
-    def club_cards(self, team: str) -> list[str]:
-        """The cards that count towards a club's collection: its base and special cards (not its legends)."""
-        return [cid for cid, c in self.cards.items() if c["type"] in ("base", "special") and c["player"]["team"] == team]
+    def available(self, played: set[str]) -> set[str]:
+        """Ids of the cards that exist once the given games are played: every card not tied to a game, plus the cards
+        of those games."""
+        return {cid for cid in self.cards if self.card_game.get(cid) is None or self.card_game[cid] in played}
 
-    def legends_due(self, team: str, owned: dict[str, str]) -> int:
+    def game_cards(self, game_id: str) -> list[str]:
+        return [cid for cid, gid in self.card_game.items() if gid == game_id and self.cards[cid]["type"] == "special"]
+
+    def club_cards(self, team: str, available: set[str]) -> list[str]:
+        """The cards that count towards a club's collection: its base and special cards (not its legends) that exist
+        so far. The club grows with every game it plays."""
+        return [cid for cid, c in self.cards.items()
+                if c["type"] in ("base", "special") and c["player"]["team"] == team and cid in available]
+
+    def legends_due(self, team: str, owned: dict[str, str], available: set[str]) -> int:
         """How many legends a user has earned for the club: one per threshold (share of club_cards owned) reached."""
-        club = self.club_cards(team)
+        club = self.club_cards(team, available)
         have = sum(cid in owned for cid in club)
         return sum(have >= math.ceil(t * len(club)) for t in self.legend_thresholds)
 
-    def club_progress(self, owned: dict[str, str]) -> list[dict]:
+    def club_progress(self, owned: dict[str, str], available: set[str]) -> list[dict]:
         """Per club: cards collected, legends owned and how many cards the next legend needs."""
         teams = dict.fromkeys(c["player"]["team"] for c in self.cards.values() if c["type"] == "legend")
         result = []
         for team in teams:
-            club = self.club_cards(team)
+            club = self.club_cards(team, available)
             have = sum(cid in owned for cid in club)
             steps = [math.ceil(t * len(club)) for t in self.legend_thresholds]
             legends = [cid for cid, c in self.cards.items() if c["type"] == "legend" and c["player"]["team"] == team]
@@ -612,8 +631,8 @@ class Content:
             "last_name": "",
         }
 
-    def progress(self, owned: dict[str, str]) -> dict:
-        """Reward-bar state from the owned cards (card id -> edition)."""
+    def progress(self, owned: dict[str, str], available: set[str]) -> dict:
+        """Reward-bar state from the owned cards (card id -> edition) among the cards that exist so far."""
         points = sum(self.card_points.get(edition, 0) for edition in owned.values())
         rewards = [{**r, "reached": points >= r["points"]} for r in self.rewards]
         return {
@@ -622,31 +641,45 @@ class Content:
             "rewards": rewards,
             "owned_count": len(owned),
             "stadium_count": sum(1 for e in owned.values() if e == "stadium"),
-            "total_cards": len(self.cards),
-            "clubs": self.club_progress(owned),
+            "total_cards": len(available),
+            "clubs": self.club_progress(owned, available),
         }
 
     def build_question(self, card_id: str, rng) -> dict:
-        """Multiple choice question: the card's player plus two other players with the same card
-        type (so a player never shows up twice), shuffled. option_ids are card ids. Special cards
-        ask 'who was the <archetype>?', base cards 'who is this player?' with a profile clue."""
+        """Multiple choice question: the card's player plus two other players, shuffled. option_ids are card ids.
+        For a card from a game the other options are players of that game in the same role (goalkeeper or skater):
+        at most one with another special card of the game (so the questions of one game don't all list the same
+        names), the rest from the base cards of both teams. Special cards ask 'who was the <archetype>?', base cards
+        'who is this player?' with a profile clue."""
         card = self.cards[card_id]
-        player = (card["player"]["team"], card["player"]["jersey"])
-        others = [
-            c
-            for c, other in self.cards.items()
-            if other["type"] == card["type"] and (other["player"]["team"], other["player"]["jersey"]) != player
-        ]
-        # One option per player, so a player with two cards of this type is not listed twice.
-        distinct = {(self.cards[c]["player"]["team"], self.cards[c]["player"]["jersey"]): c for c in others}
-        others = list(distinct.values())
-        option_ids = rng.sample(others, min(2, len(others))) + [card_id]
+        player_of = lambda cid: (self.cards[cid]["player"]["team"], self.cards[cid]["player"]["jersey"])
+        player = player_of(card_id)
+        game = self.card_game.get(card_id)
+        if game:
+            teams = (card["match"]["home_team"], card["match"]["away_team"])
+            goalie = card["player"]["position"] == "Goalkeeper"
+            same_role = lambda cid: (self.cards[cid]["player"]["position"] == "Goalkeeper") == goalie
+            specials = [c for c in self.game_cards(game) if same_role(c) and player_of(c) != player]
+            base = [c for c, o in self.cards.items() if o["type"] == "base" and o["player"]["team"] in teams and same_role(c)]
+            rng.shuffle(specials)
+            rng.shuffle(base)
+            candidates = specials[:1] + base
+        else:
+            candidates = [c for c, other in self.cards.items() if other["type"] == card["type"]]
+            rng.shuffle(candidates)
+        # One option per player, so a player with several cards is not listed twice.
+        distinct = {}
+        for c in candidates:
+            if player_of(c) != player:
+                distinct.setdefault(player_of(c), c)
+        others = list(distinct.values())[:2]
+        option_ids = others + [card_id]
         rng.shuffle(option_ids)
         m = card["match"]
         if card["type"] == "base":
             prompt, clue = "Who is this player?", self._profile_clue(card)
         else:
-            prompt, clue = f'Who was the "{card["title"]}" in this game?', self.archetypes[card["title"]]
+            prompt, clue = f'Who was the "{card["title"]}" in this game?', card["archetype"] or self.archetypes[card["title"]]
         return {
             "option_ids": option_ids,
             "prompt": prompt,

@@ -24,29 +24,24 @@ async function request(path, { method = 'GET', body } = {}) {
   return data
 }
 
-export const TEST_GAMES_KEY = 'hockeyCards.testGames'
-
-const testGames = () => {
-  try {
-    const saved = JSON.parse(localStorage.getItem(TEST_GAMES_KEY))
-    return Array.isArray(saved) ? saved : []
-  } catch {
-    return []
-  }
-}
-
 export const api = {
   login: (username, favoriteTeam) =>
     request('/login', { method: 'POST', body: { username, favorite_team: favoriteTeam || null } }),
   teams: () => request('/teams'),
   logout: () => request('/logout', { method: 'POST' }),
   me: () => request('/me'),
-  cards: (testGames = []) => request(`/cards${testGames.length ? `?test_games=${encodeURIComponent(testGames.join(','))}` : ''}`),
-  testdata: () => request('/testdata'),
+  // The cards that exist at the user's stage of the tournament timeline.
+  cards: () => request('/cards'),
   adminCards: () => request('/admin/cards'),
-  card: (id) =>
-    // A Road to Final card depends on which test games are switched on.
-    request(`/cards/${id}${id.startsWith('test-road-') ? `?test_games=${encodeURIComponent(testGames().join(','))}` : ''}`),
+  card: (id) => request(`/cards/${id}`),
+  tournament: () => request('/tournament'),
+  setStage: (stage) => request('/tournament/stage', { method: 'POST', body: { stage } }),
+  predict: (gameId, questionId, optionId) =>
+    request('/tournament/predict', {
+      method: 'POST',
+      body: { game_id: gameId, question_id: questionId, option_id: optionId },
+    }),
+  openGamePacks: (gameId) => request(`/tournament/packs/${encodeURIComponent(gameId)}`, { method: 'POST' }),
   dailyStatus: () => request('/daily'),
   dailyClaim: () => request('/daily/claim', { method: 'POST' }),
   tradeInfo: () => request('/trade'),

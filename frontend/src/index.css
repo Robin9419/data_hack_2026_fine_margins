@@ -149,20 +149,68 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .admin-cell figcaption small { font-size: 0.75rem; }
 
 /* Test data panel: switch the other games of the 2025 Spengler Cup on */
-.testdata { margin: 16px 0 0; padding: 12px 16px; background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; }
-.testdata summary { cursor: pointer; font-weight: 600; }
-.testdata-actions { display: flex; gap: 8px; margin: 8px 0; }
-.testgames { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.testgames li { border: 1px solid var(--border); border-radius: 8px; }
-.testgames li.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
-.testgames label { display: grid; grid-template-columns: auto minmax(110px, 1fr) auto minmax(70px, auto); align-items: center; gap: 12px; padding: 8px 10px; cursor: pointer; }
-.testgames input:disabled ~ * { opacity: 0.7; }
-.tg-when small { display: block; color: var(--muted); font-weight: 400; font-size: 0.75rem; }
-.tg-teams { display: flex; align-items: center; gap: 8px; }
-.tg-team { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; }
-.tg-team img { width: 22px; height: 22px; object-fit: contain; }
-.tg-cards { font-size: 0.75rem; text-align: right; }
-@media (max-width: 560px) { .testgames label { grid-template-columns: auto 1fr; } .tg-cards { text-align: left; grid-column: 2; } }
+/* Tournament: gameday panel in the gallery (predictions, results, packs) */
+.gameday { margin: 0 0 24px; display: grid; gap: 12px; }
+.gameday h2 { margin: 2px 0 4px; font-size: 1.3rem; display: flex; align-items: center; gap: 8px; }
+.gameday-intro p.muted { margin: 0; }
+.gameday-heading { margin: 8px 0 0; font-size: 1rem; }
+.gameday-games { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.gameday-earlier summary { cursor: pointer; font-weight: 600; margin-bottom: 8px; }
+.gameday-next { justify-self: start; animation: none; }
+.game-card { display: grid; gap: 10px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.game-card.played { background: #fbfcfd; }
+.game-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-top: 4px; }
+.game-team { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9rem; min-width: 0; }
+.game-team.right { flex-direction: row-reverse; text-align: right; }
+.game-score { font-family: var(--display); font-size: 1.6rem; line-height: 1; }
+.team-logo { width: 22px; height: 22px; object-fit: contain; flex: none; }
+.predictions { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.prediction { padding-top: 10px; border-top: 1px solid var(--border); }
+.prediction p { margin: 0 0 6px; }
+.prediction-prompt { font-weight: 600; }
+.prediction-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.prediction-option { display: inline-flex; align-items: center; gap: 6px; }
+.prediction-option .team-logo { width: 16px; height: 16px; }
+.prediction-option.active .team-logo { filter: drop-shadow(0 0 1px #fff); }
+.prediction-option:disabled { cursor: default; }
+.prediction-option.answer { border-color: #1a7f37; background: #e6f4ea; color: #12512a; }
+.prediction-option.answer.active { background: #1a7f37; border-color: #1a7f37; color: #fff; }
+.prediction-option.wrong { background: #fdeceb; border-color: #e5a29b; color: #8c1d18; text-decoration: line-through; }
+.prediction-result { margin: 6px 0 0 !important; }
+.tick, .cross { display: inline-block; width: 1.2em; font-weight: 800; }
+.tick { color: #1a7f37; }
+.cross { color: #b42318; }
+.game-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.game-foot .pack-button { padding: 8px 18px; animation: none; }
+
+/* Tournament timeline: fixed at the bottom of every page */
+.app { padding-bottom: 120px; }
+.timeline { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255, 255, 255, 0.96); border-top: 1px solid var(--border); box-shadow: 0 -4px 16px rgba(21, 32, 43, 0.08); backdrop-filter: blur(6px); }
+.timeline-inner { max-width: 960px; margin: 0 auto; padding: 8px 16px 10px; display: flex; align-items: center; gap: 16px; }
+.timeline-title { flex: none; font-weight: 700; font-size: 0.85rem; }
+.timeline-title small { display: block; font-weight: 400; color: var(--muted); font-size: 0.75rem; }
+.timeline-track { --dot: 14px; position: relative; flex: 1; display: grid; grid-template-columns: repeat(var(--n), 1fr); list-style: none; margin: 0; padding: 0; }
+/* The line runs from the first dot to the last; the filled part up to the current stop. */
+.timeline-track::before, .timeline-track::after { content: ''; position: absolute; top: calc(4px + var(--dot) / 2 - 2px); height: 4px; border-radius: 2px; left: calc(50% / var(--n)); }
+.timeline-track::before { right: calc(50% / var(--n)); background: var(--border); }
+.timeline-track::after { width: calc((100% - 100% / var(--n)) * var(--at) / (var(--n) - 1)); background: var(--accent); transition: width 300ms ease; }
+.timeline-stop { position: relative; z-index: 1; text-align: center; }
+.timeline-stop button { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; padding: 4px 0 0; border: 0; background: none; font: inherit; color: var(--muted); cursor: pointer; }
+.timeline-stop button:disabled { cursor: progress; }
+.timeline-dot { width: var(--dot); height: var(--dot); border-radius: 50%; background: var(--surface); border: 3px solid var(--border); transition: transform 150ms; }
+.timeline-stop button:hover .timeline-dot { transform: scale(1.2); }
+.timeline-stop strong { font-size: 0.78rem; white-space: nowrap; }
+.timeline-stop small { font-size: 0.65rem; white-space: nowrap; }
+.timeline-stop.past .timeline-dot { background: var(--accent); border-color: var(--accent); }
+.timeline-stop.current .timeline-dot { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); }
+.timeline-stop.current button { color: var(--text); }
+.timeline-stop.current strong { color: var(--accent); }
+@media (max-width: 640px) {
+  .timeline-title { display: none; }
+  .timeline-stop small { display: none; }
+  .timeline-stop strong { font-size: 0.68rem; }
+  .app { padding-bottom: 96px; }
+}
 
 /* Base cards: plain team-colour frame, muted label */
 .card-face.base .card-archetype { background: rgba(255, 255, 255, 0.16); color: #fff; }

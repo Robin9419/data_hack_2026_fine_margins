@@ -1,23 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { api, TEST_GAMES_KEY } from '../api'
+import { api } from '../api'
 import { useAuth } from '../auth'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
-import TestDataPanel from '../components/TestDataPanel'
+import GamedayPanel from '../components/GamedayPanel'
 import { TEAMS } from '../teams'
+import { useTournament } from '../tournament'
 
 const PAGE_SIZE = 8
 const SWIPE_PX = 50
-
-const loadTestGames = () => {
-  try {
-    const saved = JSON.parse(localStorage.getItem(TEST_GAMES_KEY))
-    return Array.isArray(saved) ? saved : []
-  } catch {
-    return []
-  }
-}
 
 const TEAM_FILTERS = [
   { value: 'all', label: 'All teams' },
@@ -55,6 +47,8 @@ export default function Gallery() {
   const location = useLocation()
   const navigate = useNavigate()
   const { progress, setProgress } = useAuth()
+  const { tournament, refresh: refreshTournament } = useTournament()
+  const stage = tournament?.stage
   const newCardIds = location.state?.newCardIds ?? []
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
@@ -62,39 +56,34 @@ export default function Gallery() {
   const [type, setType] = useState('all')
   const [page, setPage] = useState(0)
   const [dailyAvailable, setDailyAvailable] = useState(false)
-  const [testGames, setTestGames] = useState(loadTestGames)
-  const [testData, setTestData] = useState(null) // the games that can be switched on
   const [spotlight, setSpotlight] = useState(null) // special card popped out of the grid
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
   const touchStartX = useRef(null)
 
   const load = () =>
     api
-      .cards(testGames)
+      .cards()
       .then((data) => {
         setCards(data.cards)
         setProgress(data.progress)
       })
       .catch((err) => setError(err.message))
 
+  // The cards that exist change with the stage of the tournament timeline.
   useEffect(() => {
+    if (!stage) return
     load()
-  }, [testGames])
+    setPage(0)
+  }, [stage])
 
   useEffect(() => {
     api.dailyStatus().then((d) => setDailyAvailable(d.available)).catch(() => {})
-    api.testdata().then((d) => setTestData(d.games)).catch(() => {})
   }, [])
-
-  const changeTestGames = (ids) => {
-    localStorage.setItem(TEST_GAMES_KEY, JSON.stringify(ids))
-    setTestGames(ids)
-    setPage(0)
-  }
 
   const onReset = async () => {
     const data = await api.reset()
     setProgress(data.progress)
+    refreshTournament()
     navigate('/pack', { state: { pack: data.pack } })
   }
 
@@ -112,7 +101,9 @@ export default function Gallery() {
   if (error) return <p className="error">{error}</p>
   if (!cards) return <p className="muted">Loading cards…</p>
 
-  const realCards = cards.filter((c) => !c.test)
+  // Road to Final cards change with every game and are not collected, so they don't count.
+  const realCards = cards.filter((c) => c.kind !== 'road')
+  const gamesPlayed = tournament?.results.length ?? 0
   const ownedCount = realCards.filter((c) => c.owned).length
   const spareCount = realCards.reduce((n, c) => n + (c.type === 'base' && c.copies > 1 ? c.copies - 1 : 0), 0)
   const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
@@ -151,6 +142,8 @@ export default function Gallery() {
         </div>
       )}
 
+      <GamedayPanel />
+
       <div className="gallery-header">
         <h1>Your collection</h1>
         <span className="progress">
@@ -180,15 +173,17 @@ export default function Gallery() {
         <span aria-hidden="true">⇄</span>
       </Link>
 
-      <Link to="/quiz" className="quiz-cta">
-        <span>
-          <strong>Play trivia, win more cards</strong>
-          <small>Three questions about the game. Answer at the stadium for the exclusive Stadium edition.</small>
-        </span>
-        <span aria-hidden="true">→</span>
-      </Link>
-
-      {testData && <TestDataPanel games={testData} selected={testGames} onChange={changeTestGames} />}
+      {gamesPlayed > 0 && (
+        <Link to="/quiz" className="quiz-cta">
+          <span>
+            <strong>Play trivia about the games, win their special cards</strong>
+            <small>
+              Three questions, starting with the latest games. Answer at the stadium for the exclusive Stadium edition.
+            </small>
+          </span>
+          <span aria-hidden="true">→</span>
+        </Link>
+      )}
 
       <div className="gallery-filters">
         <FilterSelect label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />

@@ -58,7 +58,8 @@ function Select({ label, options, value, onChange }) {
   )
 }
 
-// Every card that exists, regardless of what the user owns: the card set plus the test cards of all 2025 games.
+// Every card that exists after the whole tournament, regardless of what the user owns or where they are on the
+// timeline: the card set, including the test cards of all 2025 games.
 export default function Admin() {
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)

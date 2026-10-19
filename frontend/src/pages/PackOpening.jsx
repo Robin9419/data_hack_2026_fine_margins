@@ -81,7 +81,7 @@ function Pack({ pack, title, fromTrade, legendPack, hasLegends, onLegends, previ
       <div className="pack-row">
         {pack.map((card, i) => (
           <button
-            key={card.id}
+            key={`${card.id}-${i}`}
             type="button"
             className={`pack-card ${stages[i]} ${card.type === 'base' ? '' : card.type}`}
             style={{ '--delay': `${i * 120}ms` }}

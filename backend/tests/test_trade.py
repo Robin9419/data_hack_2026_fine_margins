@@ -20,8 +20,9 @@ class TradeTests(unittest.TestCase):
         self.cards = get_content().cards
         self.base = [cid for cid, c in self.cards.items() if c['type'] == 'base']
 
-    def user(self, favorite=None):
-        return db.get_or_create_user(f'u{random.random()}', favorite)[0]
+    def user(self, favorite=None, stage='post'):
+        # After the tournament by default, so every special card exists.
+        return {**db.get_or_create_user(f'u{random.random()}', favorite)[0], 'stage': stage}
 
     def test_duplicates_stack_and_trade_takes_copies(self):
         uid = self.user()['id']
@@ -88,6 +89,14 @@ class TradeTests(unittest.TestCase):
             main.trade(main.TradeRequest(card_ids=[self.base[0]] * 3), user)
         self.assertEqual(err.exception.status_code, 409)
         self.assertEqual(db.card_copies(user['id'])[self.base[0]], 3)
+
+    def test_no_special_cards_before_their_game(self):
+        random.seed(2)
+        user = self.user('HC Davos', stage='pre')
+        for _ in range(100):
+            db.clear_cards(user['id'])
+            db.grant_cards(user['id'], [self.base[0]] * 3)
+            self.assertEqual(main.trade(main.TradeRequest(card_ids=[self.base[0]] * 3), user)['pack'][0]['type'], 'base')
 
     def test_odds_without_favorite_team(self):
         self.assertEqual([o['chance'] for o in main.trade_odds(None)], [0.75, 0.25])

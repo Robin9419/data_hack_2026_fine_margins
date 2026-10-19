@@ -1,7 +1,7 @@
 """Road to Final: one evolving card per star player that grows while the tournament goes on.
 
-The card is built from the games switched on in the gallery (plus the final, which is real data), so it shows what the
-player's tournament looks like up to that point: the rating per game as bars, an average rating and a stage.
+The card is built from the games played so far on the user's tournament timeline (see tournament.py), so it shows what
+the player's tournament looks like up to that point: the rating per game as bars, an average rating and a stage.
 See docs/CARD_TYPES.md. The game ratings are the made-up test ratings of testdata.py."""
 
 import re
@@ -60,17 +60,10 @@ class RoadToFinal:
             stars += sorted(averages, key=lambda k: (-averages[k], k[1]))[:STARS_PER_TEAM]
         return stars
 
-    def cards_for(self, game_ids: list[str]) -> list[dict]:
-        """A card per star whose team has at least one of the switched-on games."""
-        on = {g for g in game_ids if g in self._td.by_id and not self._td.by_id[g]["has_wisehockey"]}
-        included = on | {g["id"] for g in self._td.games if g["has_wisehockey"]}
-        cards = []
-        for key in self.stars:
-            if any(g["id"] in on for g in self.team_games[key[0]]):
-                card = self._card(key, included)
-                if card:
-                    cards.append(card)
-        return cards
+    def cards_for(self, played: set[str]) -> list[dict]:
+        """A card per star whose team has played at least one of the given games, built from those games."""
+        included = {g for g in played if g in self._td.by_id}
+        return [card for key in self.stars if (card := self._card(key, included))]
 
     @staticmethod
     def _label(game: dict, index: int) -> str:

@@ -1,6 +1,7 @@
 import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './auth'
 import RewardBar from './components/RewardBar'
+import TimelineBar from './components/TimelineBar'
 import Admin from './pages/Admin'
 import CardDetail from './pages/CardDetail'
 import Gallery from './pages/Gallery'
@@ -91,6 +92,8 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+
+      {user && <TimelineBar />}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-"""Tiny SQLite store for dummy users, sessions, owned cards and quiz questions."""
+"""Tiny SQLite store for dummy users, sessions, owned cards, quiz questions and tournament predictions."""
 
 import json
 import secrets
@@ -34,6 +34,21 @@ CREATE TABLE IF NOT EXISTS quiz_questions (
     option_ids TEXT NOT NULL,
     answered INTEGER NOT NULL DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS predictions (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    game_id TEXT NOT NULL,
+    question TEXT NOT NULL,
+    option_id TEXT NOT NULL,
+    PRIMARY KEY (user_id, game_id, question)
+);
+-- A row once the game is played on the user's timeline: the predictions are locked and `correct` packs are earned.
+CREATE TABLE IF NOT EXISTS game_packs (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    game_id TEXT NOT NULL,
+    correct INTEGER NOT NULL,
+    claimed INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, game_id)
+);
 """
 
 
@@ -57,6 +72,8 @@ def init_db():
             conn.execute("ALTER TABLE users ADD COLUMN favorite_team TEXT")
         if "last_daily_claim" not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN last_daily_claim TEXT")
+        if "stage" not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN stage TEXT NOT NULL DEFAULT 'pre'")
         card_columns = [r["name"] for r in conn.execute("PRAGMA table_info(owned_cards)")]
         if "copies" not in card_columns:
             conn.execute("ALTER TABLE owned_cards ADD COLUMN copies INTEGER NOT NULL DEFAULT 1")
@@ -82,12 +99,12 @@ def get_or_create_user(username: str, favorite_team: str | None = None) -> tuple
     """Returns (user, created). The favorite team is only stored for a new account."""
     with connect() as conn:
         row = conn.execute(
-            "SELECT id, username, favorite_team FROM users WHERE username = ?", (username,)
+            "SELECT id, username, favorite_team, stage FROM users WHERE username = ?", (username,)
         ).fetchone()
         if row:
             return dict(row), False
         cur = conn.execute("INSERT INTO users (username, favorite_team) VALUES (?, ?)", (username, favorite_team))
-        return {"id": cur.lastrowid, "username": username, "favorite_team": favorite_team}, True
+        return {"id": cur.lastrowid, "username": username, "favorite_team": favorite_team, "stage": "pre"}, True
 
 
 def create_session(user_id: int) -> str:
@@ -105,7 +122,7 @@ def delete_session(token: str):
 def user_for_token(token: str) -> dict | None:
     with connect() as conn:
         row = conn.execute(
-            "SELECT u.id, u.username, u.favorite_team FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?",
+            "SELECT u.id, u.username, u.favorite_team, u.stage FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?",
             (token,),
         ).fetchone()
         return dict(row) if row else None
@@ -185,6 +202,9 @@ def clear_cards(user_id: int):
     with connect() as conn:
         conn.execute("DELETE FROM owned_cards WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM quiz_questions WHERE user_id = ?", (user_id,))
+        conn.execute("DELETE FROM predictions WHERE user_id = ?", (user_id,))
+        conn.execute("DELETE FROM game_packs WHERE user_id = ?", (user_id,))
+        conn.execute("UPDATE users SET stage = 'pre' WHERE id = ?", (user_id,))
 
 
 def create_quiz(user_id: int, venue: str, questions: list[tuple[str, list[str]]]) -> list[int]:
@@ -212,3 +232,59 @@ def get_question(user_id: int, question_id: int) -> dict | None:
 def mark_answered(question_id: int):
     with connect() as conn:
         conn.execute("UPDATE quiz_questions SET answered = 1 WHERE id = ?", (question_id,))
+
+
+def set_stage(user_id: int, stage: str):
+    with connect() as conn:
+        conn.execute("UPDATE users SET stage = ? WHERE id = ?", (stage, user_id))
+
+
+def predictions(user_id: int) -> dict[str, dict[str, str]]:
+    """game_id -> {question id -> option id}"""
+    with connect() as conn:
+        rows = conn.execute("SELECT game_id, question, option_id FROM predictions WHERE user_id = ?", (user_id,)).fetchall()
+    result: dict[str, dict[str, str]] = {}
+    for r in rows:
+        result.setdefault(r["game_id"], {})[r["question"]] = r["option_id"]
+    return result
+
+
+def save_prediction(user_id: int, game_id: str, question: str, option_id: str) -> bool:
+    """Stores or changes a prediction. False if the game was already played (its predictions are locked)."""
+    with connect() as conn:
+        if conn.execute("SELECT 1 FROM game_packs WHERE user_id = ? AND game_id = ?", (user_id, game_id)).fetchone():
+            return False
+        conn.execute(
+            "INSERT INTO predictions (user_id, game_id, question, option_id) VALUES (?, ?, ?, ?) "
+            "ON CONFLICT (user_id, game_id, question) DO UPDATE SET option_id = excluded.option_id",
+            (user_id, game_id, question, option_id),
+        )
+        return True
+
+
+def game_packs(user_id: int) -> dict[str, dict]:
+    """game_id -> {correct, claimed} for the games already played on the user's timeline."""
+    with connect() as conn:
+        rows = conn.execute("SELECT game_id, correct, claimed FROM game_packs WHERE user_id = ?", (user_id,)).fetchall()
+        return {r["game_id"]: {"correct": r["correct"], "claimed": bool(r["claimed"])} for r in rows}
+
+
+def resolve_game(user_id: int, game_id: str, correct: int):
+    """Locks the game's predictions and records the packs they earned. Only the first time the game is played."""
+    with connect() as conn:
+        conn.execute("INSERT OR IGNORE INTO game_packs (user_id, game_id, correct) VALUES (?, ?, ?)",
+                     (user_id, game_id, correct))
+
+
+def claim_game_packs(user_id: int, game_id: str) -> int | None:
+    """Marks the game's packs as opened and returns how many there are. None if there is nothing to open (atomic, so
+    a double click can't open them twice)."""
+    with connect() as conn:
+        cur = conn.execute(
+            "UPDATE game_packs SET claimed = 1 WHERE user_id = ? AND game_id = ? AND claimed = 0 AND correct > 0",
+            (user_id, game_id),
+        )
+        if not cur.rowcount:
+            return None
+        return conn.execute("SELECT correct FROM game_packs WHERE user_id = ? AND game_id = ?",
+                            (user_id, game_id)).fetchone()["correct"]

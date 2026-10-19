@@ -12,6 +12,7 @@ export default function Quiz() {
   const { progress, setProgress } = useAuth()
   const [venue, setVenue] = useState(null)
   const [questions, setQuestions] = useState(null)
+  const [gamesPlayed, setGamesPlayed] = useState(0)
   const [index, setIndex] = useState(0)
   const [missed, setMissed] = useState(null) // { chosen, answer } once the current question was answered wrong
   const [unlock, setUnlock] = useState(null) // { card, result, points, progress }
@@ -27,6 +28,7 @@ export default function Quiz() {
       const data = await api.quizStart(chosen)
       setVenue(chosen)
       setQuestions(data.questions)
+      setGamesPlayed(data.games_played)
       setIndex(0)
       setMissed(null)
       setWon(0)
@@ -81,7 +83,7 @@ export default function Quiz() {
       <section className="quiz">
         <h1>Trivia time</h1>
         <p className="muted">
-          Answer three questions about the game to win cards. Where are you watching? (In this demo you tell us. A real
+          Answer three questions about the games played so far to win their special cards. Where are you watching? (In this demo you tell us. A real
           app would check your ticket.)
         </p>
         <div className="venue-choices">
@@ -102,14 +104,29 @@ export default function Quiz() {
     )
   }
 
+  if (questions.length === 0 && gamesPlayed === 0) {
+    return (
+      <section className="quiz">
+        <h1>No games played yet</h1>
+        <p className="muted">
+          The trivia asks about the games of the tournament, so it opens after the first one. Make your predictions on
+          a gameday, then move on in the timeline at the bottom to play the games.
+        </p>
+        <button type="button" className="pack-button" onClick={() => navigate('/')}>
+          Back to collection
+        </button>
+      </section>
+    )
+  }
+
   if (questions.length === 0) {
     return (
       <section className="quiz">
         <h1>Nothing left to win</h1>
         <p className="muted">
           {venue === 'stadium'
-            ? 'You already own every card as a Stadium edition.'
-            : 'You already own every card. Come to the stadium to win the Stadium editions!'}
+            ? 'You already own every special card of the games so far as a Stadium edition.'
+            : 'You already own every special card of the games so far. Come to the stadium to win the Stadium editions, or play the next games!'}
         </p>
         <button type="button" className="pack-button" onClick={() => navigate('/')}>
           Back to collection

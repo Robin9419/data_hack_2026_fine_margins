@@ -54,3 +54,40 @@ The existing cutter now discovers pass moments too, writes `backend/media/clips/
 Video time is `event Timestamp / 1000 - recording.timestamp_offset`. Confirm synchronization for each recording. Source rows identify KPI occurrences, while a shared timestamp can reuse the same physical video clip. If several moment kinds share a timestamp, the cutter uses the union of their windows so every linked event remains covered. Store both origin and later snapshot timestamps even when the clip is anchored at the origin.
 
 Without generated clips, statistics and pass moments remain visible, with no pass video button. No clips are generated automatically at server startup.
+
+## Pass Packing (frozen-opponent variant)
+
+`pass_packing` reuses successful-pass eligibility and the first strictly later receiver snapshot within 2 seconds from PBP. Only opposing skaters count; goalkeepers are excluded. All opponent positions are frozen at pass release. The receiver's x coordinate comes from the later snapshot; later opponent movement is ignored.
+
+Project into attacking x direction (+1 or −1). Count opponents strictly between passer and receiver x positions: positive for forward passes, negative for backward passes. A sideways pass or a backward pass crossing no opponents is zero. Opponents exactly level with either endpoint are not counted. This is longitudinal packing, not a geometric passing-lane model.
+
+`infer_attack_directions` estimates direction independently per period from the median x position of the opposing goalkeeper. Both teams must have goalkeeper evidence on opposite sides and at least 10 m from center. Otherwise the direction is unavailable. The current export is normalized: Home attacks +x and Away attacks −x in all three periods. Do not blindly alternate direction each period. Another provider should supply verified `(period, side) -> +1/-1` mappings through the calculator argument.
+
+Missing origin/player/opponent coordinates, reception snapshots, or direction produce unavailable results. Results store both source rows/timestamps, origin and reception x, attack direction, and IDs of bypassed/restored opponents. Aggregates include signed total and mean, positive share/count, coverage, and evaluated counts. Rankings retain the provisional minimum of 10 evaluated passes.
+
+Registered as `Content.derived_kpis['pass_packing']`; authenticated endpoint: `/api/analysis/pass-packing`. `packing_mean` and `packing_total` are available as card metrics. They are displayed alongside average PBP on the Pressure Reliever card; Packing does not change that award's PBP-based winner. The selection of one passing award per category is not implemented by this KPI addition.
+
+`pass_packing` moments link to the same pass timestamp and `pass` video window as PBP. Existing clips can be reused without recutting. The clip cutter ignores non-final/test-game events and cards without moments. Packing is currently computed only from the real final event export, not inferred for other games from aggregate statistics.
+
+
+## Progression Master Award
+
+`Content._add_progression_card` adds a separate `progression-master` collectible for the highest **positive mean Packing**, with the calculator's minimum evaluated-pass threshold (currently 10). Ties favor more evaluated passes, then the lexicographically greatest player ID, for deterministic selection. No card is created if nobody qualifies. The winner is calculated from the real final events; other games do not receive invented Packing awards.
+
+The card shows average Packing, signed total Packing, and the share of evaluated passes with positive Packing. Supporting event links for the share include only positive passes; mean and total include all evaluated passes, including zero and negative values. When available, the highlight is the winner's highest positive-Packing pass clip (earliest timestamp breaks ties). Existing pass clips are reused. The normal collection, trivia, and final-game availability rules apply. Pressure Reliever remains independently awarded using PBP; selecting only one award per passing category remains future work.
+
+## Expected Assists (xA) and Chance Architect
+
+`expected_assists` evaluates each `Shot` row once, including `ShotResult=Goal`. Separate `Goal` rows never receive additional credit. A valid, finite `ShotXG` between 0 and 1 and an identified shooter/team are required; zero is valid, missing xG is not zero.
+
+Search backward in precise timestamp order within the same period for the **last successful pass** from an identified teammate to the shooter, strictly before the shot and at most **4 seconds** earlier. Source-row order breaks equal-timestamp ordering; a pass with exactly the shot timestamp is not accepted. Opposing `PuckControlState=HomeControl/AwayControl` cancels attribution. A successful opponent pass also establishes intervening possession. Loose/contested puck states alone do not cancel attribution. No extra reception-coordinate requirement is introduced for this KPI: the successful outcome is the completion evidence.
+
+The passer receives xA equal to shot xG. Each shot is credited to at most one passer; one pass can prepare multiple shots within the window unless opposing control intervenes. Rebounds without another successful pass can therefore retain the same passer under this definition. Exclusions record missing/invalid xG, unknown shooter, no qualifying pass, and intervening opponent control. This is project-defined chance attribution, not necessarily the provider's or official assist definition.
+
+Results retain pass and shot source rows/timestamps, shooter, credited passer and value. Player statistics are total xA, attributed shot count, and average xG of attributed shots. Means use attributed shots only; a player with no credited shots has no mean. The current generic eligible/evaluated counts and coverage for these player aggregates describe credited shots, not the proportion of every pass successfully evaluated; match-wide attribution coverage must be read from the shot-level results and exclusions.
+
+Registered as `derived_kpis['expected_assists']`; authenticated endpoint `/api/analysis/expected-assists`. Metrics: `xa_total`, `xa_assisted_shots`, `xa_mean`. The provisional **Chance Architect** award selects the highest positive total xA, without a minimum pass count. Ties favor more attributed shots, then player ID. No card is created if nobody has positive xA. Only the real final event export supplies these awards.
+
+Supporting `expected_assist` moments belong to the passer and anchor video at the **shot timestamp**, while retaining the pass timestamp for traceability. The `expected_assist` recording window is **7 seconds before to 3 seconds after** the shot, covering a pass up to 4 seconds earlier. The card highlight selects the highest-xG attributed shot with a camera clip. No unrelated broadcast replay is attached to xA moments.
+
+Existing shot clips may be too short for the new window. Run `python -m scripts.cut_clips --force` and restart the backend to regenerate clips with the union of all required event windows. Clip generation remains manual.

@@ -9,7 +9,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from .events import ORDINALS, PERIOD_SECONDS, MatchEvents, _clock
-from .event_kpis import EventAnalysis, pass_body_pressure
+from .event_kpis import EventAnalysis, pass_body_pressure, pass_packing, expected_assists
 from .ratings import HIGH_DANGER_XG, compute_ratings, goalie_stats
 from .road_to_final import RoadToFinal
 from .testdata import TestData
@@ -42,6 +42,8 @@ def format_value(value, fmt: str) -> str:
         return str(int(value))
     if fmt == "decimal1":
         return f"{value:.1f}"
+    if fmt == "decimal3":
+        return f"{value:.3f}"
     if fmt == "decimal2":
         return f"{value:.2f}"
     if fmt == "pct":
@@ -83,8 +85,12 @@ class Content:
         goalkeeper_ids = {r['EventSecondaryPlayerId'] for r in self.event_rows
                           if r['EventType'] == 'Shot' and r['EventSecondaryPlayerId']}
         self.analysis = EventAnalysis(self.event_rows, goalkeeper_ids)
-        self.derived_kpis = {'pass_body_pressure': pass_body_pressure(self.analysis)}
+        self.derived_kpis = {'pass_body_pressure': pass_body_pressure(self.analysis),
+                             'pass_packing': pass_packing(self.analysis),
+                             'expected_assists': expected_assists(self.analysis)}
         self._add_pass_moments()
+        self._add_packing_moments()
+        self._add_xa_moments()
         self.player_images = self._load_player_images()
         base_doc = _load_json("base_cards.json")
         # Dual nationalities ("Canada / USA") show the first one on the card.
@@ -94,6 +100,8 @@ class Content:
         self.card_images = _load_json("card_images.json")
         self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
         self._add_pressure_card()
+        self._add_progression_card()
+        self._add_xa_card()
         self.cards |= {c["id"]: self._build_base_card(c, base_doc) for c in base_doc["cards"]}
         self._add_performance_cards(cards_doc["performance_specials"])
         self.reward_rules = {}  # reward card id -> function(owned card ids -> editions) saying whether it is earned
@@ -129,6 +137,20 @@ class Content:
         for moments in self.events.by_player.values():
             moments.sort(key=lambda m: (int(m['timestamp']), m['id']))
 
+    def _add_packing_moments(self):
+        for result in self.derived_kpis['pass_packing']['events']:
+            if result['value'] is None:
+                continue
+            row = self.event_rows[result['source_row'] - 1]
+            moment = self.events._moment(
+                row, 'pass_packing', 'Packing pass',
+                f"To {self.events.names.get(result['receiver_id'], 'receiver')}. "
+                f"Packing {result['value']:+d} opposing skaters (positions frozen at release).")
+            moment.update(id=result['id'], kpi=result)
+            self.events.by_player.setdefault(result['passer_id'], []).append(moment)
+        for moments in self.events.by_player.values():
+            moments.sort(key=lambda m: (int(m['timestamp']), m['id']))
+
     def _add_pressure_card(self):
         candidates = [(pid, stats) for pid, stats in self.derived_kpis['pass_body_pressure']['players'].items()
                       if stats['ranking_eligible'] and stats['mean'] > 0]
@@ -139,14 +161,83 @@ class Content:
         team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
         self.archetypes['Pressure Reliever'] = ('Highest average reduction in nearby opposing skaters through successful passes, '
                                                'with at least 10 evaluated passes. Snapshot-based estimate.')
-        self.archetype_metrics['Pressure Reliever'] = ['pbp_mean', 'pbp_positive_share', 'pbp_evaluated']
+        self.archetype_metrics['Pressure Reliever'] = ['pbp_mean', 'packing_mean', 'packing_total']
         cfg = {'id': 'pressure-reliever', 'team': team, 'jersey': jersey, 'position': 'Skater',
-               'title': 'Pressure Reliever', 'attributes': ['pbp_mean', 'pbp_positive_share', 'pbp_evaluated'],
+               'title': 'Pressure Reliever', 'attributes': ['pbp_mean', 'packing_mean', 'packing_total'],
                'explanation': f"Reduced nearby opponent pressure by {stats['mean']:.2f} skaters per evaluated pass on average. "
                               f"{stats['evaluated_passes']} of {stats['eligible_passes']} eligible passes could be evaluated. "
                               'This measures pressure relief, not overall passing or attacking quality.',
                'achievement': None, 'video': None}
         self.cards[cfg['id']] = self._build_card(cfg)
+
+    def _add_progression_card(self):
+        calculation = self.derived_kpis['pass_packing']
+        candidates = [(pid, stats) for pid, stats in calculation['players'].items()
+                      if stats['ranking_eligible'] and stats['mean'] > 0]
+        if not candidates:
+            return
+        pid, stats = max(candidates, key=lambda item: (item[1]['mean'], item[1]['evaluated_passes'], item[0]))
+        team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
+        minimum = calculation['parameters']['min_evaluated']
+        title = 'Progression Master'
+        self.archetypes[title] = (
+            f'Highest positive average pass packing with at least {minimum} evaluated passes. '
+            'Counts opposing skaters bypassed along the attacking axis, with positions frozen at release. '
+            'Backward passes can reduce the score; ties favor more evaluated passes, then player ID.')
+        metrics = ['packing_mean', 'packing_total', 'packing_positive_share']
+        self.archetype_metrics[title] = metrics
+        cfg = {'id': 'progression-master', 'team': team, 'jersey': jersey, 'position': 'Skater',
+               'title': title, 'attributes': metrics,
+               'explanation': f"Averaged {stats['mean']:.2f} net opposing skaters bypassed per evaluated pass, "
+                              f"the highest qualifying average in this game. Signed total: {stats['total']}. "
+                              f"{stats['evaluated_passes']} of {stats['eligible_passes']} eligible passes evaluated. "
+                              'Packing measures longitudinal progression, not overall passing quality.',
+               'achievement': None, 'video': None}
+        card = self._build_card(cfg)
+        filmed = [m for m in card['moments'] if m['kind'] == 'pass_packing' and m['kpi']['value'] > 0 and m['clip']]
+        if filmed:
+            best = max(filmed, key=lambda m: (m['kpi']['value'], -int(m['timestamp'])))
+            card['video'] = {**best['clip'], 'description': self._describe(best), 'scope': 'moment'}
+        card['source'] = self.match['events_source']
+        self.cards[cfg['id']] = card
+
+    def _add_xa_moments(self):
+        for result in self.derived_kpis['expected_assists']['events']:
+            if result['value'] is None:
+                continue
+            row = self.event_rows[result['source_row'] - 1]
+            moment = self.events._moment(row, 'expected_assist', 'Chance set up',
+                f"Pass to {self.events.names.get(result['shooter_id'], 'shooter')}; xA {result['value']:.3f}.", shot=row)
+            moment.update(id=result['id'], kpi=result)
+            self.events.by_player.setdefault(result['passer_id'], []).append(moment)
+        for moments in self.events.by_player.values():
+            moments.sort(key=lambda m: (int(m['timestamp']), m['id']))
+
+    def _add_xa_card(self):
+        candidates = [(pid, stats) for pid, stats in self.derived_kpis['expected_assists']['players'].items()
+                      if stats['total'] > 0]
+        if not candidates:
+            return
+        pid, stats = max(candidates, key=lambda item: (item[1]['total'], item[1]['assisted_shots'], item[0]))
+        team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
+        title = 'Chance Architect'
+        self.archetypes[title] = ('Highest total expected assists (xA): the last successful pass to a shooter '
+                                 'within 4 seconds earns the shot xG, unless opponent possession intervenes.')
+        metrics = ['xa_total', 'xa_assisted_shots', 'xa_mean']
+        self.archetype_metrics[title] = metrics
+        cfg = {'id': 'chance-architect', 'team': team, 'jersey': jersey, 'position': 'Skater',
+               'title': title, 'attributes': metrics,
+               'explanation': f"Created {stats['total']:.3f} expected assists from {stats['assisted_shots']} shots. "
+                              'Credit comes from completed passes within four seconds before a shot, '
+                              'with no intervening opponent possession. This is a project-defined xA metric.',
+               'achievement': None, 'video': None}
+        card = self._build_card(cfg)
+        filmed = [m for m in card['moments'] if m['kind'] == 'expected_assist' and m['clip']]
+        if filmed:
+            best = max(filmed, key=lambda m: (m['kpi']['value'], -int(m['timestamp'])))
+            card['video'] = {**best['clip'], 'description': self._describe(best), 'scope': 'moment'}
+        card['source'] = self.match['events_source']
+        self.cards[cfg['id']] = card
 
     def _load_stats(self) -> list[dict]:
         path = DATA_DIR / self.match["stats_file"]
@@ -254,7 +345,8 @@ class Content:
         attr["moment_ids"] = MatchEvents.select(moments, metric["events"]) if "events" in metric else None
         if metric.get('derived'):
             attr['coverage'] = stats.get('coverage')
-            attr['detail'] = f"{stats.get('evaluated_passes', 0)} of {stats.get('eligible_passes', 0)} eligible passes evaluated"
+            attr['detail'] = (f"{stats.get('assisted_shots', 0)} attributed shots" if metric['derived'] == 'expected_assists'
+                              else f"{stats.get('evaluated_passes', 0)} of {stats.get('eligible_passes', 0)} eligible passes evaluated")
             attr['moment_ids'] = stats.get('positive_event_ids' if metric['aggregate'] == 'positive_share' else 'event_ids', [])
             if not stats.get('ranking_eligible'):
                 attr['match_rank'] = None

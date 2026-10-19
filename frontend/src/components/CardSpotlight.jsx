@@ -31,7 +31,7 @@ function pickClips(card) {
 
 // Pop-out view of a special card from the gallery. It opens on the card's back, which shows the KPIs that earned
 // the player this archetype, next to clips that show it. Links on to the full card page.
-export default function CardSpotlight({ card, onClose, hideLink = false }) {
+export default function CardSpotlight({ card, onClose, detailPath = `/cards/${card.id}` }) {
   const [flipped, setFlipped] = useState(true)
   const [clipIndex, setClipIndex] = useState(0)
   const closeRef = useRef(null)
@@ -122,15 +122,13 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
               ))}
             </div>
           )}
-          {!hideLink && (
-            <Link to={`/cards/${card.id}`} className="spotlight-more">
-              <span>
-                <strong>See the full card</strong>
-                <small>Every stat, how it ranks and all game events</small>
-              </span>
-              <span aria-hidden="true">→</span>
-            </Link>
-          )}
+          <Link to={detailPath} onClick={onClose} className="spotlight-more">
+            <span>
+              <strong>See the full card</strong>
+              <small>Every stat, how it ranks and all game events</small>
+            </span>
+            <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </div>
     </div>

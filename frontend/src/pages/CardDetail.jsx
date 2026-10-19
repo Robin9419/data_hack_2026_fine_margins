@@ -8,7 +8,7 @@ import PlayerPhoto from '../components/PlayerPhoto'
 import VideoSlot from '../components/VideoSlot'
 import { formatMatchDate, scoreline } from '../format'
 
-export default function CardDetail() {
+export default function CardDetail({ preview = false }) {
   const { id } = useParams()
   const [card, setCard] = useState(null)
   const [error, setError] = useState(null)
@@ -17,17 +17,28 @@ export default function CardDetail() {
   const videoRef = useRef(null)
 
   useEffect(() => {
+    let active = true
+    setCard(null)
+    setError(null)
     setPlaying(null)
-    api
-      .card(id)
-      .then(setCard)
-      .catch((err) => setError(err.message))
-  }, [id])
+    setVideoOnly(false)
+    const request = preview
+      ? api.adminCards().then(({ cards }) => {
+          const found = cards.find((card) => card.id === id)
+          if (!found) throw new Error('Card not found')
+          return found
+        })
+      : api.card(id)
+    request
+      .then((card) => { if (active) setCard(card) })
+      .catch((err) => { if (active) setError(err.message) })
+    return () => { active = false }
+  }, [id, preview])
 
   if (error)
     return (
       <section>
-        <Link to="/">← Back to collection</Link>
+        <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
         <p className="error">{error}</p>
       </section>
     )
@@ -50,7 +61,7 @@ export default function CardDetail() {
 
   return (
     <section className="detail">
-      <Link to="/">← Back to collection</Link>
+      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
 
       {card.test && (
         <div className="banner">

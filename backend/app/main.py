@@ -500,3 +500,13 @@ def open_game_packs(game_id: str, user: dict = Depends(current_user)):
 def pass_pressure_analysis(user: dict = Depends(current_user)):
     """Event results, exclusions, coverage and aggregates for every passer."""
     return get_content().derived_kpis['pass_body_pressure']
+
+
+@app.get('/api/analysis/pass-packing')
+def packing_analysis(user: dict = Depends(current_user)):
+    return get_content().derived_kpis['pass_packing']
+
+
+@app.get('/api/analysis/expected-assists')
+def xa_analysis(user: dict = Depends(current_user)):
+    return get_content().derived_kpis['expected_assists']

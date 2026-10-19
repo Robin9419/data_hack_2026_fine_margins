@@ -13,7 +13,7 @@ ORDINALS = {1: "1st", 2: "2nd", 3: "3rd"}
 
 
 # Which clip window (videos.json -> recording.windows) each kind of moment uses.
-CLIP_WINDOWS = {"goal": "goal", "assist": "goal", "goal_against": "goal", "faceoff_win": "faceoff", "pass_pressure": "pass"}
+CLIP_WINDOWS = {"goal": "goal", "assist": "goal", "goal_against": "goal", "faceoff_win": "faceoff", "pass_pressure": "pass", "pass_packing": "pass", "expected_assist": "expected_assist"}
 
 
 def clip_window_kind(moment_kind: str) -> str:

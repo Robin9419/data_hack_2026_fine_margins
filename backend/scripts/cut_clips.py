@@ -40,8 +40,13 @@ def main():
 
     # One clip per event; goal, assist and goal-against moments share the Goal event.
     events = {}
+    recording_timestamps = {r["Timestamp"] for r in content.event_rows}
     for card in content.cards.values():
-        for m in card["moments"]:
+        # Base, legend and reward cards have no event timeline.
+        for m in card.get("moments", []):
+            # Other tournament games have no footage in this final-game recording.
+            if card.get("test_game") or m.get("timestamp") not in recording_timestamps:
+                continue
             kind = clip_window_kind(m["kind"])
             before, after = rec['windows'][kind]
             previous = events.get(m['timestamp'], (before, after))

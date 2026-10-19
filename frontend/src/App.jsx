@@ -82,6 +82,14 @@ export default function App() {
             }
           />
           <Route
+            path="/admin/cards/:id"
+            element={
+              <RequireAuth>
+                <CardDetail preview />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/admin"
             element={
               <RequireAuth>

@@ -272,6 +272,90 @@
       "events": [
         "pass_pressure"
       ]
+    },
+    {
+      "id": "packing_mean",
+      "label": "Average pass packing",
+      "derived": "pass_packing",
+      "aggregate": "mean",
+      "format": "decimal2",
+      "unit": "skaters",
+      "higher_is_better": true,
+      "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "source_definition": "Project-defined longitudinal packing, with opponent positions frozen at pass release. Not a measure of passing lanes or defender movement.",
+      "events": [
+        "pass_packing"
+      ]
+    },
+    {
+      "id": "packing_total",
+      "label": "Total pass packing",
+      "derived": "pass_packing",
+      "aggregate": "total",
+      "format": "int",
+      "unit": "skaters",
+      "higher_is_better": true,
+      "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "source_definition": "Project-defined longitudinal packing, with opponent positions frozen at pass release. Not a measure of passing lanes or defender movement.",
+      "events": [
+        "pass_packing"
+      ]
+    },
+    {
+      "id": "packing_positive_share",
+      "label": "Positive-packing passes",
+      "derived": "pass_packing",
+      "aggregate": "positive_share",
+      "format": "pct",
+      "unit": "%",
+      "higher_is_better": true,
+      "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "source_definition": "Project-defined longitudinal packing, with opponent positions frozen at pass release. Not a measure of passing lanes or defender movement.",
+      "events": [
+        "pass_packing"
+      ]
+    },
+    {
+      "id": "xa_total",
+      "label": "Expected assists (xA)",
+      "derived": "expected_assists",
+      "aggregate": "total",
+      "format": "decimal3",
+      "unit": "xA",
+      "higher_is_better": true,
+      "definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "source_definition": "Project-defined expected assists using Wisehockey shot xG and pass/control events.",
+      "events": [
+        "expected_assist"
+      ]
+    },
+    {
+      "id": "xa_assisted_shots",
+      "label": "Shots set up",
+      "derived": "expected_assists",
+      "aggregate": "assisted_shots",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "source_definition": "Project-defined expected assists using Wisehockey shot xG and pass/control events.",
+      "events": [
+        "expected_assist"
+      ]
+    },
+    {
+      "id": "xa_mean",
+      "label": "Average xG of shots set up",
+      "derived": "expected_assists",
+      "aggregate": "mean",
+      "format": "decimal3",
+      "unit": "xG",
+      "higher_is_better": true,
+      "definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "source_definition": "Project-defined expected assists using Wisehockey shot xG and pass/control events.",
+      "events": [
+        "expected_assist"
+      ]
     }
   ]
 }

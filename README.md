@@ -2,7 +2,7 @@
 
 Repository for the Sports Innovation Challenge. Concept: [docs/IDEA.md](docs/IDEA.md).
 
-## Hockey Performance Cards: skeleton app
+## Spengler Cup Cards: skeleton app
 
 - **backend/**: FastAPI + SQLite. Dummy username sign-in, a starter pack for new accounts only, owned cards (standard or stadium edition), trivia quiz, reward points, card data.
 - **frontend/**: React (Vite). Sign-in, pack opening (tap a mystery card to reveal it), reward bar, trivia quiz with a card-unlock animation, card gallery, card detail page with KPI explanations and a video slot.

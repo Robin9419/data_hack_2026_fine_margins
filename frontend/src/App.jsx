@@ -23,7 +23,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <Link to="/" className="brand">
-          Hockey Performance Cards
+          Spengler Cup Cards
         </Link>
         {user && (
           <div className="topbar-user">

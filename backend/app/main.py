@@ -95,6 +95,54 @@ def open_daily_card(user_id: int) -> list[dict]:
     return [{**content.cards[drawn], "owned": True, "is_new": drawn in new_ids}]
 
 
+def open_random_base_cards(user_id: int, count: int) -> list[dict]:
+    """Random base cards, one draw each, so duplicates are possible."""
+    content = get_content()
+    base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
+    drawn = [random.choice(base_ids) for _ in range(count)]
+    new_ids = db.grant_cards(user_id, drawn)
+    seen: set[str] = set()
+    pack = []
+    for cid in drawn:
+        pack.append({**content.cards[cid], "owned": True, "is_new": cid in new_ids and cid not in seen})
+        seen.add(cid)
+    return pack
+
+
+# Welcome bonuses: following Spengler Cup on Instagram (once) and buying match tickets (per ticket). Neither is
+# verified against Instagram or a ticket shop yet, so for the demo the claim is taken on trust.
+INSTAGRAM_CARDS = 3
+CARDS_PER_TICKET = 5
+MAX_TICKETS = 4
+
+
+class TicketBonusRequest(BaseModel):
+    tickets: int = Field(ge=1, le=MAX_TICKETS)
+
+
+@app.get("/api/bonus")
+def bonus_info(user: dict = Depends(current_user)):
+    return {
+        "instagram": {"cards": INSTAGRAM_CARDS, "claimed": db.instagram_claimed(user["id"])},
+        "tickets": {"cards_per_ticket": CARDS_PER_TICKET, "max": MAX_TICKETS},
+    }
+
+
+@app.post("/api/bonus/instagram")
+def bonus_instagram(user: dict = Depends(current_user)):
+    if not db.claim_instagram(user["id"]):
+        raise HTTPException(409, "You already claimed the Instagram bonus")
+    pack = open_random_base_cards(user["id"], INSTAGRAM_CARDS)
+    return {"pack": pack + award_legends(user), "progress": progress_for(user), "title": "Welcome to Instagram!"}
+
+
+@app.post("/api/bonus/tickets")
+def bonus_tickets(body: TicketBonusRequest, user: dict = Depends(current_user)):
+    pack = open_random_base_cards(user["id"], CARDS_PER_TICKET * body.tickets)
+    title = f'{body.tickets} {"ticket" if body.tickets == 1 else "tickets"}, {len(pack)} free cards'
+    return {"pack": pack + award_legends(user), "progress": progress_for(user), "title": title}
+
+
 def with_rewards(owned: dict[str, str]) -> dict[str, str]:
     """The owned cards plus the reward cards they earn (collector and context cards)."""
     return owned | get_content().earned_cards(owned)

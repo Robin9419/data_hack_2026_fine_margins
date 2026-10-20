@@ -72,6 +72,8 @@ def init_db():
             conn.execute("ALTER TABLE users ADD COLUMN favorite_team TEXT")
         if "last_daily_claim" not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN last_daily_claim TEXT")
+        if "instagram_claimed" not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN instagram_claimed INTEGER NOT NULL DEFAULT 0")
         if "stage" not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN stage TEXT NOT NULL DEFAULT 'pre'")
         card_columns = [r["name"] for r in conn.execute("PRAGMA table_info(owned_cards)")]
@@ -92,6 +94,19 @@ def claim_daily(user_id: int, today: str) -> bool:
             "UPDATE users SET last_daily_claim = ? WHERE id = ? AND (last_daily_claim IS NULL OR last_daily_claim <> ?)",
             (today, user_id, today),
         )
+        return cur.rowcount > 0
+
+
+def instagram_claimed(user_id: int) -> bool:
+    with connect() as conn:
+        row = conn.execute("SELECT instagram_claimed FROM users WHERE id = ?", (user_id,)).fetchone()
+        return bool(row and row["instagram_claimed"])
+
+
+def claim_instagram(user_id: int) -> bool:
+    """Marks the Instagram bonus as claimed. False if it already was (atomic, so it can only be claimed once)."""
+    with connect() as conn:
+        cur = conn.execute("UPDATE users SET instagram_claimed = 1 WHERE id = ? AND instagram_claimed = 0", (user_id,))
         return cur.rowcount > 0
 
 

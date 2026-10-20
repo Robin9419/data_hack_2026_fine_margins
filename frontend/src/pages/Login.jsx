@@ -6,9 +6,10 @@ import { TEAMS } from '../teams'
 
 
 const STEPS = [
-  { icon: '🎁', title: 'Open your starter pack', text: 'Three free cards, each one a player’s performance in the match.' },
-  { icon: '🧠', title: 'Answer the trivia', text: 'Work out who made the difference from the clues and win more cards.' },
-  { icon: '🏆', title: 'Collect and unlock', text: 'Watch the highlights and earn points towards rewards.' },
+  { icon: '🎁', title: 'Open your starter pack', text: 'Three free cards to begin: the players, the clubs and the legends of the Spengler Cup.' },
+  { icon: '🔮', title: 'Call the games', text: 'Before every gameday, predict the winner, the first goal and a key stat. Right calls earn you packs.' },
+  { icon: '🧠', title: 'Play the trivia', text: 'Clues from the games already played, from who scored to who stood tall. Each right answer unlocks a card.' },
+  { icon: '🏆', title: 'Collect all week', text: 'Come back every day for a free card, trade spares for new finds and climb the reward bar. Win Stadium editions when you are at the rink.' },
 ]
 
 export default function Login() {
@@ -50,15 +51,16 @@ export default function Login() {
     <div className="landing">
       <section className="hero">
         <div className="hero-glow" aria-hidden="true" />
-        <p className="hero-eyebrow">Spengler Cup</p>
+        <p className="hero-eyebrow">Spengler Cup · Davos · 26–31 December</p>
         <h1>
-          The match is over.
+          Your Spengler Cup,
           <br />
-          Who made the difference?
+          one card at a time.
         </h1>
         <p className="hero-lead">
-          Turn the performances that defined the game into collectible cards. Every card is backed by real match data,
-          with the highlight to prove it.
+          The world’s oldest invitational hockey tournament, in your pocket. Collect the players and legends of every
+          club, predict the games, test yourself with trivia and watch your collection grow with each day of the
+          tournament.
         </p>
         <div className="hero-cards" aria-hidden="true">
           <span className="hero-card hc-1 team-hcd">?</span>
@@ -109,7 +111,7 @@ export default function Login() {
           </fieldset>
 
           <button type="submit" className="cta" disabled={submitting || !username.trim()}>
-            {submitting ? 'Opening…' : 'Get my free cards'}
+            {submitting ? 'Opening…' : 'Open my free pack'}
           </button>
           {error && <p className="error">{error}</p>}
         </form>

@@ -4,6 +4,7 @@ import { api } from '../api'
 import { useAuth } from '../auth'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
+import FreeCards from '../components/FreeCards'
 import GamedayPanel from '../components/GamedayPanel'
 import { TEAMS } from '../teams'
 import { useTournament } from '../tournament'
@@ -172,6 +173,8 @@ export default function Gallery() {
         </span>
         <span aria-hidden="true">⇄</span>
       </Link>
+
+      <FreeCards />
 
       {gamesPlayed > 0 && (
         <Link to="/quiz" className="quiz-cta">

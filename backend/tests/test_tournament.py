@@ -58,11 +58,11 @@ class TournamentTests(unittest.TestCase):
     def test_every_game_has_three_questions_with_a_valid_answer(self):
         for game in self.t.games:
             questions = self.t.questions[game['id']]
-            self.assertEqual([q['id'] for q in questions], ['winner', 'first_goal', 'kpi'])
+            self.assertEqual([q['id'] for q in questions], ['winner', 'goal', 'kpi'])
             for q in questions:
                 self.assertIn(q['answer'], {o['id'] for o in q['options']}, (game['id'], q['id']))
         self.assertEqual(self.t.answer_of(FRI_SPA, 'winner'), 'home')
-        self.assertEqual(self.t.answer_of(FRI_SPA, 'first_goal'), 'HC Fribourg-Gottéron#17')
+        self.assertEqual(self.t.answer_of(FRI_SPA, 'goal'), 'HC Fribourg-Gottéron#17')
 
     def test_predictions_only_for_todays_games(self):
         with self.assertRaises(main.HTTPException):
@@ -80,7 +80,7 @@ class TournamentTests(unittest.TestCase):
     def test_correct_predictions_earn_packs_after_the_game(self):
         self.go(FIRST_DAY)
         self.predict(FRI_SPA, 'winner', 'home')  # right
-        self.predict(FRI_SPA, 'first_goal', 'HC Fribourg-Gottéron#17')  # right
+        self.predict(FRI_SPA, 'goal', 'HC Fribourg-Gottéron#17')  # right
         self.predict(FRI_SPA, 'kpi', 'fast')  # wrong: 159.3 km/h
         view = self.go('2025-12-27')
         result = next(g for g in view['results'] if g['id'] == FRI_SPA)
@@ -125,6 +125,14 @@ class TournamentTests(unittest.TestCase):
             for o in question['option_ids']:
                 self.assertEqual(self.content.cards[o]['player']['position'] == 'Goalkeeper', goalie)
 
+    def test_trivia_drops_out_once_played_on_the_gameday(self):
+        self.go('2025-12-28')
+        self.assertGreater(main.activities(self.user)['trivia'], 0)
+        main.quiz_start(main.QuizStart(venue='home'), self.user)
+        self.assertEqual(main.activities(self.user)['trivia'], 0)
+        self.go('2025-12-29')  # the next gameday offers its own round again
+        self.assertGreater(main.activities(self.user)['trivia'], 0)
+
     def test_reset_goes_back_before_the_tournament(self):
         self.go(FIRST_DAY)
         self.predict(FRI_SPA, 'winner', 'home')
@@ -133,6 +141,55 @@ class TournamentTests(unittest.TestCase):
         self.assertEqual(db.user_for_token(db.create_session(self.user['id']))['stage'], 'pre')
         self.assertEqual(db.predictions(self.user['id']), {})
         self.assertEqual(db.game_packs(self.user['id']), {})
+
+    def test_goal_and_kpi_questions_vary_between_games(self):
+        prompts = lambda i: {self.t.questions[g['id']][i]['prompt'] for g in self.t.games}
+        self.assertGreaterEqual(len(prompts(1)), 6)
+        self.assertGreaterEqual(len(prompts(2)), 5)
+
+    def test_stage_change_reports_the_games_it_played(self):
+        self.go(FIRST_DAY)
+        self.predict(FRI_SPA, 'winner', 'home')
+        result = main.set_stage(main.StageRequest(stage='2025-12-27'), self.user)
+        self.user = {**self.user, 'stage': '2025-12-27'}
+        played = {g['id']: g for g in result['just_played']}
+        self.assertEqual(set(played), {g['id'] for g in self.t.today(FIRST_DAY)})
+        self.assertEqual(played[FRI_SPA]['correct'], 1)
+        self.go(FIRST_DAY)
+        again = main.set_stage(main.StageRequest(stage='2025-12-27'), self.user)
+        self.assertEqual(again['just_played'], [])  # already resolved
+
+    def test_open_all_packs_opens_every_waiting_pack(self):
+        self.go(FIRST_DAY)
+        self.predict(FRI_SPA, 'winner', 'home')
+        self.predict(FRI_SPA, 'goal', 'HC Fribourg-Gottéron#17')
+        self.go('2025-12-27')
+        self.assertEqual(main.activities(self.user)['packs_waiting'], 2)
+        cards = [c for c in main.open_all_packs(self.user)['pack'] if c['type'] != 'legend']
+        self.assertEqual(len(cards), 6)
+        self.assertEqual(main.activities(self.user)['packs_waiting'], 0)
+        with self.assertRaises(main.HTTPException):
+            main.open_all_packs(self.user)
+
+    def test_activities_drop_out_once_done(self):
+        self.go(FIRST_DAY)
+        acts = main.activities(self.user)
+        self.assertTrue(acts['daily'])
+        self.assertEqual(acts['social']['id'], 'facebook')
+        self.assertEqual(acts['predictions'], {'games': 2, 'picks': 0, 'questions': 6})
+        main.daily_claim(self.user)
+        main.bonus_social(self.user)
+        for game in self.t.today(FIRST_DAY):
+            for q in self.t.questions[game['id']]:
+                self.predict(game['id'], q['id'], q['options'][0]['id'])
+        acts = main.activities(self.user)
+        self.assertEqual((acts['daily'], acts['social'], acts['predictions']), (False, None, None))
+        with self.assertRaises(main.HTTPException):
+            main.daily_claim(self.user)
+        self.go('2025-12-27')  # a new day: a new daily card and another channel
+        acts = main.activities(self.user)
+        self.assertTrue(acts['daily'])
+        self.assertEqual(acts['social']['id'], 'tiktok')
 
 
 if __name__ == '__main__':

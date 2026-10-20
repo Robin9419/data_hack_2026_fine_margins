@@ -1,12 +1,14 @@
 import { Link, Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './auth'
 import RewardBar from './components/RewardBar'
+import ResultsModal from './components/ResultsModal'
 import TimelineBar from './components/TimelineBar'
 import Admin from './pages/Admin'
 import CardDetail from './pages/CardDetail'
 import Gallery from './pages/Gallery'
 import Login from './pages/Login'
 import PackOpening from './pages/PackOpening'
+import Predictions from './pages/Predictions'
 import Quiz from './pages/Quiz'
 import Trade from './pages/Trade'
 
@@ -58,6 +60,14 @@ export default function App() {
             }
           />
           <Route
+            path="/predict"
+            element={
+              <RequireAuth>
+                <Predictions />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/quiz"
             element={
               <RequireAuth>
@@ -102,6 +112,7 @@ export default function App() {
       </main>
 
       {user && <TimelineBar />}
+      {user && <ResultsModal />}
     </div>
   )
 }

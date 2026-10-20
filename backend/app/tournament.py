@@ -1,8 +1,8 @@
 """The tournament timeline: the demo simulates the 2025 Spengler Cup day by day.
 
 A user is always at one stage: before the tournament, on one of the gamedays (26 to 31 December) or after it. On a
-gameday that day's games are still to be played: the user predicts three things per game (winner, first goal and a
-KPI question). Moving on in the timeline plays the games: the predictions are resolved and every correct one earns a
+gameday that day's games are still to be played: the user predicts three things per game (the winner, a goal question
+and a KPI question; the last two rotate from game to game). Moving on in the timeline plays the games: the predictions are resolved and every correct one earns a
 pack. Cards that come from a game (its specials, and for the final the Wisehockey cards) only exist once the game is
 played, and the post-game trivia asks about them. The results come from testdata.json (official game pages)."""
 
@@ -114,6 +114,124 @@ KPI_QUESTIONS = [_kpi_top_shot, _kpi_busy_period, _kpi_penalty_minutes, _kpi_pow
                  _kpi_more_shots]
 
 
+# One goal question per game, in turn like the KPI questions (with a different cycle length, so the pairs vary too).
+# The first-scorer question needs the named candidates (see Tournament._first_goal_candidates).
+
+FIRST_GOAL_BUCKETS = [("early", "In the first 5 minutes", 299), ("p1a", "Minute 5 to 10", 599),
+                      ("p1b", "Minute 10 to 20", 1199), ("later", "After the 1st period", float("inf"))]
+TOTAL_GOAL_BUCKETS = [("low", "4 or fewer", 4), ("mid", "5 or 6", 6), ("high", "7 or 8", 8), ("lots", "9 or more", float("inf"))]
+MARGIN_BUCKETS = [("one", "1 goal", 1), ("two", "2 goals", 2), ("more", "3 or more", float("inf"))]
+YES_NO = [{"id": "yes", "label": "Yes"}, {"id": "no", "label": "No"}]
+
+
+def _seconds(clock: str) -> int:
+    minutes, seconds = clock.split(":")
+    return int(minutes) * 60 + int(seconds)
+
+
+def _goal_first_scorer(game: dict, candidates: dict[str, list[dict]]):
+    home, away = game["home_team"], game["away_team"]
+    first = game["goals"][0]
+    named = [p for team in (home, away) for p in candidates.get(team, [])]
+    scorer = first["scorer"] and (first["team"], first["scorer"]["jersey"])
+    return {
+        "prompt": "Who will score the first goal?",
+        "hint": "The two top scorers of each team at this Spengler Cup, or anyone else.",
+        "options": [{"id": f'{p["team"]}#{p["jersey"]}', "label": _name(p), "team": p["team"]} for p in named]
+                   + [{"id": OTHER, "label": "Someone else"}],
+        "answer": next((f"{k[0]}#{k[1]}" for k in map(_key, named) if k == scorer), OTHER),
+        "explanation": f'{_name(first["scorer"]) if first["scorer"] else "Unknown"} ({first["team"]}) at {first["clock"]}.',
+    }
+
+
+def _goal_first_team(game: dict, _):
+    home, away = game["home_team"], game["away_team"]
+    first = game["goals"][0]
+    return {
+        "prompt": "Which team will score first?",
+        "hint": "The team that scores first wins most hockey games, but not all of them.",
+        "options": [{"id": "home", "label": home, "team": home}, {"id": "away", "label": away, "team": away}],
+        "answer": "home" if first["team"] == home else "away",
+        "explanation": f'{first["team"]} opened the scoring at {first["clock"]}.',
+    }
+
+
+def _goal_first_time(game: dict, _):
+    first = game["goals"][0]
+    return {
+        "prompt": "When will the first goal be scored?",
+        "hint": "A period lasts 20 minutes. Some games open fast, others stay goalless for a long time.",
+        "options": [{"id": b, "label": label} for b, label, _ in FIRST_GOAL_BUCKETS],
+        "answer": _bucket(_seconds(first["clock"]), FIRST_GOAL_BUCKETS),
+        "explanation": f'First goal at {first["clock"]} by {first["team"]}.',
+    }
+
+
+def _goal_total(game: dict, _):
+    total = game["home_score"] + game["away_score"]
+    return {
+        "prompt": "How many goals will be scored in total?",
+        "hint": "Both teams together. Spengler Cup games often see 5 to 7 goals.",
+        "options": [{"id": b, "label": label} for b, label, _ in TOTAL_GOAL_BUCKETS],
+        "answer": _bucket(total, TOTAL_GOAL_BUCKETS),
+        "explanation": f'{total} goals: {game["home_score"]}–{game["away_score"]}.',
+    }
+
+
+def _goal_margin(game: dict, _):
+    margin = abs(game["home_score"] - game["away_score"])
+    return {
+        "prompt": "By how many goals will the winner win?",
+        "hint": "Many games are decided by one goal, often with an empty net at the end.",
+        "options": [{"id": b, "label": label} for b, label, _ in MARGIN_BUCKETS],
+        "answer": _bucket(margin, MARGIN_BUCKETS),
+        "explanation": f'{game["home_score"]}–{game["away_score"]}, a margin of {margin}.',
+    }
+
+
+def _goal_both_score(game: dict, _):
+    both = game["home_score"] > 0 and game["away_score"] > 0
+    return {
+        "prompt": "Will both teams score?",
+        "hint": "A shutout means a goalkeeper kept a clean sheet for the whole game.",
+        "options": YES_NO,
+        "answer": "yes" if both else "no",
+        "explanation": f'{game["home_score"]}–{game["away_score"]}.' + ("" if both else " A shutout."),
+    }
+
+
+def _goal_hat_trick(game: dict, _):
+    counts: dict[tuple[str, int], list] = {}
+    for g in game["goals"]:
+        if g["scorer"]:
+            counts.setdefault((g["team"], g["scorer"]["jersey"]), [0, g["scorer"], g["team"]])[0] += 1
+    hat = [(p, team) for n, p, team in counts.values() if n >= 3]
+    return {
+        "prompt": "Will anyone score a hat trick?",
+        "hint": "A hat trick is three goals by the same player in one game. Fans throw their hats on the ice.",
+        "options": YES_NO,
+        "answer": "yes" if hat else "no",
+        "explanation": (", ".join(f"{_name(p)} ({team})" for p, team in hat) + " scored three.") if hat
+                       else "Nobody scored three goals.",
+    }
+
+
+def _goal_late(game: dict, _):
+    late = [g for g in game["goals"] if 55 * 60 <= _seconds(g["clock"]) < 60 * 60]
+    return {
+        "prompt": "Will there be a goal in the last 5 minutes of regulation time?",
+        "hint": "Late goals are common: the trailing team pulls its goalkeeper for an extra skater.",
+        "options": YES_NO,
+        "answer": "yes" if late else "no",
+        "explanation": ("Late goals at " + ", ".join(g["clock"] for g in late) + ".") if late
+                       else "No goal after 55:00.",
+    }
+
+
+GOAL_QUESTIONS = [_goal_first_scorer, _goal_total, _goal_first_time, _goal_first_team, _goal_margin, _goal_late,
+                  _goal_both_score, _goal_hat_trick]
+
+
 class Tournament:
     def __init__(self, testdata: TestData):
         self.games = testdata.games
@@ -174,24 +292,12 @@ class Tournament:
             "answer": "home" if home_wins else "away", "explanation": f"{result}.",
         }
 
-        first = game["goals"][0]
-        named = [p for team in (home, away) for p in self._candidates.get(team, [])]
-        scorer = first["scorer"] and (first["team"], first["scorer"]["jersey"])
-        first_goal = {
-            "id": "first_goal", "prompt": "Who will score the first goal?",
-            "hint": "The two top scorers of each team at this Spengler Cup, or anyone else.",
-            "options": [{"id": f'{p["team"]}#{p["jersey"]}', "label": _name(p), "team": p["team"]} for p in named]
-                       + [{"id": OTHER, "label": "Someone else"}],
-            "answer": next((f"{k[0]}#{k[1]}" for k in map(_key, named) if k == scorer), OTHER),
-            "explanation": (f'{_name(first["scorer"]) if first["scorer"] else "Unknown"} ({first["team"]}) '
-                            f'at {first["clock"]}.'),
-        }
-
+        goal = GOAL_QUESTIONS[index % len(GOAL_QUESTIONS)](game, self._candidates)
         for offset in range(len(KPI_QUESTIONS)):
             kpi = KPI_QUESTIONS[(index + offset) % len(KPI_QUESTIONS)](game)
             if kpi:
                 break
-        return [winner, first_goal, {"id": "kpi", **kpi}]
+        return [winner, {"id": "goal", **goal}, {"id": "kpi", **kpi}]
 
     def answer_of(self, game_id: str, question_id: str) -> str | None:
         return next((q["answer"] for q in self.questions[game_id] if q["id"] == question_id), None)

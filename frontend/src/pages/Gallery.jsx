@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
+import Activities from '../components/Activities'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
-import FreeCards from '../components/FreeCards'
-import GamedayPanel from '../components/GamedayPanel'
 import { TEAMS } from '../teams'
 import { useTournament } from '../tournament'
 
@@ -56,7 +55,6 @@ export default function Gallery() {
   const [team, setTeam] = useState('all')
   const [type, setType] = useState('all')
   const [page, setPage] = useState(0)
-  const [dailyAvailable, setDailyAvailable] = useState(false)
   const [spotlight, setSpotlight] = useState(null) // special card popped out of the grid
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
   const touchStartX = useRef(null)
@@ -77,10 +75,6 @@ export default function Gallery() {
     setPage(0)
   }, [stage])
 
-  useEffect(() => {
-    api.dailyStatus().then((d) => setDailyAvailable(d.available)).catch(() => {})
-  }, [])
-
   const onReset = async () => {
     const data = await api.reset()
     setProgress(data.progress)
@@ -88,25 +82,12 @@ export default function Gallery() {
     navigate('/pack', { state: { pack: data.pack } })
   }
 
-  const onClaimDaily = async () => {
-    try {
-      const data = await api.dailyClaim()
-      setProgress(data.progress)
-      navigate('/pack', { state: { pack: data.pack, title: 'Your daily card' } })
-    } catch (err) {
-      setDailyAvailable(false)
-      setError(err.status === 409 ? null : err.message)
-    }
-  }
-
   if (error) return <p className="error">{error}</p>
   if (!cards) return <p className="muted">Loading cards…</p>
 
   // Road to Final cards change with every game and are not collected, so they don't count.
   const realCards = cards.filter((c) => c.kind !== 'road')
-  const gamesPlayed = tournament?.results.length ?? 0
   const ownedCount = realCards.filter((c) => c.owned).length
-  const spareCount = realCards.reduce((n, c) => n + (c.type === 'base' && c.copies > 1 ? c.copies - 1 : 0), 0)
   const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
   // Owned cards first, then locked; within each, by TYPE_ORDER (otherwise API order).
   const shown = cards
@@ -143,50 +124,14 @@ export default function Gallery() {
         </div>
       )}
 
-      <GamedayPanel />
+      <Activities />
 
-      <div className="gallery-header">
+      <div className="section-header collection-header">
         <h1>Your collection</h1>
         <span className="progress">
           {ownedCount} / {realCards.length} collected
         </span>
       </div>
-
-      {dailyAvailable && (
-        <button type="button" className="quiz-cta" onClick={onClaimDaily}>
-          <span>
-            <strong>Your daily card is ready</strong>
-            <small>Claim one free base card. A new one is available every day, duplicates included.</small>
-          </span>
-          <span aria-hidden="true">→</span>
-        </button>
-      )}
-
-      <Link to="/trade" className="quiz-cta trade-cta">
-        <span>
-          <strong>Trade in 3 base cards</strong>
-          <small>
-            {spareCount > 0
-              ? `You have ${spareCount} spare ${spareCount === 1 ? 'duplicate' : 'duplicates'}. Swap three for a new card, maybe a special one.`
-              : 'Swap any three base cards for a random new card, maybe a special one.'}
-          </small>
-        </span>
-        <span aria-hidden="true">⇄</span>
-      </Link>
-
-      <FreeCards />
-
-      {gamesPlayed > 0 && (
-        <Link to="/quiz" className="quiz-cta">
-          <span>
-            <strong>Play trivia about the games, win their special cards</strong>
-            <small>
-              Three questions, starting with the latest games. Answer at the stadium for the exclusive Stadium edition.
-            </small>
-          </span>
-          <span aria-hidden="true">→</span>
-        </Link>
-      )}
 
       <div className="gallery-filters">
         <FilterSelect label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />

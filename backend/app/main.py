@@ -3,9 +3,7 @@
 Run from the backend folder:  uvicorn app.main:app --reload
 """
 
-import os
 import random
-from datetime import datetime, timezone
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -77,15 +75,6 @@ def open_pack(user_id: int, favorite_team: str | None = None) -> list[dict]:
     return [{**content.cards[cid], "owned": True, "is_new": cid in new_ids} for cid in drawn]
 
 
-# The product rule is one daily card per day. It is off by default so the demo can claim as often as it likes;
-# start the server with ENFORCE_DAILY_LIMIT=1 to turn the rule on.
-ENFORCE_DAILY_LIMIT = os.environ.get("ENFORCE_DAILY_LIMIT") == "1"
-
-
-def _today() -> str:
-    return datetime.now(timezone.utc).date().isoformat()
-
-
 def open_daily_card(user_id: int) -> list[dict]:
     """One random base card. It can be a duplicate: a second copy is kept and can be traded in."""
     content = get_content()
@@ -109,9 +98,12 @@ def open_random_base_cards(user_id: int, count: int) -> list[dict]:
     return pack
 
 
-# Welcome bonuses: following Spengler Cup on Instagram (once) and buying match tickets (per ticket). Neither is
-# verified against Instagram or a ticket shop yet, so for the demo the claim is taken on trust.
-INSTAGRAM_CARDS = 3
+# Free cards: following a Spengler Cup social channel and buying match tickets (per ticket). Every stage of the
+# timeline promotes another channel, and each one pays out once. Neither is verified against the platform or a ticket
+# shop yet, so for the demo the claim is taken on trust.
+SOCIALS = [("instagram", "Instagram"), ("facebook", "Facebook"), ("tiktok", "TikTok"), ("youtube", "YouTube"),
+           ("x", "X"), ("threads", "Threads"), ("whatsapp", "WhatsApp"), ("linkedin", "LinkedIn")]
+SOCIAL_CARDS = 3
 CARDS_PER_TICKET = 5
 MAX_TICKETS = 4
 
@@ -120,20 +112,18 @@ class TicketBonusRequest(BaseModel):
     tickets: int = Field(ge=1, le=MAX_TICKETS)
 
 
-@app.get("/api/bonus")
-def bonus_info(user: dict = Depends(current_user)):
-    return {
-        "instagram": {"cards": INSTAGRAM_CARDS, "claimed": db.instagram_claimed(user["id"])},
-        "tickets": {"cards_per_ticket": CARDS_PER_TICKET, "max": MAX_TICKETS},
-    }
+def social_for(stage: str) -> tuple[str, str]:
+    """(id, name) of the channel the stage promotes."""
+    return SOCIALS[get_content().tournament.stages.index(stage) % len(SOCIALS)]
 
 
-@app.post("/api/bonus/instagram")
-def bonus_instagram(user: dict = Depends(current_user)):
-    if not db.claim_instagram(user["id"]):
-        raise HTTPException(409, "You already claimed the Instagram bonus")
-    pack = open_random_base_cards(user["id"], INSTAGRAM_CARDS)
-    return {"pack": pack + award_legends(user), "progress": progress_for(user), "title": "Welcome to Instagram!"}
+@app.post("/api/bonus/social")
+def bonus_social(user: dict = Depends(current_user)):
+    platform, name = social_for(user["stage"])
+    if not db.follow_social(user["id"], platform):
+        raise HTTPException(409, f"You already follow Spengler Cup on {name}")
+    pack = open_random_base_cards(user["id"], SOCIAL_CARDS)
+    return {"pack": pack + award_legends(user), "progress": progress_for(user), "title": f"Thanks for following on {name}!"}
 
 
 @app.post("/api/bonus/tickets")
@@ -252,17 +242,13 @@ def login(body: LoginRequest):
     return {"token": token, "user": user, "new_user": created, "pack": pack}
 
 
-@app.get("/api/daily")
-def daily_status(user: dict = Depends(current_user)):
-    return {"available": not ENFORCE_DAILY_LIMIT or db.last_daily_claim(user["id"]) != _today()}
-
-
 @app.post("/api/daily/claim")
 def daily_claim(user: dict = Depends(current_user)):
-    """One free base card per (UTC) day, unless the limit is switched off for the demo."""
-    if ENFORCE_DAILY_LIMIT and not db.claim_daily(user["id"], _today()):
+    """One free base card per day, where a day is a stage of the simulated tournament timeline."""
+    if not db.claim_daily(user["id"], user["stage"]):
         raise HTTPException(409, "You already claimed today's card. Come back tomorrow!")
-    return {"pack": open_daily_card(user["id"]) + award_legends(user), "progress": progress_for(user)}
+    return {"pack": open_daily_card(user["id"]) + award_legends(user), "progress": progress_for(user),
+            "title": "Your daily card"}
 
 
 class TradeRequest(BaseModel):
@@ -386,6 +372,16 @@ def _edition(venue: str) -> str:
     return "stadium" if venue == "stadium" else "standard"
 
 
+def trivia_cards(user: dict, venue: str) -> list[str]:
+    """The special cards the trivia can still give: of games already played and not owned yet (at the stadium, also
+    the ones owned only as the home edition)."""
+    owned = db.owned_cards(user["id"])
+    available = available_for(user)
+    return [cid for cid, card in get_content().cards.items()
+            if card["type"] == "special" and cid in available
+            and (cid not in owned or (venue == "stadium" and owned[cid] != "stadium"))]
+
+
 @app.post("/api/quiz/start")
 def quiz_start(body: QuizStart, user: dict = Depends(current_user)):
     """Three questions (three options each), each about one special card of a game already played that the user can
@@ -393,19 +389,15 @@ def quiz_start(body: QuizStart, user: dict = Depends(current_user)):
     edition. The questions start with the most recent games. Base cards are not won through trivia."""
     content = get_content()
     owned = db.owned_cards(user["id"])
-    available = available_for(user)
-    stadium = body.venue == "stadium"
-    eligible = [
-        cid
-        for cid, card in content.cards.items()
-        if card["type"] == "special" and cid in available and (cid not in owned or (stadium and owned[cid] != "stadium"))
-    ]
+    eligible = trivia_cards(user, body.venue)
     random.shuffle(eligible)
     games = content.tournament.by_id
     eligible.sort(key=lambda cid: games[content.card_game[cid]]["date"], reverse=True)
     picks = eligible[:QUESTIONS_PER_ROUND]
     built = [(cid, content.build_question(cid, random)) for cid in picks]
     ids = db.create_quiz(user["id"], body.venue, [(cid, q["option_ids"]) for cid, q in built])
+    if built:
+        db.mark_trivia_played(user["id"], user["stage"])  # the gameday's round is used up, see activities
 
     def option(card_id: str) -> dict:
         player = content.cards[card_id]["player"]
@@ -490,16 +482,20 @@ def tournament(user: dict = Depends(current_user)):
 @app.post("/api/tournament/stage")
 def set_stage(body: StageRequest, user: dict = Depends(current_user)):
     """Moves the user to a stage of the timeline. The games played by then are resolved: their predictions lock and
-    each correct one earns a pack. Going back is allowed; games already resolved stay resolved."""
+    each correct one earns a pack. Going back is allowed; games already resolved stay resolved. just_played lists the
+    games this move resolved, in order of play, for the results pop-up."""
     t = get_content().tournament
     if body.stage not in t.stages:
         raise HTTPException(400, "Unknown stage")
     db.set_stage(user["id"], body.stage)
     user = {**user, "stage": body.stage}
     predictions = db.predictions(user["id"])
-    for game_id in t.played(body.stage):
-        db.resolve_game(user["id"], game_id, t.correct_count(game_id, predictions.get(game_id, {})))
-    return {"tournament": tournament_view(user), "progress": progress_for(user)}
+    resolved = {game_id for game_id in t.played(body.stage)
+                if db.resolve_game(user["id"], game_id, t.correct_count(game_id, predictions.get(game_id, {})))}
+    packs = db.game_packs(user["id"])
+    just_played = [t.game_view(g, True, predictions.get(g["id"], {}), packs.get(g["id"]))
+                   for g in t.games if g["id"] in resolved]
+    return {"tournament": tournament_view(user), "progress": progress_for(user), "just_played": just_played}
 
 
 @app.post("/api/tournament/predict")
@@ -517,31 +513,83 @@ def predict(body: PredictionRequest, user: dict = Depends(current_user)):
     return tournament_view(user)
 
 
-@app.post("/api/tournament/packs/{game_id}")
-def open_game_packs(game_id: str, user: dict = Depends(current_user)):
-    """Opens the packs a played game earned (one per correct prediction, see Tournament.pack_cards)."""
+def open_packs_of(user: dict, game_id: str, packs: int) -> list[dict]:
+    """Draws and grants the packs a game earned (one per correct prediction, see Tournament.pack_cards)."""
     content = get_content()
-    t = content.tournament
-    if game_id not in played_for(user):
-        raise HTTPException(409, "This game has not been played yet")
-    packs = db.claim_game_packs(user["id"], game_id)
-    if not packs:
-        raise HTTPException(409, "No packs to open for this game")
-    game = t.by_id[game_id]
+    game = content.tournament.by_id[game_id]
     teams = (game["home_team"], game["away_team"])
     base_ids = [cid for cid, c in content.cards.items() if c["type"] == "base" and c["player"]["team"] in teams]
     owned = db.owned_cards(user["id"])
     game_ids = [cid for cid in content.game_cards(game_id) if cid not in owned]
     pack = []
-    for cid in t.pack_cards(packs, base_ids, game_ids, random):
+    for cid in content.tournament.pack_cards(packs, base_ids, game_ids, random):
         card = content.cards[cid]
         if card["type"] == "special":
             db.grant_card(user["id"], cid, "standard")
             pack.append({**card, "owned": True, "edition": "standard", "is_new": True})
         else:
             pack.append({**card, "owned": True, "is_new": bool(db.grant_cards(user["id"], [cid]))})
-    return {"pack": pack + award_legends(user), "progress": progress_for(user),
+    return pack
+
+
+@app.post("/api/tournament/packs/{game_id}")
+def open_game_packs(game_id: str, user: dict = Depends(current_user)):
+    """Opens the packs a played game earned."""
+    if game_id not in played_for(user):
+        raise HTTPException(409, "This game has not been played yet")
+    packs = db.claim_game_packs(user["id"], game_id)
+    if not packs:
+        raise HTTPException(409, "No packs to open for this game")
+    game = get_content().tournament.by_id[game_id]
+    return {"pack": open_packs_of(user, game_id, packs) + award_legends(user), "progress": progress_for(user),
             "title": f'{packs} {"pack" if packs == 1 else "packs"} from {game["home_team"]} – {game["away_team"]}'}
+
+
+@app.post("/api/tournament/packs")
+def open_all_packs(user: dict = Depends(current_user)):
+    """Opens, in one go, every pack the played games earned that the user has not opened yet."""
+    played = played_for(user)
+    pack, total = [], 0
+    for game_id, info in db.game_packs(user["id"]).items():
+        if game_id in played and info["correct"] and not info["claimed"]:
+            packs = db.claim_game_packs(user["id"], game_id)
+            if packs:
+                pack += open_packs_of(user, game_id, packs)
+                total += packs
+    if not total:
+        raise HTTPException(409, "No packs to open")
+    return {"pack": pack + award_legends(user), "progress": progress_for(user),
+            "title": f'Your {total} prediction {"pack" if total == 1 else "packs"}'}
+
+
+@app.get("/api/activities")
+def activities(user: dict = Depends(current_user)):
+    """What the user can do right now at their stage of the timeline. Done activities drop out (null or 0): the
+    stage's daily card once claimed, its social channel once followed, the predictions once every question of today's
+    games has a pick, the packs once opened and the trivia once played on this gameday. Trade and tickets stay."""
+    content = get_content()
+    t = content.tournament
+    stage = user["stage"]
+    predictions = db.predictions(user["id"])
+    packs = db.game_packs(user["id"])
+    played = t.played(stage)
+    open_games = [g for g in t.today(stage) if g["id"] not in packs]
+    picks = sum(len(predictions.get(g["id"], {})) for g in open_games)
+    questions = sum(len(t.questions[g["id"]]) for g in open_games)
+    platform, name = social_for(stage)
+    available = available_for(user)
+    base_copies = sum(n for cid, n in db.card_copies(user["id"]).items()
+                      if cid in available and content.cards.get(cid, {}).get("type") == "base")
+    return {
+        "daily": db.last_daily_claim(user["id"]) != stage,
+        "social": None if platform in db.followed_socials(user["id"])
+                  else {"id": platform, "name": name, "cards": SOCIAL_CARDS},
+        "predictions": {"games": len(open_games), "picks": picks, "questions": questions} if picks < questions else None,
+        "packs_waiting": sum(p["correct"] for gid, p in packs.items() if gid in played and not p["claimed"]),
+        "trivia": 0 if db.trivia_played(user["id"], stage) else len(trivia_cards(user, "home")),
+        "trade": {"cost": TRADE_COST, "base_copies": base_copies},
+        "tickets": {"cards_per_ticket": CARDS_PER_TICKET, "max": MAX_TICKETS},
+    }
 
 
 @app.get('/api/analysis/pass-body-pressure')

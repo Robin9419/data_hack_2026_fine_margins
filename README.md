@@ -70,7 +70,8 @@ Open http://localhost:5173. Vite forwards `/api` to the backend on port 8000. AP
 | Which events sit behind each KPI (`events`) | `backend/content/metrics.json` |
 | CSV loading, value formatting, match rank | `backend/app/content.py` |
 | API routes | `backend/app/main.py` |
-| Tournament timeline (stages, prediction questions, pack contents) | `backend/app/tournament.py`; bar `frontend/src/components/TimelineBar.jsx`, gameday panel `frontend/src/components/GamedayPanel.jsx` |
+| Tournament timeline (stages, rotating goal and KPI prediction questions, pack contents) | `backend/app/tournament.py`; bar `frontend/src/components/TimelineBar.jsx`, predictions page `frontend/src/pages/Predictions.jsx`, results pop-up `frontend/src/components/ResultsModal.jsx` |
+| Activities in the gallery (daily card per gameday, social channel of the day, predictions, packs, trivia, trade, tickets) | `frontend/src/components/Activities.jsx`; `/api/activities` and `SOCIALS` in `backend/app/main.py` |
 | Users / sessions / owned cards (SQLite) | `backend/app/db.py` → `backend/hockey_cards.sqlite3` |
 | Styles (deliberately plain, ready for design) | `frontend/src/index.css` |
 

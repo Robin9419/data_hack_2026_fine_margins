@@ -49,6 +49,19 @@ CREATE TABLE IF NOT EXISTS game_packs (
     claimed INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (user_id, game_id)
 );
+-- The trivia rounds the user played, one per gameday: they watched those games live or in the stadium, so the round is
+-- offered once per stage of the timeline.
+CREATE TABLE IF NOT EXISTS trivia_rounds (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    stage TEXT NOT NULL,
+    PRIMARY KEY (user_id, stage)
+);
+-- The social channels the user followed for free cards (one channel per stage of the timeline, see main.SOCIALS).
+CREATE TABLE IF NOT EXISTS social_follows (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    platform TEXT NOT NULL,
+    PRIMARY KEY (user_id, platform)
+);
 """
 
 
@@ -72,8 +85,6 @@ def init_db():
             conn.execute("ALTER TABLE users ADD COLUMN favorite_team TEXT")
         if "last_daily_claim" not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN last_daily_claim TEXT")
-        if "instagram_claimed" not in columns:
-            conn.execute("ALTER TABLE users ADD COLUMN instagram_claimed INTEGER NOT NULL DEFAULT 0")
         if "stage" not in columns:
             conn.execute("ALTER TABLE users ADD COLUMN stage TEXT NOT NULL DEFAULT 'pre'")
         card_columns = [r["name"] for r in conn.execute("PRAGMA table_info(owned_cards)")]
@@ -82,31 +93,43 @@ def init_db():
 
 
 def last_daily_claim(user_id: int) -> str | None:
+    """The timeline stage of the last daily card claimed."""
     with connect() as conn:
         row = conn.execute("SELECT last_daily_claim FROM users WHERE id = ?", (user_id,)).fetchone()
         return row["last_daily_claim"] if row else None
 
 
-def claim_daily(user_id: int, today: str) -> bool:
-    """Marks today's daily card as claimed. False if it already was (atomic, so double clicks can't claim twice)."""
+def claim_daily(user_id: int, stage: str) -> bool:
+    """Marks the daily card of this stage as claimed. False if it already was (atomic, so double clicks can't claim
+    twice)."""
     with connect() as conn:
         cur = conn.execute(
             "UPDATE users SET last_daily_claim = ? WHERE id = ? AND (last_daily_claim IS NULL OR last_daily_claim <> ?)",
-            (today, user_id, today),
+            (stage, user_id, stage),
         )
         return cur.rowcount > 0
 
 
-def instagram_claimed(user_id: int) -> bool:
+def trivia_played(user_id: int, stage: str) -> bool:
     with connect() as conn:
-        row = conn.execute("SELECT instagram_claimed FROM users WHERE id = ?", (user_id,)).fetchone()
-        return bool(row and row["instagram_claimed"])
+        return conn.execute("SELECT 1 FROM trivia_rounds WHERE user_id = ? AND stage = ?", (user_id, stage)).fetchone() is not None
 
 
-def claim_instagram(user_id: int) -> bool:
-    """Marks the Instagram bonus as claimed. False if it already was (atomic, so it can only be claimed once)."""
+def mark_trivia_played(user_id: int, stage: str):
     with connect() as conn:
-        cur = conn.execute("UPDATE users SET instagram_claimed = 1 WHERE id = ? AND instagram_claimed = 0", (user_id,))
+        conn.execute("INSERT OR IGNORE INTO trivia_rounds (user_id, stage) VALUES (?, ?)", (user_id, stage))
+
+
+def followed_socials(user_id: int) -> set[str]:
+    with connect() as conn:
+        rows = conn.execute("SELECT platform FROM social_follows WHERE user_id = ?", (user_id,)).fetchall()
+        return {r["platform"] for r in rows}
+
+
+def follow_social(user_id: int, platform: str) -> bool:
+    """Records the follow. False if the user already follows this channel (atomic, so it pays out once)."""
+    with connect() as conn:
+        cur = conn.execute("INSERT OR IGNORE INTO social_follows (user_id, platform) VALUES (?, ?)", (user_id, platform))
         return cur.rowcount > 0
 
 
@@ -219,7 +242,9 @@ def clear_cards(user_id: int):
         conn.execute("DELETE FROM quiz_questions WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM predictions WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM game_packs WHERE user_id = ?", (user_id,))
-        conn.execute("UPDATE users SET stage = 'pre' WHERE id = ?", (user_id,))
+        conn.execute("DELETE FROM social_follows WHERE user_id = ?", (user_id,))
+        conn.execute("DELETE FROM trivia_rounds WHERE user_id = ?", (user_id,))
+        conn.execute("UPDATE users SET stage = 'pre', last_daily_claim = NULL WHERE id = ?", (user_id,))
 
 
 def create_quiz(user_id: int, venue: str, questions: list[tuple[str, list[str]]]) -> list[int]:
@@ -284,11 +309,12 @@ def game_packs(user_id: int) -> dict[str, dict]:
         return {r["game_id"]: {"correct": r["correct"], "claimed": bool(r["claimed"])} for r in rows}
 
 
-def resolve_game(user_id: int, game_id: str, correct: int):
-    """Locks the game's predictions and records the packs they earned. Only the first time the game is played."""
+def resolve_game(user_id: int, game_id: str, correct: int) -> bool:
+    """Locks the game's predictions and records the packs they earned. Only the first time the game is played: True
+    then, False if it already was."""
     with connect() as conn:
-        conn.execute("INSERT OR IGNORE INTO game_packs (user_id, game_id, correct) VALUES (?, ?, ?)",
-                     (user_id, game_id, correct))
+        return conn.execute("INSERT OR IGNORE INTO game_packs (user_id, game_id, correct) VALUES (?, ?, ?)",
+                            (user_id, game_id, correct)).rowcount > 0
 
 
 def claim_game_packs(user_id: int, game_id: str) -> int | None:

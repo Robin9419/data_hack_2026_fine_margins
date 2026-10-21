@@ -105,11 +105,10 @@ SOCIALS = [("instagram", "Instagram"), ("facebook", "Facebook"), ("tiktok", "Tik
            ("x", "X"), ("threads", "Threads"), ("whatsapp", "WhatsApp"), ("linkedin", "LinkedIn")]
 SOCIAL_CARDS = 3
 CARDS_PER_TICKET = 5
-MAX_TICKETS = 4
 
 
 class TicketBonusRequest(BaseModel):
-    tickets: int = Field(ge=1, le=MAX_TICKETS)
+    tickets: int = Field(ge=1)
 
 
 def social_for(stage: str) -> tuple[str, str]:
@@ -588,7 +587,7 @@ def activities(user: dict = Depends(current_user)):
         "packs_waiting": sum(p["correct"] for gid, p in packs.items() if gid in played and not p["claimed"]),
         "trivia": 0 if db.trivia_played(user["id"], stage) else len(trivia_cards(user, "home")),
         "trade": {"cost": TRADE_COST, "base_copies": base_copies},
-        "tickets": {"cards_per_ticket": CARDS_PER_TICKET, "max": MAX_TICKETS},
+        "tickets": {"cards_per_ticket": CARDS_PER_TICKET},
     }
 
 

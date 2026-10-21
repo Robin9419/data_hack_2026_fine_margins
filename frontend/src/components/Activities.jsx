@@ -139,7 +139,6 @@ export default function Activities() {
           <button
             type="button"
             aria-label="More tickets"
-            disabled={tickets >= ticketInfo.max}
             onClick={() => setTickets(tickets + 1)}
           >
             +

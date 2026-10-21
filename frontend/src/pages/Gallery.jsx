@@ -153,7 +153,7 @@ export default function Gallery() {
             <CardTile
               key={card.id}
               card={card}
-              club={clubs[card.player.team]}
+              club={clubs[card.player?.team]}
               isNew={newCardIds.includes(card.id)}
               onOpen={setSpotlight}
             />

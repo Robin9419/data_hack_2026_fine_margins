@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
-// Player portrait. Falls back to the jersey number (a star for a legend without one) if there is no image or it fails
-// to load.
+// Player portrait, framed by image_position (CSS object-position) when the card sets one. Falls back to the jersey
+// number (a star for a legend without one) if there is no image or it fails to load.
 export default function PlayerPhoto({ player, className = 'card-art' }) {
   const [failed, setFailed] = useState(false)
   const [square, setSquare] = useState(false)
@@ -13,6 +13,7 @@ export default function PlayerPhoto({ player, className = 'card-art' }) {
         <img
           className={square ? 'square' : undefined}
           src={player.image_url}
+          style={player.image_position ? { objectPosition: player.image_position } : undefined}
           alt={`${player.first_name} ${player.last_name}`}
           referrerPolicy="no-referrer"
           loading="lazy"

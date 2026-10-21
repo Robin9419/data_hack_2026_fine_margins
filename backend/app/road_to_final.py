@@ -7,7 +7,7 @@ See docs/CARD_TYPES.md. The game ratings are the made-up test ratings of testdat
 import re
 
 from .ratings import tier_of
-from .testdata import SOURCE, TestData, _key, _skater_rating
+from .testdata import SOURCE, TestData, _key, _skater_rating, with_card_image
 
 STAGES = [
     {"n": 1, "name": "Debut", "when": "After the first game", "trigger": "The player plays his first tournament game.",
@@ -106,17 +106,18 @@ class RoadToFinal:
         info = STAGES[stage - 1]
         goals = sum(self._player[(g["id"], key)]["stats"].get("goals", 0) for g, _ in played)
         assists = sum(self._player[(g["id"], key)]["stats"].get("assists", 0) for g, _ in played)
+        card_id = f'test-road-{re.sub(r"[^a-z]+", "-", team.lower().replace("ö", "o")).strip("-")}-{key[1]}'
         return {
-            "id": f'test-road-{re.sub(r"[^a-z]+", "-", team.lower().replace("ö", "o")).strip("-")}-{key[1]}', "type": "special",
+            "id": card_id, "type": "special",
             "kind": "road", "special_type": None, "test": True, "test_game": None,
             "rating": {"mr": average, "tier": tier},
-            "player": {
+            "player": with_card_image({
                 "first_name": entry["first_name"], "last_name": entry["last_name"], "jersey": key[1], "team": team,
                 "position": self._positions.get(key, "Skater"),
                 "image_url": self._td._images.get(key) or entry["image_url"],
                 "nationality": self._td._nationalities.get(key),
                 **self._td.action_of(key),
-            },
+            }, self._td.card_images.get(card_id), full_art=True),
             "title": "Spengler Cup Champion" if stage == 4 else info["name"],
             "archetype": "An evolving card: it grows with every game of the tournament the player plays.",
             "archetype_kpis": None,

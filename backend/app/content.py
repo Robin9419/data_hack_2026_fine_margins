@@ -12,7 +12,7 @@ from .events import ORDINALS, PERIOD_SECONDS, MatchEvents, _clock
 from .event_kpis import EventAnalysis, pass_body_pressure, pass_packing, expected_assists
 from .ratings import HIGH_DANGER_XG, compute_ratings, goalie_stats
 from .road_to_final import RoadToFinal
-from .testdata import TestData
+from .testdata import TestData, with_card_image
 from .tournament import Tournament
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -110,7 +110,7 @@ class Content:
         positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"]
                      for c in self.cards.values() if c["player"]}
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
-                                 self.nationalities, self.action_media)
+                                 self.nationalities, self.action_media, self.card_images)
         self.road_to_final = RoadToFinal(self.testdata, positions)
         self.tournament = Tournament(self.testdata)
         # The game a card comes from (None: not tied to a game). Such a card only exists once its game is played on
@@ -509,7 +509,8 @@ class Content:
         positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"]
                      for c in self.cards.values() if c["player"]}
         row = self._find_row(team, jersey)
-        card["player"] = self._player({"team": team, "jersey": jersey, "position": positions.get((team, jersey), "Skater")}, row)
+        card["player"] = self._player({"id": card["id"], "team": team, "jersey": jersey,
+                                       "position": positions.get((team, jersey), "Skater")}, row)
         card["headline"] = f'{score["Home"]}–{score["Away"]}'
         assist_text = f" Assisted by {' and '.join(assists)}." if assists else " Unassisted."
         card["text"] = (
@@ -528,17 +529,17 @@ class Content:
                 "action_focus": media.get("focus")}
 
     def _player(self, cfg: dict, row: dict) -> dict:
-        return {
+        return with_card_image({
             "first_name": row["FirstName"],
             "last_name": row["LastName"],
             "jersey": cfg["jersey"],
             "team": cfg["team"],
             "position": cfg["position"],
-            "image_url": self.card_images.get(cfg.get("id")) or self.player_images.get((cfg["team"], cfg["jersey"])),
+            "image_url": self.player_images.get((cfg["team"], cfg["jersey"])),
             "nationality": self.nationalities.get((cfg["team"], cfg["jersey"])),
             "instagram": self.instagram.get((cfg["team"], cfg["jersey"])),
             **self._action_media(cfg["team"], cfg["jersey"]),
-        }
+        }, self.card_images.get(cfg.get("id")), full_art=cfg.get("kind") == "performance")
 
     def _match(self, team: str) -> dict:
         m = self.match
@@ -589,6 +590,7 @@ class Content:
                 "team": cfg["team"],
                 "position": cfg["position"],
                 "image_url": cfg.get("image_url"),
+                "image_position": cfg.get("image_position"),
                 "instagram": cfg.get("instagram"),
             },
             "title": "Legend",
@@ -720,6 +722,7 @@ class Content:
     def _photo_only(player: dict, hide_identity: bool = False) -> dict:
         return {
             "image_url": None if hide_identity else player.get("image_url"),
+            "image_position": None if hide_identity else player.get("image_position"),
             "jersey": None if hide_identity else player.get("jersey"),
             "team": player["team"],
             "first_name": "",

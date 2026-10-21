@@ -1,5 +1,5 @@
 {
-  "_comment": "Local card images (frontend/public/players), keyed by card id; they override the portrait from docs/player-images.json. Special cards get the flashier '-special' artwork; a player's base card keeps the standard portrait unless listed here. Players without a special card use the supplied artwork on the base card. Muldowney's special card is the generated 'pressure-reliever' card.",
+  "_comment": "Card images (under frontend/public), keyed by card id; they override the portrait from docs/player-images.json. A value is a URL or {image_url, position (CSS object-position for the tall card crop), credit, source}. Every special card has its own photo, never shared with another card or the player's base card (the '-special' artwork, and frontend/public/specials). On performance and road cards the image is also the full art action image. Muldowney's special card is the generated 'pressure-reliever' card. The photos are press, club and agency pictures for the internal demo only; rights are not established.",
   "gajan": "/players/gajan-special.jpg",
   "tambellini": "/players/tambellini-special.jpg",
   "fink": "/players/fink-special.jpg",
@@ -12,5 +12,269 @@
   "base-hcd-12": "/players/guebey.png",
   "base-hcd-6": "/players/dahlbeck.png",
   "base-hcd-47": "/players/komarov.png",
-  "base-hcd-44": "/players/stransky.png"
+  "base-hcd-44": "/players/stransky.png",
+  "test-road-team-canada-5": {
+    "image_url": "/action/hicketts-ca-5.jpg",
+    "position": "68% 50%",
+    "credit": "TheAHL (Scott Thomas), CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Stp_20170607_198-2_34814446090_o_(26713160638).jpg"
+  },
+  "test-gamewinner-2025-12-26_team-canada_us-collegiate-selects": {
+    "image_url": "/specials/test-gamewinner-2025-12-26_team-canada_us-collegiate-selects.jpg",
+    "position": "46% 30%",
+    "credit": "Manitoba Moose / True North Sports + Entertainment",
+    "source": "https://d1kq1f9a6xp251.cloudfront.net/manitobamoose/wp-content/uploads/2026/04/SHaw-InAntlers-desk.jpg"
+  },
+  "test-motm-2025-12-26_team-canada_us-collegiate-selects": {
+    "image_url": "/specials/test-motm-2025-12-26_team-canada_us-collegiate-selects.jpg",
+    "position": "57% 40%",
+    "credit": "Hockey Canada Images",
+    "source": "https://cdn.hockeycanada.ca/hockey-canada/MediaGroupings/4209/2025-spenlger-cup-can-uscs-07.jpg"
+  },
+  "test-road-team-canada-15": {
+    "image_url": "/specials/test-road-team-canada-15.jpg",
+    "position": "53% 40%",
+    "credit": "Hockey Canada Images",
+    "source": "https://cdn.hockeycanada.ca/hockey-canada/MediaGroupings/4215/2025-spenlger-cup-can-spa-02.jpg"
+  },
+  "test-wall-2025-12-27_ifk-helsinki_hc-sparta-praha": {
+    "image_url": "/specials/test-wall-2025-12-27_ifk-helsinki_hc-sparta-praha.jpg",
+    "position": "60% 40%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2026/01/20251219-HIFK-TPS-1142.jpg"
+  },
+  "test-wall-2025-12-29_hc-davos_ifk-helsinki": {
+    "image_url": "/specials/test-wall-2025-12-29_hc-davos_ifk-helsinki.jpg",
+    "position": "56% 45%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2026/04/2026-03-13-HIFK-Karpat-2697-e1775557749563.jpg"
+  },
+  "test-road-hifk-98": {
+    "image_url": "/specials/test-road-hifk-98.jpg",
+    "position": "45% 40%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2025/12/20251128-HIFK-TPS-0421.jpg"
+  },
+  "test-road-hifk-52": {
+    "image_url": "/specials/test-road-hifk-52.jpg",
+    "position": "25% 40%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2025/10/20250912-HIFK-KEspoo-1562.jpg"
+  },
+  "game-winner": {
+    "image_url": "/specials/game-winner.jpg",
+    "position": "71% 50%",
+    "credit": "SRF Sport (TV broadcast still)",
+    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/final-97-spengler-cup-junge-wilde-gezaehmt-hcd-mit-17-titeln-alleiniger-rekordsieger"
+  },
+  "test-gamewinner-2025-12-29_hc-davos_ifk-helsinki": {
+    "image_url": "/specials/test-gamewinner-2025-12-29_hc-davos_ifk-helsinki.jpg",
+    "position": "25% 40%",
+    "credit": "Keystone-SDA via HC Davos",
+    "source": "https://www.hcd.ch/de/news/der-hcd-sicher-im-halbfinal"
+  },
+  "test-road-hc-davos-18": {
+    "image_url": "/specials/test-road-hc-davos-18.jpg",
+    "position": "73% 40%",
+    "credit": "SRF Sport (TV interview still)",
+    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/stimmen-zum-hcd-triumph-den-rekordsieg-in-der-tasche-das-naechste-ziel-vor-augen"
+  },
+  "chance-architect": {
+    "image_url": "/specials/chance-architect.jpg",
+    "position": "82% 40%",
+    "credit": "HC Davos (club photographer)",
+    "source": "https://www.hcd.ch/de/news/davos-zermuerbt-zug"
+  },
+  "test-gamewinner-2025-12-30_hc-fribourg-gotteron_hc-davos": {
+    "image_url": "/specials/test-gamewinner-2025-12-30_hc-fribourg-gotteron_hc-davos.jpg",
+    "position": "67% 30%",
+    "credit": "Spengler Cup / Keystone-SDA",
+    "source": "https://www.spenglercup.ch/de/news/der-hcd-greift-nach-der-trophaee"
+  },
+  "test-motm-2025-12-30_hc-fribourg-gotteron_hc-davos": {
+    "image_url": "/specials/test-motm-2025-12-30_hc-fribourg-gotteron_hc-davos.jpg",
+    "position": "40% 50%",
+    "credit": "SRF Sport (TV broadcast still)",
+    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/spengler-cup-halbfinal-revanche-geglueckt-hcd-beendet-schwarze-serie"
+  },
+  "test-gamewinner-2025-12-28_team-canada_hc-davos": {
+    "image_url": "/specials/test-gamewinner-2025-12-28_team-canada_hc-davos.jpg",
+    "position": "85% 50%",
+    "credit": "SRF Sport (TV broadcast still)",
+    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/prestigesieg-am-spengler-cup-hcd-ringt-kanadier-nieder-muss-aber-dennoch-den-umweg-nehmen"
+  },
+  "moment-last-goal": {
+    "image_url": "/specials/moment-last-goal.jpg",
+    "position": "57% 50%",
+    "credit": "Keystone-SDA (via HC Davos / bluewin.ch)",
+    "source": "https://www.hcd.ch/de/news/spengler-cup-sieger-2025"
+  },
+  "test-motm-2025-12-28_team-canada_hc-davos": {
+    "image_url": "/specials/test-motm-2025-12-28_team-canada_hc-davos.jpg",
+    "position": "100% 30%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/aktuelles/news"
+  },
+  "test-road-hc-davos-44": {
+    "image_url": "/specials/test-road-hc-davos-44.jpg",
+    "position": "45% 30%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/aktuelles/news"
+  },
+  "test-motm-2025-12-29_hc-davos_ifk-helsinki": {
+    "image_url": "/specials/test-motm-2025-12-29_hc-davos_ifk-helsinki.jpg",
+    "position": "62% 30%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/aktuelles/news"
+  },
+  "test-wall-2025-12-27_hc-davos_us-collegiate-selects": {
+    "image_url": "/specials/test-wall-2025-12-27_hc-davos_us-collegiate-selects.jpg",
+    "position": "46% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/aktuelles/news"
+  },
+  "test-wall-2025-12-30_hc-fribourg-gotteron_hc-davos": {
+    "image_url": "/specials/test-wall-2025-12-30_hc-fribourg-gotteron_hc-davos.jpg",
+    "position": "88% 50%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/aktuelles/news"
+  },
+  "test-motm-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha": {
+    "image_url": "/specials/test-motm-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha.jpg",
+    "position": "45% 40%",
+    "credit": "Keystone (via La Liberté)",
+    "source": "https://www.laliberte.ch/articles/sports/hockey-sur-glace/gotteron-lance-la-defense-de-son-titre-face-au-sparta-prague-1272647"
+  },
+  "test-road-hc-fribourg-gott-ron-9": {
+    "image_url": "/specials/test-road-hc-fribourg-gott-ron-9.jpg",
+    "position": "45% 60%",
+    "credit": "Keystone (via La Liberté)",
+    "source": "https://www.laliberte.ch/articles/sports/hockey-sur-glace/vainqueur-d-helsinki-fribourg-gotteron-file-en-demi-finale-de-la-coupe-spengler-1273108"
+  },
+  "test-motm-2025-12-28_hc-fribourg-gotteron_ifk-helsinki": {
+    "image_url": "/specials/test-motm-2025-12-28_hc-fribourg-gotteron_ifk-helsinki.jpg",
+    "position": "22% 40%",
+    "credit": "Keystone via Le Matin (lematin.ch)",
+    "source": "https://www.lematin.ch/story/hockey-sur-glace-debut-de-coupe-spengler-reussi-pour-fribourg-gotteron-103476227"
+  },
+  "test-road-hc-fribourg-gott-ron-17": {
+    "image_url": "/specials/test-road-hc-fribourg-gott-ron-17.jpg",
+    "position": "27% 50%",
+    "credit": "Keystone-SDA via blue News (bluewin.ch)",
+    "source": "https://www.bluewin.ch/en/sport/fribourg-gotteron-with-the-perfect-debut-li.3024997"
+  },
+  "test-gamewinner-2025-12-29_hc-sparta-praha_team-canada": {
+    "image_url": "/specials/test-gamewinner-2025-12-29_hc-sparta-praha_team-canada.jpg",
+    "position": "62% 30%",
+    "credit": "Keystone-SDA via blue News (bluewin.ch)",
+    "source": "https://www.bluewin.ch/en/sport/sparta-prague-eliminates-team-canada-3029217.html"
+  },
+  "test-road-hc-sparta-praha-14": {
+    "image_url": "/specials/test-road-hc-sparta-praha-14.jpg",
+    "position": "57% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/chlap-k-jsem-na-t-m-py-n-17460"
+  },
+  "test-gamewinner-2025-12-27_ifk-helsinki_hc-sparta-praha": {
+    "image_url": "/specials/test-gamewinner-2025-12-27_ifk-helsinki_hc-sparta-praha.jpg",
+    "position": "84% 30%",
+    "credit": "SRF Sport (agency photo)",
+    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/spengler-cup-gruppe-torriani-4-1-ueber-helsinki-sparta-prag-gelingt-reaktion"
+  },
+  "test-motm-2025-12-29_hc-sparta-praha_team-canada": {
+    "image_url": "/specials/test-motm-2025-12-29_hc-sparta-praha_team-canada.jpg",
+    "position": "55% 30%",
+    "credit": "SRF Sport (agency photo)",
+    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/5-1-sieg-am-spengler-cup-sparta-prag-beendet-kanadas-titeltraeume-frueh"
+  },
+  "test-motm-2025-12-27_ifk-helsinki_hc-sparta-praha": {
+    "image_url": "/specials/test-motm-2025-12-27_ifk-helsinki_hc-sparta-praha.jpg",
+    "position": "47% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/hrab-k-hr-li-jsme-p-esn-to-co-jsme-cht-li-17446"
+  },
+  "test-wall-2025-12-29_hc-sparta-praha_team-canada": {
+    "image_url": "/specials/test-wall-2025-12-29_hc-sparta-praha_team-canada.jpg",
+    "position": "80% 30%",
+    "credit": "SRF Sport (freshfocus agency photo)",
+    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/spengler-cup-gruppe-torriani-sparta-prag-ruhmvoller-rueckkehrer"
+  },
+  "test-road-hc-sparta-praha-23": {
+    "image_url": "/specials/test-road-hc-sparta-praha-23.jpg",
+    "position": "37% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/kousal-fribourg-na-rozd-l-od-n-s-ance-prom-nil-17441"
+  },
+  "progression-master": {
+    "image_url": "/specials/progression-master.jpg",
+    "position": "56% 30%",
+    "credit": "Clarkson Creative Photography / University of Denver Athletics",
+    "source": "https://denverpioneers.com/news/2026/4/16/du-pioneers-hockey-eric-pohlkamp-signs-with-san-jose-sharks"
+  },
+  "test-recordbreaker-2025-12-26_team-canada_us-collegiate-selects": {
+    "image_url": "/specials/test-recordbreaker-2025-12-26_team-canada_us-collegiate-selects.jpg",
+    "position": "32% 30%",
+    "credit": "Jamie Schwaberow / Clarkson Creative Photography (University of Denver Athletics)",
+    "source": "https://denverpioneers.com/news/2026/4/10/du-pioneers-hockey-eric-pohlkamp-named-2025-26-all-american"
+  },
+  "test-recordbreaker-2025-12-30_us-collegiate-selects_hc-sparta-praha": {
+    "image_url": "/specials/test-recordbreaker-2025-12-30_us-collegiate-selects_hc-sparta-praha.jpg",
+    "position": "75% 30%",
+    "credit": "Simon French / USCS (via Grand Forks Herald)",
+    "source": "https://www.grandforksherald.com/sports/und-hockey/u-s-collegiate-selects-beat-sparta-praha-to-reach-spengler-cup-championship"
+  },
+  "test-road-u-s-collegiate-selects-23": {
+    "image_url": "/specials/test-road-u-s-collegiate-selects-23.jpg",
+    "position": "68% 30%",
+    "credit": "Melanie Duchene / Keystone (via Grand Forks Herald)",
+    "source": "https://www.grandforksherald.com/sports/und-hockey/u-s-collegiate-selects-beat-sparta-praha-to-reach-spengler-cup-championship"
+  },
+  "test-gamewinner-2025-12-30_us-collegiate-selects_hc-sparta-praha": {
+    "image_url": "/specials/test-gamewinner-2025-12-30_us-collegiate-selects_hc-sparta-praha.jpg",
+    "position": "5% 50%",
+    "credit": "Keystone (via The Daily Collegian / ČTK)",
+    "source": "https://www.psucollegian.com/sports/men_hockey/guy-gadowsky-led-u-s-collegiate-select-team-advances-to-final-with-victory-over-sparta/article_8116504c-ed65-4f66-992f-1bf0dcefedfe.html"
+  },
+  "test-motm-2025-12-30_us-collegiate-selects_hc-sparta-praha": {
+    "image_url": "/specials/test-motm-2025-12-30_us-collegiate-selects_hc-sparta-praha.jpg",
+    "position": "58% 30%",
+    "credit": "Keystone (via The Boston Globe)",
+    "source": "https://www.bostonglobe.com/2025/12/30/sports/united-states-collegiate-selects-spengler-cup"
+  },
+  "test-road-u-s-collegiate-selects-18": {
+    "image_url": "/specials/test-road-u-s-collegiate-selects-18.jpg",
+    "position": "3% 30%",
+    "credit": "Eishockey NEWS (agency not stated)",
+    "source": "https://www.eishockeynews.de/spiel/us-collegiate-selects-gegen-hc-sparta-praha-5186566/bericht"
+  },
+  "brick-wall": {
+    "image_url": "/specials/brick-wall.jpg",
+    "position": "28% 50%",
+    "credit": "Simon French / U.S. Collegiate Selects (via Duluth News Tribune)",
+    "source": "https://www.duluthnewstribune.com/sports/bulldogs-hockey/gajan-backstops-u-s-collegiate-selects-to-first-spengler-cup-win"
+  },
+  "test-gamewinner-2025-12-27_hc-davos_us-collegiate-selects": {
+    "image_url": "/specials/test-gamewinner-2025-12-27_hc-davos_us-collegiate-selects.jpg",
+    "position": "50% 50%",
+    "credit": "Wisconsin Athletics (uwbadgers.com)",
+    "source": "https://uwbadgers.com/news/2026/1/20/mens-hockey-quinn-finleys-unbelievable-spengler-cup-experience"
+  },
+  "test-motm-2025-12-27_hc-davos_us-collegiate-selects": {
+    "image_url": "/specials/test-motm-2025-12-27_hc-davos_us-collegiate-selects.jpg",
+    "position": "95% 50%",
+    "credit": "KEYSTONE / Melanie Duchene (via spenglercup.ch)",
+    "source": "https://www.spenglercup.ch/en/news/college-selection-shocks-hc-davos"
+  },
+  "test-wall-2025-12-26_team-canada_us-collegiate-selects": {
+    "image_url": "/specials/test-wall-2025-12-26_team-canada_us-collegiate-selects.jpg",
+    "position": "53% 50%",
+    "credit": "Trent Singer / Sioux Falls Live",
+    "source": "https://www.siouxfallslive.com/sports/college/augustana-goalie-josh-kotai-earns-repeat-nod-as-mike-richter-award-semifinalist"
+  },
+  "test-wall-2025-12-30_us-collegiate-selects_hc-sparta-praha": {
+    "image_url": "/specials/test-wall-2025-12-30_us-collegiate-selects_hc-sparta-praha.jpg",
+    "position": "48% 50%",
+    "credit": "KEYSTONE / Melanie Duchene (via College Hockey Inc.)",
+    "source": "https://www.collegehockeyinc.com/2026/04/college-hockey-invited-to-return-to-spengler-cup/"
+  }
 }

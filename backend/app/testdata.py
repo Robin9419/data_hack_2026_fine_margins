@@ -26,6 +26,20 @@ ORDINALS = {1: "1st", 2: "2nd", 3: "3rd"}
 STRENGTH = {"PP1": "Power play", "PP2": "Power play", "SH1": "Short-handed", "SH2": "Short-handed", "EN": "Empty net"}
 
 
+def with_card_image(player: dict, entry, full_art: bool = False) -> dict:
+    """The player block with the card's own image from card_images.json (a URL, or {"image_url", "position"}), so
+    no two cards share a photo. On a full art card (performance, and road once it turns into the champion card) the
+    image also replaces the action media, which is what the dark card shows."""
+    if not entry:
+        return player
+    if isinstance(entry, str):
+        entry = {"image_url": entry}
+    image = {"image_url": entry["image_url"], "image_position": entry.get("position")}
+    if full_art:
+        image |= {"action_image_url": entry["image_url"], "action_video_url": None, "action_focus": entry.get("position")}
+    return {**player, **image}
+
+
 def _key(p: dict) -> tuple[str, int]:
     return p["team"], p["jersey"]
 
@@ -56,7 +70,7 @@ class TestData:
     __test__ = False  # not a pytest class
 
     def __init__(self, specs: dict, metrics: dict, format_value, positions: dict, images: dict, nationalities: dict,
-                 action_media: dict):
+                 action_media: dict, card_images: dict):
         doc = json.loads(TESTDATA_FILE.read_text(encoding="utf-8"))
         self.games = sorted(doc["games"], key=lambda g: (g["date"], g["start"]))
         self.by_id = {g["id"]: g for g in self.games}
@@ -64,6 +78,7 @@ class TestData:
         self._specs, self._metrics, self._format = specs, metrics, format_value
         self._positions, self._images, self._nationalities = positions, images, nationalities
         self._action_media = action_media
+        self.card_images = card_images
         self.cards: dict[str, dict] = {}
         self.game_cards: dict[str, list[str]] = {g["id"]: [] for g in self.games}
         self._build()
@@ -181,17 +196,18 @@ class TestData:
         mr = _goalie_rating(player["stats"]) if player["goalkeeper"] else _skater_rating(player["stats"])
         moments = self._moments(game, player)
         opponent = game["away_team"] if player["team"] == game["home_team"] else game["home_team"]
+        card_id = f'test-{special_type}-{game["id"]}'
         return {
-            "id": f'test-{special_type}-{game["id"]}', "type": "special", "kind": "performance",
+            "id": card_id, "type": "special", "kind": "performance",
             "special_type": special_type, "test": True, "test_game": game["id"],
             "rating": {"mr": mr, "tier": tier_of(mr)},
-            "player": {
+            "player": with_card_image({
                 "first_name": player["first_name"], "last_name": player["last_name"], "jersey": player["jersey"],
                 "team": player["team"], "position": position,
                 "image_url": self._images.get(_key(player)) or player["image_url"],
                 "nationality": self._nationalities.get(_key(player)),
                 **self.action_of(_key(player)),
-            },
+            }, self.card_images.get(card_id), full_art=True),
             "title": spec["title"], "archetype": TEST_RULES.get(special_type, spec["rule"]), "archetype_kpis": None,
             "match": {
                 "id": game["id"], "date": game["date"], "stage": game["stage"], "home_team": game["home_team"],

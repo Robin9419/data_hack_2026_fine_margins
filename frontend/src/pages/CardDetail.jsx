@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import AttributeRow from '../components/AttributeRow'
 import FormBars from '../components/FormBars'
+import InstagramLink from '../components/InstagramLink'
 import MomentList from '../components/MomentList'
 import PlayerPhoto from '../components/PlayerPhoto'
 import VideoSlot from '../components/VideoSlot'
@@ -81,6 +82,7 @@ export default function CardDetail({ preview = false }) {
             {player.team}
             {player.position ? ` · ${player.position}` : ''}
           </p>
+          <InstagramLink player={player} />
           {card.achievement && (
             <div className="achievement">
               <strong>
@@ -261,6 +263,7 @@ function BaseCardDetail({ card }) {
             #{player.jersey} {player.first_name} {player.last_name}
           </h1>
           <p className="muted">{player.team}</p>
+          <InstagramLink player={player} />
         </div>
       </header>
 
@@ -318,6 +321,7 @@ function LegendCardDetail({ card }) {
             {player.jersey ? `#${player.jersey} ` : ''}
             {player.first_name} {player.last_name}
           </h1>
+          <InstagramLink player={player} />
           <div className="match-context">
             {facts.map(([label, value]) => (
               <div key={label}>

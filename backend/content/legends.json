@@ -1,5 +1,5 @@
 {
-  "_comment": "Club legends: three per team, earned automatically (never drawn, traded or won in trivia). Each threshold is a share of the club's base and special cards; reaching it grants one random legend of that club, so a complete club holds all three. Facts researched 2026-10-15 on Wikipedia, Elite Prospects, club, federation and press sites (see sources per card). The HIFK legends never played a Spengler Cup (HIFK first played in 1994), Zábrodský's Spengler Cups were with LTC Praha, and the U.S. Collegiate Selects legends are NCAA greats because that team first played in 2025; their cards say so. Photos are hotlinked and shown in black and white; rights are not established for the press photos (image_credit).",
+  "_comment": "Club legends: three per team, earned automatically (never drawn, traded or won in trivia). Each threshold is a share of the club's base and special cards; reaching it grants one random legend of that club, so a complete club holds all three. Facts researched 2026-10-15 on Wikipedia, Elite Prospects, club, federation and press sites (see sources per card). The HIFK legends never played a Spengler Cup (HIFK first played in 1994), Zábrodský's Spengler Cups were with LTC Praha, and the U.S. Collegiate Selects legends are NCAA greats because that team first played in 2025; their cards say so. Photos are hotlinked and shown in black and white; rights are not established for the press photos (image_credit). 'instagram' (optional) is the player's public Instagram handle, set only where Wikidata's Instagram username (P2003, on the item with the same Elite Prospects ID) and the profile itself both confirm it (researched 2026-10-21); every other player is left without one.",
   "source": "Club legend research",
   "thresholds": [
     0.5,
@@ -118,7 +118,8 @@
         "https://www.hockeycanada.ca/news/roster-named-for-2015-spengler-cup",
         "https://thehockeynews.com/news/team-canada-downs-hc-lugano-to-win-spengler-cup-for-13th-time",
         "https://en.wikipedia.org/wiki/2015_Spengler_Cup"
-      ]
+      ],
+      "instagram": "roystar11"
     },
     {
       "id": "legend-can-hazen",
@@ -173,7 +174,8 @@
         "https://en.wikipedia.org/wiki/Maxim_Noreau",
         "https://amp.cbc.ca/sports/hockey/canada-spengler-cup-title-2019-1.5411401",
         "https://dailyhive.com/calgary/canada-win-spengler-cup-2017"
-      ]
+      ],
+      "instagram": "mnoreau56"
     },
     {
       "id": "legend-spa-horak",
@@ -232,7 +234,8 @@
       "sources": [
         "https://www.ceskenoviny.cz/zpravy/2303708",
         "https://en.wikipedia.org/wiki/Michal_Kempn%C3%BD"
-      ]
+      ],
+      "instagram": "michalkempny"
     },
     {
       "id": "legend-spa-zabrodsky",
@@ -375,7 +378,8 @@
         "https://en.wikipedia.org/wiki/2024_Spengler_Cup",
         "https://en.wikipedia.org/wiki/2025_Spengler_Cup",
         "https://en.wikipedia.org/wiki/Reto_Berra"
-      ]
+      ],
+      "instagram": "reto_berra"
     },
     {
       "id": "legend-fri-soerensen",
@@ -464,7 +468,8 @@
       "sources": [
         "https://en.wikipedia.org/wiki/Macklin_Celebrini",
         "https://en.wikipedia.org/wiki/Hobey_Baker_Award"
-      ]
+      ],
+      "instagram": "mackcelebrini"
     },
     {
       "id": "legend-usc-fantilli",
@@ -517,7 +522,8 @@
       "sources": [
         "https://en.wikipedia.org/wiki/Cale_Makar",
         "https://en.wikipedia.org/wiki/Hobey_Baker_Award"
-      ]
+      ],
+      "instagram": "calemakar_"
     }
   ]
 }

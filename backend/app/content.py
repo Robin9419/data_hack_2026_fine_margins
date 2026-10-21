@@ -96,6 +96,7 @@ class Content:
         # Dual nationalities ("Canada / USA") show the first one on the card.
         self.nationalities = {(c["team"], c["jersey"]): c["nationality"].split(" / ")[0]
                               for c in base_doc["cards"] if c.get("nationality")}
+        self.instagram = {(c["team"], c["jersey"]): c["instagram"] for c in base_doc["cards"] if c.get("instagram")}
         self.action_media = {(m["team"], m["jersey"]): m for m in _load_json("action_media.json")["players"]}
         self.card_images = _load_json("card_images.json")
         self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
@@ -535,6 +536,7 @@ class Content:
             "position": cfg["position"],
             "image_url": self.card_images.get(cfg.get("id")) or self.player_images.get((cfg["team"], cfg["jersey"])),
             "nationality": self.nationalities.get((cfg["team"], cfg["jersey"])),
+            "instagram": self.instagram.get((cfg["team"], cfg["jersey"])),
             **self._action_media(cfg["team"], cfg["jersey"]),
         }
 
@@ -587,6 +589,7 @@ class Content:
                 "team": cfg["team"],
                 "position": cfg["position"],
                 "image_url": cfg.get("image_url"),
+                "instagram": cfg.get("instagram"),
             },
             "title": "Legend",
             "match": None,

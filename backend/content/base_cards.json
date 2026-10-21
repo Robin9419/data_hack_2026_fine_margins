@@ -1,5 +1,5 @@
 {
-  "_comment": "Base cards: 20 skaters and 2 goalkeepers for each team. For the two teams in the final that is the final's lineup (all 20 skaters in the stats CSV, plus both dressed goalkeepers); for HIFK, Team Canada, HC Sparta Praha and HC Fribourg-Gottéron it is the two goalkeepers with the most minutes and the 20 skaters who dressed for the most 2025 Spengler Cup games, ties broken by points, then penalty minutes, then average line in the official lineups (SIHF game data and spenglercup.ch game pages, retrieved 2026-10-15). Cards that cannot be named from the stats CSV (other teams, and the final's backup goalkeepers) carry first_name/last_name themselves. Unlike cards.json they have no archetype or game stats, only profile facts from Elite Prospects (eliteprospects.com, researched 2026-10-13 and 2026-10-15; null where it could not be confirmed). 'club' is the 2025-26 college team (U.S. Collegiate Selects only). Photos come from docs/player-images.json, matched by team + jersey, like the special cards.",
+  "_comment": "Base cards: 20 skaters and 2 goalkeepers for each team. For the two teams in the final that is the final's lineup (all 20 skaters in the stats CSV, plus both dressed goalkeepers); for HIFK, Team Canada, HC Sparta Praha and HC Fribourg-Gottéron it is the two goalkeepers with the most minutes and the 20 skaters who dressed for the most 2025 Spengler Cup games, ties broken by points, then penalty minutes, then average line in the official lineups (SIHF game data and spenglercup.ch game pages, retrieved 2026-10-15). Cards that cannot be named from the stats CSV (other teams, and the final's backup goalkeepers) carry first_name/last_name themselves. Unlike cards.json they have no archetype or game stats, only profile facts from Elite Prospects (eliteprospects.com, researched 2026-10-13 and 2026-10-15; null where it could not be confirmed). 'club' is the 2025-26 college team (U.S. Collegiate Selects only). Photos come from docs/player-images.json, matched by team + jersey, like the special cards. 'instagram' (optional) is the player's public Instagram handle, set only where Wikidata's Instagram username (P2003, on the item with the same Elite Prospects ID) and the profile itself both confirm it (researched 2026-10-21); every other player is left without one.",
   "source": "Elite Prospects",
   "cards": [
     {
@@ -257,7 +257,8 @@
       "shoots": "R",
       "draft": null,
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/270301/enzo-guebey"
+      "ep_url": "https://www.eliteprospects.com/player/270301/enzo-guebey",
+      "instagram": "enzoguebey"
     },
     {
       "id": "base-hcd-36",
@@ -272,7 +273,8 @@
       "shoots": "L",
       "draft": "2021 round 6 #179 overall by Nashville Predators",
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/293158/simon-knak"
+      "ep_url": "https://www.eliteprospects.com/player/293158/simon-knak",
+      "instagram": "knak.36"
     },
     {
       "id": "base-hcd-47",
@@ -287,7 +289,8 @@
       "shoots": "L",
       "draft": "2006 round 6 #180 overall by Toronto Maple Leafs",
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/7617/leo-komarov"
+      "ep_url": "https://www.eliteprospects.com/player/7617/leo-komarov",
+      "instagram": "komarovleo47"
     },
     {
       "id": "base-hcd-66",
@@ -347,7 +350,8 @@
       "shoots": "L",
       "draft": "2023 round 2 #35 overall by Chicago Blackhawks",
       "club": "Univ. of Minnesota-Duluth",
-      "ep_url": "https://www.eliteprospects.com/player/690368/adam-gajan"
+      "ep_url": "https://www.eliteprospects.com/player/690368/adam-gajan",
+      "instagram": "adam__gajan"
     },
     {
       "id": "base-usc-33",
@@ -1208,7 +1212,8 @@
       "shoots": "L",
       "draft": "2011 round 7 #201 overall by Tampa Bay Lightning",
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/78295/matthew-peca"
+      "ep_url": "https://www.eliteprospects.com/player/78295/matthew-peca",
+      "instagram": "mpeca"
     },
     {
       "id": "base-can-12",
@@ -1497,7 +1502,8 @@
       "shoots": "L",
       "draft": null,
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/98156/jakub-krejcik"
+      "ep_url": "https://www.eliteprospects.com/player/98156/jakub-krejcik",
+      "instagram": "jakubkrejcik"
     },
     {
       "id": "base-spa-14",
@@ -1514,7 +1520,8 @@
       "shoots": "L",
       "draft": "2015 round 2 #48 overall by Ottawa Senators",
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/157524/filip-chlapik"
+      "ep_url": "https://www.eliteprospects.com/player/157524/filip-chlapik",
+      "instagram": "filipchlapik"
     },
     {
       "id": "base-spa-34",
@@ -1650,7 +1657,8 @@
       "shoots": "L",
       "draft": "2015 round 3 #68 overall by Toronto Maple Leafs",
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/239362/martins-dzierkals"
+      "ep_url": "https://www.eliteprospects.com/player/239362/martins-dzierkals",
+      "instagram": "martinsdzierkals"
     },
     {
       "id": "base-spa-74",
@@ -1803,7 +1811,8 @@
       "shoots": "L",
       "draft": "2006 round 4 #106 overall by St. Louis Blues",
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/11986/reto-berra"
+      "ep_url": "https://www.eliteprospects.com/player/11986/reto-berra",
+      "instagram": "reto_berra"
     },
     {
       "id": "base-fri-1",
@@ -1837,7 +1846,8 @@
       "shoots": "R",
       "draft": null,
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/126282/andrea-glauser"
+      "ep_url": "https://www.eliteprospects.com/player/126282/andrea-glauser",
+      "instagram": "gandrea96"
     },
     {
       "id": "base-fri-95",
@@ -1905,7 +1915,8 @@
       "shoots": "R",
       "draft": "2012 round 6 #158 overall by Minnesota Wild",
       "club": null,
-      "ep_url": "https://www.eliteprospects.com/player/85327/christoph-bertschy"
+      "ep_url": "https://www.eliteprospects.com/player/85327/christoph-bertschy",
+      "instagram": "guarano22"
     },
     {
       "id": "base-fri-21",

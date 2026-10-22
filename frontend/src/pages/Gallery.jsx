@@ -28,6 +28,23 @@ const TYPE_FILTERS = [
 // Within owned and within locked cards: legends, then special, then reward, then base.
 const TYPE_ORDER = { legend: 0, special: 1, reward: 2, base: 3 }
 
+// The filters and page survive a visit to a card's detail page. Per tab, so a new visit starts fresh.
+const VIEW_KEY = 'gallery-view'
+function readView() {
+  try {
+    return JSON.parse(sessionStorage.getItem(VIEW_KEY)) ?? {}
+  } catch {
+    return {}
+  }
+}
+function saveView(view) {
+  try {
+    sessionStorage.setItem(VIEW_KEY, JSON.stringify(view))
+  } catch {
+    // Storage can be blocked; the gallery still works without remembering the view.
+  }
+}
+
 function FilterSelect({ label, options, value, onChange }) {
   return (
     <label className="filter-select">
@@ -52,12 +69,18 @@ export default function Gallery() {
   const newCardIds = location.state?.newCardIds ?? []
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
-  const [team, setTeam] = useState('all')
-  const [type, setType] = useState('all')
-  const [page, setPage] = useState(0)
+  const [view] = useState(readView)
+  const [team, setTeam] = useState(view.team ?? 'all')
+  const [type, setType] = useState(view.type ?? 'all')
+  const [page, setPage] = useState(view.page ?? 0)
   const [spotlight, setSpotlight] = useState(null) // special card popped out of the grid
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
   const touchStartX = useRef(null)
+  const lastStage = useRef(stage)
+
+  useEffect(() => {
+    saveView({ team, type, page })
+  }, [team, type, page])
 
   const load = () =>
     api
@@ -72,7 +95,9 @@ export default function Gallery() {
   useEffect(() => {
     if (!stage) return
     load()
-    setPage(0)
+    // Only a change of stage while on the page starts over; the first load keeps the remembered page.
+    if (lastStage.current !== undefined && lastStage.current !== stage) setPage(0)
+    lastStage.current = stage
   }, [stage])
 
   const onReset = async () => {

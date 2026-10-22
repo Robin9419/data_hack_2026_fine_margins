@@ -81,7 +81,7 @@ export default function Activities() {
         key="daily"
         icon="🎁"
         title="Your daily card is ready"
-        text="One free base card every day of the tournament, duplicates included."
+        text="Three free base cards every day of the tournament, duplicates included."
         action={
           <button type="button" className="activity-button" disabled={busy} onClick={() => claim(api.dailyClaim)}>
             Claim

@@ -91,7 +91,7 @@ On a gameday the gallery asks three predictions per game: who wins, who scores t
 
 ### Daily cards, duplicates and trade-ins
 
-The daily card is a random base card and can be a duplicate. Duplicates stack (`copies` in `owned_cards`) and show as ×2, ×3 on the card. On the trade-in page you give up any 3 base card copies, duplicates or your last copy of a card, for one random card: with a favorite team it is 50% a base card from another team, 25% a base card from the favorite team and 25% a special card (one you don't own yet, in the standard edition); without a favorite team it is 75% any base card and 25% a special card. Once you own every special card, a special roll gives a base card instead.
+The daily card is three random base cards and each can be a duplicate. Duplicates stack (`copies` in `owned_cards`) and show as ×2, ×3 on the card. On the trade-in page you give up any 3 base card copies, duplicates or your last copy of a card, for one random card: with a favorite team it is 50% a base card from another team, 25% a base card from the favorite team and 25% a special card (one you don't own yet, in the standard edition); without a favorite team it is 75% any base card and 25% a special card. Once you own every special card, a special roll gives a base card instead.
 
 ### Club legends
 

@@ -65,7 +65,7 @@ class LegendTests(unittest.TestCase):
         db.grant_cards(self.uid, club[: need - 1])
         with mock.patch.object(main.random, 'choice', return_value=club[need - 1]):
             pack = main.daily_claim(self.user)['pack']
-        self.assertEqual([c['type'] for c in pack], ['base', 'legend'])
+        self.assertEqual([c['type'] for c in pack], ['base', 'base', 'base', 'legend'])
 
     def test_legends_are_never_traded_for(self):
         db.grant_cards(self.uid, list(self.content.cards)[:5])

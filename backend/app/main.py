@@ -75,13 +75,12 @@ def open_pack(user_id: int, favorite_team: str | None = None) -> list[dict]:
     return [{**content.cards[cid], "owned": True, "is_new": cid in new_ids} for cid in drawn]
 
 
+DAILY_CARDS = 3
+
+
 def open_daily_card(user_id: int) -> list[dict]:
-    """One random base card. It can be a duplicate: a second copy is kept and can be traded in."""
-    content = get_content()
-    base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
-    drawn = random.choice(base_ids)
-    new_ids = db.grant_cards(user_id, [drawn])
-    return [{**content.cards[drawn], "owned": True, "is_new": drawn in new_ids}]
+    """Random base cards. They can be duplicates: a second copy is kept and can be traded in."""
+    return open_random_base_cards(user_id, DAILY_CARDS)
 
 
 def open_random_base_cards(user_id: int, count: int) -> list[dict]:
@@ -243,7 +242,7 @@ def login(body: LoginRequest):
 
 @app.post("/api/daily/claim")
 def daily_claim(user: dict = Depends(current_user)):
-    """One free base card per day, where a day is a stage of the simulated tournament timeline."""
+    """Three free base cards per day, where a day is a stage of the simulated tournament timeline."""
     if not db.claim_daily(user["id"], user["stage"]):
         raise HTTPException(409, "You already claimed today's card. Come back tomorrow!")
     return {"pack": open_daily_card(user["id"]) + award_legends(user), "progress": progress_for(user),

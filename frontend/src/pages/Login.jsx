@@ -9,7 +9,7 @@ const STEPS = [
   { icon: '🎁', title: 'Open your starter pack', text: 'Three free cards to begin: the players, the clubs and the legends of the Spengler Cup.' },
   { icon: '🔮', title: 'Call the games', text: 'Before every gameday, predict the winner, the first goal and a key stat. Right calls earn you packs.' },
   { icon: '🧠', title: 'Play the trivia', text: 'Clues from the games already played, from who scored to who stood tall. Each right answer unlocks a card.' },
-  { icon: '🏆', title: 'Collect all week', text: 'Come back every day for a free card, trade spares for new finds and climb the reward bar. Win Stadium editions when you are at the rink.' },
+  { icon: '🏆', title: 'Collect all week', text: 'Come back every day for three free cards, trade spares for new finds and climb the reward bar. Win Stadium editions when you are at the rink.' },
 ]
 
 export default function Login() {

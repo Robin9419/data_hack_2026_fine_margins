@@ -14,7 +14,8 @@ PRE, POST = "pre", "post"
 WEEKDAYS = {"2025-12-26": "Fri", "2025-12-27": "Sat", "2025-12-28": "Sun", "2025-12-29": "Mon", "2025-12-30": "Tue",
             "2025-12-31": "Wed"}
 SHORT_STAGE = {"Quarterfinal": "Quarter-finals", "Semifinal": "Semi-finals", "Final": "Final"}
-PACK_BASE_CARDS = 2  # per pack: two base cards of the two teams plus one card of the game (see pack_cards)
+PACK_BASE_CARDS = 2  # per pack: two base cards of the two teams plus one more (see pack_cards)
+PACK_SPECIAL_CHANCE = 0.2  # the third card of a pack is a special card of the game, otherwise a base card
 FIRST_GOAL_CANDIDATES = 2  # per team, plus "someone else"
 OTHER = "other"
 
@@ -331,11 +332,14 @@ class Tournament:
     @staticmethod
     def pack_cards(packs: int, base_ids: list[str], game_card_ids: list[str], rng: random.Random) -> list[str]:
         """One pack per correct prediction. Each holds two base cards of the two teams that played (duplicates are
-        possible, they can be traded in) and one card from the game itself that the user does not own yet, or a third
-        base card once there is none left."""
+        possible, they can be traded in) and a third card: 20% a special card of the game the user does not own yet,
+        otherwise a base card. With no special left to draw, the third card is a base card."""
         drawn, left = [], list(game_card_ids)
         rng.shuffle(left)
         for _ in range(packs):
             drawn += rng.sample(base_ids, min(PACK_BASE_CARDS, len(base_ids)))
-            drawn.append(left.pop() if left else rng.choice(base_ids))
+            if left and rng.random() < PACK_SPECIAL_CHANCE:
+                drawn.append(left.pop())
+            else:
+                drawn.append(rng.choice(base_ids))
         return drawn

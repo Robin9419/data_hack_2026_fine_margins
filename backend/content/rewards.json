@@ -1,10 +1,14 @@
 {
-  "_comment": "Illustrative reward milestones (simulated, nothing is actually redeemable). Points per card come from 'card_points': a stadium edition is worth more than a home edition, so stadium fans progress faster while home fans still unlock every card.",
-  "card_points": { "starter": 0, "standard": 10, "stadium": 25, "legend": 25 },
+  "_comment": "Illustrative reward milestones (simulated, nothing is actually redeemable). Points per card come from 'card_points' by card type: base 5, legend 25, any other card (special, collector, context) 10. A card earned at the stadium (a stadium edition) is worth 'stadium_multiplier' times as much. The milestones are spread over the full collection (about 1,650 points without the stadium bonus): the first is reachable in the first days, the last takes most of the tournament.",
+  "card_points": { "base": 5, "special": 10, "legend": 25 },
+  "stadium_multiplier": 2,
   "rewards": [
-    { "id": "soda", "title": "Free soda", "points": 30, "icon": "🥤" },
-    { "id": "merch", "title": "10% off fan shop", "points": 70, "icon": "🧢" },
-    { "id": "ticket", "title": "Free game ticket", "points": 120, "icon": "🎟️" },
-    { "id": "meet", "title": "Meet the team", "points": 200, "icon": "🏆" }
+    { "id": "soda", "title": "Free soda", "points": 50, "icon": "🥤" },
+    { "id": "popcorn", "title": "Free popcorn", "points": 120, "icon": "🍿" },
+    { "id": "merch", "title": "10% off fan shop", "points": 250, "icon": "🧢" },
+    { "id": "ticket", "title": "Free game ticket", "points": 450, "icon": "🎟️" },
+    { "id": "photo", "title": "Signed team photo", "points": 700, "icon": "📸" },
+    { "id": "meet", "title": "Meet the team", "points": 1000, "icon": "🏆" },
+    { "id": "vip", "title": "VIP lounge for a game", "points": 1300, "icon": "🥇" }
   ]
 }

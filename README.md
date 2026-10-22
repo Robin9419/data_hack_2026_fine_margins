@@ -59,7 +59,7 @@ Open http://localhost:5173. Vite forwards `/api` to the backend on port 8000. AP
 | KPI library (CSV column, label, plain-language definition) | `backend/content/metrics.json` |
 | Match metadata (teams, score, date) | `backend/content/match.json` |
 | Quiz clue per archetype (`archetypes`) | `backend/content/cards.json` |
-| Reward milestones and points per card edition | `backend/content/rewards.json` |
+| Reward milestones and points per card type | `backend/content/rewards.json` |
 | Trade-in page (pick 3 base cards, odds, slots) | `frontend/src/pages/Trade.jsx`, `.trade-*` in `index.css`; odds in `trade_odds` in `backend/app/main.py` |
 | Quiz page and unlock animation | `frontend/src/pages/Quiz.jsx`, `frontend/src/components/CardUnlock.jsx`, `.unlock-*` in `index.css` |
 | Achievements | `backend/content/achievements.json` |
@@ -81,13 +81,13 @@ The card face shows only the photo, the archetype (`title`, e.g. Sniper, Workhor
 
 ### Trivia and rewards
 
-A new account gets a starter pack of 3 random cards. After that cards are only won through trivia: a round is 3 questions, each "Who was the *Sniper* in this game?" (the card's archetype) with four player options and a clue. A wrong answer can be retried; a right one unlocks the card with an animation. The player says where they watch (self-reported in the demo; a real product would verify a ticket or location): **at home** gives the standard card (10 pts), **at the stadium** gives the foil Stadium edition (25 pts, purely cosmetic otherwise) and upgrades a card already owned as standard. The reward bar at the top shows the points and the milestones in `rewards.json` (illustrative rewards only).
+A new account gets a starter pack of 3 random cards. After that cards are only won through trivia: a round is 3 questions, each "Who was the *Sniper* in this game?" (the card's archetype) with four player options and a clue. A wrong answer can be retried; a right one unlocks the card with an animation. The player says where they watch (self-reported in the demo; a real product would verify a ticket or location): **at home** gives the standard card, **at the stadium** gives the foil Stadium edition and upgrades a card already owned as standard. Reward points: a base card is worth 5, a legend 25 and any other card (special, collector, context) 10; a Stadium edition is worth double. The reward bar at the top shows the points and the milestones in `rewards.json` (illustrative rewards only).
 
 ### Tournament timeline and predictions
 
 The bar at the bottom of every page simulates the 2025 Spengler Cup: before the tournament, one stop per gameday (26 to 31 December) and after it. The stage is stored per user. Before the tournament the set holds base cards, club legends and the stadium card only. A game's cards (its performance specials from the official game pages, and for the final every Wisehockey card) only exist once the game is played, and so do the Road to Final cards, the trivia about the game and the clubs' new cards towards their legends. Going back in the timeline hides the cards of the games not played yet; they come back when you move forward again.
 
-On a gameday the gallery asks three predictions per game: who wins, who scores the first goal (the team's two top scorers of the tournament, or someone else) and one stat question that changes from game to game (hardest shot, busiest period, penalty minutes, power-play goal, busier goalkeeper, more shots). Moving on in the timeline plays the games: the predictions lock and every right one earns a pack of three cards, two base cards of the two teams and one card of the game you don't own yet. The trivia asks about the most recent games first.
+On a gameday the gallery asks three predictions per game: who wins, who scores the first goal (the team's two top scorers of the tournament, or someone else) and one stat question that changes from game to game (hardest shot, busiest period, penalty minutes, power-play goal, busier goalkeeper, more shots). Moving on in the timeline plays the games: the predictions lock and every right one earns a pack of three cards, two base cards of the two teams and a third card: 80% a base card, 20% a special card of the game you don't own yet. The trivia asks about the most recent games first.
 
 ### Daily cards, duplicates and trade-ins
 

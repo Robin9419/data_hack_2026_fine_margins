@@ -67,6 +67,7 @@ class Content:
         self.archetype_metrics = {k: v for k, v in cards_doc["archetype_metrics"].items() if not k.startswith("_")}
         rewards_doc = _load_json("rewards.json")
         self.card_points = rewards_doc["card_points"]
+        self.stadium_multiplier = rewards_doc["stadium_multiplier"]
         self.rewards = rewards_doc["rewards"]
         videos_doc = _load_json("videos.json")
         self.videos = {v["id"]: v for v in videos_doc["videos"]}
@@ -729,9 +730,16 @@ class Content:
             "last_name": "",
         }
 
+    def card_value(self, card_id: str, edition: str) -> int:
+        """Reward points for one owned card: base cards and legends by their own value, every other card (special,
+        collector, context) as a special. A stadium edition is worth the stadium multiplier."""
+        card_type = self.cards[card_id]["type"]
+        value = self.card_points[card_type] if card_type in ("base", "legend") else self.card_points["special"]
+        return value * self.stadium_multiplier if edition == "stadium" else value
+
     def progress(self, owned: dict[str, str], available: set[str]) -> dict:
         """Reward-bar state from the owned cards (card id -> edition) among the cards that exist so far."""
-        points = sum(self.card_points.get(edition, 0) for edition in owned.values())
+        points = sum(self.card_value(cid, edition) for cid, edition in owned.items() if cid in self.cards)
         rewards = [{**r, "reached": points >= r["points"]} for r in self.rewards]
         return {
             "points": points,

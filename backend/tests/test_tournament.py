@@ -90,7 +90,7 @@ class TournamentTests(unittest.TestCase):
         opened = main.open_game_packs(FRI_SPA, self.user)
         cards = [c for c in opened['pack'] if c['type'] != 'legend']
         self.assertEqual(len(cards), 6)
-        self.assertEqual(sum(c['type'] == 'special' for c in cards), 2)  # one card of the game per pack
+        self.assertLessEqual(sum(c['type'] == 'special' for c in cards), 2)  # each pack's third card: 20% a special
         teams = {'HC Fribourg-Gottéron', 'HC Sparta Praha'}
         self.assertTrue(all(c['player']['team'] in teams for c in cards))
         with self.assertRaises(main.HTTPException):

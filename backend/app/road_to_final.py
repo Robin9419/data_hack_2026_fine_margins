@@ -32,9 +32,10 @@ def _won(team: str, game: dict) -> bool:
 
 
 class RoadToFinal:
-    def __init__(self, testdata: TestData, positions: dict):
+    def __init__(self, testdata: TestData, positions: dict, highlights: list[dict]):
         self._td = testdata
         self._positions = positions
+        self._highlights = {(h["team"], h["jersey"]): h for h in highlights}
         self._player = {}  # (game id, (team, jersey)) -> the player's entry in that game
         self._rating = {}  # same key -> made-up match rating, only for skaters who got ice time
         for game in testdata.games:
@@ -132,13 +133,30 @@ class RoadToFinal:
             ],
             "explanation": (f'Stage {stage}, {info["name"]}: {n} {"game" if n == 1 else "games"} played, average match '
                             f"rating {average}. {info['trigger']}"),
-            "achievement": None, "video": None, "video_sources": [], "moments": moments, "edition": "standard",
+            "achievement": None, "video": self._highlight(key), "video_sources": self._highlight_sources(key),
+            "moments": moments, "edition": "standard",
             "source": SOURCE,
             "road": {
                 "stage": stage, "stage_name": info["name"], "games": slots, "trend": trend, "played": n,
                 "stages": [{**s, "reached": s["n"] <= stage} for s in STAGES],
             },
         }
+
+    def _highlight(self, key: tuple[str, int]) -> dict | None:
+        h = self._highlights.get(key)
+        if not h:
+            return None
+        return {"video_id": h["id"], "youtube_id": h["youtube_id"], "start": h["start"], "end": h["end"],
+                "poster": f'https://i.ytimg.com/vi/{h["youtube_id"]}/hqdefault.jpg', "description": h["title"],
+                "scope": "player"}
+
+    def _highlight_sources(self, key: tuple[str, int]) -> list[dict]:
+        h = self._highlights.get(key)
+        if not h:
+            return []
+        return [{"id": h["id"], "youtube_id": h["youtube_id"], "title": h["title"], "channel": h["channel"],
+                 "url": h["url"], "permission": f'Player highlight embedded with the YouTube player from {h["channel"]}. '
+                                                 "Not downloaded or re-edited."}]
 
     def _total(self, metric_id: str, value: int, moments: list[dict]) -> dict:
         metric = self._td._metrics[metric_id]

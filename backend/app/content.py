@@ -112,7 +112,7 @@ class Content:
                      for c in self.cards.values() if c["player"]}
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
                                  self.nationalities, self.action_media, self.card_images)
-        self.road_to_final = RoadToFinal(self.testdata, positions)
+        self.road_to_final = RoadToFinal(self.testdata, positions, _load_json("road_videos.json")["players"])
         self.tournament = Tournament(self.testdata)
         # The game a card comes from (None: not tied to a game). Such a card only exists once its game is played on
         # the user's timeline. The cards built from the Wisehockey data, and the reward cards about them, are the final.

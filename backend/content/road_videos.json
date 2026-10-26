@@ -1,0 +1,137 @@
+{
+  "_comment": "Highlight video per Road to Final star, keyed by team and jersey as in the stats CSV. Each one is a YouTube video embedded with the official player, so only the start/end seconds are used. Null end plays to the end of the video. The videos are not from the Spengler Cup broadcast: they are player highlights from other seasons and leagues, found by searching the player's name, and their channels are not the organiser's. Check the permission before shipping.",
+  "players": [
+    {
+      "team": "HC Fribourg-Gottéron",
+      "jersey": 9,
+      "youtube_id": "YHnSNIQ9rYM",
+      "start": 0,
+      "end": null,
+      "id": "road-video-sorensen",
+      "title": "Highlights of Marcus Sörensen",
+      "channel": "Champions Hockey League",
+      "url": "https://www.youtube.com/watch?v=YHnSNIQ9rYM"
+    },
+    {
+      "team": "HC Fribourg-Gottéron",
+      "jersey": 17,
+      "youtube_id": "5LOLuSl03ZM",
+      "start": 0,
+      "end": null,
+      "id": "road-video-biasca",
+      "title": "Highlights of Attilio Biasca",
+      "channel": "All NHL Goals",
+      "url": "https://www.youtube.com/watch?v=5LOLuSl03ZM"
+    },
+    {
+      "team": "HC Sparta Praha",
+      "jersey": 14,
+      "youtube_id": "p3xtCVqaMeI",
+      "start": 0,
+      "end": null,
+      "id": "road-video-chlapik",
+      "title": "Highlights of Filip Chlapík",
+      "channel": "Champions Hockey League",
+      "url": "https://www.youtube.com/watch?v=p3xtCVqaMeI"
+    },
+    {
+      "team": "HC Sparta Praha",
+      "jersey": 23,
+      "youtube_id": "Ca9uBj-2DF4",
+      "start": 0,
+      "end": null,
+      "id": "road-video-kousal",
+      "title": "Highlights of Pavel Kousal",
+      "channel": "TELH",
+      "url": "https://www.youtube.com/watch?v=Ca9uBj-2DF4"
+    },
+    {
+      "team": "Team Canada",
+      "jersey": 15,
+      "youtube_id": "KQhJyS8fH-Q",
+      "start": 0,
+      "end": null,
+      "id": "road-video-brouillard",
+      "title": "Highlights of Nikolas Brouillard",
+      "channel": "San Diego Gulls",
+      "url": "https://www.youtube.com/watch?v=KQhJyS8fH-Q"
+    },
+    {
+      "team": "Team Canada",
+      "jersey": 5,
+      "youtube_id": "bBVV5ElA9B8",
+      "start": 0,
+      "end": null,
+      "id": "road-video-hicketts",
+      "title": "Highlights of Joe Hicketts",
+      "channel": "Hicketts Is Epic",
+      "url": "https://www.youtube.com/watch?v=bBVV5ElA9B8"
+    },
+    {
+      "team": "U.S. Collegiate Selects",
+      "jersey": 18,
+      "youtube_id": "KatSXuQeXF4",
+      "start": 0,
+      "end": null,
+      "id": "road-video-fink",
+      "title": "Highlights of Aiden Fink",
+      "channel": "Big Ten Hockey",
+      "url": "https://www.youtube.com/watch?v=KatSXuQeXF4"
+    },
+    {
+      "team": "U.S. Collegiate Selects",
+      "jersey": 23,
+      "youtube_id": "89id92pnXMI",
+      "start": 0,
+      "end": null,
+      "id": "road-video-pohlkamp",
+      "title": "Highlights of Eric Pohlkamp",
+      "channel": "Shift Logic Hockey",
+      "url": "https://www.youtube.com/watch?v=89id92pnXMI"
+    },
+    {
+      "team": "HIFK",
+      "jersey": 98,
+      "youtube_id": "AGbvVotit74",
+      "start": 0,
+      "end": null,
+      "id": "road-video-larsen",
+      "title": "Highlights of Oliver Larsen",
+      "channel": "Jkoosteet",
+      "url": "https://www.youtube.com/watch?v=AGbvVotit74"
+    },
+    {
+      "team": "HIFK",
+      "jersey": 52,
+      "youtube_id": "kat1gl8LpuY",
+      "start": 0,
+      "end": null,
+      "id": "road-video-palmu",
+      "title": "Highlights of Petrus Palmu",
+      "channel": "Mixu99",
+      "url": "https://www.youtube.com/watch?v=kat1gl8LpuY"
+    },
+    {
+      "team": "HC Davos",
+      "jersey": 44,
+      "youtube_id": "eeYZEivN6_A",
+      "start": 0,
+      "end": 180,
+      "id": "road-video-stransky",
+      "title": "Highlights of Matej Stransky",
+      "channel": "HC Davos",
+      "url": "https://www.youtube.com/watch?v=eeYZEivN6_A"
+    },
+    {
+      "team": "HC Davos",
+      "jersey": 18,
+      "youtube_id": "NSlfZJ9FHdE",
+      "start": 0,
+      "end": 170,
+      "id": "road-video-zadina",
+      "title": "Highlights of Filip Zadina",
+      "channel": "HC Davos",
+      "url": "https://www.youtube.com/watch?v=NSlfZJ9FHdE"
+    }
+  ]
+}

@@ -72,7 +72,7 @@ One card per player that grows during the tournament. Starts as a normal profile
 - Rarity symbol: ★★★.
 - Needs several games. Game 1 is real data, later games are a fictional example in the mockup.
 - Stages in the app: 1 Debut (first game), 2 In Form (every further game, MR is the average, trend arrow), 3 Finalist (the team wins its semi-final: one tier up and glitter), 4 Champion (the team wins the final: dark gold look with the surname on the side). The mockup's "Hot Streak" (three games with MR 90 or more) is replaced by Finalist because the test ratings rarely reach it.
-- Status: **in app with test data** (`backend/app/road_to_final.py`). The cards of the two best skaters of each team grow with every game played on the tournament timeline; the final uses the real data.
+- Status: **in app with test data** (`backend/app/road_to_final.py`). The cards of the two best skaters of each team grow with every game played on the tournament timeline; the final uses the real data. They are collected like any other card: they come from any pack (game packs and base-only packs, 10% per pack) once their team has played, and are not handed out automatically.
 
 ### 5. Collector card
 
@@ -80,12 +80,12 @@ A reward for owning cards. The card shows the collection, not a performance. It 
 
 | Set | Rule | Reward card |
 |---|---|---|
-| Complete player | Own every card of one player (every player with at least 3 cards) | Collector card of that player |
+| Complete club | Own every base card of one club | Collector card of that club (the club logo) |
 | Duo / Rivals | Own both players' cards | Duo card (shared goals) or Rivals card (head to head) |
 | All profile types | Own one card of every archetype | Coach card of the team |
 
-- Shows: photo, name, "Collector" label, set progress ("3 / 3 cards"). Gold frame and glitter.
-- Status: Complete player **in app**. Duo, Rivals and Coach are **mockup only**.
+- Shows: club logo, club name, "Collector" label, set progress ("3 / 3 cards"). Gold frame and glitter.
+- Status: Complete club **in app**. Duo, Rivals and Coach are **mockup only**.
 
 ### 6. Legend
 

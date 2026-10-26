@@ -16,6 +16,7 @@ WEEKDAYS = {"2025-12-26": "Fri", "2025-12-27": "Sat", "2025-12-28": "Sun", "2025
 SHORT_STAGE = {"Quarterfinal": "Quarter-finals", "Semifinal": "Semi-finals", "Final": "Final"}
 PACK_BASE_CARDS = 2  # per pack: two base cards of the two teams plus one more (see pack_cards)
 PACK_SPECIAL_CHANCE = 0.2  # the third card of a pack is a special card of the game, otherwise a base card
+ROAD_CHANCE = 0.1  # per pack: the chance that one card is a Road to Final card the user does not own yet
 FIRST_GOAL_CANDIDATES = 2  # per team, plus "someone else"
 OTHER = "other"
 
@@ -330,15 +331,19 @@ class Tournament:
     # Packs
 
     @staticmethod
-    def pack_cards(packs: int, base_ids: list[str], game_card_ids: list[str], rng: random.Random) -> list[str]:
+    def pack_cards(packs: int, base_ids: list[str], game_card_ids: list[str], rng: random.Random,
+                   road_ids: list[str] = ()) -> list[str]:
         """One pack per correct prediction. Each holds two base cards of the two teams that played (duplicates are
-        possible, they can be traded in) and a third card: 20% a special card of the game the user does not own yet,
-        otherwise a base card. With no special left to draw, the third card is a base card."""
+        possible, they can be traded in) and a third card: ROAD_CHANCE a Road to Final card from road_ids, otherwise
+        20% a special card of the game the user does not own yet, otherwise a base card. With no special left to draw,
+        the third card is a base card."""
         drawn, left = [], list(game_card_ids)
         rng.shuffle(left)
         for _ in range(packs):
             drawn += rng.sample(base_ids, min(PACK_BASE_CARDS, len(base_ids)))
-            if left and rng.random() < PACK_SPECIAL_CHANCE:
+            if road_ids and rng.random() < ROAD_CHANCE:
+                drawn.append(rng.choice(road_ids))
+            elif left and rng.random() < PACK_SPECIAL_CHANCE:
                 drawn.append(left.pop())
             else:
                 drawn.append(rng.choice(base_ids))

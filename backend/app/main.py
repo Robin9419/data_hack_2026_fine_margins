@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 
 from . import db
 from .content import MEDIA_DIR, get_content
+from .tournament import ROAD_CHANCE
 
 app = FastAPI(title="Hockey Performance Cards")
 app.add_middleware(
@@ -60,39 +61,56 @@ class LoginRequest(BaseModel):
     favorite_team: Literal[tuple(TEAMS)] | None = None
 
 
-def open_pack(user_id: int, favorite_team: str | None = None) -> list[dict]:
+def road_cards_for(user: dict) -> dict[str, dict]:
+    """The Road to Final cards a pack can give: one per star whose team has played at the user's stage, by card id."""
+    return {c["id"]: c for c in get_content().road_to_final.cards_for(played_for(user))}
+
+
+def with_road_card(user_id: int, roads: dict[str, dict], drawn: list[str]) -> list[str]:
+    """Base-only packs: ROAD_CHANCE that the last card is a Road to Final card the user does not own yet."""
+    owned = db.owned_cards(user_id)
+    pool = [cid for cid in roads if cid not in owned]
+    if pool and random.random() < ROAD_CHANCE:
+        drawn[-1] = random.choice(pool)
+    return drawn
+
+
+def open_pack(user: dict) -> list[dict]:
     """Draws distinct random base cards, adds them to the collection and returns them in full. If the user has a
     favorite team with base cards in the set, one of the cards is guaranteed to be from that team."""
     content = get_content()
     base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
     size = min(content.pack_size, len(base_ids))
-    favorites = [cid for cid in base_ids if content.cards[cid]["player"]["team"] == favorite_team]
+    favorites = [cid for cid in base_ids if content.cards[cid]["player"]["team"] == user["favorite_team"]]
     drawn = [random.choice(favorites)] if favorites else []
     rest = [cid for cid in base_ids if cid not in drawn]
     drawn += random.sample(rest, size - len(drawn))
+    roads = road_cards_for(user)
+    drawn = with_road_card(user["id"], roads, drawn)
     random.shuffle(drawn)
-    new_ids = db.grant_cards(user_id, drawn)
-    return [{**content.cards[cid], "owned": True, "is_new": cid in new_ids} for cid in drawn]
+    new_ids = db.grant_cards(user["id"], drawn)
+    return [{**(roads.get(cid) or content.cards[cid]), "owned": True, "is_new": cid in new_ids} for cid in drawn]
 
 
 DAILY_CARDS = 3
 
 
-def open_daily_card(user_id: int) -> list[dict]:
+def open_daily_card(user: dict) -> list[dict]:
     """Random base cards. They can be duplicates: a second copy is kept and can be traded in."""
-    return open_random_base_cards(user_id, DAILY_CARDS)
+    return open_random_base_cards(user, DAILY_CARDS)
 
 
-def open_random_base_cards(user_id: int, count: int) -> list[dict]:
+def open_random_base_cards(user: dict, count: int) -> list[dict]:
     """Random base cards, one draw each, so duplicates are possible."""
     content = get_content()
     base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
-    drawn = [random.choice(base_ids) for _ in range(count)]
-    new_ids = db.grant_cards(user_id, drawn)
+    roads = road_cards_for(user)
+    drawn = with_road_card(user["id"], roads, [random.choice(base_ids) for _ in range(count)])
+    new_ids = db.grant_cards(user["id"], drawn)
     seen: set[str] = set()
     pack = []
     for cid in drawn:
-        pack.append({**content.cards[cid], "owned": True, "is_new": cid in new_ids and cid not in seen})
+        pack.append({**(roads.get(cid) or content.cards[cid]), "owned": True, "is_new": cid in new_ids and cid not in seen})
         seen.add(cid)
     return pack
 
@@ -120,13 +138,13 @@ def bonus_social(user: dict = Depends(current_user)):
     platform, name = social_for(user["stage"])
     if not db.follow_social(user["id"], platform):
         raise HTTPException(409, f"You already follow Spengler Cup on {name}")
-    pack = open_random_base_cards(user["id"], SOCIAL_CARDS)
+    pack = open_random_base_cards(user, SOCIAL_CARDS)
     return {"pack": pack + award_legends(user), "progress": progress_for(user), "title": f"Thanks for following on {name}!"}
 
 
 @app.post("/api/bonus/tickets")
 def bonus_tickets(body: TicketBonusRequest, user: dict = Depends(current_user)):
-    pack = open_random_base_cards(user["id"], CARDS_PER_TICKET * body.tickets)
+    pack = open_random_base_cards(user, CARDS_PER_TICKET * body.tickets)
     title = f'{body.tickets} {"ticket" if body.tickets == 1 else "tickets"}, {len(pack)} free cards'
     return {"pack": pack + award_legends(user), "progress": progress_for(user), "title": title}
 
@@ -236,7 +254,7 @@ def login(body: LoginRequest):
     """Dummy sign-in: any username works. Only a brand new account gets a starter pack."""
     user, created = db.get_or_create_user(body.username.strip(), body.favorite_team)
     token = db.create_session(user["id"])
-    pack = open_pack(user["id"], user["favorite_team"]) + award_legends(user) if created else None
+    pack = open_pack(user) + award_legends(user) if created else None
     return {"token": token, "user": user, "new_user": created, "pack": pack}
 
 
@@ -245,7 +263,7 @@ def daily_claim(user: dict = Depends(current_user)):
     """Three free base cards per day, where a day is a stage of the simulated tournament timeline."""
     if not db.claim_daily(user["id"], user["stage"]):
         raise HTTPException(409, "You already claimed today's card. Come back tomorrow!")
-    return {"pack": open_daily_card(user["id"]) + award_legends(user), "progress": progress_for(user),
+    return {"pack": open_daily_card(user) + award_legends(user), "progress": progress_for(user),
             "title": "Your daily card"}
 
 
@@ -294,7 +312,7 @@ def me(user: dict = Depends(current_user)):
 @app.get("/api/cards")
 def list_cards(user: dict = Depends(current_user)):
     """The cards that exist at the user's stage of the tournament. Owned cards are full; locked cards only show a
-    teaser. The Road to Final cards of the stars of the teams that have played are added as owned cards; they change
+    teaser. The Road to Final cards are collected from packs like any card: the owned ones are listed, and they change
     with every game and never count in the progress."""
     content = get_content()
     available = available_for(user)
@@ -308,7 +326,7 @@ def list_cards(user: dict = Depends(current_user)):
             result.append({**card, "owned": True, "edition": owned[card_id], "copies": copies.get(card_id, 1)})
         else:
             result.append({**content.card_summary(card), "owned": False})
-    road = [{**card, "owned": True} for card in content.road_to_final.cards_for(played_for(user))]
+    road = [{**card, "owned": True} for card in content.road_to_final.cards_for(played_for(user)) if card["id"] in copies]
     return {"cards": result + road, "progress": content.progress(owned, available)}
 
 
@@ -325,10 +343,12 @@ def admin_cards(user: dict = Depends(current_user)):
 def get_card(card_id: str, user: dict = Depends(current_user)):
     content = get_content()
     if card_id.startswith("test-road-"):
-        road = {c["id"]: c for c in content.road_to_final.cards_for(played_for(user))}
-        if card_id in road:
-            return {**road[card_id], "owned": True}
-        raise HTTPException(404, "This player's team has not played yet")
+        road = road_cards_for(user)
+        if card_id not in road:
+            raise HTTPException(404, "This player's team has not played yet")
+        if card_id not in db.owned_cards(user["id"]):
+            raise HTTPException(403, "You don't own this card yet")
+        return {**road[card_id], "owned": True}
     card = content.cards.get(card_id)
     if not card:
         raise HTTPException(404, "Card not found")
@@ -350,7 +370,7 @@ def reset(user: dict = Depends(current_user)):
     """Empty the user's collection and open a fresh starter pack (for demos/testing)."""
     db.clear_cards(user["id"])  # also clears the predictions and goes back to before the tournament
     user = {**user, "stage": "pre"}
-    pack = open_pack(user["id"], user["favorite_team"]) + award_legends(user)
+    pack = open_pack(user) + award_legends(user)
     return {"pack": pack, "progress": progress_for(user)}
 
 
@@ -519,8 +539,13 @@ def open_packs_of(user: dict, game_id: str, packs: int) -> list[dict]:
     base_ids = [cid for cid, c in content.cards.items() if c["type"] == "base" and c["player"]["team"] in teams]
     owned = db.owned_cards(user["id"])
     game_ids = [cid for cid in content.game_cards(game_id) if cid not in owned]
+    roads = road_cards_for(user)
+    road_ids = [cid for cid in roads if cid not in owned]
     pack = []
-    for cid in content.tournament.pack_cards(packs, base_ids, game_ids, random):
+    for cid in content.tournament.pack_cards(packs, base_ids, game_ids, random, road_ids):
+        if cid in roads:
+            pack.append({**roads[cid], "owned": True, "is_new": bool(db.grant_cards(user["id"], [cid]))})
+            continue
         card = content.cards[cid]
         if card["type"] == "special":
             db.grant_card(user["id"], cid, "standard")

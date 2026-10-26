@@ -118,7 +118,7 @@ class Content:
         # the user's timeline. The cards built from the Wisehockey data, and the reward cards about them, are the final.
         final_id = self.tournament.final["id"]
         self.card_game = {cid: final_id for cid, c in self.cards.items()
-                          if c["type"] == "special" or c.get("kind") == "collector" or c.get("context_type") in ("moment", "trophy")}
+                          if c["type"] == "special" or c.get("context_type") in ("moment", "trophy")}
         self.cards |= self.testdata.cards  # the specials of the other games (official game statistics)
         self.card_game |= {cid: c["test_game"] for cid, c in self.testdata.cards.items()}
         legends_doc = _load_json("legends.json")
@@ -454,24 +454,21 @@ class Content:
             self.cards[cfg["id"]] = self._build_card(cfg)
 
     def _add_reward_cards(self, doc: dict):
-        """Cards earned from what the user owns: a collector card per player with enough cards, plus context cards."""
+        """Cards earned from what the user owns: a collector card per club whose base cards are all owned, plus context cards."""
         match = self._match(self.match["home_team"])
-        by_player: dict[tuple[str, int], list[str]] = {}
+        by_team: dict[str, list[str]] = {}
         for cid, card in self.cards.items():
-            by_player.setdefault((card["player"]["team"], card["player"]["jersey"]), []).append(cid)
+            if card["type"] == "base":
+                by_team.setdefault(card["player"]["team"], []).append(cid)
 
         collector = doc["collector"]
-        for (team, jersey), ids in by_player.items():
-            if len(ids) < collector["min_cards"]:
-                continue
-            player = self.cards[ids[0]]["player"]
-            name = f'{player["first_name"]} {player["last_name"]}'
-            card_id = "collector-" + re.sub(r"\W+", "-", team.lower()) + f"-{jersey}"
+        for team, ids in by_team.items():
+            card_id = "collector-" + re.sub(r"\W+", "-", team.lower())
             self.cards[card_id] = {
                 "id": card_id, "type": "reward", "kind": "collector", "special_type": None, "rating": None,
-                "player": player, "title": collector["title"], "match": self._match(team), "edition": "reward",
+                "player": None, "team": team, "title": team, "match": self._match(team), "edition": "reward",
                 "requires": ids, "unlock": collector["unlock"],
-                "explanation": f"All {len(ids)} cards of {name} in one collection.",
+                "explanation": f"All {len(ids)} base cards of {team} in one collection.",
                 "source": self.match["source"],
             }
             self.reward_rules[card_id] = lambda owned, ids=ids: all(i in owned for i in ids)
@@ -711,9 +708,8 @@ class Content:
         nothing but its club, so it stays a surprise. Reward cards show what unlocks them instead, which is not a
         secret."""
         if card["type"] == "reward":
-            keys = ("id", "type", "kind", "context_type", "title", "unlock", "requires")
-            player = self._photo_only(card["player"]) if card["kind"] == "collector" else None
-            return {**{k: card[k] for k in keys if k in card}, "player": player}
+            keys = ("id", "type", "kind", "context_type", "title", "unlock", "requires", "team")
+            return {**{k: card[k] for k in keys if k in card}, "player": None}
         summary = {"id": card["id"], "type": card["type"], "player": self._photo_only(card["player"], card["type"] == "legend")}
         if "kind" in card:
             summary["kind"] = card["kind"]

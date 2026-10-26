@@ -8,6 +8,7 @@ import MomentList from '../components/MomentList'
 import PlayerPhoto from '../components/PlayerPhoto'
 import VideoSlot from '../components/VideoSlot'
 import { formatMatchDate, scoreline } from '../format'
+import { teamOf } from '../teams'
 
 export default function CardDetail({ preview = false }) {
   const { id } = useParams()
@@ -190,7 +191,11 @@ function RewardCardDetail({ card }) {
       <Link to="/">← Back to collection</Link>
 
       <header className="detail-header">
-        {card.image_url ? (
+        {card.kind === 'collector' ? (
+          <div className="detail-photo">
+            <img src={teamOf(card.team).logo} alt={card.team} />
+          </div>
+        ) : card.image_url ? (
           <div className="detail-photo">
             <img src={card.image_url} alt={card.image_alt} referrerPolicy="no-referrer" />
           </div>
@@ -199,7 +204,7 @@ function RewardCardDetail({ card }) {
         )}
         <div className="detail-heading">
           <p className="eyebrow">{REWARD_LABEL[card.context_type ?? card.kind]}</p>
-          <h1>{card.kind === 'collector' ? `${player.first_name} ${player.last_name}` : card.title}</h1>
+          <h1>{card.title}</h1>
           <p className="muted">{card.headline ?? card.title}</p>
         </div>
       </header>

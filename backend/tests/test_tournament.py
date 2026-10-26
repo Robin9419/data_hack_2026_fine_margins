@@ -46,7 +46,7 @@ class TournamentTests(unittest.TestCase):
         after_day_one = cards()
         self.assertTrue(set(self.content.game_cards(FRI_SPA)) <= set(after_day_one))
         self.assertFalse(set(self.content.game_cards(FINAL)) & set(after_day_one))
-        self.assertTrue(any(c.get('kind') == 'road' for c in after_day_one.values()))
+        self.assertFalse(any(c.get('kind') == 'road' for c in after_day_one.values()))  # road cards come from packs only
         self.go('post')
         self.assertTrue(set(self.content.game_cards(FINAL)) <= set(cards()))
 

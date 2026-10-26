@@ -1,9 +1,7 @@
 {
-  "_comment": "Reward cards are never drawn or won in the trivia: they are earned by what the user already owns (see earned_cards in content.py). 'collector' = every card of one player; 'context' cards are about the match and the tournament. Images are free-licence Wikimedia Commons files, for the demo only.",
+  "_comment": "Reward cards are never drawn or won in the trivia: they are earned by what the user already owns (see earned_cards in content.py). 'collector' = the club logo, earned with every base card of one club; 'context' cards are about the match and the tournament. Images are free-licence Wikimedia Commons files, for the demo only.",
   "collector": {
-    "title": "Complete player",
-    "min_cards": 3,
-    "unlock": "Own every card of this player"
+    "unlock": "Own every base card of this club"
   },
   "context": [
     {

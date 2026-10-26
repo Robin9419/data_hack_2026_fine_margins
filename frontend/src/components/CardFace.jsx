@@ -9,7 +9,7 @@ import PlayerPhoto from './PlayerPhoto'
 //   base         photo, name, position, team
 //   profile      team-colour frame, tag (Sniper, Playmaker, ...) as icon and line above the name
 //   performance  dark glitter card with its own accent colour, label on the side (Player of the Match, ...)
-//   collector    gold card for a player whose cards are all collected
+//   collector    gold card with the club logo, for a club whose base cards are all collected
 //   road         Road to Final: evolving card with the rating per game as bars; the last stage is the Champion look
 //   context      moment, stadium or trophy: a scene instead of a player portrait
 // state: 'owned' (full colour), 'locked' (gallery: grayed out photo only, no info) or 'hidden' (a mystery card in
@@ -87,10 +87,18 @@ const CONTEXT = {
 
 const kindOf = (card) => card.kind ?? (card.type === 'base' ? 'base' : 'profile')
 
+// The big club logo that stands in for a photo on a collector card.
+function ClubLogo({ team }) {
+  const { logo, name } = teamOf(team)
+  return <div className="card-art club-art">{logo && <img src={logo} alt={name} />}</div>
+}
+
 function LockedReward({ card }) {
   const ctx = CONTEXT[card.context_type]
+  const collector = card.kind === 'collector'
   return (
-    <div className="card-face locked reward-locked" style={teamStyle(card.player?.team ?? 'HC Davos')}>
+    <div className="card-face locked reward-locked" style={teamStyle(card.team ?? card.player?.team ?? 'HC Davos')}>
+      {collector && <ClubLogo team={card.team} />}
       {card.player && <PlayerPhoto player={card.player} className="card-art" />}
       <div className="card-info">
         <p className="card-archetype chip">
@@ -130,6 +138,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
 
   const kind = kindOf(card)
   if (kind === 'context') return <ContextFace card={card} />
+  if (kind === 'collector') return <CollectorFace card={card} />
   const { player, match } = card
   const team = teamOf(player.team)
   const nation = nationOf(player.nationality)
@@ -280,6 +289,34 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
           )}
           <p className="card-foot">
             <span className={`card-rarity ${kind === 'base' ? 'faint' : ''}`}>{rarity}</span>
+            <CardIcon name="trophy" />
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Collector: the club logo on a gold card, earned with every base card of the club.
+function CollectorFace({ card }) {
+  return (
+    <div className="card-face owned collector tier-gold" style={teamStyle(card.team)}>
+      <div className="card-inner">
+        <ClubLogo team={card.team} />
+        <div className="card-glitter" aria-hidden="true" />
+        <div className="card-tag" style={{ '--tc': '#ffd76a' }}>
+          <span className="card-tag-icon">
+            <CardIcon name="gift" />
+          </span>
+        </div>
+        <div className="card-info">
+          <p className="card-tagline" style={{ '--tc': '#ffd76a' }}>
+            <CardIcon name="gift" />
+            Collector · {card.requires.length}/{card.requires.length}
+          </p>
+          <p className="card-name">{card.title}</p>
+          <p className="card-foot">
+            <span className="card-rarity">★★★</span>
             <CardIcon name="trophy" />
           </p>
         </div>

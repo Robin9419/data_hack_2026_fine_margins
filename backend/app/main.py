@@ -312,8 +312,8 @@ def me(user: dict = Depends(current_user)):
 @app.get("/api/cards")
 def list_cards(user: dict = Depends(current_user)):
     """The cards that exist at the user's stage of the tournament. Owned cards are full; locked cards only show a
-    teaser. The Road to Final cards are collected from packs like any card: the owned ones are listed, and they change
-    with every game and never count in the progress."""
+    teaser. The Road to Final cards are collected from packs like any card, so the ones not owned yet show a teaser
+    too. They only exist once their team has played, change with every game and never count in the progress."""
     content = get_content()
     available = available_for(user)
     owned = owned_now(user)
@@ -326,7 +326,8 @@ def list_cards(user: dict = Depends(current_user)):
             result.append({**card, "owned": True, "edition": owned[card_id], "copies": copies.get(card_id, 1)})
         else:
             result.append({**content.card_summary(card), "owned": False})
-    road = [{**card, "owned": True} for card in content.road_to_final.cards_for(played_for(user)) if card["id"] in copies]
+    road = [{**card, "owned": True} if card["id"] in copies else {**content.card_summary(card), "owned": False}
+            for card in content.road_to_final.cards_for(played_for(user))]
     return {"cards": result + road, "progress": content.progress(owned, available)}
 
 

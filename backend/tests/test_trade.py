@@ -84,11 +84,19 @@ class TradeTests(unittest.TestCase):
     def test_trade_refuses_when_everything_is_owned(self):
         user = self.user()
         cards = list(self.cards)
-        db.grant_cards(user['id'], cards + [self.base[0]] * 2)
+        db.grant_cards(user['id'], cards + list(main.road_cards_for(user)) + [self.base[0]] * 2)
         with self.assertRaises(main.HTTPException) as err:
             main.trade(main.TradeRequest(card_ids=[self.base[0]] * 3), user)
         self.assertEqual(err.exception.status_code, 409)
         self.assertEqual(db.card_copies(user['id'])[self.base[0]], 3)
+
+    def test_trade_can_give_a_road_card_when_only_those_are_missing(self):
+        user = self.user()
+        roads = main.road_cards_for(user)
+        db.grant_cards(user['id'], list(self.cards) + [self.base[0]] * 2)
+        card = main.trade(main.TradeRequest(card_ids=[self.base[0]] * 3), user)['pack'][0]
+        self.assertIn(card['id'], roads)
+        self.assertIn(card['id'], db.owned_cards(user['id']))
 
     def test_no_special_cards_before_their_game(self):
         random.seed(2)

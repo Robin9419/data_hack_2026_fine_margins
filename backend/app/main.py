@@ -174,11 +174,13 @@ def trade_odds(favorite_team: str | None) -> list[dict]:
 def tradeable_cards(user: dict, traded_ids: list[str]) -> list[str]:
     """Card ids a trade may give: base and special cards that exist at the user's stage of the tournament, which the
     user does not hold and is not trading in. A trade never returns a duplicate, so this is the only pool it draws
-    from. Legends are only earned (see award_legends)."""
+    from. Road to Final cards the user does not own count as special cards. Legends are only earned (see
+    award_legends)."""
     excluded = set(db.owned_cards(user["id"])) | set(traded_ids)
     available = available_for(user)
-    return [cid for cid, c in get_content().cards.items()
-            if c["type"] in ("base", "special") and cid not in excluded and cid in available]
+    cards = [cid for cid, c in get_content().cards.items()
+             if c["type"] in ("base", "special") and cid not in excluded and cid in available]
+    return cards + [cid for cid in road_cards_for(user) if cid not in excluded]
 
 
 def roll_trade(user: dict, traded_ids: list[str]) -> tuple[str, dict]:
@@ -190,8 +192,9 @@ def roll_trade(user: dict, traded_ids: list[str]) -> tuple[str, dict]:
     odds = trade_odds(favorite_team)
     rolled = random.choices([o["id"] for o in odds], weights=[o["chance"] for o in odds])[0]
     available = set(tradeable_cards(user, traded_ids))
-    base = [cid for cid in available if content.cards[cid]["type"] == "base"]
-    specials = [cid for cid in available if content.cards[cid]["type"] == "special"]
+    roads = road_cards_for(user)
+    base = [cid for cid in available if cid not in roads and content.cards[cid]["type"] == "base"]
+    specials = [cid for cid in available if cid in roads or content.cards[cid]["type"] == "special"]
     pools = {
         "special": specials,
         "base": base,
@@ -199,6 +202,9 @@ def roll_trade(user: dict, traded_ids: list[str]) -> tuple[str, dict]:
         "other": [cid for cid in base if content.cards[cid]["player"]["team"] != favorite_team],
     }
     drawn = random.choice(pools[rolled] or base or specials)
+    if drawn in roads:
+        db.grant_cards(user_id, [drawn])
+        return "special", {**roads[drawn], "owned": True, "is_new": True}
     card = content.cards[drawn]
     if card["type"] == "special":
         db.grant_card(user_id, drawn, "standard")

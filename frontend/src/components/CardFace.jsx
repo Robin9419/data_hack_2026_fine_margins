@@ -71,9 +71,11 @@ const ARCHETYPES = {
   'Chance Creator': { icon: 'burst', color: '#ffd76a' },
   'Go-To Scorer': { icon: 'flag', color: '#ff6a4a' },
   Playmaker: { icon: 'nodes', color: '#b98bff' },
-  'Pressure Reliever': { icon: 'nodes', color: '#b98bff' },
+  'Pressure Breaker': { icon: 'nodes', color: '#b98bff' },
   Speedster: { icon: 'bolt', color: '#19e6ff' },
   'Shot Blocker': { icon: 'shield', color: '#45ff92' },
+  'Puck Hunter': { icon: 'target', color: '#45ff92' },
+  'Pass Thief': { icon: 'shield', color: '#5bd8ff' },
   Workhorse: { icon: 'flame', color: '#ff9a3c' },
   'Shot Stopper': { icon: 'shield', color: '#7cc4ff' },
 }

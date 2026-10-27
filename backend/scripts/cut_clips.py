@@ -28,16 +28,9 @@ def ffmpeg_exe() -> str:
         return exe
 
 
-def main():
-    force = "--force" in sys.argv
-    content = get_content()
+def event_windows(content):
+    """Merge fixed and sequence-specific windows for shared physical timestamps."""
     rec = content.recording
-    source = ROOT / rec["file"]
-    if not source.exists():
-        sys.exit(f"Recording not found: {source}")
-    ffmpeg = ffmpeg_exe()
-    CLIPS_DIR.mkdir(parents=True, exist_ok=True)
-
     # One clip per event; goal, assist and goal-against moments share the Goal event.
     events = {}
     recording_timestamps = {r["Timestamp"] for r in content.event_rows}
@@ -48,9 +41,22 @@ def main():
             if card.get("test_game") or m.get("timestamp") not in recording_timestamps:
                 continue
             kind = clip_window_kind(m["kind"])
-            before, after = rec['windows'][kind]
+            before, after = m.get('clip_window', rec['windows'][kind])
             previous = events.get(m['timestamp'], (before, after))
             events[m['timestamp']] = (min(previous[0], before), max(previous[1], after))
+    return events
+
+
+def main():
+    force = "--force" in sys.argv
+    content = get_content()
+    rec = content.recording
+    source = ROOT / rec["file"]
+    if not source.exists():
+        sys.exit(f"Recording not found: {source}")
+    ffmpeg = ffmpeg_exe()
+    CLIPS_DIR.mkdir(parents=True, exist_ok=True)
+    events = event_windows(content)
 
     def cut(item):
         ts, window = item

@@ -41,7 +41,7 @@ One for every player of every team, independent of any game. Photo as on the clu
 
 About 5 per team per game. One player who stood for one clear role in this game. The label is the archetype.
 
-- Archetypes: Sniper, Playmaker, Volume Shooter, Chance Creator, Speedster, Shot Blocker, Workhorse, Go-To Scorer (team leader), Shot Stopper, Pressure Reliever. A new tracking metric can add an archetype.
+- Archetypes: Sniper, Playmaker, Volume Shooter, Chance Creator, Speedster, Shot Blocker, Workhorse, Go-To Scorer (team leader), Shot Stopper, Pressure Breaker. A new tracking metric can add an archetype.
 - Shows: position, the tag (icon top left, its name above the player name), the game next to the jersey number. No rating or tier on the front.
 - Frame: team colour. Rarity symbol: ◆.
 - Back: the three KPIs that earned the archetype with value, rank and a plain-language definition, the story in one sentence and the video clips.

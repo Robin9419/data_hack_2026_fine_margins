@@ -9,7 +9,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from .events import ORDINALS, PERIOD_SECONDS, MatchEvents, _clock
-from .event_kpis import EventAnalysis, pass_body_pressure, pass_packing, expected_assists
+from .event_kpis import EventAnalysis, pass_body_pressure, pass_packing, expected_assists, blc_xg, controlled_zone_exits, interceptions
 from .ratings import HIGH_DANGER_XG, compute_ratings, goalie_stats
 from .road_to_final import RoadToFinal
 from .testdata import TestData, with_card_image
@@ -65,6 +65,7 @@ class Content:
         self.pack_size = cards_doc["pack_size"]
         self.archetypes = cards_doc["archetypes"]
         self.archetype_metrics = {k: v for k, v in cards_doc["archetype_metrics"].items() if not k.startswith("_")}
+        self.award_categories = _load_json('award_categories.json')['categories']
         rewards_doc = _load_json("rewards.json")
         self.card_points = rewards_doc["card_points"]
         self.stadium_multiplier = rewards_doc["stadium_multiplier"]
@@ -88,10 +89,15 @@ class Content:
         self.analysis = EventAnalysis(self.event_rows, goalkeeper_ids)
         self.derived_kpis = {'pass_body_pressure': pass_body_pressure(self.analysis),
                              'pass_packing': pass_packing(self.analysis),
-                             'expected_assists': expected_assists(self.analysis)}
+                             'expected_assists': expected_assists(self.analysis),
+                             'blc_xg': blc_xg(self.analysis),
+                             'controlled_zone_exits': controlled_zone_exits(self.analysis),
+                             'interceptions': interceptions(self.analysis)}
         self._add_pass_moments()
         self._add_packing_moments()
         self._add_xa_moments()
+        self._add_zone_moments()
+        self._add_interception_moments()
         self.player_images = self._load_player_images()
         base_doc = _load_json("base_cards.json")
         # Dual nationalities ("Canada / USA") show the first one on the card.
@@ -104,6 +110,7 @@ class Content:
         self._add_pressure_card()
         self._add_progression_card()
         self._add_xa_card()
+        self._add_category_cards()
         self.cards |= {c["id"]: self._build_base_card(c, base_doc) for c in base_doc["cards"]}
         self._add_performance_cards(cards_doc["performance_specials"])
         self.reward_rules = {}  # reward card id -> function(owned card ids -> editions) saying whether it is earned
@@ -124,6 +131,11 @@ class Content:
         legends_doc = _load_json("legends.json")
         self.legend_thresholds = legends_doc["thresholds"]
         self.cards |= {c["id"]: self._build_legend_card(c, legends_doc) for c in legends_doc["cards"]}
+        for category in self.award_categories:
+            titles = set(category.get('existing_awards', [])) | {award['title'] for award in category['awards']}
+            for card in self.cards.values():
+                if card['type'] == 'special' and card['title'] in titles:
+                    card.update(category_id=category['id'], category=category['label'])
 
     def _add_pass_moments(self):
         for result in self.derived_kpis['pass_body_pressure']['events']:
@@ -161,11 +173,11 @@ class Content:
         # Deterministic tie break: more evaluated passes, then player ID.
         pid, stats = max(candidates, key=lambda item: (item[1]['mean'], item[1]['evaluated_passes'], item[0]))
         team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
-        self.archetypes['Pressure Reliever'] = ('Highest average reduction in nearby opposing skaters through successful passes, '
+        self.archetypes['Pressure Breaker'] = ('Highest average reduction in nearby opposing skaters through successful passes, '
                                                'with at least 10 evaluated passes. Snapshot-based estimate.')
-        self.archetype_metrics['Pressure Reliever'] = ['pbp_mean', 'packing_mean', 'packing_total']
+        self.archetype_metrics['Pressure Breaker'] = ['pbp_mean', 'packing_mean', 'packing_total']
         cfg = {'id': 'pressure-reliever', 'team': team, 'jersey': jersey, 'position': 'Skater',
-               'title': 'Pressure Reliever', 'attributes': ['pbp_mean', 'packing_mean', 'packing_total'],
+               'title': 'Pressure Breaker', 'attributes': ['pbp_mean', 'packing_mean', 'packing_total'],
                'explanation': f"Reduced nearby opponent pressure by {stats['mean']:.2f} skaters per evaluated pass on average. "
                               f"{stats['evaluated_passes']} of {stats['eligible_passes']} eligible passes could be evaluated. "
                               'This measures pressure relief, not overall passing or attacking quality.',
@@ -240,6 +252,88 @@ class Content:
             card['video'] = {**best['clip'], 'description': self._describe(best), 'scope': 'moment'}
         card['source'] = self.match['events_source']
         self.cards[cfg['id']] = card
+
+    def _add_zone_moments(self):
+        for metric_id, kind in [('blc_xg', 'zone_entry'), ('controlled_zone_exits', 'zone_exit')]:
+            for result in self.derived_kpis[metric_id]['events']:
+                if result['value'] is None:
+                    continue
+                row = self.event_rows[result['source_row'] - 1]
+                entry = metric_id == 'blc_xg'
+                title = 'Offensive zone entry' if entry else ('Controlled zone exit' if result['value'] else 'Uncontrolled zone exit')
+                text = (f"BLCxG {result['value']:.3f} from {len(result['shot_source_rows'])} own-team shots. "
+                        'Opponent possession inside the zone does not end the sequence.' if entry
+                        else f"Crossing outcome: {result['crossing_result']}.")
+                moment = self.events._moment(row, kind, title, text)
+                moment.update(id=result['id'], kpi=result)
+                if entry:
+                    duration = (int(result['end_timestamp']) - int(result['timestamp'])) / 1000
+                    moment['clip_window'] = [-3, duration + 2]
+                self.events.by_player.setdefault(result['player_id'], []).append(moment)
+        for moments in self.events.by_player.values():
+            moments.sort(key=lambda m: (int(m['timestamp']), m['id']))
+
+    def _add_interception_moments(self):
+        for result in self.derived_kpis['interceptions']['events']:
+            if result['value'] is None:
+                continue
+            row = self.event_rows[result['source_row'] - 1]
+            moment = self.events._moment(row, 'interception', 'Pass intercepted',
+                f"Intercepted a pass from {self.events.names.get(result['passer_id'], 'opponent')}.")
+            moment.update(id=result['id'], kpi=result)
+            self.events.by_player.setdefault(result['interceptor_id'], []).append(moment)
+        for moments in self.events.by_player.values():
+            moments.sort(key=lambda m: (int(m['timestamp']), m['id']))
+
+    def _add_category_cards(self):
+        for category in self.award_categories:
+            for award in category['awards']:
+                if award.get('derived'):
+                    calculation = self.derived_kpis[award['derived']]
+                    candidates = [(pid, stats) for pid, stats in calculation['players'].items()
+                                  if stats['ranking_eligible'] and stats[award['aggregate']] is not None
+                                  and stats[award['aggregate']] > 0
+                                  and any(value == pid for value in self.events.ids.values())]
+                else:
+                    metric = self.metrics[award['primary_metric']]
+                    candidates = []
+                    for row in self.rows:
+                        pid = self.events.player_id(row['Team'], int(row['Jersey']))
+                        value = _to_number(row[metric['column']])
+                        if pid and pid not in self.analysis.goalkeeper_ids and value is not None and math.isfinite(value) and value > 0:
+                            candidates.append((pid, {award['aggregate']: value}))
+                if award.get('tie_break_metric'):
+                    enriched = []
+                    for pid, stats in candidates:
+                        # Copy calculator aggregates rather than mutating the cached analysis.
+                        stats = dict(stats)
+                        team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
+                        moments = self.events.moments(pid)
+                        attr = self._build_attribute(award['tie_break_metric'], self._find_row(team, jersey), moments)
+                        stats[award['tie_break_aggregate']] = attr['value'] if attr['value'] is not None else 0
+                        enriched.append((pid, stats))
+                    candidates = enriched
+                if not candidates:
+                    continue
+                pid, stats = max(candidates, key=lambda item: (
+                    item[1][award['aggregate']], item[1][award['tie_break_aggregate']], item[0]))
+                team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
+                title, metrics = award['title'], award['metrics']
+                self.archetypes[title] = award['definition']
+                self.archetype_metrics[title] = metrics
+                cfg = {'id': award['id'], 'team': team, 'jersey': jersey, 'position': 'Skater',
+                       'title': title, 'attributes': metrics, 'explanation': award['definition'],
+                       'achievement': None, 'video': None}
+                card = self._build_card(cfg)
+                card.update(category_id=category['id'], category=category['label'],
+                            source=self.match['events_source'] if award.get('derived') else self.match['source'])
+                ids = set(card['attributes'][0]['moment_ids'] or [])
+                filmed = [m for m in card['moments'] if m['id'] in ids and m['clip'] and m['kpi']['value'] > 0]
+                card['video'] = None
+                if filmed:
+                    best = max(filmed, key=lambda m: (m['kpi']['value'], -int(m['timestamp'])))
+                    card['video'] = {**best['clip'], 'description': self._describe(best), 'scope': 'moment'}
+                self.cards[award['id']] = card
 
     def _load_stats(self) -> list[dict]:
         path = DATA_DIR / self.match["stats_file"]
@@ -347,9 +441,21 @@ class Content:
         attr["moment_ids"] = MatchEvents.select(moments, metric["events"]) if "events" in metric else None
         if metric.get('derived'):
             attr['coverage'] = stats.get('coverage')
-            attr['detail'] = (f"{stats.get('assisted_shots', 0)} attributed shots" if metric['derived'] == 'expected_assists'
-                              else f"{stats.get('evaluated_passes', 0)} of {stats.get('eligible_passes', 0)} eligible passes evaluated")
-            attr['moment_ids'] = stats.get('positive_event_ids' if metric['aggregate'] == 'positive_share' else 'event_ids', [])
+            if metric['derived'] == 'expected_assists':
+                attr['detail'] = f"{stats.get('assisted_shots', 0)} attributed shots"
+            elif metric['derived'] == 'blc_xg':
+                attr['detail'] = f"{stats.get('evaluated_entries', 0)} of {stats.get('eligible_entries', 0)} eligible entries evaluated"
+            elif metric['derived'] == 'controlled_zone_exits':
+                attr['detail'] = (f"{format_value(stats.get('controlled_exits'), 'int')} of "
+                                  f"{stats.get('evaluated_exits', 0)} evaluated exits controlled; "
+                                  f"{stats.get('eligible_exits', 0)} eligible crossings")
+            elif metric['derived'] == 'interceptions':
+                attr['detail'] = f"{stats.get('interceptions', 0)} intercepted opponent passes across all zones"
+            else:
+                attr['detail'] = f"{stats.get('evaluated_passes', 0)} of {stats.get('eligible_passes', 0)} eligible passes evaluated"
+            event_key = ('positive_event_ids' if metric['aggregate'] == 'positive_share' else
+                         'controlled_event_ids' if metric['aggregate'] == 'controlled_exits' else 'event_ids')
+            attr['moment_ids'] = stats.get(event_key, [])
             if not stats.get('ranking_eligible'):
                 attr['match_rank'] = None
                 attr['team_rank'] = None

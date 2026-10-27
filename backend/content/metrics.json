@@ -356,6 +356,111 @@
       "events": [
         "expected_assist"
       ]
+    },
+    {
+      "id": "blcxg_mean",
+      "label": "Average entry BLCxG",
+      "derived": "blc_xg",
+      "aggregate": "mean",
+      "format": "decimal3",
+      "unit": "xG",
+      "higher_is_better": true,
+      "definition": "Average own-team shot xG generated per evaluated offensive entry. Opponent control inside the zone does not end the sequence; puck departure or stoppage does. Entries with missing shot xG or unknown sequence endings are excluded, not zero.",
+      "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
+      "category_id": "zone-entries-exits",
+      "events": [
+        "zone_entry"
+      ]
+    },
+    {
+      "id": "blcxg_total",
+      "label": "Total entry BLCxG",
+      "derived": "blc_xg",
+      "aggregate": "total",
+      "format": "decimal3",
+      "unit": "xG",
+      "higher_is_better": true,
+      "definition": "Sum of BLCxG over fully evaluated offensive entries. Each shot credits at most one entry; Goal rows do not add xG again.",
+      "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
+      "category_id": "zone-entries-exits",
+      "events": [
+        "zone_entry"
+      ]
+    },
+    {
+      "id": "blcxg_entries",
+      "label": "Evaluated offensive entries",
+      "derived": "blc_xg",
+      "aggregate": "evaluated_entries",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Number of offensive entries with a known sequence ending and valid xG for every own-team shot. Completed sequences without shots count as zero BLCxG.",
+      "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
+      "category_id": "zone-entries-exits",
+      "events": [
+        "zone_entry"
+      ]
+    },
+    {
+      "id": "controlled_exits",
+      "label": "Controlled zone exits",
+      "derived": "controlled_zone_exits",
+      "aggregate": "controlled_exits",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Defensive zone crossings towards the opponent with PossessionMaintained. No additional possession-retention window is required.",
+      "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
+      "category_id": "zone-entries-exits",
+      "events": [
+        "zone_exit"
+      ]
+    },
+    {
+      "id": "controlled_exit_share",
+      "label": "Controlled exit share",
+      "derived": "controlled_zone_exits",
+      "aggregate": "success_share",
+      "format": "pct",
+      "unit": "%",
+      "higher_is_better": true,
+      "definition": "Controlled exits divided by defensive exit attempts with a known crossing outcome. PossessionLost and PuckDumpedIn count as uncontrolled; None and missing outcomes are excluded.",
+      "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
+      "category_id": "zone-entries-exits",
+      "events": [
+        "zone_exit"
+      ]
+    },
+    {
+      "id": "zone_exit_attempts",
+      "label": "Zone exit attempts",
+      "derived": "controlled_zone_exits",
+      "aggregate": "attempted_exits",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Defensive zone exit attempts with PossessionMaintained, PossessionLost or PuckDumpedIn and an identified skater.",
+      "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
+      "category_id": "zone-entries-exits",
+      "events": [
+        "zone_exit"
+      ]
+    },
+    {
+      "id": "interceptions_total",
+      "label": "Passes intercepted",
+      "derived": "interceptions",
+      "aggregate": "interceptions",
+      "format": "int",
+      "unit": "",
+      "higher_is_better": true,
+      "definition": "Opponent passes explicitly marked Intercepted, credited to the identified secondary skater on the opposing team, across all zones. Successful and Failed passes do not count. Goalkeepers are excluded.",
+      "source_definition": "Wisehockey PassResult=Intercepted; EventPrimaryPlayerId is the passer and EventSecondaryPlayerId the intercepting opponent.",
+      "events": [
+        "interception"
+      ],
+      "category_id": "defending"
     }
   ]
 }

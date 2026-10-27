@@ -1,6 +1,6 @@
 # Awards and Categories — Discussion Summary
 
-Updated: 2026-10-19. This document records the agreed product direction, implemented award rules, and outstanding decisions. Technical KPI and video integration instructions are in [EVENT_KPIS.md](EVENT_KPIS.md); tournament context is in [SPENGLER_CUP_2025.md](SPENGLER_CUP_2025.md).
+Updated: 2026-10-27. This document records the agreed product direction, implemented award rules, and outstanding decisions. Technical KPI and video integration instructions are in [EVENT_KPIS.md](EVENT_KPIS.md); tournament context is in [SPENGLER_CUP_2025.md](SPENGLER_CUP_2025.md).
 
 ## Product Direction
 
@@ -20,29 +20,43 @@ This grouping was discussed as an example; it is not yet a finalized configurati
 
 | Category | Candidate awards |
 |---|---|
-| Passing | Playmaker, Pressure Reliever, Progression Master, Chance Architect |
+| Passing | Playmaker, Pressure Breaker, Progression Master, Chance Architect |
 | Scoring | Sniper, Volume Shooter, Chance Creator, Go-To Scorer |
 | Goalkeeping | Shot Stopper, Brick Wall |
-| Defending | Shot Blocker; further defensive awards to be defined |
+| Defending | Shot Blocker, Puck Hunter, Pass Thief (registered) |
 | Work Rate / Skating | Workhorse, Speedster |
+| Zone entries / exits | Attack Launcher, Escape Artist (confirmed; registered) |
 
-Man of the Match, Game Winner, and Record Breaker also exist. Their placement inside categories, or treatment as additional awards outside the category system, remains undecided. Reward, legend, and base cards are separate collection features, not automatically members of this player-performance category system.
+Man of the Match, Game Winner, and Record Breaker are grouped under **General** for this overview. This documentation grouping does not change the implemented category-selection rules. Reward, legend, and base cards are separate collection features, not automatically members of this player-performance category system.
 
 ## Existing Award Logic
 
 The original nine archetypes are manually assigned to players in `backend/content/cards.json`: Sniper, Playmaker, Volume Shooter, Chance Creator, Speedster, Shot Blocker, Workhorse, Go-To Scorer, and Shot Stopper. Each displays supporting KPIs, but the three displayed attributes do not constitute an automatic scoring or selection formula.
 
-Other awards are calculated in the backend:
+The table includes all current player-performance awards. Entries marked **Manually assigned** have supporting KPI values from the data, but no automatic winner-selection formula; the remaining awards are calculated in the backend.
 
-| Award | Current rule |
-|---|---|
-| Pressure Reliever | Highest positive average PBP; at least 10 evaluated passes. Ties favor more evaluated passes, then player ID. |
-| Progression Master | Highest positive average Packing; at least 10 evaluated passes. Ties favor more evaluated passes, then player ID. |
-| Chance Architect | Highest positive total xA. Ties favor more attributed shots, then player ID. No minimum sample threshold currently applies. |
-| Man of the Match | Most points on the winning team; goals break ties. |
-| Game Winner | Scorer of the winning team's `(opponent final goals + 1)`-th goal, selected from goal events. |
-| Brick Wall | Most saves against shots with xG ≥ 0.15; total saves break ties. |
-| Record Breaker | New tournament hardest-shot best; currently available through the test-data tournament mode. |
+| Award | Category | Current rule |
+|---|---|---|
+| Sniper | Scoring | **Manually assigned.** Scoring-focused profile; supporting KPIs: goals, shots and total xG. |
+| Playmaker | Passing | **Manually assigned.** Creates for teammates; supporting KPIs: assists, points and pass completion. |
+| Volume Shooter | Scoring | **Manually assigned.** Profile for the player taking the most shots; supporting KPIs: shots, total xG and top shot speed. |
+| Chance Creator | Scoring | **Manually assigned.** Profile for the player generating the greatest total shot xG; supporting KPIs: total xG, shots and goals. |
+| Go-To Scorer | Scoring | **Manually assigned.** Team-leading shooting threat; supporting KPIs: shots, total xG and goals. |
+| Shot Stopper | Goalkeeping | **Manually assigned.** Profile for the goalkeeper making the most saves; supporting KPIs: saves, save percentage and shots on goal against. |
+| Shot Blocker | Defending | **Manually assigned.** Shot-blocking profile; supporting KPIs: blocked shots, puck battles won and time on ice. |
+| Workhorse | Work Rate / Skating | **Manually assigned.** Workload profile emphasizing time on ice and distance skated; supporting KPIs also include puck battles won. Definition is pending refinement. |
+| Speedster | Work Rate / Skating | **Manually assigned.** Speed-focused profile; supporting KPIs: top skating speed, puck battles won and distance skated. |
+| Pressure Breaker | Passing | Highest positive average PBP; at least 10 evaluated passes. Ties favor more evaluated passes, then player ID. |
+| Progression Master | Passing | Highest positive average Packing; at least 10 evaluated passes. Ties favor more evaluated passes, then player ID. |
+| Chance Architect | Passing | Highest positive total xA. Ties favor more attributed shots, then player ID. No minimum sample threshold currently applies. |
+| Attack Launcher | Zone entries / exits | Highest positive mean BLCxG with at least 3 evaluated offensive entries. Ties favor evaluated entries, then player ID. |
+| Escape Artist | Zone entries / exits | Most controlled defensive exits. Ties favor controlled-exit share, then player ID. |
+| Puck Hunter | Defending | Most puck battles won (PCW) across all zones. Ties favor interceptions, then player ID. |
+| Pass Thief | Defending | Most validated interceptions across all zones. Ties favor PCW, then player ID. |
+| Man of the Match | General | Most points on the winning team; goals break ties. |
+| Game Winner | General | Scorer of the winning team's `(opponent final goals + 1)`-th goal, selected from goal events. |
+| Brick Wall | Goalkeeping | Most saves against shots with xG ≥ 0.15; total saves break ties. |
+| Record Breaker | General | New tournament hardest-shot best; currently available through the test-data tournament mode. |
 
 For the three new passing awards, the final player-ID tie break selects the lexicographically greatest ID solely for deterministic behavior. The 10-pass minimum for PBP and Packing is provisional, not a statistically validated threshold.
 
@@ -50,7 +64,7 @@ These are project-defined awards. Do not present them as official Spengler Cup a
 
 ## Passing: Three Complementary Dimensions
 
-### Pressure Reliever — Pass Body Pressure
+### Pressure Breaker — Pass Body Pressure
 
 PBP measures pressure reduction around the puck carrier:
 
@@ -106,7 +120,7 @@ At the time of this discussion, the real final dataset produces:
 
 | Award | Player | Evidence |
 |---|---|---|
-| Pressure Reliever | Joey Muldowney | Mean PBP approximately 0.82 from 11 evaluated passes |
+| Pressure Breaker | Joey Muldowney | Mean PBP approximately 0.82 from 11 evaluated passes |
 | Progression Master | Eric Pohlkamp | Mean Packing approximately 1.64; signed total 23 |
 | Chance Architect | Tino Kessler | Total xA 0.551 from five attributed shots |
 
@@ -134,3 +148,23 @@ The passing awards are currently separate special cards. A player can receive mu
 8. Make history-dependent selection reproducible in chronological game order and specify whether revisiting a game preserves its original award.
 
 Until these decisions are made, retain independently calculated awards and their transparent KPI evidence. The one-award-per-category policy remains the next product step.
+
+## Zone Entries / Exits
+
+The category is registered in `backend/content/award_categories.json`, with independent Attack Launcher and Escape Artist cards. Category metadata is available through `/api/award-categories` and on the new cards. Attack Launcher is the user-selected replacement for Entry Catalyst. The three-entry minimum remains provisional. Escape Artist was explicitly selected by the user, replacing Exit Specialist. Selecting one award from this category per game remains pending.
+
+**BLCxG** credits an offensive entrant with the sum of own-team shot xG until the puck leaves the offensive zone or play stops. The user explicitly chose to retain the same sequence through opponent possession and subsequent puck recovery inside the zone. No fixed time limit applies. Both controlled and uncontrolled known-outcome puck entries are included; missing shot xG or an unclosed sequence makes the entry unavailable. Attack Launcher ranks average BLCxG; total and evaluated entry count provide context.
+
+**Controlled exits** count defensive blue-line crossings with the exported result `PossessionMaintained`. This is possession evidence at the crossing, without an extra retention window. The controlled share uses all evaluated known-outcome exits as its denominator. Escape Artist ranks the successful count; controlled share and attempted exits provide context.
+
+Entry videos cover the full evaluated sequence; exits use a short crossing clip. Source rows, sequence endings and contributing shots remain auditable. See [EVENT_KPIS.md](EVENT_KPIS.md) for eligibility, exclusions and clip regeneration.
+
+## Defending: Two Additional Awards
+
+The user explicitly requested **Puck Hunter** to count won battles in **all zones**, including offensive and neutral zones. It ranks the existing aggregate PCW count. Workhorse may be revised separately; its current implementation was not changed here.
+
+**Pass Thief** counts passes explicitly labelled `PassResult=Intercepted`, attributing each to the opposing secondary player. Failed passes and general possession changes do not count. The current export provides complete player attribution for all 79 interceptions. Both new awards require a positive primary count. Puck Hunter breaks ties using interceptions; Pass Thief uses PCW. A final player-ID tie-break makes selection deterministic.
+
+The real final yields Valentin Nussbaumer for Puck Hunter (11 won battles) and Eric Pohlkamp for Pass Thief (5 interceptions, 7 won battles). Their cards display PCW, interceptions and blocked shots as transparent context. No weighted multi-KPI score is applied.
+
+Defending is registered alongside Zone entries / exits. Existing Shot Blocker cards are also assigned to Defending, retaining their original manual winner selection. The new awards are independent final-game collectibles; one-award-per-category selection remains pending. Interceptions have source-event/video links. PCW remains an aggregate with no inferred per-battle video attribution.

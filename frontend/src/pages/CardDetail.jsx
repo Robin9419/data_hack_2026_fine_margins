@@ -76,7 +76,7 @@ export default function CardDetail({ preview = false }) {
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
         <div className="detail-heading">
-          <p className="eyebrow">{card.title}</p>
+          <p className="eyebrow">{card.category ? `${card.category} · ` : ''}{card.title}</p>
           <h1>
             #{player.jersey} {player.first_name} {player.last_name}
           </h1>

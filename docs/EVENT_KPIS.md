@@ -21,7 +21,7 @@ Results retain source row number (1-based data row, excluding header), metric ID
 
 Player aggregates include mean PBP, positive count/share, eligible/evaluated counts, coverage and supporting event IDs. `/api/analysis/pass-body-pressure` returns all results to signed-in demo users.
 
-A provisional **minimum of 10 evaluated passes** controls ranking eligibility. This is a product rule, not a statistically validated threshold. The “Pressure Reliever” card selects the highest positive mean, breaking ties by evaluated count then player ID. No card is added if nobody qualifies. It is a separate collectible and does not replace existing player cards. More than one card may therefore represent the same player. The current dataset's winner is Joey Muldowney; this is calculated, not hard-coded. PBP does not measure forward progression or overall passing quality.
+A provisional **minimum of 10 evaluated passes** controls ranking eligibility. This is a product rule, not a statistically validated threshold. The user-selected name **Pressure Breaker** replaces Pressure Reliever. Its stable card ID remains `pressure-reliever`, preserving ownership, artwork and links. The “Pressure Breaker” card selects the highest positive mean, breaking ties by evaluated count then player ID. No card is added if nobody qualifies. It is a separate collectible and does not replace existing player cards. More than one card may therefore represent the same player. The current dataset's winner is Joey Muldowney; this is calculated, not hard-coded. PBP does not measure forward progression or overall passing quality.
 
 ## Adding Another KPI
 
@@ -65,7 +65,7 @@ Project into attacking x direction (+1 or −1). Count opponents strictly betwee
 
 Missing origin/player/opponent coordinates, reception snapshots, or direction produce unavailable results. Results store both source rows/timestamps, origin and reception x, attack direction, and IDs of bypassed/restored opponents. Aggregates include signed total and mean, positive share/count, coverage, and evaluated counts. Rankings retain the provisional minimum of 10 evaluated passes.
 
-Registered as `Content.derived_kpis['pass_packing']`; authenticated endpoint: `/api/analysis/pass-packing`. `packing_mean` and `packing_total` are available as card metrics. They are displayed alongside average PBP on the Pressure Reliever card; Packing does not change that award's PBP-based winner. The selection of one passing award per category is not implemented by this KPI addition.
+Registered as `Content.derived_kpis['pass_packing']`; authenticated endpoint: `/api/analysis/pass-packing`. `packing_mean` and `packing_total` are available as card metrics. They are displayed alongside average PBP on the Pressure Breaker card; Packing does not change that award's PBP-based winner. The selection of one passing award per category is not implemented by this KPI addition.
 
 `pass_packing` moments link to the same pass timestamp and `pass` video window as PBP. Existing clips can be reused without recutting. The clip cutter ignores non-final/test-game events and cards without moments. Packing is currently computed only from the real final event export, not inferred for other games from aggregate statistics.
 
@@ -74,7 +74,7 @@ Registered as `Content.derived_kpis['pass_packing']`; authenticated endpoint: `/
 
 `Content._add_progression_card` adds a separate `progression-master` collectible for the highest **positive mean Packing**, with the calculator's minimum evaluated-pass threshold (currently 10). Ties favor more evaluated passes, then the lexicographically greatest player ID, for deterministic selection. No card is created if nobody qualifies. The winner is calculated from the real final events; other games do not receive invented Packing awards.
 
-The card shows average Packing, signed total Packing, and the share of evaluated passes with positive Packing. Supporting event links for the share include only positive passes; mean and total include all evaluated passes, including zero and negative values. When available, the highlight is the winner's highest positive-Packing pass clip (earliest timestamp breaks ties). Existing pass clips are reused. The normal collection, trivia, and final-game availability rules apply. Pressure Reliever remains independently awarded using PBP; selecting only one award per passing category remains future work.
+The card shows average Packing, signed total Packing, and the share of evaluated passes with positive Packing. Supporting event links for the share include only positive passes; mean and total include all evaluated passes, including zero and negative values. When available, the highlight is the winner's highest positive-Packing pass clip (earliest timestamp breaks ties). Existing pass clips are reused. The normal collection, trivia, and final-game availability rules apply. Pressure Breaker remains independently awarded using PBP; selecting only one award per passing category remains future work.
 
 ## Expected Assists (xA) and Chance Architect
 
@@ -91,3 +91,100 @@ Registered as `derived_kpis['expected_assists']`; authenticated endpoint `/api/a
 Supporting `expected_assist` moments belong to the passer and anchor video at the **shot timestamp**, while retaining the pass timestamp for traceability. The `expected_assist` recording window is **7 seconds before to 3 seconds after** the shot, covering a pass up to 4 seconds earlier. The card highlight selects the highest-xG attributed shot with a camera clip. No unrelated broadcast replay is attached to xA moments.
 
 Existing shot clips may be too short for the new window. Run `python -m scripts.cut_clips --force` and restart the backend to regenerate clips with the union of all required event windows. Clip generation remains manual.
+
+## Zone entries / exits: BLCxG and controlled exits
+
+Implemented on 2026-10-27 in `event_kpis.py`, using the shared `EventAnalysis`. Registered as `derived_kpis['blc_xg']` and `derived_kpis['controlled_zone_exits']`. Authenticated endpoints: `/api/analysis/blc-xg` and `/api/analysis/controlled-zone-exits`.
+
+### Crossing classification and eligibility
+
+The export contains `BluelineCrossingDirection=TowardsOpponent/TowardsHome` and outcomes `PossessionMaintained`, `PossessionLost`, `PuckDumpedIn`, and `None`. Classify a crossing using `EventStartCoordinate.x` projected into the team's attacking direction, obtained from `infer_attack_directions` or an explicit `(period, side)` mapping:
+
+- Opponent-side blue line + `TowardsOpponent`: offensive entry.
+- Own-side blue line + `TowardsOpponent`: defensive exit.
+- Opponent-side blue line + `TowardsHome`: offensive-zone departure.
+- Own-side blue line + `TowardsHome`: defensive entry.
+
+This uses provider-labelled blue-line events, not a hard-coded rink length. `EventPosition` alone is insufficient: it can label either side of a crossing. Missing crossing coordinates, team/direction, or an identified skater prevents attribution. Goalkeepers are excluded as award candidates. `None`/empty outcomes provide no confirmation of a puck crossing and do not start or terminate a sequence. Keep those source occurrences in the result list with an exclusion reason; do not deduplicate simultaneous rows. Validate these provider-specific semantics for each new export.
+
+### BLCxG sequence rule
+
+An identified offensive entry with any of the three known outcomes starts a sequence, including `PossessionLost` and `PuckDumpedIn`. Thus the metric covers puck entries rather than only controlled entries. The entrant receives the sum of **their team's** `ShotXG` values in the following offensive-zone sequence:
+
+- **Opponent control, loose pucks, and contested possession inside the zone do not end it.** Shots after a recovery contribute to the same entry.
+- End at a confirmed outward puck crossing, `PuckControlEndZone` outside the offensive zone, or a puck-action event (`Pass`, `Shot`, `Dump`, `Clear`) located outside it. A shot outside is not included.
+- `StoppageOfPlay` ends it. `Goal` and `Faceoff` also provide explicit evidence of a stoppage. The goal's preceding Shot contributes once; the Goal row contributes no additional xG.
+- Player crossings with `None` outcomes and penalty locations do not establish puck departure.
+- Never carry a sequence across periods. Without observed departure/stoppage before a period change or end of the export, mark it `unclosed_sequence`; do not publish a partial total as complete.
+- Order by precise timestamp and source-row occurrence. A second entry inside an already active sequence is retained as `overlapping_entry_without_departure` and excluded from evaluation. It does not restart attribution or double-credit shots.
+- No time cap is imposed. A fully closed sequence without shots has BLCxG **zero**.
+
+Each own-team shot must have finite xG in `[0, 1]`. If any is missing/invalid, the sequence value is unavailable. Retain `known_xg_total`, missing-shot source rows, and all shot source rows/timestamps for auditing, but exclude the incomplete sequence from means/totals. Opponent shots never add xG. This is entry-linked team chance production, not an isolated causal measure of the entrant's skill.
+
+Player aggregates: eligible/evaluated entry counts, total/mean BLCxG, entries with a shot, coverage, ranking eligibility, and evaluated event IDs. Means include evaluated zero-shot entries. Metrics: `blcxg_mean`, `blcxg_total`, `blcxg_entries`.
+
+### Controlled defensive exits
+
+An identified skater's defensive exit counts as controlled only when `BluelineCrossingResult=PossessionMaintained`. `PossessionLost` and `PuckDumpedIn` count as zero. Unknown outcomes remain unavailable, not zero. No later retention window or reception snapshot is imposed: the provider's result supplies the possession evidence at the crossing.
+
+The calculator evaluates **BlueLineCrossing rows only**. It does not additionally infer exits from passes, Clears or Dumps, which could duplicate crossing events. It therefore measures the player attribution provided by those crossing rows, not every possible breakout assist.
+
+Player aggregates: eligible exits (including unknown outcomes), evaluated/attempted exits with known outcomes, controlled-exit count, controlled share (`controlled / evaluated`), coverage (`evaluated / eligible`), and supporting IDs. If no exits can be evaluated, the count/share is unavailable and the player cannot rank. Metrics: `controlled_exits`, `controlled_exit_share`, `zone_exit_attempts`. The controlled count links only successful exits; the share and attempt count link all evaluated exits.
+
+### Category and provisional awards
+
+`backend/content/award_categories.json` registers **Zone entries / exits**, exposed by `/api/award-categories`. Both new cards retain `category_id` and `category` and show category context on the detail page. Attack Launcher is the user-selected replacement for Entry Catalyst; the stable card ID remains `entry-catalyst`, preserving ownership and links. The sample threshold remains provisional. Escape Artist is the user-selected replacement for Exit Specialist; the stable card ID remains `exit-specialist` so existing ownership and links are preserved:
+
+- **Attack Launcher** (`entry-catalyst`): highest positive mean BLCxG with at least **3 evaluated entries**. Ties favor evaluated entry count, then the lexicographically greatest player ID. The sample minimum is provisional; the observed dataset has relatively few entries per player.
+- **Escape Artist** (`exit-specialist`): most controlled defensive exits, requiring a positive count. Ties favor controlled share, then player ID.
+
+The real final currently yields Aiden Fink for Attack Launcher (mean 0.09375 xG over 4 evaluated entries; total 0.375) and Lukas Frick for Escape Artist (7 controlled exits out of 12 evaluated). Winners are calculated, not hard-coded. Only this final has the required event data; do not invent these KPIs for other tournament games.
+
+Both awards currently remain independent collectibles. Registration of a category does **not** implement history-dependent selection of exactly one award per category/game. `/api/award-categories` explicitly reports `selection_policy=independent_awards`.
+
+### Sequence videos
+
+`zone_entry` moments anchor at the entry timestamp and retain the sequence end and all contributing shots in `kpi`. Their explicit `clip_window` is **3 seconds before entry through 2 seconds after the observed sequence end**. `zone_exit` uses a fixed `[-3, +5]` second window. Neither attaches unrelated YouTube goals.
+
+`cut_clips.event_windows` merges these event-specific windows with fixed recording windows for timestamps shared by multiple moments. This permits future sequence KPIs to request different clip lengths without adding computation to React. Existing entry clips may be too short, so regenerate with:
+
+```bash
+cd backend
+source .venv/bin/activate
+python -m scripts.cut_clips --force
+```
+
+Then restart the backend so clip availability is refreshed. Sequence clips can be longer than pass/shot clips; generation remains manual. The frontend already supports playing linked moments in the card detail timeline and spotlight. Award highlights choose a positive supporting event, when its arena clip exists. No video encoding is performed as part of KPI calculation.
+
+## Defending: Puck Hunter and Pass Thief
+
+Pass Thief is the user-selected replacement for Passing Lane Guardian. The stable card ID remains `passing-lane-guardian`, preserving ownership and links.
+
+`award_categories.json` registers **Defending**, with the existing **Shot Blocker** title in `existing_awards` and two additional independently calculated awards. `_add_category_cards` now handles both derived KPI selections and selections using existing aggregate metrics. Existing Shot Blocker cards receive category metadata without changing their manual assignment. Other games do not receive invented Interception or Puck Hunter awards.
+
+### Interceptions
+
+`interceptions(analysis)` is registered as `derived_kpis['interceptions']`, exposed through authenticated `/api/analysis/interceptions`. Metric: `interceptions_total`.
+
+- Evaluate `EventType=Pass` rows; only `PassResult=Intercepted` qualifies.
+- Primary player is the passer. **Secondary player is the intercepting opponent**, not an intended teammate receiver.
+- Require identified, distinct players and opposite Home/Away teams. Exclude goalkeeper interceptors. Successful, Failed and unknown pass outcomes do not count.
+- Include all zones and periods. No coordinates, possession search or timing window is needed: the provider explicitly supplies the outcome and interceptor.
+- Each eligible source occurrence contributes 1 to the interceptor. Preserve source row and timestamp, including distinct occurrences sharing a timestamp. Never collapse rows by timestamp.
+- Invalid eligible rows retain `value=None` and an exclusion reason. They are not credited as zero-valued events. Match-level eligible/evaluated counts and coverage expose attribution completeness.
+- Player totals count validated interceptions; identified skaters with none have zero and an empty event list. If some eligible rows cannot be attributed, totals are validated counts, not guaranteed complete totals. Use match-level coverage to assess this limitation. Per-player completeness is not inferred from unassigned events.
+
+All 79 intercepted passes in the current final export identify a valid opposing skater, so attribution coverage is 100%. Subsequent control-event spot checks corroborate the secondary-player role. This is the provider's interception definition, not a reconstruction of forced turnovers or all defensive recoveries.
+
+`interception` moments belong to the interceptor and anchor at the **intercepted pass timestamp**, retaining the passer and source row in `kpi`. They use the existing `pass` video window (`[-3, +5]` seconds). No unrelated broadcast goal replay is attached. The existing cutter discovers these moments and merges their windows with other moments at the same timestamp. Generate missing clips with `python -m scripts.cut_clips`; use `--force` to regenerate existing ones, then restart the backend.
+
+### Award rules
+
+- **Puck Hunter** (`puck-hunter`): highest positive **PCW / puck battles won** from the aggregate statistics, across **all zones**, as explicitly requested. Ties favor validated interceptions, then the lexicographically greatest player ID.
+- **Pass Thief** (`passing-lane-guardian`): highest positive **interception count**, across all zones. Ties favor aggregate PCW, then the lexicographically greatest player ID.
+
+Both show PCW, interceptions and blocked shots, ordered with the deciding KPI first. Supporting attributes do not form a weighted score. Omit an award if nobody has a positive valid primary value. The final currently awards Puck Hunter to **Valentin Nussbaumer (11 PCW)** and Pass Thief to **Eric Pohlkamp (5 interceptions, 7 PCW)**. Four players share the highest interception count; the PCW tie-break selects Pohlkamp. Winners are computed, not fixed in JSON.
+
+PCW remains the existing aggregate metric `puck_contest_wins`; no guessed contest-winner calculator is introduced. Contested control rows identify participants, but do not explicitly identify the winner, and later possession can belong to another player. Consequently PCW has `moment_ids=None` and no dedicated evidence highlight. The card's interception attribute still links its validated interception events. Pass Thief's highlight uses a supporting interception clip when available. Workhorse's definition and attributes have not been changed by this addition.
+
+For category configuration, derived awards specify `derived` and `aggregate`; aggregate-stat awards specify `primary_metric` and `aggregate`. `tie_break_metric` optionally supplies a supporting metric used only to resolve equal primary values. Candidate enrichment copies aggregates to preserve cached calculator results. The new category is available through `/api/award-categories`; the selection policy remains `independent_awards`, not one award per category/game.

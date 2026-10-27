@@ -663,3 +663,23 @@ def packing_analysis(user: dict = Depends(current_user)):
 @app.get('/api/analysis/expected-assists')
 def xa_analysis(user: dict = Depends(current_user)):
     return get_content().derived_kpis['expected_assists']
+
+
+@app.get('/api/analysis/blc-xg')
+def blc_xg_analysis(user: dict = Depends(current_user)):
+    return get_content().derived_kpis['blc_xg']
+
+
+@app.get('/api/analysis/controlled-zone-exits')
+def zone_exit_analysis(user: dict = Depends(current_user)):
+    return get_content().derived_kpis['controlled_zone_exits']
+
+
+@app.get('/api/award-categories')
+def award_categories(user: dict = Depends(current_user)):
+    return {'categories': get_content().award_categories, 'selection_policy': 'independent_awards'}
+
+
+@app.get('/api/analysis/interceptions')
+def interception_analysis(user: dict = Depends(current_user)):
+    return get_content().derived_kpis['interceptions']

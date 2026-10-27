@@ -273,3 +273,236 @@ def expected_assists(analysis, window_seconds=4):
                            'opponent_control_breaks_attribution': True},
             'events': results, 'players': players,
             'exclusions': dict(Counter(s['exclusion_reason'] for s in results if s['exclusion_reason']))}
+
+
+CROSSING_OUTCOMES = {'PossessionMaintained', 'PossessionLost', 'PuckDumpedIn'}
+ZONE_NAMES = {'HomeTeamZone', 'AwayTeamZone', 'NeutralZone'}
+
+
+def _crossing(analysis, index, directions):
+    """Classify a provider-labelled crossing using its blue-line x and team direction.
+
+    EventPosition can refer to either side of the line, so it cannot by itself
+    distinguish entry from exit. None outcomes do not establish a puck crossing.
+    """
+    row = analysis.rows[index]
+    side = row.get('EventPrimaryTeam')
+    sign = directions.get((int(row['Period']), side))
+    xy = coordinate(row.get('EventStartCoordinate'))
+    movement = row.get('BluelineCrossingDirection')
+    if side not in ('Home', 'Away'):
+        return None, 'unknown_team'
+    if sign not in (-1, 1):
+        return None, 'unknown_attack_direction'
+    if xy is None or xy[0] == 0:
+        return None, 'missing_crossing_coordinates'
+    if movement not in ('TowardsOpponent', 'TowardsHome'):
+        return None, 'unknown_crossing_direction'
+    offensive_line = sign * xy[0] > 0
+    forward = movement == 'TowardsOpponent'
+    kind = ('offensive_entry' if forward else 'offensive_exit') if offensive_line else (
+        'defensive_exit' if forward else 'defensive_entry')
+    return {'kind': kind, 'side': side, 'attack_direction': sign, 'x': xy[0]}, None
+
+
+def _zone_result(row, index, metric_id):
+    return {'id': f'row-{index + 1}-{metric_id}', 'metric_id': metric_id,
+            'source_row': index + 1, 'timestamp': row['Timestamp'], 'period': int(row['Period']),
+            'player_id': row.get('EventPrimaryPlayerId'), 'team': row.get('EventPrimaryTeam'),
+            'crossing_kind': None, 'crossing_result': row.get('BluelineCrossingResult'),
+            'eligible': False, 'value': None, 'exclusion_reason': None}
+
+
+def controlled_zone_exits(analysis, attack_directions=None):
+    """Count defensive puck crossings whose exported outcome confirms retained possession."""
+    directions = infer_attack_directions(analysis) if attack_directions is None else attack_directions
+    if any(direction not in (-1, 1) for direction in directions.values()):
+        raise ValueError('Attack directions must be +1 or -1')
+    results, grouped = [], defaultdict(list)
+    for index, row in enumerate(analysis.rows):
+        if row['EventType'] != 'BluelineCrossing':
+            continue
+        result = _zone_result(row, index, 'controlled_zone_exits')
+        crossing, error = _crossing(analysis, index, directions)
+        if crossing:
+            result.update(crossing_kind=crossing['kind'], attack_direction=crossing['attack_direction'])
+        if error:
+            result['exclusion_reason'] = error
+        elif crossing['kind'] != 'defensive_exit':
+            result['exclusion_reason'] = 'not_defensive_exit'
+        elif not result['player_id'] or result['player_id'] in analysis.goalkeeper_ids:
+            result['exclusion_reason'] = 'unidentified_or_goalkeeper'
+        else:
+            result['eligible'] = True
+            if result['crossing_result'] not in CROSSING_OUTCOMES:
+                result['exclusion_reason'] = 'unknown_crossing_outcome'
+            else:
+                result['value'] = int(result['crossing_result'] == 'PossessionMaintained')
+            grouped[result['player_id']].append(result)
+        results.append(result)
+    players = {}
+    for pid, exits in grouped.items():
+        evaluated = [event for event in exits if event['value'] is not None]
+        n = len(evaluated)
+        successful = [event for event in evaluated if event['value'] == 1]
+        players[pid] = {'eligible_exits': len(exits), 'attempted_exits': n, 'evaluated_exits': n,
+                       'controlled_exits': len(successful) if n else None,
+                       'success_share': len(successful) / n if n else None,
+                       'coverage': n / len(exits), 'ranking_eligible': n > 0,
+                       'event_ids': [event['id'] for event in evaluated],
+                       'controlled_event_ids': [event['id'] for event in successful]}
+    return {'parameters': {'success_outcome': 'PossessionMaintained', 'retention_window_seconds': None,
+                           'attack_directions': {f'{p}:{s}': d for (p, s), d in directions.items()}},
+            'events': results, 'players': players,
+            'exclusions': dict(Counter(e['exclusion_reason'] for e in results if e['exclusion_reason']))}
+
+
+def blc_xg(analysis, attack_directions=None, min_evaluated=3):
+    """Own-team shot xG after an offensive puck entry, until zone departure or stoppage.
+
+    Opponent possession inside the zone never ends a sequence. Each shot belongs
+    to at most one entry. Missing xG or an unclosed sequence makes the total unknown.
+    """
+    if min_evaluated < 1:
+        raise ValueError('Minimum evaluated entries must be positive')
+    directions = infer_attack_directions(analysis) if attack_directions is None else attack_directions
+    if any(direction not in (-1, 1) for direction in directions.values()):
+        raise ValueError('Attack directions must be +1 or -1')
+    results, active = [], {}
+
+    def finish(side, row=None, index=None, reason='unclosed_sequence'):
+        result = active.pop(side)
+        result.update(end_timestamp=row['Timestamp'] if row else None,
+                      end_source_row=index + 1 if index is not None else None, end_reason=reason)
+        if reason == 'unclosed_sequence':
+            result['exclusion_reason'] = reason
+        elif result['missing_xg_source_rows']:
+            result['exclusion_reason'] = 'missing_or_invalid_sequence_xg'
+        else:
+            result['value'] = result['known_xg_total']
+
+    ordered = sorted(enumerate(analysis.rows), key=lambda item: (int(item[1]['Timestamp']), item[0]))
+    for index, row in ordered:
+        period, kind = int(row['Period']), row['EventType']
+        for side in list(active):
+            if active[side]['period'] != period:
+                finish(side, reason='unclosed_sequence')
+        crossing, error = _crossing(analysis, index, directions) if kind == 'BluelineCrossing' else (None, None)
+        meaningful_crossing = crossing and row.get('BluelineCrossingResult') in CROSSING_OUTCOMES
+        for side in list(active):
+            offensive_zone = 'AwayTeamZone' if side == 'Home' else 'HomeTeamZone'
+            departure = False
+            if meaningful_crossing:
+                departure = (directions[(period, side)] * crossing['x'] < 0
+                             or (crossing['side'] == side and crossing['kind'] == 'offensive_exit')
+                             or (crossing['side'] != side and crossing['kind'] == 'defensive_exit'))
+            elif kind == 'PuckControl':
+                end_zone = row.get('PuckControlEndZone')
+                departure = end_zone in ZONE_NAMES and end_zone != offensive_zone
+            elif kind in ('Pass', 'Shot', 'Dump', 'Clear', 'Goal'):
+                # These event locations describe puck actions. Player-only crossings
+                # and penalty locations must never be used as puck departure evidence.
+                zone = row.get('EventPosition')
+                departure = zone in ZONE_NAMES and zone != offensive_zone
+            if kind in ('StoppageOfPlay', 'Faceoff', 'Goal'):
+                # A Goal row follows its Shot; do not count it as another shot.
+                finish(side, row, index, 'stoppage')
+            elif departure:
+                finish(side, row, index, 'zone_departure')
+
+        if kind == 'BluelineCrossing':
+            result = _zone_result(row, index, 'blc_xg')
+            result.update(end_timestamp=None, end_source_row=None, end_reason=None,
+                          shot_source_rows=[], shot_timestamps=[], missing_xg_source_rows=[], known_xg_total=0.0)
+            if crossing:
+                result.update(crossing_kind=crossing['kind'], attack_direction=crossing['attack_direction'])
+            if error:
+                result['exclusion_reason'] = error
+            elif crossing['kind'] != 'offensive_entry':
+                result['exclusion_reason'] = 'not_offensive_entry'
+            elif not result['player_id'] or result['player_id'] in analysis.goalkeeper_ids:
+                result['exclusion_reason'] = 'unidentified_or_goalkeeper'
+            elif result['crossing_result'] not in CROSSING_OUTCOMES:
+                result['exclusion_reason'] = 'unknown_crossing_outcome'
+            else:
+                result['eligible'] = True
+                side = crossing['side']
+                if side in active:
+                    result['exclusion_reason'] = 'overlapping_entry_without_departure'
+                else:
+                    active[side] = result
+            results.append(result)
+        elif kind == 'Shot' and row.get('EventPrimaryTeam') in active:
+            result = active[row['EventPrimaryTeam']]
+            result['shot_source_rows'].append(index + 1)
+            result['shot_timestamps'].append(row['Timestamp'])
+            try:
+                xg = float(row.get('ShotXG'))
+            except (TypeError, ValueError):
+                xg = None
+            if xg is None or not isfinite(xg) or not 0 <= xg <= 1:
+                result['missing_xg_source_rows'].append(index + 1)
+            else:
+                result['known_xg_total'] += xg
+    for side in list(active):
+        finish(side)
+    grouped = defaultdict(list)
+    for result in results:
+        if result['eligible']:
+            grouped[result['player_id']].append(result)
+    players = {}
+    for pid, entries in grouped.items():
+        evaluated = [entry for entry in entries if entry['value'] is not None]
+        n = len(evaluated)
+        players[pid] = {'eligible_entries': len(entries), 'evaluated_entries': n,
+                       'total': sum(e['value'] for e in evaluated) if n else None,
+                       'mean': sum(e['value'] for e in evaluated) / n if n else None,
+                       'shot_entries': sum(bool(e['shot_source_rows']) for e in evaluated),
+                       'coverage': n / len(entries), 'ranking_eligible': n >= min_evaluated,
+                       'event_ids': [e['id'] for e in evaluated]}
+    return {'parameters': {'min_evaluated': min_evaluated, 'opponent_control_ends_sequence': False,
+                           'entry_outcomes': sorted(CROSSING_OUTCOMES),
+                           'attack_directions': {f'{p}:{s}': d for (p, s), d in directions.items()}},
+            'events': results, 'players': players,
+            'exclusions': dict(Counter(e['exclusion_reason'] for e in results if e['exclusion_reason']))}
+
+
+def interceptions(analysis):
+    """Provider-labelled intercepted passes, credited to the opposing secondary skater."""
+    results, grouped = [], defaultdict(list)
+    skaters = {row.get(f'Event{role}PlayerId') for row in analysis.rows for role in ('Primary', 'Secondary')
+               if row.get(f'Event{role}PlayerId') and row.get(f'Event{role}Team') in ('Home', 'Away')}
+    skaters -= analysis.goalkeeper_ids
+    for index, row in enumerate(analysis.rows):
+        if row['EventType'] != 'Pass':
+            continue
+        passer, interceptor = row.get('EventPrimaryPlayerId'), row.get('EventSecondaryPlayerId')
+        side, other = row.get('EventPrimaryTeam'), row.get('EventSecondaryTeam')
+        result = {'id': f'row-{index + 1}-interceptions', 'metric_id': 'interceptions',
+                  'source_row': index + 1, 'timestamp': row['Timestamp'], 'period': int(row['Period']),
+                  'passer_id': passer, 'interceptor_id': interceptor, 'player_id': interceptor,
+                  'team': other, 'pass_result': row.get('PassResult'), 'eligible': False,
+                  'value': None, 'exclusion_reason': None}
+        if row.get('PassResult') != 'Intercepted':
+            result['exclusion_reason'] = 'not_intercepted'
+        else:
+            result['eligible'] = True
+            if not passer or not interceptor:
+                result['exclusion_reason'] = 'unidentified_players'
+            elif side not in ('Home', 'Away') or other not in ('Home', 'Away') or side == other or passer == interceptor:
+                result['exclusion_reason'] = 'incompatible_players_or_teams'
+            elif interceptor in analysis.goalkeeper_ids:
+                result['exclusion_reason'] = 'goalkeeper_interception'
+            else:
+                result['value'] = 1
+                grouped[interceptor].append(result)
+        results.append(result)
+    players = {pid: {'interceptions': len(grouped[pid]), 'ranking_eligible': True,
+                     'event_ids': [event['id'] for event in grouped[pid]]} for pid in sorted(skaters)}
+    eligible = sum(event['eligible'] for event in results)
+    evaluated = sum(event['value'] is not None for event in results)
+    return {'parameters': {'pass_result': 'Intercepted', 'credited_role': 'Secondary',
+                           'zones': 'all', 'goalkeepers_excluded': True},
+            'events': results, 'players': players, 'eligible_events': eligible, 'evaluated_events': evaluated,
+            'coverage': evaluated / eligible if eligible else None,
+            'exclusions': dict(Counter(e['exclusion_reason'] for e in results if e['exclusion_reason']))}

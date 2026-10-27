@@ -85,6 +85,7 @@ A reward for owning cards. The card shows the collection, not a performance. It 
 | All profile types | Own one card of every archetype | Coach card of the team |
 
 - Shows: club logo, club name, "Collector" label, set progress ("3 / 3 cards"). Gold frame and glitter.
+- Card page: club facts, history, Spengler Cup record and honours with sources (`clubs` in `reward_cards.json`).
 - Status: Complete club **in app**. Duo, Rivals and Coach are **mockup only**.
 
 ### 6. Legend

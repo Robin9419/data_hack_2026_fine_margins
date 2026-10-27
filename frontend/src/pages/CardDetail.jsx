@@ -261,12 +261,64 @@ function RewardCardDetail({ card }) {
           {formatMatchDate(match.date)}
         </div>
       </div>
+      {card.club && <ClubInfo club={card.club} />}
       <p className="muted small">
         Source: {card.source}
         {card.credit ? ` · Image: ${card.credit}` : ''}
       </p>
     </section>
   )
+}
+
+// The club behind a collector card: key facts, its story, its Spengler Cup record and honours, with sources.
+function ClubInfo({ club }) {
+  return (
+    <>
+      <h2>About the club</h2>
+      <div className="match-context">
+        {Object.entries(club.facts).map(([label, value]) => (
+          <div key={label}>
+            <span className="label">{label}</span>
+            {value}
+          </div>
+        ))}
+      </div>
+      <p className="explanation">{club.summary}</p>
+
+      <h2>At the Spengler Cup</h2>
+      <ul className="legend-facts">
+        {club.spengler_cup.map((fact) => (
+          <li key={fact}>{fact}</li>
+        ))}
+      </ul>
+
+      {club.honours.length > 0 && (
+        <>
+          <h2>Honours</h2>
+          <ul className="legend-facts">
+            {club.honours.map((fact) => (
+              <li key={fact}>{fact}</li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      <p className="muted small">
+        Club sources: <SourceLinks urls={club.sources} />
+      </p>
+    </>
+  )
+}
+
+function SourceLinks({ urls }) {
+  return urls.map((url, i) => (
+    <span key={url}>
+      {i > 0 && ', '}
+      <a href={url} target="_blank" rel="noreferrer">
+        {new URL(url).hostname.replace(/^www\./, '')}
+      </a>
+    </span>
+  ))
 }
 
 const age = (iso) => {
@@ -414,15 +466,7 @@ function LegendCardDetail({ card }) {
         {legend.sources?.length > 0 && (
           <>
             {' '}
-            · Sources:{' '}
-            {legend.sources.map((url, i) => (
-              <span key={url}>
-                {i > 0 && ', '}
-                <a href={url} target="_blank" rel="noreferrer">
-                  {new URL(url).hostname.replace(/^www\./, '')}
-                </a>
-              </span>
-            ))}
+            · Sources: <SourceLinks urls={legend.sources} />
           </>
         )}
       </p>

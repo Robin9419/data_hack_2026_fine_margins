@@ -469,6 +469,7 @@ class Content:
                 "player": None, "team": team, "title": team, "match": self._match(team), "edition": "reward",
                 "requires": ids, "unlock": collector["unlock"],
                 "explanation": f"All {len(ids)} base cards of {team} in one collection.",
+                "club": doc["clubs"].get(team),
                 "source": self.match["source"],
             }
             self.reward_rules[card_id] = lambda owned, ids=ids: all(i in owned for i in ids)

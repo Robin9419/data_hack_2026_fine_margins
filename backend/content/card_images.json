@@ -75,9 +75,21 @@
   },
   "test-road-hc-davos-18": {
     "image_url": "/specials/test-road-hc-davos-18.jpg",
-    "position": "73% 40%",
-    "credit": "SRF Sport (TV interview still)",
-    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/stimmen-zum-hcd-triumph-den-rekordsieg-in-der-tasche-das-naechste-ziel-vor-augen"
+    "position": "50% 30%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/aktuelles/news"
+  },
+  "test-road-hc-davos-18-champ": {
+    "image_url": "/specials/test-road-hc-davos-18-champ.jpg",
+    "position": "75% 30%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/aktuelles/news"
+  },
+  "test-road-hc-davos-44-champ": {
+    "image_url": "/specials/test-road-hc-davos-44-champ.jpg",
+    "position": "50% 30%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/aktuelles/news"
   },
   "chance-architect": {
     "image_url": "/specials/chance-architect.jpg",

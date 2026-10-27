@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import AttributeRow from '../components/AttributeRow'
+import CardTile from '../components/CardTile'
 import FormBars from '../components/FormBars'
 import InstagramLink from '../components/InstagramLink'
 import MomentList from '../components/MomentList'
@@ -154,7 +155,43 @@ export default function CardDetail({ preview = false }) {
       <p className="muted small">
         Source: {card.source} · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
       </p>
+
+      {!preview && <PlayerCards cardId={card.id} />}
     </section>
+  )
+}
+
+// All cards of the player on the page, the ones owned and the ones still locked.
+function PlayerCards({ cardId }) {
+  const [cards, setCards] = useState(null)
+
+  useEffect(() => {
+    let active = true
+    setCards(null)
+    api
+      .playerCards(cardId)
+      .then(({ cards }) => { if (active) setCards(cards) })
+      .catch(() => { if (active) setCards([]) })
+    return () => { active = false }
+  }, [cardId])
+
+  const others = cards?.filter((c) => c.id !== cardId)
+  if (!others || others.length === 0) return null
+  const sorted = [...others].sort((a, b) => (a.owned === b.owned ? 0 : a.owned ? -1 : 1))
+  const ownedCount = others.filter((c) => c.owned).length
+
+  return (
+    <>
+      <h2>Other cards of this player</h2>
+      <p className="muted small">
+        You own {ownedCount} of {others.length} other cards. Locked cards are still hidden.
+      </p>
+      <div className="card-grid player-cards">
+        {sorted.map((c) => (
+          <CardTile key={c.id} card={c} />
+        ))}
+      </div>
+    </>
   )
 }
 
@@ -298,6 +335,8 @@ function BaseCardDetail({ card }) {
         )}{' '}
         · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
       </p>
+
+      <PlayerCards cardId={card.id} />
     </section>
   )
 }

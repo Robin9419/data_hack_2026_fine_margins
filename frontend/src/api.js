@@ -34,6 +34,7 @@ export const api = {
   cards: () => request('/cards'),
   adminCards: () => request('/admin/cards'),
   card: (id) => request(`/cards/${id}`),
+  playerCards: (id) => request(`/cards/${id}/player-cards`),
   tournament: () => request('/tournament'),
   setStage: (stage) => request('/tournament/stage', { method: 'POST', body: { stage } }),
   predict: (gameId, questionId, optionId) =>

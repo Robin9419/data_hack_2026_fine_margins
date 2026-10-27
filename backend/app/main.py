@@ -346,6 +346,33 @@ def admin_cards(user: dict = Depends(current_user)):
     return {"cards": [{**c, "owned": True} for c in [*content.cards.values(), *road]]}
 
 
+@app.get("/api/cards/{card_id}/player-cards")
+def player_cards(card_id: str, user: dict = Depends(current_user)):
+    """Every card of the same player that exists at the user's stage: the ones owned in full, the locked ones as a
+    teaser (names are blanked, so the match has to be made here)."""
+    content = get_content()
+    card = content.cards.get(card_id)
+    if not card or not card.get("player"):
+        return {"cards": []}
+    player = card["player"]
+    who = (player.get("first_name"), player.get("last_name"), player.get("team"))
+    available = available_for(user)
+    owned = owned_now(user)
+    copies = db.card_copies(user["id"])
+    result = []
+    for other_id, other in content.cards.items():
+        p = other.get("player")
+        if other["type"] == "reward" or not p or other_id not in available:
+            continue
+        if (p.get("first_name"), p.get("last_name"), p.get("team")) != who:
+            continue
+        if other_id in owned:
+            result.append({**other, "owned": True, "edition": owned[other_id], "copies": copies.get(other_id, 1)})
+        else:
+            result.append({**content.card_summary(other), "owned": False})
+    return {"cards": result}
+
+
 @app.get("/api/cards/{card_id}")
 def get_card(card_id: str, user: dict = Depends(current_user)):
     content = get_content()

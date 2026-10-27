@@ -1,9 +1,9 @@
 {
-  "_comment": "Reward cards are never drawn or won in the trivia: they are earned by what the user already owns (see earned_cards in content.py). 'collector' = the club logo, earned with every base card of one club; 'context' cards are about the match and the tournament. Images are free-licence Wikimedia Commons files, for the demo only.",
+  "_comment": "Reward cards are never drawn or won in the trivia: they are earned by what the user already owns (see earned_cards in content.py). 'collector' = the club logo, earned with every base card of one club; 'context' cards are about the match and the tournament. Images are free-licence Wikimedia Commons files, for the demo only. 'about' (optional) holds the facts shown on a card's page, researched 2026-10-27 (sources per card).",
   "collector": {
     "unlock": "Own every base card of this club"
   },
-  "_clubs_comment": "Club facts shown on each collector card's page. Researched 2026-10-27 on Wikipedia, club, league, federation and press sites (see sources per club). Fribourg-Gottéron's founding year differs between sources (1937 or 1938). HIFK's Spengler Cup list names the appearances that could be confirmed; it may not be complete.",
+  "_clubs_comment": "Club facts (same shape as a context card's 'about': facts, summary, sections of bullet lists, sources) shown on each collector card's page. Researched 2026-10-27 on Wikipedia, club, league, federation and press sites (see sources per club). Fribourg-Gottéron's founding year differs between sources (1937 or 1938). HIFK's Spengler Cup list names the appearances that could be confirmed; it may not be complete.",
   "clubs": {
     "HC Davos": {
       "facts": {
@@ -13,16 +13,18 @@
         "Arena": "Eisstadion Davos"
       },
       "summary": "Switzerland's most successful club and the founder of the Spengler Cup, which it first presented in 1923 and has hosted ever since. The legendary 'ni-Sturm' line around Bibi Torriani brought 18 Swiss titles and six Spengler Cups between 1933 and 1950. After relegation to the 1. Liga in 1990, the club came back to the top league two years later, and coach Arno Del Curto (1996–2018) led it to six more championships.",
-      "spengler_cup": [
-        "Record 17 titles: 1927, 1933, 1936, 1938, 1941, 1942, 1943, 1951, 1957, 1958, 2000, 2001, 2004, 2006, 2011, 2023 and 2025",
-        "Also 25 times runner-up, more than any other team",
-        "2025 champion: beat Team Canada 4–1 in the group, HIFK 3–0 in the quarterfinal, Fribourg-Gottéron 3–1 in the semifinal and the U.S. Collegiate Selects 6–3 in the final"
-      ],
-      "honours": [
-        "31 Swiss championships, the Swiss record; the most recent in 2015",
-        "Six of them under Arno Del Curto: 2002, 2005, 2007, 2009, 2011 and 2015",
-        "Swiss runner-up 2026, losing game 7 of the final to Fribourg-Gottéron in overtime"
-      ],
+      "sections": {
+        "At the Spengler Cup": [
+          "Record 17 titles: 1927, 1933, 1936, 1938, 1941, 1942, 1943, 1951, 1957, 1958, 2000, 2001, 2004, 2006, 2011, 2023 and 2025",
+          "Also 25 times runner-up, more than any other team",
+          "2025 champion: beat Team Canada 4–1 in the group, HIFK 3–0 in the quarterfinal, Fribourg-Gottéron 3–1 in the semifinal and the U.S. Collegiate Selects 6–3 in the final"
+        ],
+        "Honours": [
+          "31 Swiss championships, the Swiss record; the most recent in 2015",
+          "Six of them under Arno Del Curto: 2002, 2005, 2007, 2009, 2011 and 2015",
+          "Swiss runner-up 2026, losing game 7 of the final to Fribourg-Gottéron in overtime"
+        ]
+      },
       "sources": [
         "https://en.wikipedia.org/wiki/HC_Davos",
         "https://en.wikipedia.org/wiki/Spengler_Cup",
@@ -38,14 +40,15 @@
         "Players": "Mostly Canadians playing for European clubs"
       },
       "summary": "Not the Olympic team: Hockey Canada puts this side together each December, mostly from Canadian professionals who play in European leagues. It joined the tournament in 1984, won at the first attempt and has been the most successful guest team ever since, a real challenger to the Eastern Bloc teams that had won most titles since the 1960s.",
-      "spengler_cup": [
-        "16 titles: 1984, 1986, 1987, 1992, 1995, 1996, 1997, 1998, 2002, 2003, 2007, 2012, 2015, 2016, 2017 and 2019",
-        "Won the cup at its first appearance in 1984",
-        "Four titles in a row from 1995 to 1998, and three from 2015 to 2017",
-        "10 times runner-up, most recently in 2018",
-        "2025: beat the U.S. Collegiate Selects 3–2, lost 1–4 to Davos and went out 1–5 to Sparta Praha in the quarterfinal"
-      ],
-      "honours": [],
+      "sections": {
+        "At the Spengler Cup": [
+          "16 titles: 1984, 1986, 1987, 1992, 1995, 1996, 1997, 1998, 2002, 2003, 2007, 2012, 2015, 2016, 2017 and 2019",
+          "Won the cup at its first appearance in 1984",
+          "Four titles in a row from 1995 to 1998, and three from 2015 to 2017",
+          "10 times runner-up, most recently in 2018",
+          "2025: beat the U.S. Collegiate Selects 3–2, lost 1–4 to Davos and went out 1–5 to Sparta Praha in the quarterfinal"
+        ]
+      },
       "sources": [
         "https://en.wikipedia.org/wiki/Spengler_Cup",
         "https://www.swissinfo.ch/eng/life-aging/davos-miss-spengler-cup-hat-trick/3094974",
@@ -61,16 +64,18 @@
         "Arena": "O2 Arena (since 2015)"
       },
       "summary": "Founded on 6 December 1903 as a bandy club, Sparta has played ice hockey since 1909. It has won eight national titles, four in Czechoslovakia and four in the Czech Extraliga, and plays in the O2 Arena, the largest hockey arena in the country.",
-      "spengler_cup": [
-        "Champion 1962 and 1963",
-        "Runner-up 2004 (0–2 against Davos) and 2022 (against Ambrì-Piotta)",
-        "2025: beat HIFK 4–1 in the group and Team Canada 5–1 in the quarterfinal, then lost the semifinal 3–5 to the U.S. Collegiate Selects"
-      ],
-      "honours": [
-        "Czechoslovak champion 1953, 1954, 1990 and 1993",
-        "Czech champion 2000, 2002, 2006 and 2007",
-        "Runner-up in the Champions Hockey League 2016–17"
-      ],
+      "sections": {
+        "At the Spengler Cup": [
+          "Champion 1962 and 1963",
+          "Runner-up 2004 (0–2 against Davos) and 2022 (against Ambrì-Piotta)",
+          "2025: beat HIFK 4–1 in the group and Team Canada 5–1 in the quarterfinal, then lost the semifinal 3–5 to the U.S. Collegiate Selects"
+        ],
+        "Honours": [
+          "Czechoslovak champion 1953, 1954, 1990 and 1993",
+          "Czech champion 2000, 2002, 2006 and 2007",
+          "Runner-up in the Champions Hockey League 2016–17"
+        ]
+      },
       "sources": [
         "https://en.wikipedia.org/wiki/HC_Sparta_Praha",
         "https://en.wikipedia.org/wiki/Spengler_Cup",
@@ -86,15 +91,17 @@
         "Arena": "BCF Arena"
       },
       "summary": "Founded as HC Gottéron by people from the Auge quarter of Fribourg, the club became HC Fribourg in 1967 and HC Fribourg-Gottéron in 1980, the year it reached the top league. The Soviet stars Slava Bykov and Andrei Khomutov arrived in 1990 and carried it to three finals in a row; both have their numbers retired. Saved from bankruptcy in 2006, Gottéron finally won the Spengler Cup in 2024 and its first Swiss championship in 2026.",
-      "spengler_cup": [
-        "Champion 2024, its first title: 7–2 against the Straubing Tigers in the final, with four goals in the first ten minutes",
-        "2025: won Group Torriani (5–2 against Sparta Praha, 4–3 against HIFK), then lost the semifinal 1–3 to Davos"
-      ],
-      "honours": [
-        "Swiss champion 2026, the first title in club history: 3–2 in overtime of game 7 in Davos, the winner scored by Lucas Wallmark",
-        "Captain Julien Sprunger lifted the trophy after his 1,186th and last game",
-        "Swiss runner-up 1983, 1992, 1993, 1994 and 2013"
-      ],
+      "sections": {
+        "At the Spengler Cup": [
+          "Champion 2024, its first title: 7–2 against the Straubing Tigers in the final, with four goals in the first ten minutes",
+          "2025: won Group Torriani (5–2 against Sparta Praha, 4–3 against HIFK), then lost the semifinal 1–3 to Davos"
+        ],
+        "Honours": [
+          "Swiss champion 2026, the first title in club history: 3–2 in overtime of game 7 in Davos, the winner scored by Lucas Wallmark",
+          "Captain Julien Sprunger lifted the trophy after his 1,186th and last game",
+          "Swiss runner-up 1983, 1992, 1993, 1994 and 2013"
+        ]
+      },
       "sources": [
         "https://en.wikipedia.org/wiki/HC_Fribourg-Gott%C3%A9ron",
         "https://en.wikipedia.org/wiki/2024_Spengler_Cup",
@@ -111,17 +118,19 @@
         "Arena": "Helsinki Ice Hall (opened 1966)"
       },
       "summary": "Founded in 1897 as the multi-sport club IFK Helsingfors, HIFK took up ice hockey in 1928. Stanley Cup winner Carl Brewer came as playing coach in 1968 and brought a North American style, and the first two Finnish titles followed in 1969 and 1970. Its Helsinki derby against Jokerit is a big part of the club's history.",
-      "spengler_cup": [
-        "First played the Spengler Cup in 1994; other appearances include 1995, 2004 and 2022",
-        "2022: lost the quarterfinal 2–3 to Davos",
-        "2025: no point in Group Torriani (1–4 against Sparta Praha, 3–4 against Fribourg-Gottéron), then out 0–3 to Davos in the quarterfinal",
-        "Still waiting for a first Spengler Cup title"
-      ],
-      "honours": [
-        "Finnish champion seven times: 1969, 1970, 1974, 1980, 1983, 1998 and 2011",
-        "European Cup runner-up 1980–81",
-        "The 1998 champions included Tim Thomas and Olli Jokinen"
-      ],
+      "sections": {
+        "At the Spengler Cup": [
+          "First played the Spengler Cup in 1994; other appearances include 1995, 2004 and 2022",
+          "2022: lost the quarterfinal 2–3 to Davos",
+          "2025: no point in Group Torriani (1–4 against Sparta Praha, 3–4 against Fribourg-Gottéron), then out 0–3 to Davos in the quarterfinal",
+          "Still waiting for a first Spengler Cup title"
+        ],
+        "Honours": [
+          "Finnish champion seven times: 1969, 1970, 1974, 1980, 1983, 1998 and 2011",
+          "European Cup runner-up 1980–81",
+          "The 1998 champions included Tim Thomas and Olli Jokinen"
+        ]
+      },
       "sources": [
         "https://en.wikipedia.org/wiki/HIFK_(ice_hockey)",
         "https://en.wikipedia.org/wiki/1994_Spengler_Cup",
@@ -137,13 +146,14 @@
         "Head coach 2025": "Mac Gadowsky (Penn State)"
       },
       "summary": "A team of 25 NCAA Division I players from all six men's conferences, the first team of college players in the tournament's history. Returning All-Americans were invited automatically; the coaching staff and an organising committee picked the rest with advice from NHL scouts.",
-      "spengler_cup": [
-        "Debut 2025: won Group Cattini on head-to-head after a 5–3 win over Davos (and a 2–3 loss to Team Canada)",
-        "Beat Sparta Praha 5–3 in the semifinal and lost the final 3–6 to Davos",
-        "Aiden Fink was the tournament's top scorer with 8 points (4 goals, 4 assists)",
-        "Invited back for the 2026 tournament"
-      ],
-      "honours": [],
+      "sections": {
+        "At the Spengler Cup": [
+          "Debut 2025: won Group Cattini on head-to-head after a 5–3 win over Davos (and a 2–3 loss to Team Canada)",
+          "Beat Sparta Praha 5–3 in the semifinal and lost the final 3–6 to Davos",
+          "Aiden Fink was the tournament's top scorer with 8 points (4 goals, 4 assists)",
+          "Invited back for the 2026 tournament"
+        ]
+      },
       "sources": [
         "https://www.ncaa.com/news/icehockey-men/article/2025-11-17/us-collegiate-selects-roster-finalized-spengler-cup",
         "https://www.collegehockeyinc.com/2025/11/u-s-collegiate-selects-round-out-spengler-cup-squad",
@@ -169,7 +179,35 @@
       "image_alt": "Inside the ice stadium in Davos with its wooden roof",
       "image_position": "50% 40%",
       "credit": "Michael Petri, CC BY-SA 2.0 DE (Wikimedia Commons)",
-      "unlock": "Win a card at the stadium (Stadium edition)"
+      "unlock": "Win a card at the stadium (Stadium edition)",
+      "about": {
+        "facts": {
+          "Roof built": "1979",
+          "Capacity": "7,080 (3,280 seated)",
+          "Altitude": "1,560 m",
+          "Home of": "HC Davos and the Spengler Cup",
+          "Name": "VAT Arena from the 2026/27 season"
+        },
+        "summary": "Davos's open-air rink got its roof in 1979, after HC Davos won promotion to the top league: a dome of glued laminated timber, designed by engineer Walter Bieler with Krähenbühl Architekten of Davos. It rests on four pillars left over from a roofing attempt around 1970 that ran out of money. The wooden roof gives the hall its cathedral feel, and every Spengler Cup since 1979 has been played under it.",
+        "sections": {
+          "The building": [
+            "Closed in with glass panes in 1981/82",
+            "Renovated in 1981, 1998, 2005, 2006 and 2018–2021, the last time for about CHF 27 million",
+            "Names: Eisstadion Davos, Vaillant Arena (2007–2019), zondacrypto Arena, and VAT Arena from the 2026/27 season",
+            "Owned by the municipality of Davos and run by Davos Tourismus"
+          ],
+          "Next door": [
+            "The natural-ice speed skating rink beside the arena saw many world records until 1997; Peder Østlund set four there in 1898",
+            "During the World Economic Forum the arena houses the House of Switzerland, since 2019"
+          ]
+        },
+        "sources": [
+          "https://en.wikipedia.org/wiki/Eisstadion_Davos",
+          "https://structurae.net/de/bauwerke/vaillant-arena",
+          "https://www.vatgroup.com/news/company/hcd-vat-deepen-partnership-davos-arena-becomes-vat-arena",
+          "https://www.srf.ch/sport/eishockey/spengler-cup/start-am-freitag-26-dezember-spengler-cup-in-schweizer-hand-vorhang-auf-zur-97-auflage"
+        ]
+      }
     },
     {
       "id": "trophy-spengler",
@@ -181,7 +219,36 @@
       "image_alt": "The Spengler Cup trophy on a pedestal on the ice in Davos",
       "image_position": "50% 50%",
       "credit": "Melanie Duchene / KEYSTONE, via spenglercup.ch media library",
-      "unlock": "Collect every special card of the match"
+      "unlock": "Collect every special card of the match",
+      "about": {
+        "facts": {
+          "First played": "1923",
+          "Founder": "Dr. Carl Spengler (1860–1937)",
+          "Dates": "26 to 31 December, every year",
+          "Teams": "Six, by invitation"
+        },
+        "summary": "Often called the oldest invitational ice hockey tournament in the world. The Davos surgeon and tuberculosis researcher Dr. Carl Spengler founded it in 1923 to give teams from German-speaking Europe, shut out after World War I, a place to play international hockey. Host HC Davos plays it every year between Christmas and New Year, and the winner lifts the cup on 31 December.",
+        "sections": {
+          "The cup": [
+            "Donated by Dr. Carl Spengler of Davos in 1923. His father Alexander Spengler had discovered the healing effect of the Davos mountain climate",
+            "A former Spengler Cup trophy is on display at the Hockey Hall of Fame in Toronto",
+            "First winner: Oxford University, a team of Canadian students. Lester Pearson, later Prime Minister of Canada, is reported to have played for it"
+          ],
+          "Records": [
+            "Most titles: HC Davos 17, Team Canada 16, LTC Prague 7",
+            "Played outdoors until 1978 and indoors since 1979",
+            "Not held in 1939, 1940, 1949, 1956, 2020 and 2021",
+            "2025 was the 97th edition; the 98th is played from 26 to 31 December 2026"
+          ]
+        },
+        "sources": [
+          "https://en.wikipedia.org/wiki/Spengler_Cup",
+          "https://en.wikipedia.org/wiki/Carl_Spengler",
+          "https://www.hhof.com/legendsofhockey/html/GHsilver_splashspenglercup.shtml",
+          "https://internationalhockeywiki.com/ihw/index.php/Spengler_Cup",
+          "https://www.srf.ch/sport/eishockey/spengler-cup/start-am-freitag-26-dezember-spengler-cup-in-schweizer-hand-vorhang-auf-zur-97-auflage"
+        ]
+      }
     }
   ]
 }

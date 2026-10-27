@@ -108,6 +108,7 @@ Not a player. Gives context and collecting goals.
 | Trophy | The Spengler Cup | Own every special card of the match | in app |
 | Mascot | Artwork from the club | Family tickets or kids' club | mockup only |
 
+- The Stadium and Trophy card pages add facts, history and records with sources (`about` in `reward_cards.json`).
 - Moment, Stadium and Trophy show a scene instead of a portrait. The Stadium and Trophy photos are Wikimedia Commons images (credit on the card page).
 
 ## Tiers (not shown on the cards)

@@ -480,7 +480,8 @@ class Content:
                 "id": cfg["id"], "type": "reward", "kind": "context", "context_type": cfg["context_type"],
                 "special_type": None, "rating": None, "player": None, "title": cfg["title"], "match": match,
                 "edition": "reward", "unlock": cfg["unlock"], "source": self.match["source"],
-                **{k: cfg[k] for k in ("headline", "text", "image_url", "image_alt", "image_position", "credit") if k in cfg},
+                **{k: cfg[k] for k in ("headline", "text", "image_url", "image_alt", "image_position", "credit", "about")
+                   if k in cfg},
             }
             if cfg["context_type"] == "moment":
                 scorer = self._add_moment_facts(card)

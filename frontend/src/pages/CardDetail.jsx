@@ -261,7 +261,8 @@ function RewardCardDetail({ card }) {
           {formatMatchDate(match.date)}
         </div>
       </div>
-      {card.club && <ClubInfo club={card.club} />}
+      {card.club && <AboutInfo heading="About the club" about={card.club} />}
+      {card.about && <AboutInfo heading={ABOUT_HEADING[card.context_type]} about={card.about} />}
       <p className="muted small">
         Source: {card.source}
         {card.credit ? ` · Image: ${card.credit}` : ''}
@@ -270,41 +271,36 @@ function RewardCardDetail({ card }) {
   )
 }
 
-// The club behind a collector card: key facts, its story, its Spengler Cup record and honours, with sources.
-function ClubInfo({ club }) {
+const ABOUT_HEADING = { stadium: 'About the stadium', trophy: 'About the trophy' }
+
+// Background for a reward card (the club, the stadium, the trophy): key facts, its story, lists of facts, sources.
+function AboutInfo({ heading, about }) {
   return (
     <>
-      <h2>About the club</h2>
+      <h2>{heading}</h2>
       <div className="match-context">
-        {Object.entries(club.facts).map(([label, value]) => (
+        {Object.entries(about.facts).map(([label, value]) => (
           <div key={label}>
             <span className="label">{label}</span>
             {value}
           </div>
         ))}
       </div>
-      <p className="explanation">{club.summary}</p>
+      <p className="explanation">{about.summary}</p>
 
-      <h2>At the Spengler Cup</h2>
-      <ul className="legend-facts">
-        {club.spengler_cup.map((fact) => (
-          <li key={fact}>{fact}</li>
-        ))}
-      </ul>
-
-      {club.honours.length > 0 && (
-        <>
-          <h2>Honours</h2>
+      {Object.entries(about.sections).map(([title, facts]) => (
+        <div key={title}>
+          <h2>{title}</h2>
           <ul className="legend-facts">
-            {club.honours.map((fact) => (
+            {facts.map((fact) => (
               <li key={fact}>{fact}</li>
             ))}
           </ul>
-        </>
-      )}
+        </div>
+      ))}
 
       <p className="muted small">
-        Club sources: <SourceLinks urls={club.sources} />
+        Sources: <SourceLinks urls={about.sources} />
       </p>
     </>
   )

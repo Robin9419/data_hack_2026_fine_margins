@@ -51,6 +51,7 @@ export default function PlayerProfile() {
   const [tab, setTab] = useState('cards')
   const [games, setGames] = useState(null)
   const [scrollTo, setScrollTo] = useState(null)
+  const [widePhoto, setWidePhoto] = useState(false)
 
   useEffect(() => { loadGames().then(setGames) }, [])
   useEffect(() => {
@@ -136,7 +137,7 @@ export default function PlayerProfile() {
 
   return (
     <section className="pp">
-      <div className={`pp-hero ${player.action_image_url ? '' : 'portrait'}`} style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
+      <div className={`pp-hero ${player.action_image_url || widePhoto ? '' : 'portrait'}`} style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
         <nav className="pp-crumbs" aria-label="Breadcrumb">
           <Link to="/">Collection</Link> › <span>{player.team}</span> › <span aria-current="page">{lastName}</span>
         </nav>
@@ -156,6 +157,8 @@ export default function PlayerProfile() {
             </ul>
           </div>
           {photo && <div className="pp-photo" aria-hidden="true" />}
+          {/* Some image_urls are already landscape action shots: show those wide like an action image. */}
+          {photo && <img src={photo} alt="" hidden onLoad={(e) => setWidePhoto(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight > 1.15)} />}
           {player.jersey && <span className="pp-number" aria-hidden="true">{player.jersey}</span>}
         </div>
       </div>

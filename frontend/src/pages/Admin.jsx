@@ -9,7 +9,7 @@ const KINDS = [
   ['base', 'Base'],
   ['profile', 'Profile specials'],
   ['performance', 'Performance specials'],
-  ['road', 'Road to Final'],
+  ['road', 'Ones to Watch'],
   ['collector', 'Collector'],
   ['context', 'Moment, stadium, trophy'],
 ]

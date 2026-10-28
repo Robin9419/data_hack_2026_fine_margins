@@ -21,10 +21,11 @@ const TYPE_FILTERS = [
   { value: 'base', label: 'Base' },
   { value: 'profile', label: 'Profile specials' },
   { value: 'performance', label: 'Performance specials' },
-  { value: 'road', label: 'Road to Final' },
+  { value: 'road', label: 'Ones to Watch' },
   { value: 'collector', label: 'Collector' },
-  { value: 'context', label: 'Moment, stadium, trophy' },
 ]
+// The Collector filter also shows the context cards (moment, stadium, trophy).
+const FILTER_KINDS = { collector: ['collector', 'context'] }
 // Within owned and within locked cards: legends, then special, then reward, then base.
 const TYPE_ORDER = { legend: 0, special: 1, reward: 2, base: 3 }
 
@@ -116,7 +117,7 @@ export default function Gallery() {
   const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
   // Owned cards first, then locked; within each, by TYPE_ORDER (otherwise API order).
   const shown = cards
-    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || (c.kind ?? c.type) === type))
+    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || (FILTER_KINDS[type] ?? [type]).includes(c.kind ?? c.type)))
     .sort((a, b) => {
       if (a.owned !== b.owned) return a.owned ? -1 : 1
       return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]

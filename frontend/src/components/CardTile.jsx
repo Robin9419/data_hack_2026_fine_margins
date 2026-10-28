@@ -30,7 +30,6 @@ export default function CardTile({ card, isNew, onOpen, club }) {
     return (
       <button type="button" className="card-tile" onClick={() => onOpen(card)}>
         {isNew && <span className="new-tag">NEW</span>}
-        {card.test && <span className="test-tag">TEST</span>}
         <CardFace card={card} />
       </button>
     )

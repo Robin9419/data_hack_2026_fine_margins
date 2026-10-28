@@ -2,7 +2,6 @@ import { formatMatchDate } from '../format'
 import { nationOf } from '../nations'
 import { teamOf, teamStyle } from '../teams'
 import CardIcon from './CardIcon'
-import FormBars from './FormBars'
 import PlayerPhoto from './PlayerPhoto'
 
 // Card kinds are described in docs/CARD_TYPES.md. Front of a card, identity only, no KPIs (they are on the back):
@@ -10,7 +9,7 @@ import PlayerPhoto from './PlayerPhoto'
 //   profile      team-colour frame, tag (Sniper, Playmaker, ...) as icon and line above the name
 //   performance  dark glitter card with its own accent colour, label on the side (Player of the Match, ...)
 //   collector    gold card with the club logo, for a club whose base cards are all collected
-//   road         Road to Final: evolving card with the rating per game as bars; the last stage is the Champion look
+//   road         Ones to Watch: evolving card; the last stage is the Champion look
 //   context      moment, stadium or trophy: a scene instead of a player portrait
 // state: 'owned' (full colour), 'locked' (gallery: grayed out photo only, no info) or 'hidden' (a mystery card in
 // a pack: no photo, name or archetype, so nothing leaks before it is revealed).
@@ -83,8 +82,8 @@ const PERFORMANCE_ICON = { motm: 'star', gamewinner: 'burst', wall: 'shield', re
 // Label, icon, frame tier and rarity symbol per context card.
 const CONTEXT = {
   moment: { label: 'Moment', icon: 'star', tier: 'elite', rarity: '★★★' },
-  stadium: { label: 'Stadium', icon: 'flag', tier: 'silver', rarity: '◆' },
-  trophy: { label: 'Trophy', icon: 'trophy', tier: 'elite', rarity: '★★★' },
+  stadium: { label: 'Stadium', icon: 'flag', tier: 'silver', rarity: '◆◆' },
+  trophy: { label: 'Trophy', icon: 'trophy', tier: 'elite', rarity: '★★' },
 }
 
 const kindOf = (card) => card.kind ?? (card.type === 'base' ? 'base' : 'profile')
@@ -165,10 +164,12 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
     finish ? `finish-${finish}` : '',
   ]
   const rarity =
-    dark || kind === 'road' || kind === 'collector'
+    champion
       ? '★★★'
-      : kind === 'profile'
-        ? '◆'
+      : dark || kind === 'road' || kind === 'collector'
+        ? '★★'
+        : kind === 'profile'
+          ? '◆◆'
         : kind === 'base'
           ? BASE_SYMBOL
           : null
@@ -181,7 +182,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
       : kind === 'profile'
       ? { icon: archetype.icon, color: archetype.color, label: card.title }
       : road
-        ? { icon: 'flag', color: '#ffd76a', label: 'Road to Final' }
+        ? { icon: 'flag', color: '#ffd76a', label: 'Ones to Watch' }
         : kind === 'collector'
           ? { icon: 'gift', color: '#ffd76a', label: `Collector · ${card.requires.length}/${card.requires.length}` }
           : null
@@ -249,7 +250,6 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
         )}
 
         <div className="card-info">
-          {road && <FormBars road={road} />}
           {tag && tag.line !== false && (
             <p className="card-tagline" style={{ '--tc': tag.color }}>
               <CardIcon name={tag.icon} />
@@ -318,7 +318,7 @@ function CollectorFace({ card }) {
           </p>
           <p className="card-name">{card.title}</p>
           <p className="card-foot">
-            <span className="card-rarity">★★★</span>
+            <span className="card-rarity">★★</span>
             <CardIcon name="trophy" />
           </p>
         </div>

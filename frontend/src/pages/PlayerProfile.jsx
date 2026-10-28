@@ -150,7 +150,6 @@ export default function PlayerProfile() {
   const bio = base?.bio ?? {}
   const goalie = player.position === 'Goalkeeper'
   const bioFacts = [
-    ['Team', player.team],
     ['Born', bio.date_of_birth && `${formatMatchDate(bio.date_of_birth)} (age ${age(bio.date_of_birth)})`],
     ['Birthplace', bio.place_of_birth],
     ['Height', bio.height_cm && `${bio.height_cm} cm`],
@@ -177,7 +176,8 @@ export default function PlayerProfile() {
             <ul className="pp-tags">
               {team.logo && (
                 <li className="pp-logo-pill">
-                  <img className="pp-logo" src={team.logo} alt={player.team} title={player.team} />
+                  <img className="pp-logo" src={team.logo} alt="" />
+                  {player.team}
                 </li>
               )}
               {player.jersey && <li>#{player.jersey}</li>}

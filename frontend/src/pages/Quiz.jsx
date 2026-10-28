@@ -104,7 +104,7 @@ export default function Quiz() {
           </button>
         </div>
         {error && <p className="error">{error}</p>}
-        <Link to="/">← Back to collection</Link>
+        <Link to="/" className="back-link">Back to collection</Link>
       </section>
     )
   }

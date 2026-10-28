@@ -43,7 +43,7 @@ export default function CardDetail({ preview = false }) {
   if (error)
     return (
       <section>
-        <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+        <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
         <p className="error">{error}</p>
       </section>
     )
@@ -66,7 +66,7 @@ export default function CardDetail({ preview = false }) {
 
   return (
     <section className="detail">
-      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+      <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
       {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
 
       {card.test && (
@@ -231,7 +231,7 @@ function RewardCardDetail({ card, preview }) {
   const { player, match } = card
   return (
     <section className="detail">
-      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+      <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
 
       <header className="detail-header">
         {card.kind === 'collector' ? (
@@ -349,7 +349,7 @@ function BaseCardDetail({ card, preview }) {
 
   return (
     <section className="detail">
-      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+      <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
       {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
 
       <header className="detail-header">
@@ -409,7 +409,7 @@ function LegendCardDetail({ card, preview }) {
 
   return (
     <section className="detail legend-detail">
-      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+      <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
 
       <header className="detail-header">
         <figure className="legend-figure">

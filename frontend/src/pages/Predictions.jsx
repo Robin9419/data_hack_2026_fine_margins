@@ -21,7 +21,7 @@ export default function Predictions() {
   return (
     <section className="predict">
       <Link to="/" className="back-link">
-        ← Back to collection
+        Back to collection
       </Link>
       {open.length > 0 ? (
         // Keyed by stage, so a new gameday starts at its first question.
@@ -122,7 +122,7 @@ function Round({ stage, games, next }) {
           {error && <p className="error small">{error}</p>}
           <nav className="predict-nav">
             <button type="button" className="link-button" disabled={step === 0} onClick={() => setStep(step - 1)}>
-              ← Previous
+              <span className="chev prev" aria-hidden="true" /> Previous
             </button>
             <button type="button" className="link-button" onClick={() => setStep(null)}>
               See all picks
@@ -132,7 +132,7 @@ function Round({ stage, games, next }) {
               className="link-button"
               onClick={() => setStep(step + 1 < steps.length ? step + 1 : null)}
             >
-              {current.question.prediction ? 'Next →' : 'Skip →'}
+              {current.question.prediction ? 'Next' : 'Skip'} <span className="chev next" aria-hidden="true" />
             </button>
           </nav>
         </article>

@@ -31,6 +31,11 @@ let gamesPromise = null
 const loadGames = () => (gamesPromise ??= fetch('/data/player-games.json').then((r) => (r.ok ? r.json() : null)).catch(() => null))
 
 function gameStats(rows, goalie) {
+  // Without a game played yet the block keeps its shape, with dashes.
+  if (rows.length === 0) {
+    const labels = goalie ? ['Games', 'Avg. ice time', 'Save %', 'Goals against avg.'] : ['Games', 'Avg. ice time', 'Goals + assists', 'Shots', 'Plus/minus', 'Penalty min.']
+    return labels.map((l) => [l, '-'])
+  }
   const toi = sum(rows, 'toi')
   const avg = ['Avg. ice time', mmss(toi / rows.length)]
   if (goalie) {
@@ -110,7 +115,7 @@ export default function PlayerProfile() {
   if (error)
     return (
       <section>
-        <Link to="/">← Back to collection</Link>
+        <Link to="/" className="back-link">Back to collection</Link>
         <p className="error">{error}</p>
       </section>
     )
@@ -118,7 +123,7 @@ export default function PlayerProfile() {
   if (cards.length === 0)
     return (
       <section>
-        <Link to="/">← Back to collection</Link>
+        <Link to="/" className="back-link">Back to collection</Link>
         <p className="muted">No cards found for this player.</p>
       </section>
     )
@@ -165,7 +170,8 @@ export default function PlayerProfile() {
   const lockedSpecials = list.filter((x) => x.status !== 'owned' && x.card.type === 'special')
   const playedIds = new Set((tournament?.results ?? []).map((r) => r.id))
   const playerGames = games?.[`${player.team}#${player.jersey}`]?.filter((g) => playedIds.has(g.game))
-  const stats = playerGames?.length ? gameStats(playerGames, goalie) : null
+  const stats = games ? gameStats(playerGames ?? [], goalie) : null
+  const noGames = !playerGames?.length
   const gameCards = (g) => everyCard.filter((c) => c.type === 'special' && c.kind !== 'road' && c.title && c.match?.id === g.game && c.match.date === g.date)
 
   return (
@@ -203,7 +209,7 @@ export default function PlayerProfile() {
         <div className="pp-foot">
           {stats && (
             <div className="pp-tourn">
-              <h2>Spengler Cup 2025</h2>
+              <h2>Spengler Cup 2025{noGames && <span className="pp-tourn-note"> · No games played yet, the numbers appear after his first game.</span>}</h2>
               <dl className="pp-stats">
                 {stats.map(([k, v]) => (
                   <div key={k}>

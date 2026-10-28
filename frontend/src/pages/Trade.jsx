@@ -75,7 +75,7 @@ export default function Trade() {
   return (
     <section className="trade">
       <Link to="/" className="back-link">
-        ← Back to collection
+        Back to collection
       </Link>
 
       <div className="trade-machine">

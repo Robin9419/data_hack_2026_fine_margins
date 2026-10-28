@@ -12,8 +12,8 @@ const PAGE_SIZE = 8
 const SWIPE_PX = 50
 
 const TEAM_FILTERS = [
-  { value: 'all', label: 'All teams' },
-  ...TEAMS.map((t) => ({ value: t.name, label: t.name })),
+  { value: 'all', label: 'All teams', title: 'All teams' },
+  ...TEAMS.map((t) => ({ value: t.name, label: t.short, title: t.name, logo: t.logo })),
 ]
 const TYPE_FILTERS = [
   { value: 'all', label: 'All cards' },
@@ -45,18 +45,29 @@ function saveView(view) {
   }
 }
 
-function FilterSelect({ label, options, value, onChange }) {
+function ChipFilter({ label, options, value, onChange, className = '' }) {
   return (
-    <label className="filter-select">
-      <span>{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
+    <div className="fgroup">
+      <span className="fgroup-label" id={`fg-${label}`}>
+        {label}
+      </span>
+      <div className={`chips ${className}`} role="group" aria-labelledby={`fg-${label}`}>
         {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
+          <button
+            key={o.value}
+            type="button"
+            className={`gchip ${value === o.value ? 'active' : ''}`}
+            aria-pressed={value === o.value}
+            aria-label={o.title ?? o.label}
+            title={o.title ?? o.label}
+            onClick={() => onChange(o.value)}
+          >
+            {o.logo && <img src={o.logo} alt="" loading="lazy" />}
+            <span>{o.label}</span>
+          </button>
         ))}
-      </select>
-    </label>
+      </div>
+    </div>
   )
 }
 
@@ -151,16 +162,22 @@ export default function Gallery() {
 
       <Activities />
 
-      <div className="section-header collection-header">
-        <h1>Your collection</h1>
-        <span className="progress">
-          {ownedCount} / {realCards.length} collected
-        </span>
+      <div className="collection-header">
+        <div>
+          <p className="eyebrow">Spengler Cup 2025</p>
+          <h1>Your collection</h1>
+        </div>
+        <div className="progress">
+          <strong>
+            {ownedCount} / {realCards.length}
+          </strong>
+          <span>cards collected</span>
+        </div>
       </div>
 
       <div className="gallery-filters">
-        <FilterSelect label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />
-        <FilterSelect label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
+        <ChipFilter label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} className="scroll" />
+        <ChipFilter label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
       </div>
 
       <div className="card-pager">

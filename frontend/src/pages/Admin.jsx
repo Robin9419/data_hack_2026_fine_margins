@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
 import CardFace from '../components/CardFace'
 import CardSpotlight from '../components/CardSpotlight'
-import { TEAMS, teamOf } from '../teams'
+import { TEAMS, teamOf, teamStyle } from '../teams'
 import Dropdown from '../components/Dropdown'
 
 const KINDS = [
@@ -17,6 +17,8 @@ const KINDS = [
 ]
 const KIND_LABEL = Object.fromEntries(KINDS)
 const KIND_ORDER = Object.fromEntries(KINDS.map(([k], i) => [k, i]))
+const PAGE_SIZE = 8
+const POS_SHORT = { Forward: 'FWD', Defender: 'DEF', Goalkeeper: 'GK' }
 const KIND_FILTERS = [{ value: 'all', label: 'All kinds' }, ...KINDS.map(([value, label]) => ({ value, label }))]
 const TEAM_FILTERS = [
   { value: 'all', label: 'All teams', title: 'All teams' },
@@ -47,7 +49,7 @@ const hasProfile = (c) => c.type !== 'legend' && c.type !== 'reward' && Boolean(
 const playerKey = (c) => `${c.player.team}|${c.player.jersey}`
 
 const caption = (card) => {
-  const player = card.player ? `#${card.player.jersey} ${card.player.first_name} ${card.player.last_name}` : card.title
+  const player = card.player ? `${card.player.jersey != null ? `#${card.player.jersey} ` : ''}${card.player.first_name} ${card.player.last_name}` : card.title
   const what = card.kind === 'base' ? 'Base' : card.title
   return { player, what, game: card.match?.stage }
 }
@@ -79,6 +81,10 @@ export default function Admin() {
   const [mode, setMode] = useState('cards')
   const [query, setQuery] = useState('')
   const [spotlight, setSpotlight] = useState(null)
+  const [page, setPage] = useState(0)
+  const touchStartX = useRef(null)
+  // Any change of filters, search or view starts again on the first page.
+  useEffect(() => setPage(0), [kind, team, source, photos, mode, query])
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
 
   useEffect(() => {
@@ -120,6 +126,18 @@ export default function Admin() {
         (a.player?.jersey ?? 0) - (b.player?.jersey ?? 0),
     )
   const players = mode === 'players' ? groupPlayers(shown) : []
+  const items = mode === 'players' ? players : shown
+  const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
+  const current = Math.min(page, pageCount - 1)
+  const pageItems = items.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
+  const goTo = (p) => setPage(Math.max(0, Math.min(pageCount - 1, p)))
+  const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
+  const onTouchEnd = (e) => {
+    if (touchStartX.current === null) return
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    touchStartX.current = null
+    if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1))
+  }
   const total = (key) => Object.values(counts).reduce((n, r) => n + r[key], 0)
 
   return (
@@ -195,72 +213,88 @@ export default function Admin() {
         {shown.length} of {cards.length} cards
       </p>
 
-      {mode === 'players' ? (
-        <>
-          <div className="pgrid">
-            {players.map(({ key, cardId, count, p }) => (
-              <Link key={key} to={`/players/${cardId}`} className="ptile">
-                <div className="ph">
-                  {p.image_url && <img className="photo" src={p.image_url} alt="" referrerPolicy="no-referrer" loading="lazy" />}
-                  {teamOf(p.team)?.logo && <img className="logo" src={teamOf(p.team).logo} alt={p.team} />}
-                  {p.jersey && <span className="num">{p.jersey}</span>}
-                </div>
-                <div className="body">
-                  <b>{p.last_name ?? 'Player'}</b>
-                  <small>{[p.first_name, p.position].filter(Boolean).join(' · ')}</small>
-                  <small>
-                    {count} {count === 1 ? 'card' : 'cards'}
-                  </small>
-                </div>
-              </Link>
-            ))}
-          </div>
-          {players.length === 0 && <p className="muted">No players match these filters.</p>}
-        </>
-      ) : (
-        <>
-          <div className="admin-grid">
-            {shown.map((card) => {
-              const { player, what, game } = caption(card)
-              const face = (
-                <>
-                  {card.test && testTag === 'show' && <span className="test-tag">TEST</span>}
-                  <CardFace card={card} nameLayout={nameLayout} />
-                </>
-              )
-              return (
-                <figure key={card.id} className="admin-cell">
-                  {card.type === 'special' ? (
-                    <button type="button" className="card-tile" onClick={() => setSpotlight(card)}>
-                      {face}
-                    </button>
-                  ) : (
-                    <div className="card-tile">{face}</div>
-                  )}
-                  <figcaption>
-                    <strong>{what}</strong>
-                    {hasProfile(card) ? (
-                      <Link to={`/players/${card.id}`} className="plain-link">
-                        {player}
-                      </Link>
+      <div className="card-pager">
+        <button type="button" className="pager-arrow prev" aria-label="Previous page" disabled={current === 0} onClick={() => goTo(current - 1)}>
+          ‹
+        </button>
+        <div className="card-grid admin-page" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+          {mode === 'players'
+            ? pageItems.map(({ key, cardId, count, p }) => (
+                <Link key={key} to={`/players/${cardId}`} className="ptile" style={teamStyle(p.team)}>
+                  <div className="ph">
+                    {p.image_url && <img className="photo" src={p.image_url} alt="" referrerPolicy="no-referrer" loading="lazy" />}
+                  </div>
+                  <div className="pt-corner">
+                    {teamOf(p.team)?.logo && <span className="pt-logo"><img src={teamOf(p.team).logo} alt={p.team} /></span>}
+                    {p.position && <span className="pt-pos">{POS_SHORT[p.position] ?? p.position}</span>}
+                  </div>
+                  <div className="body">
+                    {p.first_name && <small className="pt-first">{p.first_name}</small>}
+                    <b>{p.last_name ?? 'Player'}</b>
+                    <p className="pt-meta">
+                      {p.jersey && <span className="pt-no"><span><small>#</small>{p.jersey}</span></span>}
+                      <span className="pt-team">{count} {count === 1 ? 'card' : 'cards'}</span>
+                    </p>
+                  </div>
+                </Link>
+              ))
+            : pageItems.map((card) => {
+                const { player, what, game } = caption(card)
+                const face = (
+                  <>
+                    {card.test && testTag === 'show' && <span className="test-tag">TEST</span>}
+                    <CardFace card={card} nameLayout={nameLayout} />
+                  </>
+                )
+                return (
+                  <figure key={card.id} className="admin-cell">
+                    {card.type === 'special' ? (
+                      <button type="button" className="card-tile" onClick={() => setSpotlight(card)}>
+                        {face}
+                      </button>
                     ) : (
-                      <span>{player}</span>
+                      <div className="card-tile">{face}</div>
                     )}
-                    <small className="muted">
-                      {KIND_LABEL[kindOf(card)]}
-                      {game ? ` · ${game}` : ''}
-                    </small>
-                    <span className="admin-links">
-                      <Link to={`/admin/cards/${card.id}`}>Preview ›</Link>
-                      {hasProfile(card) && <Link to={`/players/${card.id}`}>Profile ›</Link>}
-                    </span>
-                  </figcaption>
-                </figure>
-              )
-            })}
-          </div>
-          {shown.length === 0 && <p className="muted">No cards match these filters.</p>}
-        </>
+                    <figcaption>
+                      <strong>{what}</strong>
+                      {hasProfile(card) ? (
+                        <Link to={`/players/${card.id}`} className="plain-link">
+                          {player}
+                        </Link>
+                      ) : (
+                        <span>{player}</span>
+                      )}
+                      <small className="muted">
+                        {KIND_LABEL[kindOf(card)]}
+                        {game ? ` · ${game}` : ''}
+                      </small>
+                      <span className="admin-links">
+                        <Link to={`/admin/cards/${card.id}`}>Preview ›</Link>
+                        {hasProfile(card) && <Link to={`/players/${card.id}`}>Profile ›</Link>}
+                      </span>
+                    </figcaption>
+                  </figure>
+                )
+              })}
+        </div>
+        <button type="button" className="pager-arrow next" aria-label="Next page" disabled={current >= pageCount - 1} onClick={() => goTo(current + 1)}>
+          ›
+        </button>
+      </div>
+      {items.length === 0 && <p className="muted">{mode === 'players' ? 'No players match these filters.' : 'No cards match these filters.'}</p>}
+      {pageCount > 1 && (
+        <div className="pager-dots">
+          {Array.from({ length: pageCount }, (_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={i === current ? 'active' : ''}
+              aria-label={`Page ${i + 1} of ${pageCount}`}
+              aria-current={i === current ? 'page' : undefined}
+              onClick={() => goTo(i)}
+            />
+          ))}
+        </div>
       )}
 
       {spotlight && <CardSpotlight card={spotlight} onClose={closeSpotlight} hideLink />}

@@ -170,17 +170,16 @@ export default function PlayerProfile() {
   return (
     <section className="pp">
       <div className={`pp-hero ${player.action_image_url || widePhoto ? '' : 'portrait'}`} style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
-        <nav className="pp-crumbs" aria-label="Breadcrumb">
-          <Link to="/">Collection</Link> › <span>{player.team}</span> › <span aria-current="page">{lastName}</span>
-        </nav>
         <div className="pp-hero-in">
           <div className="pp-id">
-            <div className="pp-name">
-              {team.logo && <img className="pp-logo" src={team.logo} alt={player.team} />}
-              {named && <p className="pp-first">{player.first_name}</p>}
-            </div>
+            {named && <p className="pp-first">{player.first_name}</p>}
             <h1 className="pp-last">{lastName}</h1>
             <ul className="pp-tags">
+              {team.logo && (
+                <li className="pp-logo-pill">
+                  <img className="pp-logo" src={team.logo} alt={player.team} title={player.team} />
+                </li>
+              )}
               {player.jersey && <li>#{player.jersey}</li>}
               {player.position && <li>{player.position}</li>}
               {nationality && (
@@ -231,21 +230,21 @@ export default function PlayerProfile() {
             const home = g.home_team === player.team
             const opp = teamOf(g.opponent)
             const chips = gameCards(g)
-            const line = goalie ? `${g.saves ?? 0} sv` : `${g.goals}-${g.assists}`
+            const line = goalie ? `${g.saves ?? 0} sv` : `${g.goals}+${g.assists}`
             const open = (c) => { setTab('data'); setScrollTo(c.id) }
             return (
               <li key={g.game} className="pp-game">
                 <span className="pp-game-top">
-                  <span className="pp-game-date">{formatMatchDate(g.date)}</span>
                   <span className="pp-game-opp">
                     {opp.logo && <img src={opp.logo} alt="" width="16" height="16" />} {opp.short || g.opponent}
                   </span>
-                  <span className={`pp-game-res ${g.won ? 'won' : 'lost'}`}>
-                    {g.won ? 'W' : 'L'} {home ? g.home_score : g.away_score}–{home ? g.away_score : g.home_score}
+                  <span className={`pp-game-res ${g.won ? 'won' : 'lost'}`} title={g.won ? 'Won' : 'Lost'}>
+                    {home ? g.home_score : g.away_score}–{home ? g.away_score : g.home_score}
                   </span>
                 </span>
                 <span className="pp-game-bot">
-                  <span className="pp-game-line">{line}</span>
+                  <span className="pp-game-date">{formatMatchDate(g.date).replace(/\s*\d{4}$/, '')}</span>
+                  <span className="pp-game-line" title={goalie ? 'Saves' : 'Goals + assists'}>{line}</span>
                   {chips.map((c) => (
                     <button key={c.id} type="button" className="pp-chip" onClick={() => open(c)}>{c.title}</button>
                   ))}

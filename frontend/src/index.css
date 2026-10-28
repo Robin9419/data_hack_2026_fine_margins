@@ -1145,10 +1145,11 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .pp-crumbs { position: relative; z-index: 2; padding: 12px 20px 0; font-size: 0.82rem; color: var(--muted); }
 .pp-crumbs a { color: var(--muted); }
 .pp-crumbs a:hover { color: var(--accent); }
-.pp-hero-in { position: relative; display: flex; align-items: flex-end; padding: 4px 20px 8px; }
+.pp-hero-in { position: relative; display: flex; align-items: flex-end; padding: 16px 20px 8px; }
 .pp-id { position: relative; z-index: 2; max-width: 62%; }
 .pp-name { display: flex; align-items: center; gap: 10px; }
-.pp-logo { height: 28px; width: auto; display: block; }
+.pp-logo { height: 20px; width: auto; display: block; }
+.pp-tags li.pp-logo-pill { padding: 3px 8px; background: rgba(255, 255, 255, 0.92); border-color: transparent; }
 .pp-first { margin: 0; font-size: 1rem; color: var(--muted); }
 .pp-last { margin: 0; font-family: var(--display); font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; text-transform: uppercase; color: var(--text); }
 .pp-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; padding: 0; }
@@ -1270,9 +1271,12 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .pp-upcoming .card-tile {opacity:.55} 
 .pp-note {margin:10px 0 0} 
 .pp-strip {list-style:none;margin:0 0 20px;padding:0 0 4px;display:flex;gap:10px;overflow-x:auto}
-.pp-game {flex:0 0 auto;display:grid;gap:6px;align-content:center;min-height:64px;max-height:72px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);font-size:.82rem;white-space:nowrap}
+.pp-game {flex:0 0 auto;display:grid;gap:4px;align-content:center;padding:7px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);font-size:.82rem;white-space:nowrap}
 .pp-game-top,.pp-game-bot {display:flex;align-items:center;gap:8px}
+.pp-game-top {justify-content:space-between;gap:12px}
 .pp-game-date {color:var(--muted);font-size:.72rem}
+.pp-game-line {color:var(--muted);font-size:.72rem}
+.pp-game-bot .pp-chip {padding:1px 8px;font-size:.68rem}
 .pp-game-opp {display:inline-flex;align-items:center;gap:5px}
 .pp-game-res {font-weight:700}
 .pp-game-res.won {color:#3ecf8e} 

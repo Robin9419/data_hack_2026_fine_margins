@@ -326,6 +326,38 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .gchip:hover { background: var(--surface-2); }
 .gchip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .gchip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: var(--glow); }
+.gallery-tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0 0; }
+.search { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--muted); flex: 1; min-width: 220px; }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--text); font: 500 14px var(--body); }
+.search input::placeholder { color: var(--muted); }
+.search svg { width: 18px; height: 18px; flex: none; }
+.search .clear { border: 0; background: none; color: var(--muted); font-size: 1.2rem; line-height: 1; cursor: pointer; }
+.seg { display: inline-grid; grid-auto-flow: column; padding: 4px; border-radius: 999px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.seg button { height: 34px; padding: 0 16px; border: 0; border-radius: 999px; background: none; font: inherit; font-weight: 700; font-size: 13px; color: var(--muted); cursor: pointer; }
+.seg button.on { background: var(--accent); color: var(--accent-ink); }
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin: 16px 0 24px; }
+.ptile { position: relative; overflow: hidden; display: block; text-align: left; text-decoration: none; color: inherit; border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow), inset 0 0 0 1px var(--line); transition: transform .15s; }
+.ptile:hover { transform: translateY(-3px); }
+.ptile .ph { position: relative; aspect-ratio: 1 / 1; background: linear-gradient(180deg, #17345e, #02040a 115%); overflow: hidden; }
+.ptile .ph img.photo { width: 100%; height: 100%; object-fit: cover; object-position: 50% 8%; }
+.ptile .ph .logo { position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; padding: 3px; border-radius: 50%; background: rgba(255,255,255,.92); object-fit: contain; }
+.ptile .ph .num { position: absolute; right: 12px; top: 6px; font: 800 34px/1 var(--display); color: rgba(255,255,255,.9); text-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.ptile .body { padding: 12px 14px 14px; }
+.ptile .body small { display: block; color: var(--muted); font-size: 11px; }
+.ptile .body b { display: block; font: 800 22px/1.05 var(--display); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dots { display: flex; gap: 4px; margin-top: 10px; align-items: center; }
+.dots i { flex: 1; height: 4px; border-radius: 4px; background: var(--surface-2, rgba(255,255,255,.14)); }
+.dots i.on { background: var(--accent); }
+.dots span { font-size: 11px; font-weight: 700; color: var(--muted); margin-left: 4px; white-space: nowrap; }
+.ptile.unknown .ph img.photo { filter: grayscale(1) brightness(.35); }
+@media (max-width: 640px) { .pgrid { grid-template-columns: 1fr 1fr; gap: 12px; } .ptile .body b { font-size: 19px; } }
+.card-tile { container-type: inline-size; }
+.card-tile.is-locked .card-face { filter: grayscale(1) brightness(.5) contrast(.95); transition: filter .25s; }
+.card-tile.is-locked:hover .card-face { filter: grayscale(.7) brightness(.62); }
+.lock-over { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5cqw; padding-bottom: 12cqw; pointer-events: none; }
+.lock-ico { width: 30cqw; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: rgba(6, 10, 20, 0.72); box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.55), 0 6px 18px rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+.lock-ico svg { width: 48%; height: 48%; color: #fff; }
+.lock-txt { padding: 1cqw 4cqw; border-radius: 999px; background: rgba(6, 10, 20, 0.72); color: #fff; font: 800 max(10px, 6cqw)/1.2 var(--display); letter-spacing: .16em; text-transform: uppercase; }
 .filter-group { display: flex; flex-wrap: wrap; gap: 6px; }
 .filter-chip { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; font-size: 0.85rem; cursor: pointer; }
 .filter-chip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }

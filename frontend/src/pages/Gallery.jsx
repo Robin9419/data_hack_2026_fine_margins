@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../api'
+import { useAllCards } from '../allCards'
 import { useAuth } from '../auth'
 import Activities from '../components/Activities'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
-import { TEAMS } from '../teams'
+import { TEAMS, teamOf } from '../teams'
 import { useTournament } from '../tournament'
 
 const PAGE_SIZE = 8
@@ -71,6 +72,46 @@ function ChipFilter({ label, options, value, onChange, className = '' }) {
   )
 }
 
+// One tile per player (team + jersey) among the shown cards; progress counts all of his cards.
+function groupPlayers(shown, cards, playerOf) {
+  const keyOf = (c) => (c.type === 'legend' || c.type === 'reward' || !c.player?.jersey ? null : `${c.player.team}|${c.player.jersey}`)
+  const groups = new Map()
+  for (const c of cards) {
+    const key = keyOf(c)
+    if (!key) continue
+    const g = groups.get(key) ?? { key, total: 0, owned: 0, cardId: c.id, ownedId: null, shown: false, p: null }
+    g.total += 1
+    if (c.owned) {
+      g.owned += 1
+      g.ownedId ??= c.id
+    }
+    const p = playerOf(c)
+    if (p?.last_name && (!g.p?.last_name || c.owned)) g.p = p
+    g.p ??= p
+    groups.set(key, g)
+  }
+  for (const c of shown) {
+    const g = groups.get(keyOf(c) ?? '')
+    if (g) g.shown = true
+  }
+  return [...groups.values()]
+    .filter((g) => g.shown)
+    .map((g) => ({
+      key: g.key,
+      cardId: g.ownedId ?? g.cardId,
+      owned: g.owned,
+      total: g.total,
+      team: g.p.team,
+      logo: teamOf(g.p.team)?.logo,
+      jersey: g.p.jersey,
+      first: g.p.first_name,
+      last: g.p.last_name ?? 'Locked player',
+      position: g.p.position,
+      image: g.p.image_url,
+    }))
+    .sort((a, b) => b.owned - a.owned || a.last.localeCompare(b.last))
+}
+
 export default function Gallery() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -84,14 +125,17 @@ export default function Gallery() {
   const [team, setTeam] = useState(view.team ?? 'all')
   const [type, setType] = useState(view.type ?? 'all')
   const [page, setPage] = useState(view.page ?? 0)
+  const [mode, setMode] = useState(view.mode ?? 'cards')
+  const [query, setQuery] = useState(view.query ?? '')
+  const allCards = useAllCards()
   const [spotlight, setSpotlight] = useState(null) // special card popped out of the grid
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
   const touchStartX = useRef(null)
   const lastStage = useRef(stage)
 
   useEffect(() => {
-    saveView({ team, type, page })
-  }, [team, type, page])
+    saveView({ team, type, page, mode, query })
+  }, [team, type, page, mode, query])
 
   const load = () =>
     api
@@ -125,9 +169,20 @@ export default function Gallery() {
   const realCards = cards.filter((c) => c.kind !== 'road')
   const ownedCount = realCards.filter((c) => c.owned).length
   const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
+  const fullOf = (c) => allCards?.get(c.id)
+  // Locked cards are blanked in the list; the full card has the names.
+  const playerOf = (c) => (c.owned ? c.player : fullOf(c)?.player ?? c.player)
+  const q = query.trim().toLowerCase()
+  const matches = (c) => {
+    if (!q) return true
+    const p = playerOf(c)
+    if (!p) return false
+    return [p.first_name, p.last_name, p.jersey && String(p.jersey), p.jersey && `#${p.jersey}`, `${p.first_name ?? ''} ${p.last_name ?? ''}`]
+      .some((s) => s && String(s).toLowerCase().includes(q))
+  }
   // Owned cards first, then locked; within each, by TYPE_ORDER (otherwise API order).
   const shown = cards
-    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || (c.kind ?? c.type) === type))
+    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || (c.kind ?? c.type) === type) && matches(c))
     .sort((a, b) => {
       if (a.owned !== b.owned) return a.owned ? -1 : 1
       return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]
@@ -136,6 +191,7 @@ export default function Gallery() {
   const current = Math.min(page, pageCount - 1)
   const pageCards = shown.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
   const goTo = (p) => setPage(Math.max(0, Math.min(pageCount - 1, p)))
+  const players = mode === 'players' ? groupPlayers(shown, cards, playerOf) : []
   const filterBy = (setter) => (value) => {
     setter(value)
     setPage(0)
@@ -175,11 +231,69 @@ export default function Gallery() {
         </div>
       </div>
 
+      <div className="gallery-tools">
+        <label className="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+          <input
+            type="search"
+            value={query}
+            placeholder="Search a player or jersey number"
+            aria-label="Search a player or jersey number"
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setPage(0)
+            }}
+          />
+          {query && (
+            <button type="button" className="clear" aria-label="Clear search" onClick={() => { setQuery(''); setPage(0) }}>
+              ×
+            </button>
+          )}
+        </label>
+        <div className="seg" role="group" aria-label="View">
+          {[['players', 'Players'], ['cards', 'Cards']].map(([value, label]) => (
+            <button key={value} type="button" className={mode === value ? 'on' : ''} aria-pressed={mode === value} onClick={() => setMode(value)}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="gallery-filters">
         <ChipFilter label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} className="scroll" />
         <ChipFilter label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
       </div>
 
+      {mode === 'players' ? (
+        <>
+          <div className="pgrid">
+            {players.map((p) => (
+              <Link key={p.key} to={`/players/${p.cardId}`} className={`ptile ${p.owned ? '' : 'unknown'}`}>
+                <div className="ph">
+                  {p.image && <img className="photo" src={p.image} alt="" referrerPolicy="no-referrer" loading="lazy" />}
+                  {p.logo && <img className="logo" src={p.logo} alt={p.team} />}
+                  {p.jersey && <span className="num">{p.jersey}</span>}
+                </div>
+                <div className="body">
+                  <b>{p.last}</b>
+                  <small>{[p.first, p.position].filter(Boolean).join(' · ')}</small>
+                  <div className="dots" aria-label={`${p.owned} of ${p.total} cards`}>
+                    {Array.from({ length: p.total }, (_, i) => (
+                      <i key={i} className={i < p.owned ? 'on' : ''} />
+                    ))}
+                    <span>{p.owned}/{p.total}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {players.length === 0 && <p className="muted">No players match these filters.</p>}
+        </>
+      ) : (
+      <>
       <div className="card-pager">
         <button
           type="button"
@@ -198,6 +312,7 @@ export default function Gallery() {
               club={clubs[card.player?.team]}
               isNew={newCardIds.includes(card.id)}
               onOpen={setSpotlight}
+              full={fullOf(card)}
             />
           ))}
         </div>
@@ -225,6 +340,8 @@ export default function Gallery() {
             />
           ))}
         </div>
+      )}
+      </>
       )}
 
       <button className="link-button reset" onClick={onReset}>

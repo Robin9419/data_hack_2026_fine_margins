@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
+import { useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
 import CardTile from '../components/CardTile'
 import FormBars from '../components/FormBars'
@@ -13,6 +14,7 @@ import { teamOf } from '../teams'
 
 export default function CardDetail({ preview = false }) {
   const { id } = useParams()
+  const allCards = useAllCards()
   const [card, setCard] = useState(null)
   const [error, setError] = useState(null)
   const [playing, setPlaying] = useState(null) // clip picked from a game event
@@ -191,7 +193,7 @@ function PlayerCards({ cardId }) {
       </p>
       <div className="card-grid player-cards">
         {sorted.map((c) => (
-          <CardTile key={c.id} card={c} />
+          <CardTile key={c.id} card={c} full={allCards?.get(c.id)} />
         ))}
       </div>
     </>

@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
+import { useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
 import CardTile from '../components/CardTile'
 import { formatMatchDate, scoreline } from '../format'
@@ -20,6 +21,7 @@ const age = (iso) => {
 
 export default function PlayerProfile() {
   const { cardId } = useParams()
+  const allCards = useAllCards()
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
   const [tab, setTab] = useState('cards')
@@ -164,7 +166,7 @@ export default function PlayerProfile() {
               <div className="pp-cards">
                 {sorted.map((c) => (
                   <figure key={c.id} className="pp-card">
-                    <CardTile card={c} />
+                    <CardTile card={c} full={allCards?.get(c.id)} />
                     <figcaption>
                       <strong>{c.owned ? c.title ?? 'Base card' : 'Locked'}</strong>
                       {c.owned && c.type === 'special' && gameOf(c) && <span className="muted small">{gameOf(c)}</span>}
@@ -199,7 +201,7 @@ export default function PlayerProfile() {
               {lockedSpecials.map((c) => (
                 <article key={c.id} className="pp-box pp-data locked">
                   <div className="pp-data-card">
-                    <CardTile card={c} />
+                    <CardTile card={c} full={allCards?.get(c.id)} />
                   </div>
                   <div className="pp-data-body">
                     <h2>Locked card</h2>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import AttributeRow from '../components/AttributeRow'
@@ -9,6 +9,14 @@ import { teamOf } from '../teams'
 
 const hasData = (c) => c.owned && c.type === 'special' && Array.isArray(c.attributes)
 const gameOf = (c) => (c.match?.opponent ? `vs ${c.match.opponent}${c.match.date ? ` · ${formatMatchDate(c.match.date)}` : ''}` : null)
+
+const age = (iso) => {
+  const born = new Date(iso)
+  const now = new Date()
+  const hadBirthday =
+    now.getMonth() > born.getMonth() || (now.getMonth() === born.getMonth() && now.getDate() >= born.getDate())
+  return now.getFullYear() - born.getFullYear() - (hadBirthday ? 0 : 1)
+}
 
 export default function PlayerProfile() {
   const { cardId } = useParams()
@@ -53,6 +61,17 @@ export default function PlayerProfile() {
   const nation = nationOf(nationality)
   const team = teamOf(player.team)
   const photo = player.action_image_url ?? player.image_url
+  const bio = base?.bio ?? {}
+  const goalie = player.position === 'Goalkeeper'
+  const bioFacts = [
+    ['Born', bio.date_of_birth && `${formatMatchDate(bio.date_of_birth)} (age ${age(bio.date_of_birth)})`],
+    ['Birthplace', bio.place_of_birth],
+    ['Height', bio.height_cm && `${bio.height_cm} cm`],
+    ['Weight', bio.weight_kg && `${bio.weight_kg} kg`],
+    [goalie ? 'Catches' : 'Shoots', bio.shoots && (bio.shoots === 'L' ? 'Left' : 'Right')],
+    ['College 2025–26', bio.club],
+    ['Draft', bio.draft],
+  ].filter(([, value]) => value)
   const lastName = named ? player.last_name : 'Locked player'
   const roles = owned.filter((c) => c.type === 'special' && c.title)
   const sorted = [...cards].sort((a, b) => (a.owned === b.owned ? 0 : a.owned ? -1 : 1))
@@ -61,7 +80,7 @@ export default function PlayerProfile() {
 
   return (
     <section className="pp">
-      <div className="pp-hero" style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
+      <div className={`pp-hero ${player.action_image_url ? '' : 'portrait'}`} style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
         <nav className="pp-crumbs" aria-label="Breadcrumb">
           <Link to="/">Collection</Link> › <span>{player.team}</span> › <span aria-current="page">{lastName}</span>
         </nav>
@@ -95,6 +114,7 @@ export default function PlayerProfile() {
               {player.position && (<><dt>Position</dt><dd>{player.position}</dd></>)}
               {nationality && (<><dt>Nationality</dt><dd>{nationality}</dd></>)}
               {player.jersey && (<><dt>Jersey</dt><dd>#{player.jersey}</dd></>)}
+              {bioFacts.map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>))}
             </dl>
           </div>
           {roles.length > 0 && (
@@ -147,7 +167,7 @@ export default function PlayerProfile() {
                     <CardTile card={c} />
                     <figcaption>
                       <strong>{c.owned ? c.title ?? 'Base card' : 'Locked'}</strong>
-                      {c.owned && gameOf(c) && <span className="muted small">{gameOf(c)}</span>}
+                      {c.owned && c.type === 'special' && gameOf(c) && <span className="muted small">{gameOf(c)}</span>}
                     </figcaption>
                   </figure>
                 ))}

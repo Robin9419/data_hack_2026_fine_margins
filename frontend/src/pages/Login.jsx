@@ -96,7 +96,7 @@ export default function Login() {
                   aria-pressed={favorite === t.name}
                   onClick={() => setFavorite(favorite === t.name ? null : t.name)}
                 >
-                  <span className="team-badge">
+                  <span className="ch-av">
                     <img src={t.logo} alt="" loading="lazy" />
                   </span>
                   <span className="team-name ch-txt">{t.name}</span>

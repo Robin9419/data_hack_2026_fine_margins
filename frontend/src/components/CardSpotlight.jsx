@@ -35,7 +35,9 @@ function pickClips(card) {
 export default function CardSpotlight({ card, onClose, hideLink = false }) {
   const { pathname } = useLocation()
   const showLink = !hideLink && card.player?.last_name && (card.type === 'base' || card.type === 'special') && !pathname.startsWith('/players/')
-  const [flipped, setFlipped] = useState(true)
+  const [flipped, setFlipped] = useState(false)
+  // A base card's back only repeats the facts in the panel, so it has none.
+  const flippable = card.type !== 'base'
   const [clipIndex, setClipIndex] = useState(0)
   const closeRef = useRef(null)
   const clips = pickClips(card)
@@ -72,20 +74,28 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
         </button>
 
         <div className="spotlight-card-col">
-          <button
-            type="button"
-            className={`spotlight-card ${flipped ? 'flipped' : ''}`}
-            onClick={() => setFlipped(!flipped)}
-            aria-label={flipped ? 'Show the front of the card' : 'Show the back of the card'}
-          >
-            <span className="spotlight-flip">
-              <span className="spotlight-front">
-                <CardFace card={card} />
-              </span>
-              <CardBack card={card} />
-            </span>
-          </button>
-          <p className="spotlight-hint">Tap the card to flip it</p>
+          {flippable ? (
+            <>
+              <button
+                type="button"
+                className={`spotlight-card ${flipped ? 'flipped' : ''}`}
+                onClick={() => setFlipped(!flipped)}
+                aria-label={flipped ? 'Show the front of the card' : 'Show the back of the card'}
+              >
+                <span className="spotlight-flip">
+                  <span className="spotlight-front">
+                    <CardFace card={card} />
+                  </span>
+                  <CardBack card={card} />
+                </span>
+              </button>
+              <p className="spotlight-hint">Tap the card to flip it</p>
+            </>
+          ) : (
+            <div className="spotlight-card">
+              <CardFace card={card} />
+            </div>
+          )}
         </div>
 
         <div className="spotlight-clips">

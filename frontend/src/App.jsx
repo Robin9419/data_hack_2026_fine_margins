@@ -8,6 +8,7 @@ import CardDetail from './pages/CardDetail'
 import Gallery from './pages/Gallery'
 import Login from './pages/Login'
 import PackOpening from './pages/PackOpening'
+import PlayerProfile from './pages/PlayerProfile'
 import Predictions from './pages/Predictions'
 import Quiz from './pages/Quiz'
 import Trade from './pages/Trade'
@@ -100,6 +101,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <CardDetail />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/players/:cardId"
+            element={
+              <RequireAuth>
+                <PlayerProfile />
               </RequireAuth>
             }
           />

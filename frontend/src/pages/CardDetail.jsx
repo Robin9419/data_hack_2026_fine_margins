@@ -78,7 +78,9 @@ export default function CardDetail({ preview = false }) {
         <div className="detail-heading">
           <p className="eyebrow">{card.category ? `${card.category} · ` : ''}{card.title}</p>
           <h1>
-            #{player.jersey} {player.first_name} {player.last_name}
+            <Link to={`/players/${card.id}`} className="plain-link">
+              #{player.jersey} {player.first_name} {player.last_name}
+            </Link>
           </h1>
           <p className="muted">
             {player.team}
@@ -183,6 +185,7 @@ function PlayerCards({ cardId }) {
   return (
     <>
       <h2>Other cards of this player</h2>
+      <p><Link to={`/players/${cardId}`}>Player profile ›</Link></p>
       <p className="muted small">
         You own {ownedCount} of {others.length} other cards. Locked cards are still hidden.
       </p>
@@ -350,7 +353,9 @@ function BaseCardDetail({ card }) {
         <div className="detail-heading">
           <p className="eyebrow">Base card</p>
           <h1>
-            #{player.jersey} {player.first_name} {player.last_name}
+            <Link to={`/players/${card.id}`} className="plain-link">
+              #{player.jersey} {player.first_name} {player.last_name}
+            </Link>
           </h1>
           <p className="muted">{player.team}</p>
           <InstagramLink player={player} />

@@ -1185,3 +1185,17 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
   .detail h2 { font-size: 1.3rem; }
 }
   
+ 
+.pp-upcoming .card-tile {opacity:.55} 
+.pp-note {margin:10px 0 0} 
+.pp-games {list-style:none;margin:0;padding:0;display:grid;gap:10px} 
+.pp-game {display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:.9rem} 
+.pp-game-date {grid-column:1/-1;color:var(--muted);font-size:.8rem} 
+.pp-game-opp {display:inline-flex;align-items:center;gap:6px} 
+.pp-game-res {font-weight:700;text-align:right} 
+.pp-game-res.won {color:#3ecf8e} 
+.pp-game-res.lost {color:var(--muted)} 
+.pp-game-line {color:var(--muted);grid-column:1/-1} 
+.pp-game-chips {grid-column:1/-1} 
+.pp-chip {font:inherit;font-size:.75rem;padding:2px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:inherit;cursor:pointer} 
+.pp-chip:hover {border-color:var(--accent)} 

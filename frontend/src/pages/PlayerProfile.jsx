@@ -19,12 +19,45 @@ const age = (iso) => {
   return now.getFullYear() - born.getFullYear() - (hadBirthday ? 0 : 1)
 }
 
+const STAGES = { 'Group Torriani': 'Group', 'Group Cattini': 'Group', Quarterfinal: 'QF', Semifinal: 'SF', Final: 'Final' }
+const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`
+const sum = (rows, key) => rows.reduce((t, r) => t + (r[key] ?? 0), 0)
+const samePlayer = (a, b) => a.first_name === b.first_name && a.last_name === b.last_name && a.team === b.team
+
+// Static export of backend/scripts/player_games.py; null if it is not there.
+let gamesPromise = null
+const loadGames = () => (gamesPromise ??= fetch('/data/player-games.json').then((r) => (r.ok ? r.json() : null)).catch(() => null))
+
+function gameStats(rows, goalie) {
+  const toi = sum(rows, 'toi')
+  const avg = ['Avg. ice time', mmss(toi / rows.length)]
+  if (goalie) {
+    const sa = sum(rows, 'shots_against')
+    return [['Games', rows.length], avg, ['Save %', sa ? `${((sum(rows, 'saves') / sa) * 100).toFixed(1)}%` : '–'],
+      ['Goals against avg.', toi ? ((sum(rows, 'goals_against') * 3600) / toi).toFixed(2) : '–']]
+  }
+  const g = sum(rows, 'goals')
+  const a = sum(rows, 'assists')
+  const pm = sum(rows, 'plus_minus')
+  return [['Games', rows.length], avg, ['Goals + assists', `${g + a} (${g}+${a})`], ['Shots', sum(rows, 'shots')],
+    ['Plus/minus', pm > 0 ? `+${pm}` : pm], ['Penalty min.', sum(rows, 'pim')]]
+}
+
 export default function PlayerProfile() {
   const { cardId } = useParams()
   const allCards = useAllCards()
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
   const [tab, setTab] = useState('cards')
+  const [games, setGames] = useState(null)
+  const [scrollTo, setScrollTo] = useState(null)
+
+  useEffect(() => { loadGames().then(setGames) }, [])
+  useEffect(() => {
+    if (tab !== 'data' || !scrollTo) return
+    document.getElementById(`pp-data-${scrollTo}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setScrollTo(null)
+  }, [tab, scrollTo])
 
   useEffect(() => {
     let active = true
@@ -55,10 +88,28 @@ export default function PlayerProfile() {
     )
 
   const owned = cards.filter((c) => c.owned)
+  const availableIds = new Set(cards.map((c) => c.id))
+  const ownedIds = new Set(owned.map((c) => c.id))
   const source = owned[0] ?? cards[0]
-  const player = owned.find((c) => c.player?.last_name)?.player ?? source.player
+  const who = allCards?.get(cardId)?.player ?? owned.find((c) => c.player?.last_name)?.player ?? source.player
+  // Every card of the player, including the ones not available yet at the user's stage.
+  const everyCard = allCards
+    ? [...allCards.values()].filter((c) => c.type !== 'reward' && c.player && samePlayer(c.player, who))
+    : []
+  const list = everyCard.length > 0
+    ? everyCard.map((c) => ({
+        card: ownedIds.has(c.id) ? owned.find((o) => o.id === c.id) : { ...(cards.find((x) => x.id === c.id) ?? c), owned: false },
+        full: c,
+        status: ownedIds.has(c.id) ? 'owned' : availableIds.has(c.id) ? 'locked' : 'upcoming',
+      }))
+    : cards.map((c) => ({ card: c, full: allCards?.get(c.id), status: c.owned ? 'owned' : 'locked' }))
+  const rank = { owned: 0, locked: 1, upcoming: 2 }
+  const sorted = [...list].sort((a, b) => rank[a.status] - rank[b.status])
+  const availableCount = list.filter((x) => x.status !== 'upcoming').length
+  const upcomingCount = list.length - availableCount
+  const player = everyCard.find((c) => c.player.last_name)?.player ?? owned.find((c) => c.player?.last_name)?.player ?? source.player
   const named = Boolean(player.last_name)
-  const base = owned.find((c) => c.bio)
+  const base = everyCard.find((c) => c.bio) ?? owned.find((c) => c.bio)
   const nationality = base?.bio?.nationality ?? player.nationality
   const nation = nationOf(nationality)
   const team = teamOf(player.team)
@@ -76,9 +127,12 @@ export default function PlayerProfile() {
   ].filter(([, value]) => value)
   const lastName = named ? player.last_name : 'Locked player'
   const roles = owned.filter((c) => c.type === 'special' && c.title)
-  const sorted = [...cards].sort((a, b) => (a.owned === b.owned ? 0 : a.owned ? -1 : 1))
   const dataCards = owned.filter(hasData)
-  const lockedSpecials = cards.filter((c) => !c.owned && c.type === 'special')
+  const lockedSpecials = list.filter((x) => x.status !== 'owned' && x.card.type === 'special')
+  const playerGames = games?.[`${player.team}#${player.jersey}`]
+  const stats = playerGames?.length ? gameStats(playerGames, goalie) : null
+  const gameCards = (g) => everyCard.filter((c) => c.type === 'special' && c.kind !== 'road' && c.title && c.match?.id === g.game && c.match.date === g.date)
+  const comesWith = (full) => (full?.match?.date ? `Comes with the game on ${formatMatchDate(full.match.date)}` : 'Later in the tournament')
 
   return (
     <section className="pp">
@@ -117,8 +171,45 @@ export default function PlayerProfile() {
               {nationality && (<><dt>Nationality</dt><dd>{nationality}</dd></>)}
               {player.jersey && (<><dt>Jersey</dt><dd>#{player.jersey}</dd></>)}
               {bioFacts.map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>))}
+              {stats && stats.map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>))}
             </dl>
+            {stats && <p className="muted small pp-note">Spengler Cup 2025, official game statistics</p>}
           </div>
+          {playerGames?.length > 0 && (
+            <div className="pp-box">
+              <h2>Games</h2>
+              <ul className="pp-games">
+                {playerGames.map((g) => {
+                  const home = g.home_team === player.team
+                  const opp = teamOf(g.opponent)
+                  const chips = gameCards(g)
+                  const line = player.position === 'Goalkeeper'
+                    ? `${g.saves ?? 0} sv`
+                    : `${g.goals}-${g.assists}`
+                  const open = (c) => { setTab('data'); setScrollTo(c.id) }
+                  return (
+                    <li key={g.game} className="pp-game">
+                      <span className="pp-game-date">{formatMatchDate(g.date)} · {STAGES[g.stage] ?? g.stage}</span>
+                      <span className="pp-game-opp">
+                        {opp.logo && <img src={opp.logo} alt="" width="18" height="18" />} {opp.short || g.opponent}
+                      </span>
+                      <span className={`pp-game-res ${g.won ? 'won' : 'lost'}`}>
+                        {g.won ? 'W' : 'L'} {home ? g.home_score : g.away_score}–{home ? g.away_score : g.home_score}
+                      </span>
+                      <span className="pp-game-line">{line} · {mmss(g.toi)}</span>
+                      {chips.length > 0 && (
+                        <span className="pp-game-chips">
+                          {chips.map((c) => (
+                            <button key={c.id} type="button" className="pp-chip" onClick={() => open(c)}>{c.title}</button>
+                          ))}
+                        </span>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )}
           {roles.length > 0 && (
             <div className="pp-box">
               <h2>Roles</h2>
@@ -157,19 +248,23 @@ export default function PlayerProfile() {
               <div className="pp-box pp-set">
                 <div className="pp-set-head">
                   <h2>Player set</h2>
-                  <span>{owned.length} of {cards.length} cards</span>
+                  <span>
+                    {owned.length} of {availableCount} cards
+                    {upcomingCount > 0 && <span className="muted"> · +{upcomingCount} more to come</span>}
+                  </span>
                 </div>
-                <div className="pp-bar" role="progressbar" aria-valuemin={0} aria-valuemax={cards.length} aria-valuenow={owned.length}>
-                  <div style={{ width: `${(owned.length / cards.length) * 100}%` }} />
+                <div className="pp-bar" role="progressbar" aria-valuemin={0} aria-valuemax={availableCount} aria-valuenow={owned.length}>
+                  <div style={{ width: `${availableCount ? (owned.length / availableCount) * 100 : 0}%` }} />
                 </div>
               </div>
               <div className="pp-cards">
-                {sorted.map((c) => (
-                  <figure key={c.id} className="pp-card">
-                    <CardTile card={c} full={allCards?.get(c.id)} />
+                {sorted.map(({ card: c, full, status }) => (
+                  <figure key={c.id} className={`pp-card ${status === 'upcoming' ? 'pp-upcoming' : ''}`}>
+                    <CardTile card={c} full={full} />
                     <figcaption>
-                      <strong>{c.owned ? c.title ?? 'Base card' : 'Locked'}</strong>
-                      {c.owned && c.type === 'special' && gameOf(c) && <span className="muted small">{gameOf(c)}</span>}
+                      <strong>{status === 'owned' ? c.title ?? 'Base card' : status === 'locked' ? 'Locked' : full?.title ?? 'Upcoming'}</strong>
+                      {status === 'upcoming' && <span className="muted small">{comesWith(full)}</span>}
+                      {status === 'owned' && c.type === 'special' && gameOf(c) && <span className="muted small">{gameOf(c)}</span>}
                     </figcaption>
                   </figure>
                 ))}
@@ -179,9 +274,18 @@ export default function PlayerProfile() {
 
           {tab === 'data' && (
             <div id="pp-panel-data" role="tabpanel" aria-labelledby="pp-tab-data">
-              {dataCards.length === 0 && <p className="muted">No match data yet. Collect this player's performance cards.</p>}
+              {dataCards.length === 0 && (
+                <div className="pp-box">
+                  <h2>No match data yet</h2>
+                  <p className="muted">
+                    Performance cards show the numbers behind a player's game. Collect this player's special cards
+                    {lockedSpecials.length > 0 ? ' (shown below)' : ''} and their match data appears here.
+                  </p>
+                  <button type="button" className="pp-chip" onClick={() => setTab('cards')}>See all cards of this player</button>
+                </div>
+              )}
               {dataCards.map((c) => (
-                <article key={c.id} className="pp-box pp-data">
+                <article key={c.id} id={`pp-data-${c.id}`} className="pp-box pp-data">
                   <div className="pp-data-card">
                     <CardTile card={c} />
                   </div>
@@ -198,14 +302,14 @@ export default function PlayerProfile() {
                   </div>
                 </article>
               ))}
-              {lockedSpecials.map((c) => (
-                <article key={c.id} className="pp-box pp-data locked">
+              {lockedSpecials.map(({ card: c, full, status }) => (
+                <article key={c.id} id={`pp-data-${c.id}`} className={`pp-box pp-data locked ${status === 'upcoming' ? 'pp-upcoming' : ''}`}>
                   <div className="pp-data-card">
-                    <CardTile card={c} full={allCards?.get(c.id)} />
+                    <CardTile card={c} full={full} />
                   </div>
                   <div className="pp-data-body">
-                    <h2>Locked card</h2>
-                    <p className="muted">Unlock to see the data.</p>
+                    <h2>{status === 'upcoming' ? full?.title ?? 'Upcoming card' : 'Locked card'}</h2>
+                    <p className="muted">{status === 'upcoming' ? comesWith(full) : 'Unlock to see the data.'}</p>
                   </div>
                 </article>
               ))}

@@ -8,6 +8,7 @@ import CardTile from '../components/CardTile'
 import { formatMatchDate, scoreline } from '../format'
 import { nationOf } from '../nations'
 import { teamOf } from '../teams'
+import { useTournament } from '../tournament'
 
 const hasData = (c) => c.owned && c.type === 'special' && Array.isArray(c.attributes)
 const gameOf = (c) => (c.match?.opponent ? `vs ${c.match.opponent}${c.match.date ? ` · ${formatMatchDate(c.match.date)}` : ''}` : null)
@@ -67,6 +68,8 @@ function Info({ id, text }) {
 export default function PlayerProfile() {
   const { cardId } = useParams()
   const allCards = useAllCards()
+  const { tournament } = useTournament()
+  const stage = tournament?.stage
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
   const [tab, setTab] = useState('cards')
@@ -102,7 +105,7 @@ export default function PlayerProfile() {
       .then(({ cards }) => { if (active) setCards(cards) })
       .catch((err) => { if (active) setError(err.message) })
     return () => { active = false }
-  }, [cardId])
+  }, [cardId, stage])
 
   if (error)
     return (
@@ -125,21 +128,20 @@ export default function PlayerProfile() {
   const ownedIds = new Set(owned.map((c) => c.id))
   const source = owned[0] ?? cards[0]
   const who = allCards?.get(cardId)?.player ?? owned.find((c) => c.player?.last_name)?.player ?? source.player
-  // Every card of the player, including the ones not available yet at the user's stage.
+  // Only cards that exist at the user's stage (owned or still locked); what comes later is not shown.
   const everyCard = allCards
-    ? [...allCards.values()].filter((c) => c.type !== 'reward' && c.player && samePlayer(c.player, who))
+    ? [...allCards.values()].filter((c) => c.type !== 'reward' && c.player && samePlayer(c.player, who) && availableIds.has(c.id))
     : []
   const list = everyCard.length > 0
     ? everyCard.map((c) => ({
         card: ownedIds.has(c.id) ? owned.find((o) => o.id === c.id) : { ...(cards.find((x) => x.id === c.id) ?? c), owned: false },
         full: c,
-        status: ownedIds.has(c.id) ? 'owned' : availableIds.has(c.id) ? 'locked' : 'upcoming',
+        status: ownedIds.has(c.id) ? 'owned' : 'locked',
       }))
     : cards.map((c) => ({ card: c, full: allCards?.get(c.id), status: c.owned ? 'owned' : 'locked' }))
-  const rank = { owned: 0, locked: 1, upcoming: 2 }
+  const rank = { owned: 0, locked: 1 }
   const sorted = [...list].sort((a, b) => rank[a.status] - rank[b.status])
-  const availableCount = list.filter((x) => x.status !== 'upcoming').length
-  const upcomingCount = list.length - availableCount
+  const availableCount = list.length
   const player = everyCard.find((c) => c.player.last_name)?.player ?? owned.find((c) => c.player?.last_name)?.player ?? source.player
   const named = Boolean(player.last_name)
   const base = everyCard.find((c) => c.bio) ?? owned.find((c) => c.bio)
@@ -161,10 +163,10 @@ export default function PlayerProfile() {
   const lastName = named ? player.last_name : 'Locked player'
   const dataCards = owned.filter(hasData)
   const lockedSpecials = list.filter((x) => x.status !== 'owned' && x.card.type === 'special')
-  const playerGames = games?.[`${player.team}#${player.jersey}`]
+  const playedIds = new Set((tournament?.results ?? []).map((r) => r.id))
+  const playerGames = games?.[`${player.team}#${player.jersey}`]?.filter((g) => playedIds.has(g.game))
   const stats = playerGames?.length ? gameStats(playerGames, goalie) : null
   const gameCards = (g) => everyCard.filter((c) => c.type === 'special' && c.kind !== 'road' && c.title && c.match?.id === g.game && c.match.date === g.date)
-  const comesWith = (full) => (full?.match?.date ? `Comes with the game on ${formatMatchDate(full.match.date)}` : 'Later in the tournament')
 
   return (
     <section className="pp">
@@ -215,7 +217,6 @@ export default function PlayerProfile() {
           <div className="pp-set">
             <span className="pp-set-label">
               Player set {owned.length} of {availableCount} cards
-              {upcomingCount > 0 && <> · +{upcomingCount} more to come</>}
             </span>
             <div className="pp-bar" role="progressbar" aria-label="Player set" aria-valuemin={0} aria-valuemax={availableCount} aria-valuenow={owned.length}>
               <div style={{ width: `${availableCount ? (owned.length / availableCount) * 100 : 0}%` }} />
@@ -278,11 +279,10 @@ export default function PlayerProfile() {
             <div id="pp-panel-cards" role="tabpanel" aria-labelledby="pp-tab-cards">
               <div className="pp-cards">
                 {sorted.map(({ card: c, full, status }) => (
-                  <figure key={c.id} className={`pp-card ${status === 'upcoming' ? 'pp-upcoming' : ''}`}>
+                  <figure key={c.id} className="pp-card">
                     <CardTile card={c} full={full} onOpen={setSpotlight} />
                     <figcaption>
-                      <strong>{status === 'owned' ? c.title ?? 'Base card' : status === 'locked' ? 'Locked' : full?.title ?? 'Upcoming'}</strong>
-                      {status === 'upcoming' && <span className="muted small">{comesWith(full)}</span>}
+                      <strong>{status === 'owned' ? c.title ?? 'Base card' : 'Locked'}</strong>
                       {status === 'owned' && c.type === 'special' && gameOf(c) && <span className="muted small">{gameOf(c)}</span>}
                     </figcaption>
                   </figure>
@@ -321,14 +321,14 @@ export default function PlayerProfile() {
                   </div>
                 </article>
               ))}
-              {lockedSpecials.map(({ card: c, full, status }) => (
-                <article key={c.id} id={`pp-data-${c.id}`} className={`pp-box pp-data locked ${status === 'upcoming' ? 'pp-upcoming' : ''}`}>
+              {lockedSpecials.map(({ card: c, full }) => (
+                <article key={c.id} id={`pp-data-${c.id}`} className="pp-box pp-data locked">
                   <div className="pp-data-card">
                     <CardTile card={c} full={full} />
                   </div>
                   <div className="pp-data-body">
-                    <h2>{status === 'upcoming' ? full?.title ?? 'Upcoming card' : 'Locked card'}</h2>
-                    <p className="muted">{status === 'upcoming' ? comesWith(full) : 'Unlock to see the data.'}</p>
+                    <h2>Locked card</h2>
+                    <p className="muted">Unlock to see the data.</p>
                   </div>
                 </article>
               ))}

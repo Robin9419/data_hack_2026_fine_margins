@@ -187,11 +187,12 @@ export default function Gallery() {
       if (a.owned !== b.owned) return a.owned ? -1 : 1
       return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]
     })
-  const pageCount = Math.max(1, Math.ceil(shown.length / PAGE_SIZE))
-  const current = Math.min(page, pageCount - 1)
-  const pageCards = shown.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
-  const goTo = (p) => setPage(Math.max(0, Math.min(pageCount - 1, p)))
   const players = mode === 'players' ? groupPlayers(shown, cards, playerOf) : []
+  const items = mode === 'players' ? players : shown
+  const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
+  const current = Math.min(page, pageCount - 1)
+  const pageItems = items.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
+  const goTo = (p) => setPage(Math.max(0, Math.min(pageCount - 1, p)))
   const filterBy = (setter) => (value) => {
     setter(value)
     setPage(0)
@@ -255,7 +256,7 @@ export default function Gallery() {
         </label>
         <div className="seg" role="group" aria-label="View">
           {[['players', 'Players'], ['cards', 'Cards']].map(([value, label]) => (
-            <button key={value} type="button" className={mode === value ? 'on' : ''} aria-pressed={mode === value} onClick={() => setMode(value)}>
+            <button key={value} type="button" className={mode === value ? 'on' : ''} aria-pressed={mode === value} onClick={() => { setMode(value); setPage(0) }}>
               {label}
             </button>
           ))}
@@ -267,66 +268,59 @@ export default function Gallery() {
         <ChipFilter label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
       </div>
 
-      {mode === 'players' ? (
-        <>
-          <div className="pgrid">
-            {players.map((p) => (
-              <Link key={p.key} to={`/players/${p.cardId}`} className={`ptile ${p.owned ? '' : 'unknown'}`}>
-                <div className="ph">
-                  {p.image && <img className="photo" src={p.image} alt="" referrerPolicy="no-referrer" loading="lazy" />}
-                  {p.logo && <img className="logo" src={p.logo} alt={p.team} />}
-                  {p.jersey && <span className="num">{p.jersey}</span>}
-                </div>
-                <div className="body">
-                  <b>{p.last}</b>
-                  <small>{[p.first, p.position].filter(Boolean).join(' · ')}</small>
-                  <div className="dots" aria-label={`${p.owned} of ${p.total} cards`}>
-                    {Array.from({ length: p.total }, (_, i) => (
-                      <i key={i} className={i < p.owned ? 'on' : ''} />
-                    ))}
-                    <span>{p.owned}/{p.total}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-          {players.length === 0 && <p className="muted">No players match these filters.</p>}
-        </>
-      ) : (
-      <>
       <div className="card-pager">
         <button
           type="button"
           className="pager-arrow prev"
-          aria-label="Previous cards"
+          aria-label={mode === 'players' ? 'Previous players' : 'Previous cards'}
           disabled={current === 0}
           onClick={() => goTo(current - 1)}
         >
           ‹
         </button>
         <div className="card-grid" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-          {pageCards.map((card) => (
-            <CardTile
-              key={card.id}
-              card={card}
-              club={clubs[card.player?.team]}
-              isNew={newCardIds.includes(card.id)}
-              onOpen={setSpotlight}
-              full={fullOf(card)}
-            />
-          ))}
+          {mode === 'players'
+            ? pageItems.map((p) => (
+                <Link key={p.key} to={`/players/${p.cardId}`} className={`ptile ${p.owned ? '' : 'unknown'}`}>
+                  <div className="ph">
+                    {p.image && <img className="photo" src={p.image} alt="" referrerPolicy="no-referrer" loading="lazy" />}
+                    {p.logo && <img className="logo" src={p.logo} alt={p.team} />}
+                    {p.jersey && <span className="num">{p.jersey}</span>}
+                  </div>
+                  <div className="body">
+                    <b>{p.last}</b>
+                    <small>{[p.first, p.position].filter(Boolean).join(' · ')}</small>
+                    <div className="dots" aria-label={`${p.owned} of ${p.total} cards`}>
+                      {Array.from({ length: p.total }, (_, i) => (
+                        <i key={i} className={i < p.owned ? 'on' : ''} />
+                      ))}
+                      <span>{p.owned}/{p.total}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            : pageItems.map((card) => (
+                <CardTile
+                  key={card.id}
+                  card={card}
+                  club={clubs[card.player?.team]}
+                  isNew={newCardIds.includes(card.id)}
+                  onOpen={setSpotlight}
+                  full={fullOf(card)}
+                />
+              ))}
         </div>
         <button
           type="button"
           className="pager-arrow next"
-          aria-label="Next cards"
+          aria-label={mode === 'players' ? 'Next players' : 'Next cards'}
           disabled={current >= pageCount - 1}
           onClick={() => goTo(current + 1)}
         >
           ›
         </button>
       </div>
-      {shown.length === 0 && <p className="muted">No cards match these filters.</p>}
+      {items.length === 0 && <p className="muted">{mode === 'players' ? 'No players match these filters.' : 'No cards match these filters.'}</p>}
       {pageCount > 1 && (
         <div className="pager-dots">
           {Array.from({ length: pageCount }, (_, i) => (
@@ -340,8 +334,6 @@ export default function Gallery() {
             />
           ))}
         </div>
-      )}
-      </>
       )}
 
       <button className="link-button reset" onClick={onReset}>

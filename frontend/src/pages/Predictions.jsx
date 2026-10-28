@@ -66,7 +66,9 @@ function Round({ stage, games, next }) {
   return (
     <>
       <header className="predict-head">
-        <p className="eyebrow">Gameday · {games[0].stage}</p>
+        <p className="eyebrow">
+          <span className="badge">Prediction</span>Gameday · {games[0].stage}
+        </p>
         <h1>Your predictions</h1>
         <p className="muted">
           {dayName(stage)} · {plural(games.length, 'game')}. Every right pick earns a pack of three cards after the
@@ -81,7 +83,7 @@ function Round({ stage, games, next }) {
       </header>
 
       {current ? (
-        <article className="predict-card">
+        <article className="predict-card q-card">
           <div className="predict-game">
             <span className="muted small">
               Game {games.indexOf(current.game) + 1} of {games.length} · {current.game.start}
@@ -102,13 +104,18 @@ function Round({ stage, games, next }) {
               <button
                 key={o.id}
                 type="button"
-                className={`predict-option ${current.question.prediction === o.id ? 'active' : ''}`}
+                className={`choice predict-option ${current.question.prediction === o.id ? 'selected' : ''}`}
                 aria-pressed={current.question.prediction === o.id}
                 disabled={busy}
                 onClick={() => choose(current.game, current.question, o)}
               >
-                {o.team && <TeamLogo name={o.team} />}
-                <span>{o.label}</span>
+                {o.team && (
+                  <span className="ch-av">
+                    <TeamLogo name={o.team} />
+                  </span>
+                )}
+                <span className="ch-txt">{o.label}</span>
+                <span className="ch-mark" aria-hidden="true" />
               </button>
             ))}
           </div>
@@ -130,7 +137,7 @@ function Round({ stage, games, next }) {
           </nav>
         </article>
       ) : (
-        <article className="predict-card">
+        <article className="predict-card q-card">
           <h2 className="predict-prompt">{picked === steps.length ? 'All set!' : `${steps.length - picked} picks left`}</h2>
           <p className="muted small">
             {picked === steps.length

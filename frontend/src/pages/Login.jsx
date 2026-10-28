@@ -69,7 +69,7 @@ export default function Login() {
         </div>
       </section>
 
-      <section className="signup">
+      <section className="signup q-card">
         <h2>Start your collection</h2>
         <form onSubmit={onSubmit} className="login-form">
           <label htmlFor="username">Username</label>
@@ -91,7 +91,7 @@ export default function Login() {
                 <button
                   type="button"
                   key={t.name}
-                  className={`team-option ${favorite === t.name ? 'selected' : ''}`}
+                  className={`choice team-option ${favorite === t.name ? 'selected' : ''}`}
                   style={{ '--c1': t.c1, '--c2': t.c2 }}
                   aria-pressed={favorite === t.name}
                   onClick={() => setFavorite(favorite === t.name ? null : t.name)}
@@ -99,7 +99,8 @@ export default function Login() {
                   <span className="team-badge">
                     <img src={t.logo} alt="" loading="lazy" />
                   </span>
-                  <span className="team-name">{t.name}</span>
+                  <span className="team-name ch-txt">{t.name}</span>
+                  <span className="ch-mark" aria-hidden="true" />
                 </button>
               ))}
             </div>

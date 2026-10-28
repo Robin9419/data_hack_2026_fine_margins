@@ -80,22 +80,27 @@ export default function Quiz() {
 
   if (!venue) {
     return (
-      <section className="quiz">
+      <section className="quiz q-card">
+        <p className="eyebrow"><span className="badge">Quiz</span></p>
         <h1>Trivia time</h1>
         <p className="muted">
           Answer three questions about the games played so far to win their special cards. Where are you watching? (In this demo you tell us. A real
           app would check your ticket.)
         </p>
         <div className="venue-choices">
-          <button type="button" className="venue-choice" disabled={busy} onClick={() => start('home')}>
-            <span className="venue-icon">📺</span>
-            <strong>At home</strong>
-            <span>Watching on TV. Win the standard card of each player.</span>
+          <button type="button" className="choice venue-choice" disabled={busy} onClick={() => start('home')}>
+            <span className="ch-av venue-icon">📺</span>
+            <span className="ch-txt">
+              <strong>At home</strong>
+              <small>Watching on TV. Win the standard card of each player.</small>
+            </span>
           </button>
-          <button type="button" className="venue-choice stadium" disabled={busy} onClick={() => start('stadium')}>
-            <span className="venue-icon">🏟</span>
-            <strong>At the stadium</strong>
-            <span>Win the exclusive Stadium edition of the card and more reward points.</span>
+          <button type="button" className="choice venue-choice stadium" disabled={busy} onClick={() => start('stadium')}>
+            <span className="ch-av venue-icon">🏟</span>
+            <span className="ch-txt">
+              <strong>At the stadium</strong>
+              <small>Win the exclusive Stadium edition of the card and more reward points.</small>
+            </span>
           </button>
         </div>
         {error && <p className="error">{error}</p>}
@@ -159,8 +164,9 @@ export default function Quiz() {
   const last = index === questions.length - 1
 
   return (
-    <section className="quiz">
+    <section className="quiz q-card">
       <p className="eyebrow">
+        <span className="badge">Quiz</span>
         Question {index + 1} of {questions.length} · {venue === 'stadium' ? '🏟 Stadium' : '📺 At home'}
       </p>
       <h1>{question.prompt}</h1>
@@ -179,12 +185,15 @@ export default function Quiz() {
             <li key={option.id}>
               <button
                 type="button"
-                className={`quiz-option ${isWrong ? 'wrong' : ''}`}
+                className={`choice quiz-option ${isWrong ? 'wrong' : ''} ${missed && !isWrong ? 'dim' : ''}`}
                 disabled={Boolean(missed) || busy}
                 onClick={() => answer(question, option)}
               >
-                <strong>{option.name}</strong>
-                <span>{option.team}</span>
+                <span className="ch-txt">
+                  <strong>{option.name}</strong>
+                  <small>{option.team}</small>
+                </span>
+                <span className="ch-mark" aria-hidden="true" />
               </button>
             </li>
           )

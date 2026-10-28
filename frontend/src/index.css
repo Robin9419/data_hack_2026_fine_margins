@@ -1176,13 +1176,12 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .pp-master dt { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .pp-master dd { margin: 0; font-size: 0.82rem; color: var(--text); opacity: 0.85; white-space: nowrap; }
 .pp-foot { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 0 20px 12px; }
-.pp-tourn h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
-.pp-tourn h2::before { content: ''; width: 14px; height: 2px; border-radius: 2px; background: var(--accent); }
-.pp-set { width: min(180px, 100%); margin-left: auto; display: grid; gap: 4px; opacity: 0.7; }
-.pp-set-label { font-size: 0.65rem; color: var(--muted); text-align: right; }
+.pp-tourn h2 { margin: 0 0 6px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); opacity: 0.85; }
+.pp-set { width: auto; max-width: 100%; margin-left: auto; display: grid; gap: 4px; opacity: 0.7; }
+.pp-set-label { font-size: 0.65rem; color: var(--muted); text-align: right; white-space: nowrap; }
 .pp-stats { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; }
 .pp-stats dd { margin: 0; font-family: var(--display); font-size: 1.35rem; line-height: 1.1; color: var(--text); }
-.pp-stats dt { font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+.pp-stats dt { font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 4px; }
 .pp-info { position: relative; display: inline-flex; color: var(--muted); cursor: help; border-radius: 50%; }
 .pp-info:hover, .pp-info:focus-visible { color: var(--accent); outline: none; }
 .pp-tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 200px; padding: 6px 9px; border-radius: var(--radius-sm); background: rgba(15, 18, 24, 0.92); backdrop-filter: blur(8px); border: 1px solid var(--line); color: var(--text); font-size: 0.72rem; line-height: 1.35; text-align: left; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.12s; z-index: 10; }

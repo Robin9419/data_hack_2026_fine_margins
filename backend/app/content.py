@@ -165,9 +165,18 @@ class Content:
         for moments in self.events.by_player.values():
             moments.sort(key=lambda m: (int(m['timestamp']), m['id']))
 
+    def _without_profile(self, candidates):
+        """A player holds one profile card per game: drop the candidates who already have one, so that an award
+        whose winner is taken goes to the next best player."""
+        held = {(c['player']['team'], c['player']['jersey']) for c in self.cards.values()
+                if c.get('kind') == 'profile' and c.get('player')}
+        return [(pid, stats) for pid, stats in candidates
+                if next((key for key, value in self.events.ids.items() if value == pid), None) not in held]
+
     def _add_pressure_card(self):
         candidates = [(pid, stats) for pid, stats in self.derived_kpis['pass_body_pressure']['players'].items()
                       if stats['ranking_eligible'] and stats['mean'] > 0]
+        candidates = self._without_profile(candidates)
         if not candidates:
             return
         # Deterministic tie break: more evaluated passes, then player ID.
@@ -188,6 +197,7 @@ class Content:
         calculation = self.derived_kpis['pass_packing']
         candidates = [(pid, stats) for pid, stats in calculation['players'].items()
                       if stats['ranking_eligible'] and stats['mean'] > 0]
+        candidates = self._without_profile(candidates)
         if not candidates:
             return
         pid, stats = max(candidates, key=lambda item: (item[1]['mean'], item[1]['evaluated_passes'], item[0]))
@@ -230,6 +240,7 @@ class Content:
     def _add_xa_card(self):
         candidates = [(pid, stats) for pid, stats in self.derived_kpis['expected_assists']['players'].items()
                       if stats['total'] > 0]
+        candidates = self._without_profile(candidates)
         if not candidates:
             return
         pid, stats = max(candidates, key=lambda item: (item[1]['total'], item[1]['assisted_shots'], item[0]))
@@ -302,6 +313,7 @@ class Content:
                         value = _to_number(row[metric['column']])
                         if pid and pid not in self.analysis.goalkeeper_ids and value is not None and math.isfinite(value) and value > 0:
                             candidates.append((pid, {award['aggregate']: value}))
+                candidates = self._without_profile(candidates)
                 if award.get('tie_break_metric'):
                     enriched = []
                     for pid, stats in candidates:

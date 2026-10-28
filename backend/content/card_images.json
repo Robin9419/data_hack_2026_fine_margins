@@ -9,6 +9,24 @@
   "mccartthy": "/players/mccartthy-special.jpg",
   "nussbaumer": "/players/nussbaumer-special.jpg",
   "pressure-reliever": "/players/muldowney-special.jpg",
+  "exit-specialist": {
+    "image_url": "/specials/exit-specialist.jpg",
+    "position": "85% 5%",
+    "credit": "Supplied by the project team (rights not established)",
+    "source": ""
+  },
+  "entry-catalyst": {
+    "image_url": "/specials/entry-catalyst.jpg",
+    "position": "50% 30%",
+    "credit": "Supplied by the project team (rights not established)",
+    "source": ""
+  },
+  "puck-hunter": {
+    "image_url": "/specials/puck-hunter.jpg",
+    "position": "50% 30%",
+    "credit": "Supplied by the project team (rights not established)",
+    "source": ""
+  },
   "base-hcd-12": "/players/guebey.png",
   "base-hcd-6": "/players/dahlbeck.png",
   "base-hcd-47": "/players/komarov.png",

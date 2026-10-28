@@ -55,6 +55,17 @@ class InterceptionTests(unittest.TestCase):
         self.assertEqual(self.calculate([])['players'], {})
 
 
+def profile_holders_before(c, cid):
+    """Players who already had a profile card when the card cid was awarded (one profile per player)."""
+    held = set()
+    for other_id, other in c.cards.items():
+        if other_id == cid:
+            break
+        if other.get('kind') == 'profile' and other.get('player'):
+            held.add(c.events.player_id(other['player']['team'], other['player']['jersey']))
+    return held
+
+
 class DefendingContentTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -66,11 +77,12 @@ class DefendingContentTests(unittest.TestCase):
         pcw = {c.events.player_id(r['Team'], int(r['Jersey'])): int(r['PCW']) for r in c.rows}
         for cid, key in [('puck-hunter', lambda pid: (pcw[pid], counts[pid]['interceptions'], pid)),
                          ('passing-lane-guardian', lambda pid: (counts[pid]['interceptions'], pcw[pid], pid))]:
-            expected = max(pcw, key=key)
             card = c.cards[cid]
+            expected = max((pid for pid in pcw if pid not in profile_holders_before(c, cid)), key=key)
             self.assertEqual(c.events.player_id(card['player']['team'], card['player']['jersey']), expected)
             self.assertEqual(card['attributes'][0]['value'], key(expected)[0])
-            self.assertEqual(card['attributes'][0]['match_rank'], 1)
+            better = sum(1 for pid in pcw if key(pid)[0] > key(expected)[0])
+            self.assertEqual(card['attributes'][0]['match_rank'], 1 + better)
         self.assertIsNone(c.cards['puck-hunter']['attributes'][0]['moment_ids'])
         self.assertIsNone(c.cards['puck-hunter']['video'])
         self.assertEqual(c.cards['puck-hunter']['source'], c.match['source'])
@@ -123,9 +135,10 @@ class DefendingContentTests(unittest.TestCase):
     def test_equal_counts_resolve_by_player_id_without_mutating_analysis(self):
         c = self.candidate_content(1)
         before = copy.deepcopy(c.derived_kpis['interceptions'])
-        expected = max(c.events.player_id(r['Team'], int(r['Jersey'])) for r in c.rows)
+        ids = sorted(c.events.player_id(r['Team'], int(r['Jersey'])) for r in c.rows)
         c._add_category_cards()
-        for cid in ['puck-hunter', 'passing-lane-guardian']:
+        # Equal values: the greatest player ID wins; the next award goes to the next ID (one profile per player).
+        for cid, expected in zip(['puck-hunter', 'passing-lane-guardian'], reversed(ids)):
             card = c.cards[cid]
             self.assertEqual(c.events.player_id(card['player']['team'], card['player']['jersey']), expected)
         self.assertEqual(c.derived_kpis['interceptions'], before)

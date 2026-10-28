@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ordinal } from '../format'
+import { Link, useLocation } from 'react-router-dom'
+import { formatMatchDate, ordinal } from '../format'
 import { teamStyle } from '../teams'
 import CardFace from './CardFace'
 
@@ -9,13 +9,14 @@ const MAX_CLIPS = 3
 const KIND_ORDER = ['goal', 'assist', 'save', 'shot', 'faceoff_win', 'goal_against']
 
 // The KPIs behind the archetype (the card's own attributes if the API predates them).
-const kpisOf = (card) => card.archetype_kpis ?? card.attributes
+const kpisOf = (card) => card.archetype_kpis ?? card.attributes ?? []
 
 const describe = (m) => `${m.title} at ${m.clock} of the ${m.period_label}. ${m.text}`.trim()
 
 // Up to three clips of the events behind the archetype's KPIs (arena camera first, else the TV replay),
 // falling back to the card's own highlight when none of those events are on video.
 function pickClips(card) {
+  if (card.type !== 'special') return []
   const moments = card.moments || []
   const linked = new Set(kpisOf(card).flatMap((a) => a.moment_ids || []))
   const tier = (m) => (KIND_ORDER.includes(m.kind) ? KIND_ORDER.indexOf(m.kind) : KIND_ORDER.length)
@@ -29,9 +30,11 @@ function pickClips(card) {
   return clips
 }
 
-// Pop-out view of a special card from the gallery. It opens on the card's back, which shows the KPIs that earned
-// the player this archetype, next to clips that show it. Links on to the full card page.
-export default function CardSpotlight({ card, onClose, detailPath = `/cards/${card.id}` }) {
+// Pop-out view of an owned card. It opens on the back: the KPIs that earned a special card its archetype (next to
+// clips that show it), or the key facts of a base, legend or reward card. Links on to the player profile.
+export default function CardSpotlight({ card, onClose, hideLink = false }) {
+  const { pathname } = useLocation()
+  const showLink = !hideLink && card.player?.last_name && (card.type === 'base' || card.type === 'special') && !pathname.startsWith('/players/')
   const [flipped, setFlipped] = useState(true)
   const [clipIndex, setClipIndex] = useState(0)
   const closeRef = useRef(null)
@@ -58,8 +61,11 @@ export default function CardSpotlight({ card, onClose, detailPath = `/cards/${ca
 
   const { player } = card
   const clip = clips[clipIndex]
+  const name = player?.last_name ? `${player.first_name} ${player.last_name}` : ''
+  const about = card.type === 'legend' ? card.legend?.summary : card.type === 'reward' ? card.text ?? card.explanation : null
+  const lists = card.type === 'legend' ? [['At the Spengler Cup', card.legend?.spengler_cup], ['Career honours', card.legend?.honours]] : []
   return (
-    <div className="spotlight" role="dialog" aria-modal="true" aria-label={`${card.title}: ${player.first_name} ${player.last_name}`} onClick={onClose}>
+    <div className="spotlight" role="dialog" aria-modal="true" aria-label={[card.title, name].filter(Boolean).join(': ')} onClick={onClose}>
       <div className="spotlight-panel" onClick={(e) => e.stopPropagation()}>
         <button ref={closeRef} type="button" className="spotlight-close" aria-label="Close" onClick={onClose}>
           ✕
@@ -83,7 +89,19 @@ export default function CardSpotlight({ card, onClose, detailPath = `/cards/${ca
         </div>
 
         <div className="spotlight-clips">
-          <div className="spotlight-clips-head">
+          {card.type !== 'special' && (
+            <>
+              <h2>{card.title ?? 'Base card'}</h2>
+              {about && <p className="explanation">{about}</p>}
+              {lists.map(([head, items]) => items?.length > 0 && (
+                <div key={head}>
+                  <h3>{head}</h3>
+                  <ul className="legend-facts">{items.map((f) => <li key={f}>{f}</li>)}</ul>
+                </div>
+              ))}
+            </>
+          )}
+          {card.type === 'special' && <><div className="spotlight-clips-head">
             <h2>Watch it happen</h2>
             {clips.length > 1 && (
               <span className="spotlight-count">
@@ -107,7 +125,7 @@ export default function CardSpotlight({ card, onClose, detailPath = `/cards/${ca
             </div>
           ) : (
             <p className="spotlight-empty">No video of this performance in the demo.</p>
-          )}
+          )}</>}
           {clips.length > 1 && (
             <div className="pager-dots spotlight-dots">
               {clips.map((c, i) => (
@@ -122,13 +140,15 @@ export default function CardSpotlight({ card, onClose, detailPath = `/cards/${ca
               ))}
             </div>
           )}
-          <Link to={detailPath} onClick={onClose} className="spotlight-more">
-            <span>
-              <strong>See the full card</strong>
-              <small>Every stat, how it ranks and all game events</small>
-            </span>
-            <span aria-hidden="true">→</span>
-          </Link>
+          {showLink && (
+            <Link to={`/players/${card.id}`} onClick={onClose} className="spotlight-more">
+              <span>
+                <strong>Player profile ›</strong>
+                <small>All cards, stats and games of {name}</small>
+              </span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          )}
         </div>
       </div>
     </div>
@@ -143,10 +163,39 @@ function rankText(kpi) {
   return `${ordinal(kpi.match_rank)} of ${kpi.players_in_match} ${kpi.rank_pool}`
 }
 
-// The back holds only the archetype and the three KPIs that earned it.
+// Label/value facts for the back of a non-special card.
+function factsOf(card) {
+  const bio = card.bio ?? {}
+  const p = card.player ?? {}
+  const rows =
+    card.type === 'base'
+      ? [['Position', p.position], ['Born', bio.date_of_birth && formatMatchDate(bio.date_of_birth)], ['Nationality', bio.nationality], ['Height', bio.height_cm && `${bio.height_cm} cm`], ['College', bio.club], ['Draft', bio.draft]]
+      : card.type === 'legend'
+        ? [['Position', p.position], ['Nationality', card.legend?.nationality], ['Era', card.legend?.era]]
+        : [['Earned by', card.unlock], ['Date', card.match?.date && formatMatchDate(card.match.date)]]
+  return rows.filter(([, v]) => v)
+}
+
+// The back of a special card holds the archetype and the KPIs that earned it; other cards show their key facts.
 function CardBack({ card }) {
+  const style = card.player?.team ? teamStyle(card.player.team) : card.team ? teamStyle(card.team) : undefined
+  if (card.type !== 'special') {
+    return (
+      <span className="spotlight-back card-face" style={style}>
+        <span className="back-title">{card.title ?? 'Base card'}</span>
+        <span className="back-kpis">
+          {factsOf(card).map(([label, value]) => (
+            <span key={label} className="back-kpi">
+              <span className="back-kpi-value" style={{ fontSize: '1rem' }}>{value}</span>
+              <span className="back-kpi-label">{label}</span>
+            </span>
+          ))}
+        </span>
+      </span>
+    )
+  }
   return (
-    <span className="spotlight-back card-face" style={teamStyle(card.player.team)}>
+    <span className="spotlight-back card-face" style={style}>
       <span className="back-title">{card.title}</span>
       <span className="back-kpis">
         {kpisOf(card).map((kpi) => (

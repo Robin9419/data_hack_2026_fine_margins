@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import CardFace from './CardFace'
 
-// onOpen: when given, an owned special card opens in place (the spotlight) instead of going to its page.
+// onOpen: when given, an owned card opens in place (the spotlight). Without it the tile links to the admin card page.
 // club: the club's progress (from progress.clubs). Shown on hover or focus over a locked legend.
 // full: the card's full data (from allCards); a locked card then shows as a real card under a lock.
 export default function CardTile({ card, isNew, onOpen, club, full }) {
@@ -44,18 +44,19 @@ export default function CardTile({ card, isNew, onOpen, club, full }) {
     )
   }
 
-  if (onOpen && card.type === 'special') {
+  if (onOpen) {
     return (
       <button type="button" className="card-tile" onClick={() => onOpen(card)}>
         {isNew && <span className="new-tag">NEW</span>}
         {card.test && <span className="test-tag">TEST</span>}
+        {card.copies > 1 && <span className="copies-tag" title={`You have ${card.copies} copies`}>×{card.copies}</span>}
         <CardFace card={card} />
       </button>
     )
   }
 
   return (
-    <Link to={`/cards/${card.id}`} className="card-tile">
+    <Link to={`/admin/cards/${card.id}`} className="card-tile">
       {isNew && <span className="new-tag">NEW</span>}
       {card.copies > 1 && <span className="copies-tag" title={`You have ${card.copies} copies`}>×{card.copies}</span>}
       <CardFace card={card} />

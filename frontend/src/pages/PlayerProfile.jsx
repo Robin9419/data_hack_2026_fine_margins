@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
+import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
 import { formatMatchDate, scoreline } from '../format'
 import { nationOf } from '../nations'
@@ -72,7 +73,18 @@ export default function PlayerProfile() {
   const [games, setGames] = useState(null)
   const [scrollTo, setScrollTo] = useState(null)
   const [widePhoto, setWidePhoto] = useState(false)
+  const [spotlight, setSpotlight] = useState(null)
+  const [params, setParams] = useSearchParams()
+  const closeSpotlight = useCallback(() => setSpotlight(null), [])
 
+  // ?card=<id> opens that card's spotlight once; the param is dropped right away.
+  useEffect(() => {
+    const id = params.get('card')
+    if (!id || !cards) return
+    const found = cards.find((c) => c.id === id && c.owned)
+    if (found) setSpotlight(found)
+    setParams((p) => { p.delete('card'); return p }, { replace: true })
+  }, [cards, params])
   useEffect(() => { loadGames().then(setGames) }, [])
   useEffect(() => {
     if (tab !== 'data' || !scrollTo) return
@@ -287,7 +299,7 @@ export default function PlayerProfile() {
               <div className="pp-cards">
                 {sorted.map(({ card: c, full, status }) => (
                   <figure key={c.id} className={`pp-card ${status === 'upcoming' ? 'pp-upcoming' : ''}`}>
-                    <CardTile card={c} full={full} />
+                    <CardTile card={c} full={full} onOpen={setSpotlight} />
                     <figcaption>
                       <strong>{status === 'owned' ? c.title ?? 'Base card' : status === 'locked' ? 'Locked' : full?.title ?? 'Upcoming'}</strong>
                       {status === 'upcoming' && <span className="muted small">{comesWith(full)}</span>}
@@ -314,7 +326,7 @@ export default function PlayerProfile() {
               {dataCards.map((c) => (
                 <article key={c.id} id={`pp-data-${c.id}`} className="pp-box pp-data">
                   <div className="pp-data-card">
-                    <CardTile card={c} />
+                    <CardTile card={c} onOpen={setSpotlight} />
                   </div>
                   <div className="pp-data-body">
                     <h2>{c.title}</h2>
@@ -325,7 +337,7 @@ export default function PlayerProfile() {
                         <AttributeRow key={attr.metric_id} attr={attr} />
                       ))}
                     </ul>
-                    <Link to={`/cards/${c.id}`}>Open card ›</Link>
+                    <button type="button" className="link-button" onClick={() => setSpotlight(c)}>Open card ›</button>
                   </div>
                 </article>
               ))}
@@ -344,6 +356,7 @@ export default function PlayerProfile() {
           )}
         </div>
       </div>
+      {spotlight && <CardSpotlight card={spotlight} onClose={closeSpotlight} />}
     </section>
   )
 }

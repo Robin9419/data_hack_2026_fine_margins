@@ -1,4 +1,6 @@
-import { Link, Navigate, NavLink, Route, Routes } from 'react-router-dom'
+import { Link, Navigate, NavLink, Route, Routes, useParams } from 'react-router-dom'
+import { api } from './api'
+import { useEffect, useState } from 'react'
 import { useAuth } from './auth'
 import RewardBar from './components/RewardBar'
 import ResultsModal from './components/ResultsModal'
@@ -17,6 +19,19 @@ function RequireAuth({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <p className="muted">Loading…</p>
   return user ? children : <Navigate to="/login" replace />
+}
+
+// Old card page: a card now opens as a spotlight on its player's profile, or on the collection for cards without one.
+function CardRedirect() {
+  const { id } = useParams()
+  const [to, setTo] = useState(null)
+  useEffect(() => {
+    api
+      .card(id)
+      .then((c) => setTo(c.player && (c.type === 'base' || c.type === 'special') ? `/players/${id}?card=${id}` : `/?card=${id}`))
+      .catch(() => setTo('/'))
+  }, [id])
+  return to ? <Navigate to={to} replace /> : <p className="muted">Loading card…</p>
 }
 
 export default function App() {
@@ -100,7 +115,7 @@ export default function App() {
             path="/cards/:id"
             element={
               <RequireAuth>
-                <CardDetail />
+                <CardRedirect />
               </RequireAuth>
             }
           />

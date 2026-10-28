@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAllCards } from '../allCards'
 import { useAuth } from '../auth'
@@ -132,7 +132,8 @@ export default function Gallery() {
   const [mode, setMode] = useState(view.mode ?? 'cards')
   const [query, setQuery] = useState(view.query ?? '')
   const allCards = useAllCards()
-  const [spotlight, setSpotlight] = useState(null) // special card popped out of the grid
+  const [spotlight, setSpotlight] = useState(null) // card popped out of the grid
+  const [params, setParams] = useSearchParams()
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
   const touchStartX = useRef(null)
   const lastStage = useRef(stage)
@@ -158,6 +159,15 @@ export default function Gallery() {
     if (lastStage.current !== undefined && lastStage.current !== stage) setPage(0)
     lastStage.current = stage
   }, [stage])
+
+  // ?card=<id> (a link to a card) opens that card's spotlight once the cards are loaded.
+  useEffect(() => {
+    const id = params.get('card')
+    if (!id || !cards) return
+    const found = cards.find((c) => c.id === id && c.owned)
+    if (found) setSpotlight(found)
+    setParams((p) => { p.delete('card'); return p }, { replace: true })
+  }, [cards, params])
 
   const onReset = async () => {
     const data = await api.reset()

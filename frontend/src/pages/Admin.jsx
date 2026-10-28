@@ -4,7 +4,7 @@ import { api } from '../api'
 import CardFace from '../components/CardFace'
 import CardSpotlight from '../components/CardSpotlight'
 import { TEAMS, teamOf } from '../teams'
-import { ChipFilter } from './Gallery'
+import Dropdown from '../components/Dropdown'
 
 const KINDS = [
   ['legend', 'Legends'],
@@ -182,13 +182,13 @@ export default function Admin() {
         </div>
       </div>
 
-      <div className="gallery-filters">
-        <ChipFilter label="Team" options={TEAM_FILTERS} value={team} onChange={setTeam} className="scroll" />
-        <ChipFilter label="Card type" options={KIND_FILTERS} value={kind} onChange={setKind} />
-        <ChipFilter label="Source" options={SOURCES} value={source} onChange={setSource} />
-        <ChipFilter label="Photos" options={PHOTOS} value={photos} onChange={setPhotos} />
-        <ChipFilter label="TEST tag" options={TEST_TAG} value={testTag} onChange={setTestTag} />
-        <ChipFilter label="Name on specials" options={NAME_LAYOUT} value={nameLayout} onChange={setNameLayout} />
+      <div className="dd-row">
+        <Dropdown label="Team" options={TEAM_FILTERS} value={team} onChange={setTeam} />
+        <Dropdown label="Card type" options={KIND_FILTERS} value={kind} onChange={setKind} />
+        <Dropdown label="Source" options={SOURCES} value={source} onChange={setSource} />
+        <Dropdown label="Photos" options={PHOTOS} value={photos} onChange={setPhotos} />
+        <Dropdown label="TEST tag" options={TEST_TAG} value={testTag} onChange={setTestTag} />
+        <Dropdown label="Name on specials" options={NAME_LAYOUT} value={nameLayout} onChange={setNameLayout} />
       </div>
       <p className="muted small">
         {mode === 'players' ? `${players.length} players · ` : ''}

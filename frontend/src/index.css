@@ -328,6 +328,27 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 
 /* Gallery filters and pages of 8 cards */
 .gallery-filters { display: flex; flex-direction: column; gap: 12px; margin: 16px 0 20px; }
+
+/* Dropdown */
+.dd-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 16px 0 12px; }
+@media (min-width: 700px) { .dd-row { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
+.dd { position: relative; min-width: 0; }
+.dd-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 12px; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius-sm); font-family: var(--body); text-align: left; cursor: pointer; }
+.dd-btn:hover, .dd-btn[aria-expanded="true"] { border-color: var(--accent); background: var(--surface-2); }
+.dd-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dd-text { display: flex; flex-direction: column; min-width: 0; }
+.dd-label { font-family: var(--display); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.dd-value { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; white-space: nowrap; overflow: hidden; }
+.dd-value span { overflow: hidden; text-overflow: ellipsis; }
+.dd-value img, .dd-opt img { width: 18px; height: 18px; object-fit: contain; flex: none; }
+.dd-chev { flex: none; color: var(--muted); transition: transform .15s; }
+.dd-btn[aria-expanded="true"] .dd-chev { transform: rotate(180deg); color: var(--accent); }
+.dd-list { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; min-width: 100%; width: max-content; max-width: 280px; max-height: 280px; overflow-y: auto; margin: 0; padding: 4px; list-style: none; background: color-mix(in srgb, var(--surface-2) 92%, transparent); backdrop-filter: blur(14px); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow); scrollbar-width: thin; outline: none; }
+.dd-opt { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; font-size: 0.9rem; color: var(--text); cursor: pointer; }
+.dd-opt-label { flex: 1; }
+.dd-opt.active { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.dd-opt.sel { color: var(--accent); font-weight: 600; }
+.dd-opt:active { background: var(--accent); color: var(--accent-ink); }
 .fgroup { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .fgroup-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }

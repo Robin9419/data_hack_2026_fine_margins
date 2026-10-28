@@ -41,7 +41,7 @@ export default function App() {
           {user && (
             <div className="topbar-user">
               <span>{user.username}</span>
-              <Link to="/admin">Admin</Link>
+              <NavLink to="/admin">Admin</NavLink>
               <button className="link-button" onClick={logout}>
                 Sign out
               </button>

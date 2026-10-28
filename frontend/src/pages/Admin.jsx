@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../api'
 import CardFace from '../components/CardFace'
 import CardSpotlight from '../components/CardSpotlight'
-import { TEAMS } from '../teams'
+import { TEAMS, teamOf } from '../teams'
+import { ChipFilter } from './Gallery'
 
 const KINDS = [
   ['legend', 'Legends'],
@@ -15,12 +17,16 @@ const KINDS = [
 ]
 const KIND_LABEL = Object.fromEntries(KINDS)
 const KIND_ORDER = Object.fromEntries(KINDS.map(([k], i) => [k, i]))
+const KIND_FILTERS = [{ value: 'all', label: 'All kinds' }, ...KINDS.map(([value, label]) => ({ value, label }))]
+const TEAM_FILTERS = [
+  { value: 'all', label: 'All teams', title: 'All teams' },
+  ...TEAMS.map((t) => ({ value: t.name, label: t.short, title: t.name, logo: t.logo })),
+]
 const SOURCES = [
   { value: 'all', label: 'Real and test data' },
   { value: 'real', label: 'Real data only' },
   { value: 'test', label: 'Test data only' },
 ]
-const ALL_TEAMS = TEAMS
 const PHOTOS = [
   { value: 'all', label: 'All cards' },
   { value: 'action', label: 'Action photos only' },
@@ -36,6 +42,9 @@ const NAME_LAYOUT = [
 const hasActionPhoto = (c) => c.kind === 'performance' && Boolean(c.player?.action_image_url)
 
 const kindOf = (c) => c.kind ?? c.type
+// Legends and rewards have no player profile page.
+const hasProfile = (c) => c.type !== 'legend' && c.type !== 'reward' && Boolean(c.player?.jersey)
+const playerKey = (c) => `${c.player.team}|${c.player.jersey}`
 
 const caption = (card) => {
   const player = card.player ? `#${card.player.jersey} ${card.player.first_name} ${card.player.last_name}` : card.title
@@ -43,19 +52,17 @@ const caption = (card) => {
   return { player, what, game: card.match?.stage }
 }
 
-function Select({ label, options, value, onChange }) {
-  return (
-    <label className="filter-select">
-      <span>{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  )
+// One tile per player (team + jersey) among the shown cards.
+function groupPlayers(shown) {
+  const groups = new Map()
+  for (const c of shown) {
+    if (!hasProfile(c)) continue
+    const g = groups.get(playerKey(c)) ?? { key: playerKey(c), cardId: c.id, count: 0, p: c.player }
+    g.count += 1
+    if (!g.p.last_name && c.player.last_name) g.p = c.player
+    groups.set(g.key, g)
+  }
+  return [...groups.values()].sort((a, b) => (a.p.team ?? '').localeCompare(b.p.team ?? '') || a.p.jersey - b.p.jersey)
 }
 
 // Every card that exists after the whole tournament, regardless of what the user owns or where they are on the
@@ -69,6 +76,8 @@ export default function Admin() {
   const [photos, setPhotos] = useState('all')
   const [testTag, setTestTag] = useState('show')
   const [nameLayout, setNameLayout] = useState('vertical')
+  const [mode, setMode] = useState('cards')
+  const [query, setQuery] = useState('')
   const [spotlight, setSpotlight] = useState(null)
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
 
@@ -88,13 +97,21 @@ export default function Admin() {
   if (error) return <p className="error">{error}</p>
   if (!cards) return <p className="muted">Loading all cards…</p>
 
+  const q = query.trim().toLowerCase()
+  const matches = (c) => {
+    if (!q) return true
+    const p = c.player
+    return [p?.first_name, p?.last_name, p?.jersey && String(p.jersey), p?.jersey && `#${p.jersey}`, p && `${p.first_name ?? ''} ${p.last_name ?? ''}`, c.title]
+      .some((s) => s && String(s).toLowerCase().includes(q))
+  }
   const shown = cards
     .filter(
       (c) =>
         (kind === 'all' || kindOf(c) === kind) &&
         (team === 'all' || c.player?.team === team) &&
         (source === 'all' || (source === 'test') === Boolean(c.test)) &&
-        (photos === 'all' || hasActionPhoto(c)),
+        (photos === 'all' || hasActionPhoto(c)) &&
+        matches(c),
     )
     .sort(
       (a, b) =>
@@ -102,86 +119,149 @@ export default function Admin() {
         (a.player?.team ?? '').localeCompare(b.player?.team ?? '') ||
         (a.player?.jersey ?? 0) - (b.player?.jersey ?? 0),
     )
+  const players = mode === 'players' ? groupPlayers(shown) : []
   const total = (key) => Object.values(counts).reduce((n, r) => n + r[key], 0)
 
   return (
     <section>
-      <h1>All cards</h1>
+      <div className="collection-header">
+        <div>
+          <p className="eyebrow">Admin</p>
+          <h1 className="admin-title">All cards</h1>
+        </div>
+      </div>
       <p className="muted small">
         Everything that exists in the app, whether or not a user owns it. Test cards come from the 2025 games without
         Wisehockey data. Tap a special card to flip it.
       </p>
 
-      <table className="admin-counts">
-        <thead>
-          <tr>
-            <th>Kind</th>
-            <th>Real data</th>
-            <th>Test data</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {KINDS.map(([k, label]) => (
-            <tr key={k}>
-              <th scope="row">{label}</th>
-              <td>{counts[k].real}</td>
-              <td>{counts[k].test}</td>
-              <td>{counts[k].real + counts[k].test}</td>
-            </tr>
+      <div className="stat-tiles">
+        <div className="stat-tile total">
+          <span className="stat-label">All cards</span>
+          <strong>{total('real') + total('test')}</strong>
+          <small>
+            {total('real')} real · {total('test')} test
+          </small>
+        </div>
+        {KINDS.map(([k, label]) => (
+          <div key={k} className="stat-tile">
+            <span className="stat-label">{label}</span>
+            <strong>{counts[k].real + counts[k].test}</strong>
+            <small>
+              {counts[k].real} real · {counts[k].test} test
+            </small>
+          </div>
+        ))}
+      </div>
+
+      <div className="gallery-tools">
+        <label className="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+          <input
+            type="search"
+            value={query}
+            placeholder="Search a player or jersey number"
+            aria-label="Search a player or jersey number"
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {query && (
+            <button type="button" className="clear" aria-label="Clear search" onClick={() => setQuery('')}>
+              ×
+            </button>
+          )}
+        </label>
+        <div className="seg" role="group" aria-label="View">
+          {[['players', 'Players'], ['cards', 'Cards']].map(([value, label]) => (
+            <button key={value} type="button" className={mode === value ? 'on' : ''} aria-pressed={mode === value} onClick={() => setMode(value)}>
+              {label}
+            </button>
           ))}
-          <tr className="total">
-            <th scope="row">All cards</th>
-            <td>{total('real')}</td>
-            <td>{total('test')}</td>
-            <td>{total('real') + total('test')}</td>
-          </tr>
-        </tbody>
-      </table>
+        </div>
+      </div>
 
       <div className="gallery-filters">
-        <Select label="Card type" options={[{ value: 'all', label: 'All kinds' }, ...KINDS.map(([value, label]) => ({ value, label }))]} value={kind} onChange={setKind} />
-        <Select label="Team" options={[{ value: 'all', label: 'All teams' }, ...ALL_TEAMS.map((t) => ({ value: t.name, label: t.name }))]} value={team} onChange={setTeam} />
-        <Select label="Source" options={SOURCES} value={source} onChange={setSource} />
-        <Select label="Photos" options={PHOTOS} value={photos} onChange={setPhotos} />
-        <Select label="TEST tag" options={TEST_TAG} value={testTag} onChange={setTestTag} />
-        <Select label="Name on specials" options={NAME_LAYOUT} value={nameLayout} onChange={setNameLayout} />
+        <ChipFilter label="Team" options={TEAM_FILTERS} value={team} onChange={setTeam} className="scroll" />
+        <ChipFilter label="Card type" options={KIND_FILTERS} value={kind} onChange={setKind} />
+        <ChipFilter label="Source" options={SOURCES} value={source} onChange={setSource} />
+        <ChipFilter label="Photos" options={PHOTOS} value={photos} onChange={setPhotos} />
+        <ChipFilter label="TEST tag" options={TEST_TAG} value={testTag} onChange={setTestTag} />
+        <ChipFilter label="Name on specials" options={NAME_LAYOUT} value={nameLayout} onChange={setNameLayout} />
       </div>
       <p className="muted small">
+        {mode === 'players' ? `${players.length} players · ` : ''}
         {shown.length} of {cards.length} cards
       </p>
 
-      <div className="admin-grid">
-        {shown.map((card) => {
-          const { player, what, game } = caption(card)
-          const face = (
-            <>
-              {card.test && testTag === 'show' && <span className="test-tag">TEST</span>}
-              <CardFace card={card} nameLayout={nameLayout} />
-            </>
-          )
-          return (
-            <figure key={card.id} className="admin-cell">
-              {card.type === 'special' ? (
-                <button type="button" className="card-tile" onClick={() => setSpotlight(card)}>
-                  {face}
-                </button>
-              ) : (
-                <div className="card-tile">{face}</div>
-              )}
-              <figcaption>
-                <strong>{what}</strong>
-                <span>{player}</span>
-                <small className="muted">
-                  {KIND_LABEL[kindOf(card)]}
-                  {game ? ` · ${game}` : ''}
-                </small>
-              </figcaption>
-            </figure>
-          )
-        })}
-      </div>
-      {shown.length === 0 && <p className="muted">No cards match these filters.</p>}
+      {mode === 'players' ? (
+        <>
+          <div className="pgrid">
+            {players.map(({ key, cardId, count, p }) => (
+              <Link key={key} to={`/players/${cardId}`} className="ptile">
+                <div className="ph">
+                  {p.image_url && <img className="photo" src={p.image_url} alt="" referrerPolicy="no-referrer" loading="lazy" />}
+                  {teamOf(p.team)?.logo && <img className="logo" src={teamOf(p.team).logo} alt={p.team} />}
+                  {p.jersey && <span className="num">{p.jersey}</span>}
+                </div>
+                <div className="body">
+                  <b>{p.last_name ?? 'Player'}</b>
+                  <small>{[p.first_name, p.position].filter(Boolean).join(' · ')}</small>
+                  <small>
+                    {count} {count === 1 ? 'card' : 'cards'}
+                  </small>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {players.length === 0 && <p className="muted">No players match these filters.</p>}
+        </>
+      ) : (
+        <>
+          <div className="admin-grid">
+            {shown.map((card) => {
+              const { player, what, game } = caption(card)
+              const face = (
+                <>
+                  {card.test && testTag === 'show' && <span className="test-tag">TEST</span>}
+                  <CardFace card={card} nameLayout={nameLayout} />
+                </>
+              )
+              return (
+                <figure key={card.id} className="admin-cell">
+                  {card.type === 'special' ? (
+                    <button type="button" className="card-tile" onClick={() => setSpotlight(card)}>
+                      {face}
+                    </button>
+                  ) : (
+                    <div className="card-tile">{face}</div>
+                  )}
+                  <figcaption>
+                    <strong>{what}</strong>
+                    {hasProfile(card) ? (
+                      <Link to={`/players/${card.id}`} className="plain-link">
+                        {player}
+                      </Link>
+                    ) : (
+                      <span>{player}</span>
+                    )}
+                    <small className="muted">
+                      {KIND_LABEL[kindOf(card)]}
+                      {game ? ` · ${game}` : ''}
+                    </small>
+                    <span className="admin-links">
+                      <Link to={`/admin/cards/${card.id}`}>Preview ›</Link>
+                      {hasProfile(card) && <Link to={`/players/${card.id}`}>Profile ›</Link>}
+                    </span>
+                  </figcaption>
+                </figure>
+              )
+            })}
+          </div>
+          {shown.length === 0 && <p className="muted">No cards match these filters.</p>}
+        </>
+      )}
 
       {spotlight && <CardSpotlight card={spotlight} onClose={closeSpotlight} hideLink />}
     </section>

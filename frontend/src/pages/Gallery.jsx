@@ -46,7 +46,7 @@ function saveView(view) {
   }
 }
 
-function ChipFilter({ label, options, value, onChange, className = '' }) {
+export function ChipFilter({ label, options, value, onChange, className = '' }) {
   return (
     <div className="fgroup">
       <span className="fgroup-label" id={`fg-${label}`}>

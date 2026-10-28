@@ -48,9 +48,9 @@ export default function CardDetail({ preview = false }) {
       </section>
     )
   if (!card) return <p className="muted">Loading card…</p>
-  if (card.type === 'base') return <BaseCardDetail card={card} />
-  if (card.type === 'reward') return <RewardCardDetail card={card} />
-  if (card.type === 'legend') return <LegendCardDetail card={card} />
+  if (card.type === 'base') return <BaseCardDetail card={card} preview={preview} />
+  if (card.type === 'reward') return <RewardCardDetail card={card} preview={preview} />
+  if (card.type === 'legend') return <LegendCardDetail card={card} preview={preview} />
 
   const { player, match } = card
   const moments = card.moments || []
@@ -67,6 +67,7 @@ export default function CardDetail({ preview = false }) {
   return (
     <section className="detail">
       <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+      {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
 
       {card.test && (
         <div className="banner">
@@ -226,11 +227,11 @@ function RoadDetail({ road }) {
 const REWARD_LABEL = { collector: 'Collector card', moment: 'Moment card', stadium: 'Stadium card', trophy: 'Trophy card' }
 
 // Reward cards are earned by owning other cards, not won in the trivia.
-function RewardCardDetail({ card }) {
+function RewardCardDetail({ card, preview }) {
   const { player, match } = card
   return (
     <section className="detail">
-      <Link to="/">← Back to collection</Link>
+      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
 
       <header className="detail-header">
         {card.kind === 'collector' ? (
@@ -331,7 +332,7 @@ const age = (iso) => {
 }
 
 // A base card has no archetype or game stats, only the player's profile (from Elite Prospects).
-function BaseCardDetail({ card }) {
+function BaseCardDetail({ card, preview }) {
   const { player, bio, match } = card
   const goalie = player.position === 'Goalkeeper'
   const facts = [
@@ -348,7 +349,8 @@ function BaseCardDetail({ card }) {
 
   return (
     <section className="detail">
-      <Link to="/">← Back to collection</Link>
+      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+      {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
@@ -397,7 +399,7 @@ function BaseCardDetail({ card }) {
 }
 
 // A club legend: no game stats, only why the player is a legend, with their Spengler Cup record first.
-function LegendCardDetail({ card }) {
+function LegendCardDetail({ card, preview }) {
   const { player, legend } = card
   const facts = [
     ['Position', player.position],
@@ -407,7 +409,7 @@ function LegendCardDetail({ card }) {
 
   return (
     <section className="detail legend-detail">
-      <Link to="/">← Back to collection</Link>
+      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
 
       <header className="detail-header">
         <figure className="legend-figure">

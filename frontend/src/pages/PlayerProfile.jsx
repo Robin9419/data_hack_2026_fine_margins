@@ -160,7 +160,6 @@ export default function PlayerProfile() {
     ['Draft', bio.draft],
   ].filter(([, value]) => value)
   const lastName = named ? player.last_name : 'Locked player'
-  const roles = owned.filter((c) => c.type === 'special' && c.title)
   const dataCards = owned.filter(hasData)
   const lockedSpecials = list.filter((x) => x.status !== 'owned' && x.card.type === 'special')
   const playerGames = games?.[`${player.team}#${player.jersey}`]
@@ -176,8 +175,10 @@ export default function PlayerProfile() {
         </nav>
         <div className="pp-hero-in">
           <div className="pp-id">
-            {team.logo && <img className="pp-logo" src={team.logo} alt={player.team} />}
-            {named && <p className="pp-first">{player.first_name}</p>}
+            <div className="pp-name">
+              {team.logo && <img className="pp-logo" src={team.logo} alt={player.team} />}
+              {named && <p className="pp-first">{player.first_name}</p>}
+            </div>
             <h1 className="pp-last">{lastName}</h1>
             <ul className="pp-tags">
               {player.jersey && <li>#{player.jersey}</li>}
@@ -197,23 +198,10 @@ export default function PlayerProfile() {
           {photo && <div className="pp-photo" aria-hidden="true" />}
           {/* Some image_urls are already landscape action shots: show those wide like an action image. */}
           {photo && <img src={photo} alt="" hidden onLoad={(e) => setWidePhoto(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight > 1.15)} />}
-          {player.jersey && <span className="pp-number" aria-hidden="true">{player.jersey}</span>}
         </div>
-        <div className="pp-set">
-          <span className="pp-set-label">
-            Player set {owned.length} of {availableCount} cards
-            {upcomingCount > 0 && <> · +{upcomingCount} more to come</>}
-          </span>
-          <div className="pp-bar" role="progressbar" aria-label="Player set" aria-valuemin={0} aria-valuemax={availableCount} aria-valuenow={owned.length}>
-            <div style={{ width: `${availableCount ? (owned.length / availableCount) * 100 : 0}%` }} />
-          </div>
-        </div>
-      </div>
-
-      <div className="pp-body">
-        <aside className="pp-aside">
+        <div className="pp-foot">
           {stats && (
-            <div className="pp-box">
+            <div className="pp-tourn">
               <h2>Spengler Cup 2025</h2>
               <dl className="pp-stats">
                 {stats.map(([k, v]) => (
@@ -223,59 +211,52 @@ export default function PlayerProfile() {
                   </div>
                 ))}
               </dl>
-              <p className="muted small pp-note">official game statistics</p>
             </div>
           )}
-          {playerGames?.length > 0 && (
-            <div className="pp-box">
-              <h2>Games</h2>
-              <ul className="pp-games">
-                {playerGames.map((g) => {
-                  const home = g.home_team === player.team
-                  const opp = teamOf(g.opponent)
-                  const chips = gameCards(g)
-                  const line = player.position === 'Goalkeeper'
-                    ? `${g.saves ?? 0} sv`
-                    : `${g.goals}-${g.assists}`
-                  const open = (c) => { setTab('data'); setScrollTo(c.id) }
-                  return (
-                    <li key={g.game} className="pp-game">
-                      <span className="pp-game-date">{formatMatchDate(g.date)} · {STAGES[g.stage] ?? g.stage}</span>
-                      <span className="pp-game-opp">
-                        {opp.logo && <img src={opp.logo} alt="" width="18" height="18" />} {opp.short || g.opponent}
-                      </span>
-                      <span className={`pp-game-res ${g.won ? 'won' : 'lost'}`}>
-                        {g.won ? 'W' : 'L'} {home ? g.home_score : g.away_score}–{home ? g.away_score : g.home_score}
-                      </span>
-                      <span className="pp-game-line">{line} · {mmss(g.toi)}</span>
-                      {chips.length > 0 && (
-                        <span className="pp-game-chips">
-                          {chips.map((c) => (
-                            <button key={c.id} type="button" className="pp-chip" onClick={() => open(c)}>{c.title}</button>
-                          ))}
-                        </span>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
+          <div className="pp-set">
+            <span className="pp-set-label">
+              Player set {owned.length} of {availableCount} cards
+              {upcomingCount > 0 && <> · +{upcomingCount} more to come</>}
+            </span>
+            <div className="pp-bar" role="progressbar" aria-label="Player set" aria-valuemin={0} aria-valuemax={availableCount} aria-valuenow={owned.length}>
+              <div style={{ width: `${availableCount ? (owned.length / availableCount) * 100 : 0}%` }} />
             </div>
-          )}
-          {roles.length > 0 && (
-            <div className="pp-box">
-              <h2>Roles</h2>
-              <ul className="pp-roles">
-                {roles.map((c) => (
-                  <li key={c.id}>
-                    <strong>{c.title}</strong>
-                    {gameOf(c) && <span className="muted small">{gameOf(c)}</span>}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </aside>
+          </div>
+        </div>
+      </div>
 
+      {playerGames?.length > 0 && (
+        <ul className="pp-strip" aria-label="Games">
+          {playerGames.map((g) => {
+            const home = g.home_team === player.team
+            const opp = teamOf(g.opponent)
+            const chips = gameCards(g)
+            const line = goalie ? `${g.saves ?? 0} sv` : `${g.goals}-${g.assists}`
+            const open = (c) => { setTab('data'); setScrollTo(c.id) }
+            return (
+              <li key={g.game} className="pp-game">
+                <span className="pp-game-top">
+                  <span className="pp-game-date">{formatMatchDate(g.date)}</span>
+                  <span className="pp-game-opp">
+                    {opp.logo && <img src={opp.logo} alt="" width="16" height="16" />} {opp.short || g.opponent}
+                  </span>
+                  <span className={`pp-game-res ${g.won ? 'won' : 'lost'}`}>
+                    {g.won ? 'W' : 'L'} {home ? g.home_score : g.away_score}–{home ? g.away_score : g.home_score}
+                  </span>
+                </span>
+                <span className="pp-game-bot">
+                  <span className="pp-game-line">{line}</span>
+                  {chips.map((c) => (
+                    <button key={c.id} type="button" className="pp-chip" onClick={() => open(c)}>{c.title}</button>
+                  ))}
+                </span>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+
+      <div className="pp-body">
         <div className="pp-main">
           <div className="pp-tabs" role="tablist" aria-label="Player sections">
             {[['cards', 'Cards'], ['data', 'Match data']].map(([key, label]) => (

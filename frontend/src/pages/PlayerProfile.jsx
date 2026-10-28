@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAllCards } from '../allCards'
@@ -41,6 +41,26 @@ function gameStats(rows, goalie) {
   const pm = sum(rows, 'plus_minus')
   return [['Games', rows.length], avg, ['Goals + assists', `${g + a} (${g}+${a})`], ['Shots', sum(rows, 'shots')],
     ['Plus/minus', pm > 0 ? `+${pm}` : pm], ['Penalty min.', sum(rows, 'pim')]]
+}
+
+const TIPS = {
+  'Games': 'Games he played in the tournament.',
+  'Avg. ice time': 'Average time on the ice per game played (minutes:seconds).',
+  'Goals + assists': 'Goals plus assists in the tournament (goals+assists).',
+  'Shots': 'Shots on goal.',
+  'Plus/minus': 'Goals for minus goals against while he was on the ice at even strength or shorthanded.',
+  'Penalty min.': 'Total penalty minutes served.',
+  'Save %': 'Share of shots on goal he stopped.',
+  'Goals against avg.': 'Goals conceded per 60 minutes.',
+}
+
+function Info({ id, text }) {
+  return (
+    <span className="pp-info" tabIndex={0} aria-describedby={id}>
+      <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" strokeWidth="1.3" /><path d="M8 7v4.2M8 4.6v.1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+      <span id={id} className="pp-tip" role="tooltip">{text}</span>
+    </span>
+  )
 }
 
 export default function PlayerProfile() {
@@ -118,6 +138,7 @@ export default function PlayerProfile() {
   const bio = base?.bio ?? {}
   const goalie = player.position === 'Goalkeeper'
   const bioFacts = [
+    ['Team', player.team],
     ['Born', bio.date_of_birth && `${formatMatchDate(bio.date_of_birth)} (age ${age(bio.date_of_birth)})`],
     ['Birthplace', bio.place_of_birth],
     ['Height', bio.height_cm && `${bio.height_cm} cm`],
@@ -155,29 +176,44 @@ export default function PlayerProfile() {
                 </li>
               )}
             </ul>
+            {bioFacts.length > 0 && (
+              <dl className="pp-master">
+                {bioFacts.map(([k, v]) => (<div key={k}><dt>{k}</dt><dd>{v}</dd></div>))}
+              </dl>
+            )}
           </div>
           {photo && <div className="pp-photo" aria-hidden="true" />}
           {/* Some image_urls are already landscape action shots: show those wide like an action image. */}
           {photo && <img src={photo} alt="" hidden onLoad={(e) => setWidePhoto(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight > 1.15)} />}
           {player.jersey && <span className="pp-number" aria-hidden="true">{player.jersey}</span>}
         </div>
+        <div className="pp-set">
+          <span className="pp-set-label">
+            Player set {owned.length} of {availableCount} cards
+            {upcomingCount > 0 && <> · +{upcomingCount} more to come</>}
+          </span>
+          <div className="pp-bar" role="progressbar" aria-label="Player set" aria-valuemin={0} aria-valuemax={availableCount} aria-valuenow={owned.length}>
+            <div style={{ width: `${availableCount ? (owned.length / availableCount) * 100 : 0}%` }} />
+          </div>
+        </div>
       </div>
 
       <div className="pp-body">
         <aside className="pp-aside">
-          <div className="pp-box">
-            <h2>Facts</h2>
-            <dl className="pp-facts">
-              <dt>Team</dt>
-              <dd>{player.team}</dd>
-              {player.position && (<><dt>Position</dt><dd>{player.position}</dd></>)}
-              {nationality && (<><dt>Nationality</dt><dd>{nationality}</dd></>)}
-              {player.jersey && (<><dt>Jersey</dt><dd>#{player.jersey}</dd></>)}
-              {bioFacts.map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>))}
-              {stats && stats.map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>))}
-            </dl>
-            {stats && <p className="muted small pp-note">Spengler Cup 2025, official game statistics</p>}
-          </div>
+          {stats && (
+            <div className="pp-box">
+              <h2>Spengler Cup 2025</h2>
+              <dl className="pp-stats">
+                {stats.map(([k, v]) => (
+                  <div key={k}>
+                    <dd>{v}</dd>
+                    <dt>{k} <Info id={`pp-tip-${k.replace(/\W+/g, '')}`} text={TIPS[k]} /></dt>
+                  </div>
+                ))}
+              </dl>
+              <p className="muted small pp-note">official game statistics</p>
+            </div>
+          )}
           {playerGames?.length > 0 && (
             <div className="pp-box">
               <h2>Games</h2>
@@ -248,18 +284,6 @@ export default function PlayerProfile() {
 
           {tab === 'cards' && (
             <div id="pp-panel-cards" role="tabpanel" aria-labelledby="pp-tab-cards">
-              <div className="pp-box pp-set">
-                <div className="pp-set-head">
-                  <h2>Player set</h2>
-                  <span>
-                    {owned.length} of {availableCount} cards
-                    {upcomingCount > 0 && <span className="muted"> · +{upcomingCount} more to come</span>}
-                  </span>
-                </div>
-                <div className="pp-bar" role="progressbar" aria-valuemin={0} aria-valuemax={availableCount} aria-valuenow={owned.length}>
-                  <div style={{ width: `${availableCount ? (owned.length / availableCount) * 100 : 0}%` }} />
-                </div>
-              </div>
               <div className="pp-cards">
                 {sorted.map(({ card: c, full, status }) => (
                   <figure key={c.id} className={`pp-card ${status === 'upcoming' ? 'pp-upcoming' : ''}`}>

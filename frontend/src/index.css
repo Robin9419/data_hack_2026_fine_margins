@@ -362,10 +362,27 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .dots span { font-size: 11px; font-weight: 700; color: var(--muted); margin-left: 4px; white-space: nowrap; }
 .ptile.unknown .ph img.photo { filter: grayscale(1) brightness(.35); }
 @media (max-width: 640px) { .pgrid { grid-template-columns: 1fr 1fr; gap: 12px; } .ptile .body b { font-size: 19px; } }
-/* In the collection pager a player tile takes the same 5:7 slot as a card. */
-.card-grid .ptile { aspect-ratio: 5 / 7; display: flex; flex-direction: column; }
-.card-grid .ptile .ph { aspect-ratio: auto; flex: 1; min-height: 0; }
-.card-grid .ptile .body { flex: none; }
+/* In the collection pager a player tile takes the same 5:7 slot as a card, with the card's layout: logo and position
+   top right, first name small, surname big with the flag, jersey plate and team, then the set progress. */
+.card-grid .ptile { aspect-ratio: 5 / 7; container-type: inline-size; display: block; }
+.card-grid .ptile .ph { position: absolute; inset: 0; aspect-ratio: auto; }
+.card-grid .ptile .ph::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(2, 4, 10, .45) 0%, transparent 22%, transparent 48%, rgba(2, 4, 10, .85) 66%, #02040a 82%); }
+.card-grid .ptile .ph img.photo { object-position: top center; }
+.pt-corner { position: absolute; right: max(8px, 7cqw); top: max(7px, 6cqw); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: max(3px, 1.8cqw); }
+.pt-logo { display: grid; place-items: center; width: max(24px, 12.9cqw); aspect-ratio: 1; border-radius: 50%; background: rgba(255, 255, 255, .92); box-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
+.pt-logo img { width: 82%; height: 82%; object-fit: contain; }
+.pt-pos { font: 800 max(10px, 5.4cqw)/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, .7); }
+.card-grid .ptile .body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 0 max(8px, 5.7cqw) max(8px, 5cqw); color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .75); }
+.card-grid .ptile .pt-first { display: block; margin-bottom: max(1px, .8cqw); font-size: max(8px, 3.6cqw); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .8; color: #fff; }
+.card-grid .ptile .body b { display: flex; align-items: center; gap: max(5px, 2.4cqw); font: 800 max(16px, 10.7cqw)/1 var(--display); }
+.pt-flag { width: max(14px, 6.4cqw); height: max(10px, 4.4cqw); object-fit: cover; border-radius: .6cqw; box-shadow: 0 0 0 1px rgba(255, 255, 255, .55); flex: none; }
+.pt-meta { display: flex; align-items: center; gap: max(5px, 2.6cqw); margin: max(3px, 1.6cqw) 0 0; font-size: max(8px, 3.6cqw); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.pt-no { flex: none; display: inline-grid; place-items: center; min-width: max(16px, 9cqw); height: max(14px, 7.2cqw); padding: 0 max(3px, 1.6cqw); border-radius: max(2px, .9cqw); transform: skewX(-12deg); background: var(--c2, #ffd36b); color: var(--c1, #0a2d6e); box-shadow: 0 0 0 1px rgba(255, 255, 255, .3), 2px 2px 0 rgba(0, 0, 0, .35); text-shadow: none; }
+.pt-no span { transform: skewX(12deg); font: 800 max(10px, 5.2cqw)/1 var(--display); white-space: nowrap; }
+.card-grid .ptile .pt-no small { display: inline; margin-right: .08em; font-size: .62em; color: inherit; opacity: .75; vertical-align: .18em; }
+.pt-team { min-width: 0; overflow: hidden; text-overflow: ellipsis; opacity: .85; }
+.card-grid .ptile .dots { margin-top: max(5px, 2.6cqw); }
+.card-grid .ptile .dots span { color: rgba(255, 255, 255, .75); }
 .card-tile { container-type: inline-size; }
 .card-tile.is-locked .card-face { filter: grayscale(1) brightness(.5) contrast(.95); transition: filter .25s; }
 .card-tile.is-locked:hover .card-face { filter: grayscale(.7) brightness(.62); }

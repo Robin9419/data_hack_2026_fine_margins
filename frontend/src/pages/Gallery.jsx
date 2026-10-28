@@ -6,7 +6,8 @@ import { useAuth } from '../auth'
 import Activities from '../components/Activities'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
-import { TEAMS, teamOf } from '../teams'
+import { nationOf } from '../nations'
+import { TEAMS, teamOf, teamStyle } from '../teams'
 import { useTournament } from '../tournament'
 
 const PAGE_SIZE = 8
@@ -73,6 +74,7 @@ export function ChipFilter({ label, options, value, onChange, className = '' }) 
 }
 
 // One tile per player (team + jersey) among the shown cards; progress counts all of his cards.
+const POS_SHORT = { Forward: 'FWD', Defender: 'DEF', Goalkeeper: 'GK' }
 function groupPlayers(shown, cards, playerOf) {
   const keyOf = (c) => (c.type === 'legend' || c.type === 'reward' || !c.player?.jersey ? null : `${c.player.team}|${c.player.jersey}`)
   const groups = new Map()
@@ -108,6 +110,8 @@ function groupPlayers(shown, cards, playerOf) {
       last: g.p.last_name ?? 'Locked player',
       position: g.p.position,
       image: g.p.image_url,
+      nation: nationOf(g.p.nationality),
+      nationality: g.p.nationality,
     }))
     .sort((a, b) => b.owned - a.owned || a.last.localeCompare(b.last))
 }
@@ -281,15 +285,24 @@ export default function Gallery() {
         <div className="card-grid" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           {mode === 'players'
             ? pageItems.map((p) => (
-                <Link key={p.key} to={`/players/${p.cardId}`} className={`ptile ${p.owned ? '' : 'unknown'}`}>
+                <Link key={p.key} to={`/players/${p.cardId}`} className={`ptile ${p.owned ? '' : 'unknown'}`} style={teamStyle(p.team)}>
                   <div className="ph">
                     {p.image && <img className="photo" src={p.image} alt="" referrerPolicy="no-referrer" loading="lazy" />}
-                    {p.logo && <img className="logo" src={p.logo} alt={p.team} />}
-                    {p.jersey && <span className="num">{p.jersey}</span>}
+                  </div>
+                  <div className="pt-corner">
+                    {p.logo && <span className="pt-logo"><img src={p.logo} alt={p.team} /></span>}
+                    {p.position && <span className="pt-pos">{POS_SHORT[p.position] ?? p.position}</span>}
                   </div>
                   <div className="body">
-                    <b>{p.last}</b>
-                    <small>{[p.first, p.position].filter(Boolean).join(' · ')}</small>
+                    {p.first && <small className="pt-first">{p.first}</small>}
+                    <b>
+                      {p.last}
+                      {p.nation && <img className="pt-flag" src={`https://flagcdn.com/w80/${p.nation.iso}.png`} alt={p.nation.code} title={p.nationality} loading="lazy" />}
+                    </b>
+                    <p className="pt-meta">
+                      {p.jersey && <span className="pt-no"><span><small>#</small>{p.jersey}</span></span>}
+                      <span className="pt-team">{p.team}</span>
+                    </p>
                     <div className="dots" aria-label={`${p.owned} of ${p.total} cards`}>
                       {Array.from({ length: p.total }, (_, i) => (
                         <i key={i} className={i < p.owned ? 'on' : ''} />

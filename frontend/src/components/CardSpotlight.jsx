@@ -93,6 +93,14 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
             <>
               <h2>{card.title ?? 'Base card'}</h2>
               {about && <p className="explanation">{about}</p>}
+              <dl className="spotlight-facts">
+                {factsOf(card).all.map(([label, value]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
               {lists.map(([head, items]) => items?.length > 0 && (
                 <div key={head}>
                   <h3>{head}</h3>
@@ -163,17 +171,36 @@ function rankText(kpi) {
   return `${ordinal(kpi.match_rank)} of ${kpi.players_in_match} ${kpi.rank_pool}`
 }
 
-// Label/value facts for the back of a non-special card.
+const ageOf = (iso) => {
+  const born = new Date(iso)
+  const now = new Date()
+  const had = now.getMonth() > born.getMonth() || (now.getMonth() === born.getMonth() && now.getDate() >= born.getDate())
+  return now.getFullYear() - born.getFullYear() - (had ? 0 : 1)
+}
+
+// Label/value facts of a non-special card: `back` (at most 4) for the card back, `all` for the side panel.
 function factsOf(card) {
   const bio = card.bio ?? {}
   const p = card.player ?? {}
-  const rows =
-    card.type === 'base'
-      ? [['Position', p.position], ['Born', bio.date_of_birth && formatMatchDate(bio.date_of_birth)], ['Nationality', bio.nationality], ['Height', bio.height_cm && `${bio.height_cm} cm`], ['College', bio.club], ['Draft', bio.draft]]
-      : card.type === 'legend'
-        ? [['Position', p.position], ['Nationality', card.legend?.nationality], ['Era', card.legend?.era]]
-        : [['Earned by', card.unlock], ['Date', card.match?.date && formatMatchDate(card.match.date)]]
-  return rows.filter(([, v]) => v)
+  const goalie = p.position === 'Goalkeeper'
+  const clean = (rows) => rows.filter(([, v]) => v)
+  if (card.type === 'base') {
+    const born = bio.date_of_birth && `${formatMatchDate(bio.date_of_birth)} (age ${ageOf(bio.date_of_birth)})`
+    const height = bio.height_cm && `${bio.height_cm} cm`
+    const back = clean([['Position', p.position], ['Born', born], ['Nationality', bio.nationality], ['Height', height]])
+    const all = clean([
+      ['Team', p.team ?? card.team], ['Position', p.position], ['Nationality', bio.nationality], ['Born', born], ['Birthplace', bio.place_of_birth],
+      ['Height', height], ['Weight', bio.weight_kg && `${bio.weight_kg} kg`], [goalie ? 'Catches' : 'Shoots', bio.shoots && (bio.shoots === 'L' ? 'Left' : 'Right')],
+      ['College 2025–26', bio.club], ['Draft', bio.draft],
+    ])
+    return { back, all }
+  }
+  if (card.type === 'legend') {
+    const all = clean([['Position', p.position], ['Nationality', card.legend?.nationality], ['Era', card.legend?.era], ['Years', card.legend?.years]])
+    return { back: all.slice(0, 4), all }
+  }
+  const all = clean([['Earned by', card.unlock], ['Date', card.match?.date && formatMatchDate(card.match.date)], ['Unlocks', card.reward ?? card.title]])
+  return { back: all.slice(0, 4), all }
 }
 
 // The back of a special card holds the archetype and the KPIs that earned it; other cards show their key facts.
@@ -181,13 +208,13 @@ function CardBack({ card }) {
   const style = card.player?.team ? teamStyle(card.player.team) : card.team ? teamStyle(card.team) : undefined
   if (card.type !== 'special') {
     return (
-      <span className="spotlight-back card-face" style={style}>
+      <span className="spotlight-back card-face compact" style={style}>
         <span className="back-title">{card.title ?? 'Base card'}</span>
-        <span className="back-kpis">
-          {factsOf(card).map(([label, value]) => (
-            <span key={label} className="back-kpi">
-              <span className="back-kpi-value" style={{ fontSize: '1rem' }}>{value}</span>
-              <span className="back-kpi-label">{label}</span>
+        <span className="back-facts">
+          {factsOf(card).back.map(([label, value]) => (
+            <span key={label} className="back-fact">
+              <span className="back-fact-label">{label}</span>
+              <span className="back-fact-value">{value}</span>
             </span>
           ))}
         </span>

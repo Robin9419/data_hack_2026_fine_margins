@@ -1,4 +1,4 @@
-import { Link, Navigate, Route, Routes } from 'react-router-dom'
+import { Link, Navigate, NavLink, Route, Routes } from 'react-router-dom'
 import { useAuth } from './auth'
 import RewardBar from './components/RewardBar'
 import ResultsModal from './components/ResultsModal'
@@ -22,22 +22,34 @@ export default function App() {
   const { user, logout } = useAuth()
 
   return (
-    <div className="app">
+    <>
       <header className="topbar">
-        <Link to="/" className="brand">
-          Spengler Cup Cards
-        </Link>
-        {user && (
-          <div className="topbar-user">
-            <span>{user.username}</span>
-            <Link to="/admin">Admin</Link>
-            <button className="link-button" onClick={logout}>
-              Sign out
-            </button>
-          </div>
-        )}
+        <div className="topbar-in">
+          <Link to="/" className="brand">
+            <span className="brand-mark" aria-hidden="true" />
+            Spengler Cup Cards
+          </Link>
+          {user && (
+            <nav className="appnav" aria-label="Main">
+              <NavLink to="/" end>Collection</NavLink>
+              <NavLink to="/quiz">Quiz</NavLink>
+              <NavLink to="/predict">Predictions</NavLink>
+              <NavLink to="/trade">Trade</NavLink>
+            </nav>
+          )}
+          {user && (
+            <div className="topbar-user">
+              <span>{user.username}</span>
+              <Link to="/admin">Admin</Link>
+              <button className="link-button" onClick={logout}>
+                Sign out
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
+      <div className="app">
       <RewardBar />
 
       <main>
@@ -113,6 +125,7 @@ export default function App() {
 
       {user && <TimelineBar />}
       {user && <ResultsModal />}
-    </div>
+      </div>
+    </>
   )
 }

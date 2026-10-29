@@ -19,13 +19,12 @@ const TYPE_FILTERS = [
   { value: 'all', label: 'All cards' },
   { value: 'legend', label: 'Legends' },
   { value: 'base', label: 'Base' },
-  { value: 'profile', label: 'Profile specials' },
-  { value: 'performance', label: 'Performance specials' },
+  { value: 'impact', label: 'Impact Specials' },
   { value: 'road', label: 'Ones to Watch' },
   { value: 'collector', label: 'Collector' },
 ]
-// The Collector filter also shows the context cards (moment, stadium, trophy).
-const FILTER_KINDS = { collector: ['collector', 'context'] }
+// The Impact Specials filter covers the profile and performance specials; Collector also shows the context cards (moment, stadium, trophy).
+const FILTER_KINDS = { impact: ['profile', 'performance'], collector: ['collector', 'context'] }
 // Within owned and within locked cards: legends, then special, then reward, then base.
 const TYPE_ORDER = { legend: 0, special: 1, reward: 2, base: 3 }
 

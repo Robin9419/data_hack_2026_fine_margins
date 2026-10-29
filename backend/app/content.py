@@ -118,7 +118,8 @@ class Content:
         positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"]
                      for c in self.cards.values() if c["player"]}
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
-                                 self.nationalities, self.action_media, self.card_images)
+                                 self.nationalities, self.action_media, self.card_images,
+                                 self.archetypes)
         self.road_to_final = RoadToFinal(self.testdata, positions, _load_json("road_videos.json")["players"])
         self.tournament = Tournament(self.testdata)
         # The game a card comes from (None: not tied to a game). Such a card only exists once its game is played on

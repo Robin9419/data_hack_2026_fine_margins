@@ -3,7 +3,8 @@ import CardFace from './CardFace'
 
 // onOpen: when given, an owned special card opens in place (the spotlight) instead of going to its page.
 // club: the club's progress (from progress.clubs). Shown on hover or focus over a locked legend.
-export default function CardTile({ card, isNew, onOpen, club }) {
+// base: { owned, total } base cards of the club, shown over a locked collector card.
+export default function CardTile({ card, isNew, onOpen, club, base }) {
   if (!card.owned && card.type === 'legend') {
     return (
       <div className="card-tile locked" tabIndex={0} aria-label={`Locked ${card.player.team} legend. Collect the club's cards to unlock it.`}>
@@ -19,9 +20,21 @@ export default function CardTile({ card, isNew, onOpen, club }) {
       <div
         className="card-tile locked"
         aria-label={reward ? `Locked card. ${card.unlock}.` : 'Locked card. Answer trivia questions to unlock it.'}
+        tabIndex={reward ? 0 : undefined}
       >
         <CardFace card={card} state="locked" />
         <span className="lock-chip">🔒 Locked</span>
+        {reward && (
+          <div className="unlock-hover">
+            <strong>{card.title}</strong>
+            <span>{card.unlock}</span>
+            {base && (
+              <span className="muted small">
+                {base.owned} / {base.total} base cards collected
+              </span>
+            )}
+          </div>
+        )}
       </div>
     )
   }

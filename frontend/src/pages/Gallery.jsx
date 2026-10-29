@@ -114,6 +114,13 @@ export default function Gallery() {
   const realCards = cards.filter((c) => c.kind !== 'road')
   const ownedCount = realCards.filter((c) => c.owned).length
   const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
+  const baseCounts = {} // per club, for a locked collector card's hover info
+  for (const c of cards) {
+    if (c.type !== 'base') continue
+    const t = (baseCounts[c.player.team] ??= { owned: 0, total: 0 })
+    t.total += 1
+    if (c.owned) t.owned += 1
+  }
   // Owned cards first, then locked; within each, by TYPE_ORDER (otherwise API order).
   const shown = cards
     .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || (FILTER_KINDS[type] ?? [type]).includes(c.kind ?? c.type)))
@@ -179,6 +186,7 @@ export default function Gallery() {
               key={card.id}
               card={card}
               club={clubs[card.player?.team]}
+              base={card.kind === 'collector' ? baseCounts[card.team] : undefined}
               isNew={newCardIds.includes(card.id)}
               onOpen={setSpotlight}
             />

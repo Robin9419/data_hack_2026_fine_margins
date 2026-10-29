@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
 import AttributeRow from '../components/AttributeRow'
 import CardTile from '../components/CardTile'
-import FormBars from '../components/FormBars'
 import InstagramLink from '../components/InstagramLink'
 import MomentList from '../components/MomentList'
 import PlayerPhoto from '../components/PlayerPhoto'
@@ -66,13 +65,6 @@ export default function CardDetail({ preview = false }) {
     <section className="detail">
       <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
 
-      {card.test && (
-        <div className="banner">
-          Test data: this card comes from the official statistics of another game of the 2025 Spengler Cup. Its match
-          rating is made up and it does not count towards your progress.
-        </div>
-      )}
-
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
         <div className="detail-heading">
@@ -118,7 +110,6 @@ export default function CardDetail({ preview = false }) {
       </div>
 
       <h2>Performance</h2>
-      {card.road && <RoadDetail road={card.road} />}
       <ul className="attributes">
         {card.attributes.map((attr) => (
           <AttributeRow key={attr.metric_id} attr={attr} moments={linked(attr)} onPlay={play} />
@@ -192,29 +183,6 @@ function PlayerCards({ cardId }) {
         ))}
       </div>
     </>
-  )
-}
-
-// The stages of a Road to Final card and the rating per game; later stages are greyed out until they are unlocked.
-function RoadDetail({ road }) {
-  return (
-    <div className="road-detail">
-      <FormBars road={road} />
-      <ol className="road-stages">
-        {road.stages.map((s) => (
-          <li key={s.n} className={s.reached ? 'reached' : ''}>
-            <span className="dot">{s.n}</span>
-            <span>
-              <strong>
-                {s.name} <small>{s.when}</small>
-              </strong>
-              <small>{s.trigger}</small>
-              <small>New on the card: {s.change}</small>
-            </span>
-          </li>
-        ))}
-      </ol>
-    </div>
   )
 }
 

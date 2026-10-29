@@ -540,15 +540,6 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .card-face .form-bars .b span { margin-bottom: 1px; font-size: max(8px, 4cqw); }
 .card-face .form-labels { gap: 2cqw; font-size: max(6px, 2.5cqw); }
 .card-face.road .card-info .card-archetype.chip { margin-bottom: max(3px, 1.8cqw); }
-.road-detail { background: #0b1220; color: #fff; border-radius: 12px; padding: 16px; display: grid; gap: 16px; }
-.road-detail .form-bars { height: 110px; }
-.road-stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.road-stages li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; opacity: 0.45; }
-.road-stages li.reached { opacity: 1; }
-.road-stages .dot { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #04070f; background: #5b6b7a; }
-.road-stages li.reached .dot { background: linear-gradient(150deg, #fbe7a0, #c9a03a); }
-.road-stages strong { display: block; }
-.road-stages small { display: block; color: #b8c4d0; }
 
 /* Performance specials: darker, glitter, surname along the right edge, label along the left edge */
 .card-face.performance { --s1: #ffd76a; --s2: #fff6d1; --rar: var(--s1); --frame: linear-gradient(150deg, var(--s1), #141414 28%, var(--s2) 50%, #0b0b0b 72%, var(--s1)); }

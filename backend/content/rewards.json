@@ -1,5 +1,5 @@
 {
-  "_comment": "Illustrative reward milestones (simulated, nothing is actually redeemable). Points per card come from 'card_points' by card type: base 5, legend 25, any other card (special, collector, context) 10. A card earned at the stadium (a stadium edition) is worth 'stadium_multiplier' times as much. The milestones are spread over the full collection (about 1,650 points without the stadium bonus): the first is reachable in the first days, the last takes most of the tournament.",
+  "_comment": "Illustrative reward milestones (simulated, nothing is actually redeemable). Points per card come from 'card_points' by card type: base 5, legend 25, any other card (special, collector, context) 10, except the Stadium context card, which is worth 0. A card earned at the stadium (a stadium edition) is worth 'stadium_multiplier' times as much. The milestones are spread over the full collection (about 1,650 points without the stadium bonus): the first is reachable in the first days, the last takes most of the tournament.",
   "card_points": { "base": 5, "special": 10, "legend": 25 },
   "stadium_multiplier": 2,
   "rewards": [

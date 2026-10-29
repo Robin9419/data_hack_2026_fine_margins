@@ -849,8 +849,12 @@ class Content:
 
     def card_value(self, card_id: str, edition: str) -> int:
         """Reward points for one owned card: base cards and legends by their own value, every other card (special,
-        collector, context) as a special. A stadium edition is worth the stadium multiplier."""
-        card_type = self.cards[card_id]["type"]
+        collector, context) as a special, except the Stadium context card, which is worth nothing. A stadium edition
+        is worth the stadium multiplier."""
+        card = self.cards[card_id]
+        if card.get("context_type") == "stadium":
+            return 0
+        card_type = card["type"]
         value = self.card_points[card_type] if card_type in ("base", "legend") else self.card_points["special"]
         return value * self.stadium_multiplier if edition == "stadium" else value
 

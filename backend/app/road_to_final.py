@@ -21,6 +21,9 @@ STAGES = [
     {"n": 4, "name": "Champion", "when": "After the final", "trigger": "The player's team wins the Spengler Cup.",
      "change": "Champion look: dark gold, surname on the side, champion label."},
 ]
+PRE_STAGE = {"n": 0, "name": "Ones to Watch", "when": "From the start of the tournament",
+             "trigger": "Available from the start. The card grows with every game the player plays.",
+             "change": "The first game gives it a match rating."}
 TIER_ORDER = ["bronze", "silver", "gold", "elite"]
 STARS_PER_TEAM = 2
 MIN_GAMES = 3  # to be a star of the tournament: played at least this many of his team's games
@@ -62,15 +65,15 @@ class RoadToFinal:
         return stars
 
     def cards_for(self, played: set[str]) -> list[dict]:
-        """A card per star whose team has played at least one of the given games, built from those games."""
+        """A card per star, from the start of the tournament on, built from the given games that have been played."""
         included = {g for g in played if g in self._td.by_id}
-        return [card for key in self.stars if (card := self._card(key, included))]
+        return [self._card(key, included) for key in self.stars]
 
     @staticmethod
     def _label(game: dict, index: int) -> str:
         return {"Quarterfinal": "QF", "Semifinal": "Semi", "Final": "Final"}.get(game["stage"], f"G{index + 1}")
 
-    def _card(self, key: tuple[str, int], included: set[str]) -> dict | None:
+    def _card(self, key: tuple[str, int], included: set[str]) -> dict:
         team = key[0]
         games = self.team_games[team]
         slots, played = [], []
@@ -83,28 +86,30 @@ class RoadToFinal:
                 played.append((game, slots[-1]))
 
         n = len(played)
-        if n == 0:
-            return None
-        stage = 1 if n == 1 else 2
+        stage = 0 if n == 0 else 1 if n == 1 else 2
         semi = next((g for g, _ in played if g["stage"] == "Semifinal"), None)
         final = next((g for g, _ in played if g["stage"] == "Final"), None)
         if stage == 2 and semi and _won(team, semi):
             stage = 3
             if final and _won(team, final):
                 stage = 4
-        average = int(sum(s["mr"] for _, s in played) / n + 0.5)
-        tier = tier_of(average)
-        if stage >= 3:
-            tier = TIER_ORDER[min(TIER_ORDER.index(tier) + 1, len(TIER_ORDER) - 1)]
+        average = int(sum(s["mr"] for _, s in played) / n + 0.5) if n else None
+        tier = None
+        if n:
+            tier = tier_of(average)
+            if stage >= 3:
+                tier = TIER_ORDER[min(TIER_ORDER.index(tier) + 1, len(TIER_ORDER) - 1)]
         trend = average - played[0][1]["mr"] if n >= 2 else None
 
-        entry = self._player[(played[-1][0]["id"], key)]
+        # Before the first game the card shows the player from his first game in the schedule.
+        last = played[-1][0] if n else None
+        first_seen = next(g for g in games if (g["id"], key) in self._player)
+        entry = self._player[((last or first_seen)["id"], key)]
         moments = []
         for game, slot in played:
             for m in self._td._moments(game, entry):
                 moments.append({**m, "text": f'{slot["label"]} vs {slot["opponent"]}. {m["text"]}'})
-        last = played[-1][0]
-        info = STAGES[stage - 1]
+        info = STAGES[stage - 1] if stage else PRE_STAGE
         goals = sum(self._player[(g["id"], key)]["stats"].get("goals", 0) for g, _ in played)
         assists = sum(self._player[(g["id"], key)]["stats"].get("assists", 0) for g, _ in played)
         card_id = f'test-road-{re.sub(r"[^a-z]+", "-", team.lower().replace("ö", "o")).strip("-")}-{key[1]}'
@@ -123,7 +128,7 @@ class RoadToFinal:
             "title": "Spengler Cup Champion" if stage == 4 else info["name"],
             "archetype": "An evolving card: it grows with every game of the tournament the player plays.",
             "archetype_kpis": None,
-            "match": {
+            "match": None if last is None else {
                 "id": last["id"], "date": last["date"], "stage": last["stage"], "home_team": last["home_team"],
                 "away_team": last["away_team"], "home_score": last["home_score"], "away_score": last["away_score"],
                 "opponent": last["away_team"] if last["home_team"] == team else last["home_team"],
@@ -132,8 +137,8 @@ class RoadToFinal:
                 self._total("goals", goals, moments), self._total("assists", assists, moments),
                 self._total("points", goals + assists, moments),
             ],
-            "explanation": (f'Stage {stage}, {info["name"]}: {n} {"game" if n == 1 else "games"} played, average match '
-                            f"rating {average}. {info['trigger']}"),
+            "explanation": (f'Stage {stage}, {info["name"]}: {n} {"game" if n == 1 else "games"} played, '
+                            f'{f"average match rating {average}" if n else "no match rating yet"}. {info["trigger"]}'),
             "achievement": None, "video": self._highlight(key), "video_sources": self._highlight_sources(key),
             "moments": moments, "edition": "standard",
             "source": SOURCE,

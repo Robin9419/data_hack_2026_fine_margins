@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from . import db
 from .content import MEDIA_DIR, get_content
-from .tournament import ROAD_CHANCE
+from .tournament import PACK_CARDS, SPECIAL_CHANCE
 
 app = FastAPI(title="Hockey Performance Cards")
 app.add_middleware(
@@ -66,13 +66,50 @@ def road_cards_for(user: dict) -> dict[str, dict]:
     return {c["id"]: c for c in get_content().road_to_final.cards_for(played_for(user))}
 
 
-def with_road_card(user_id: int, roads: dict[str, dict], drawn: list[str]) -> list[str]:
-    """Base-only packs: ROAD_CHANCE that the last card is a Road to Final card the user does not own yet."""
-    owned = db.owned_cards(user_id)
-    pool = [cid for cid in roads if cid not in owned]
-    if pool and random.random() < ROAD_CHANCE:
+def trivia_reserved(user: dict) -> set[str]:
+    """The special cards the gameday's trivia is about: those of the latest games played at the user's stage. They are
+    for the trivia to give, so packs leave them out until the user has played the trivia of this stage."""
+    content = get_content()
+    played = played_for(user)
+    if not played or db.trivia_played(user["id"], user["stage"]):
+        return set()
+    games = content.tournament.by_id
+    latest = max(games[gid]["date"] for gid in played)
+    return {cid for gid in played if games[gid]["date"] == latest for cid in content.game_cards(gid)}
+
+
+def special_pool(user: dict, roads: dict[str, dict]) -> list[str]:
+    """The special cards a base-only pack can give: the Road to Final cards (Ones to Watch) and the special cards of
+    played games (impact players) the user does not own yet, except those the gameday's trivia is about."""
+    owned = db.owned_cards(user["id"])
+    available, reserved = available_for(user), trivia_reserved(user)
+    specials = [cid for cid, c in get_content().cards.items()
+                if c["type"] == "special" and cid in available and cid not in owned and cid not in reserved]
+    return specials + [cid for cid in roads if cid not in owned]
+
+
+def with_special_card(user: dict, roads: dict[str, dict], drawn: list[str]) -> list[str]:
+    """Base-only packs: SPECIAL_CHANCE that the last card is a special card from special_pool."""
+    pool = special_pool(user, roads)
+    if pool and random.random() < SPECIAL_CHANCE:
         drawn[-1] = random.choice(pool)
     return drawn
+
+
+def pack_entries(user: dict, drawn: list[str], roads: dict[str, dict]) -> list[dict]:
+    """Grants the drawn cards and returns them in full. Special cards come in the standard edition. A repeat within
+    the pack is not new."""
+    content, user_id = get_content(), user["id"]
+    entries = []
+    for cid in drawn:
+        if cid in roads:
+            entries.append({**roads[cid], "owned": True, "is_new": bool(db.grant_cards(user_id, [cid]))})
+        elif content.cards[cid]["type"] == "special":
+            db.grant_card(user_id, cid, "standard")
+            entries.append({**content.cards[cid], "owned": True, "edition": "standard", "is_new": True})
+        else:
+            entries.append({**content.cards[cid], "owned": True, "is_new": bool(db.grant_cards(user_id, [cid]))})
+    return entries
 
 
 def open_pack(user: dict) -> list[dict]:
@@ -86,10 +123,9 @@ def open_pack(user: dict) -> list[dict]:
     rest = [cid for cid in base_ids if cid not in drawn]
     drawn += random.sample(rest, size - len(drawn))
     roads = road_cards_for(user)
-    drawn = with_road_card(user["id"], roads, drawn)
+    drawn = with_special_card(user, roads, drawn)
     random.shuffle(drawn)
-    new_ids = db.grant_cards(user["id"], drawn)
-    return [{**(roads.get(cid) or content.cards[cid]), "owned": True, "is_new": cid in new_ids} for cid in drawn]
+    return pack_entries(user, drawn, roads)
 
 
 DAILY_CARDS = 3
@@ -101,18 +137,12 @@ def open_daily_card(user: dict) -> list[dict]:
 
 
 def open_random_base_cards(user: dict, count: int) -> list[dict]:
-    """Random base cards, one draw each, so duplicates are possible."""
+    """Random base cards, one draw each, so duplicates are possible. The last one can be a special card."""
     content = get_content()
     base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
     roads = road_cards_for(user)
-    drawn = with_road_card(user["id"], roads, [random.choice(base_ids) for _ in range(count)])
-    new_ids = db.grant_cards(user["id"], drawn)
-    seen: set[str] = set()
-    pack = []
-    for cid in drawn:
-        pack.append({**(roads.get(cid) or content.cards[cid]), "owned": True, "is_new": cid in new_ids and cid not in seen})
-        seen.add(cid)
-    return pack
+    drawn = with_special_card(user, roads, [random.choice(base_ids) for _ in range(count)])
+    return pack_entries(user, drawn, roads)
 
 
 # Free cards: following a Spengler Cup social channel and buying match tickets (per ticket). Every stage of the
@@ -183,17 +213,19 @@ def tradeable_cards(user: dict, traded_ids: list[str]) -> list[str]:
     return cards + [cid for cid in road_cards_for(user) if cid not in excluded]
 
 
-def roll_trade(user: dict, traded_ids: list[str]) -> tuple[str, dict]:
+def roll_trade(user: dict, traded_ids: list[str], teams: tuple[str, ...] | None = None) -> tuple[str, dict]:
     """Rolls the trade-in outcome and grants the card. Returns (outcome id, card as a pack entry). The card is always
     one the user doesn't own. If the rolled pool has nothing left, the card comes from the next best pool (a special
-    falls back to a base card, a favorite-team card to any base card), and the outcome reflects what was drawn."""
+    falls back to a base card, a favorite-team card to any base card), and the outcome reflects what was drawn. With
+    teams, the base cards are limited to those clubs (prediction packs); the caller makes sure something is left."""
     content = get_content()
     user_id, favorite_team = user["id"], user["favorite_team"]
     odds = trade_odds(favorite_team)
     rolled = random.choices([o["id"] for o in odds], weights=[o["chance"] for o in odds])[0]
     available = set(tradeable_cards(user, traded_ids))
     roads = road_cards_for(user)
-    base = [cid for cid in available if cid not in roads and content.cards[cid]["type"] == "base"]
+    base = [cid for cid in available if cid not in roads and content.cards[cid]["type"] == "base"
+            and (teams is None or content.cards[cid]["player"]["team"] in teams)]
     specials = [cid for cid in available if cid in roads or content.cards[cid]["type"] == "special"]
     pools = {
         "special": specials,
@@ -201,7 +233,7 @@ def roll_trade(user: dict, traded_ids: list[str]) -> tuple[str, dict]:
         "favorite": [cid for cid in base if content.cards[cid]["player"]["team"] == favorite_team],
         "other": [cid for cid in base if content.cards[cid]["player"]["team"] != favorite_team],
     }
-    drawn = random.choice(pools[rolled] or base or specials)
+    drawn = random.choice(pools[rolled] or base or specials or sorted(available))
     if drawn in roads:
         db.grant_cards(user_id, [drawn])
         return "special", {**roads[drawn], "owned": True, "is_new": True}
@@ -566,26 +598,18 @@ def predict(body: PredictionRequest, user: dict = Depends(current_user)):
 
 
 def open_packs_of(user: dict, game_id: str, packs: int) -> list[dict]:
-    """Draws and grants the packs a game earned (one per correct prediction, see Tournament.pack_cards)."""
+    """Draws and grants the packs a game earned, one per correct prediction: PACK_CARDS cards, each rolled like a
+    trade-in (see trade_odds), with the base cards limited to the two teams that played."""
     content = get_content()
     game = content.tournament.by_id[game_id]
     teams = (game["home_team"], game["away_team"])
     base_ids = [cid for cid, c in content.cards.items() if c["type"] == "base" and c["player"]["team"] in teams]
-    owned = db.owned_cards(user["id"])
-    game_ids = [cid for cid in content.game_cards(game_id) if cid not in owned]
-    roads = road_cards_for(user)
-    road_ids = [cid for cid in roads if cid not in owned]
     pack = []
-    for cid in content.tournament.pack_cards(packs, base_ids, game_ids, random, road_ids):
-        if cid in roads:
-            pack.append({**roads[cid], "owned": True, "is_new": bool(db.grant_cards(user["id"], [cid]))})
-            continue
-        card = content.cards[cid]
-        if card["type"] == "special":
-            db.grant_card(user["id"], cid, "standard")
-            pack.append({**card, "owned": True, "edition": "standard", "is_new": True})
-        else:
-            pack.append({**card, "owned": True, "is_new": bool(db.grant_cards(user["id"], [cid]))})
+    for _ in range(packs * PACK_CARDS):
+        if tradeable_cards(user, []):
+            pack.append(roll_trade(user, [], teams)[1])
+        else:  # the user owns every card, so the card is a base card copy
+            pack += pack_entries(user, [random.choice(base_ids)], {})
     return pack
 
 

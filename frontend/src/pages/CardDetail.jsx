@@ -88,26 +88,28 @@ export default function CardDetail({ preview = false }) {
         </div>
       </header>
 
-      <div className="match-context">
-        <div>
-          <span className="label">Match</span>
-          {scoreline(match)}
-        </div>
-        <div>
-          <span className="label">Opponent</span>
-          {match.opponent}
-        </div>
-        <div>
-          <span className="label">Date</span>
-          {formatMatchDate(match.date)}
-        </div>
-        {match.stage && (
+      {match && (
+        <div className="match-context">
           <div>
-            <span className="label">Stage</span>
-            {match.stage}
+            <span className="label">Match</span>
+            {scoreline(match)}
           </div>
-        )}
-      </div>
+          <div>
+            <span className="label">Opponent</span>
+            {match.opponent}
+          </div>
+          <div>
+            <span className="label">Date</span>
+            {formatMatchDate(match.date)}
+          </div>
+          {match.stage && (
+            <div>
+              <span className="label">Stage</span>
+              {match.stage}
+            </div>
+          )}
+        </div>
+      )}
 
       <h2>Performance</h2>
       <ul className="attributes">

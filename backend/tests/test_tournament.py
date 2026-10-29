@@ -41,7 +41,8 @@ class TournamentTests(unittest.TestCase):
     def test_game_cards_only_exist_once_the_game_is_played(self):
         cards = lambda: {c['id']: c for c in main.list_cards(self.user)['cards']}
         before = cards()
-        self.assertTrue(all(c['type'] in ('base', 'legend') or c.get('context_type') == 'stadium' for c in before.values()))
+        self.assertTrue(all(c['type'] in ('base', 'legend') or c.get('context_type') == 'stadium' or c.get('kind') == 'road'
+                            for c in before.values()))
         self.go('2025-12-27')
         after_day_one = cards()
         self.assertTrue(set(self.content.game_cards(FRI_SPA)) <= set(after_day_one))
@@ -91,9 +92,9 @@ class TournamentTests(unittest.TestCase):
         opened = main.open_game_packs(FRI_SPA, self.user)
         cards = [c for c in opened['pack'] if c['type'] != 'legend']
         self.assertEqual(len(cards), 6)
-        self.assertLessEqual(sum(c['type'] == 'special' for c in cards), 2)  # each pack's third card: 20% a special
+        self.assertLessEqual(sum(c['type'] == 'special' for c in cards), 2)  # each card: 25% a special
         teams = {'HC Fribourg-Gottéron', 'HC Sparta Praha'}
-        self.assertTrue(all(c['player']['team'] in teams for c in cards))
+        self.assertTrue(all(c['player']['team'] in teams for c in cards if c['type'] == 'base'))
         with self.assertRaises(main.HTTPException):
             main.open_game_packs(FRI_SPA, self.user)  # only once
 

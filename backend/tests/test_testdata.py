@@ -81,8 +81,11 @@ class RoadToFinalTests(unittest.TestCase):
     def stages(self, game_ids):
         return {c["player"]["team"]: c["road"]["stage"] for c in self.road.cards_for(game_ids)}
 
-    def test_nothing_before_the_first_game(self):
-        self.assertEqual(self.road.cards_for([]), [])
+    def test_ones_to_watch_from_the_start_of_the_tournament(self):
+        cards = self.road.cards_for([])
+        self.assertEqual(len(cards), len(self.road.stars))
+        self.assertTrue(all(c["road"]["stage"] == 0 and c["road"]["played"] == 0 for c in cards))
+        self.assertTrue(all(c["match"] is None and c["rating"]["mr"] is None for c in cards))
 
     def test_stage_follows_how_far_the_team_got(self):
         stages = self.stages(self.all_games)
@@ -91,11 +94,13 @@ class RoadToFinalTests(unittest.TestCase):
         self.assertEqual(stages["HC Fribourg-Gottéron"], 2)  # lost the semi-final
         self.assertEqual(stages["Team Canada"], 2)
 
-    def test_card_only_for_teams_that_have_played(self):
+    def test_only_the_teams_that_have_played_get_a_rating(self):
         first = self.all_games[0]  # Fribourg - Sparta
         cards = self.road.cards_for([first])
-        self.assertEqual({c["player"]["team"] for c in cards}, {"HC Fribourg-Gottéron", "HC Sparta Praha"})
-        self.assertTrue(all(c["road"]["stage"] == 1 and c["road"]["played"] == 1 for c in cards))
+        played = {c["player"]["team"] for c in cards if c["road"]["played"]}
+        self.assertEqual(played, {"HC Fribourg-Gottéron", "HC Sparta Praha"})
+        self.assertTrue(all(c["road"]["stage"] == 1 and c["road"]["played"] == 1 for c in cards if c["road"]["played"]))
+        self.assertTrue(all(c["road"]["stage"] == 0 for c in cards if c["player"]["team"] not in played))
 
     def test_form_chart_has_a_slot_per_team_game_and_the_card_grows(self):
         davos = lambda ids: next(c for c in self.road.cards_for(ids) if c["player"]["team"] == "HC Davos")

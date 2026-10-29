@@ -63,14 +63,15 @@ class LegendTests(unittest.TestCase):
         club = self.content.club_cards(team, self.available)
         need = math.ceil(self.content.legend_thresholds[0] * len(club))
         db.grant_cards(self.uid, club[: need - 1])
-        with mock.patch.object(main.random, 'choice', return_value=club[need - 1]):
+        with mock.patch.object(main.random, 'choice', return_value=club[need - 1]), \
+                mock.patch.object(main.random, 'random', return_value=0.99):  # no special card in the pack
             pack = main.daily_claim(self.user)['pack']
         self.assertEqual([c['type'] for c in pack], ['base', 'base', 'base', 'legend'])
 
     def test_legends_are_never_traded_for(self):
         db.grant_cards(self.uid, list(self.content.cards)[:5])
         pool = main.tradeable_cards(self.user, [])
-        self.assertFalse(any(self.content.cards[cid]['type'] == 'legend' for cid in pool))
+        self.assertFalse(any(self.content.cards.get(cid, {}).get('type') == 'legend' for cid in pool))
 
     def test_club_grows_with_the_games_it_plays(self):
         team = 'HC Davos'

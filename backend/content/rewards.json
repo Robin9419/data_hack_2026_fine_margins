@@ -1,6 +1,6 @@
 {
-  "_comment": "Illustrative reward milestones (simulated, nothing is actually redeemable). Points per card come from 'card_points' by card type: base 5, legend 25, any other card (special, collector, context) 10, except the Stadium context card, which is worth 0. A card earned at the stadium (a stadium edition) is worth 'stadium_multiplier' times as much. The milestones are spread over the full collection (about 1,650 points without the stadium bonus): the first is reachable in the first days, the last takes most of the tournament.",
-  "card_points": { "base": 5, "special": 10, "legend": 25 },
+  "_comment": "Illustrative reward milestones (simulated, nothing is actually redeemable). Points per card come from 'card_points' by card type: base 5, legend 25, reward cards (the Collector filter: collector and context, including the Stadium card) 15, any other card (special) 10. A card earned at the stadium (a stadium edition) is worth 'stadium_multiplier' times as much. The milestones are spread over the full collection (about 2,135 points without the stadium bonus): the first is reachable in the first days, the last takes most of the tournament.",
+  "card_points": { "base": 5, "special": 10, "legend": 25, "reward": 15 },
   "stadium_multiplier": 2,
   "rewards": [
     { "id": "soda", "title": "Free soda", "points": 50, "icon": "🥤" },
@@ -8,7 +8,12 @@
     { "id": "merch", "title": "10% off fan shop", "points": 250, "icon": "🧢" },
     { "id": "ticket", "title": "Free game ticket", "points": 450, "icon": "🎟️" },
     { "id": "photo", "title": "Signed team photo", "points": 700, "icon": "📸" },
+    { "id": "scarf", "title": "Fan scarf of your favorite team", "points": 850, "icon": "🧣" },
     { "id": "meet", "title": "Meet the team", "points": 1000, "icon": "🏆" },
-    { "id": "vip", "title": "VIP lounge for a game", "points": 1300, "icon": "🥇" }
+    { "id": "vip", "title": "VIP lounge for a game", "points": 1300, "icon": "🥇" },
+    { "id": "davos-tickets", "title": "2 tickets to a home game of your favorite team after the Spengler Cup", "points": 1500, "icon": "🎫" },
+    { "id": "puck", "title": "Puck signed by the team", "points": 1700, "icon": "🏒" },
+    { "id": "skate", "title": "Skate on the ice with the team", "points": 1850, "icon": "⛸️" },
+    { "id": "jersey", "title": "Signed jersey of your favorite team", "points": 2000, "icon": "👕" }
   ]
 }

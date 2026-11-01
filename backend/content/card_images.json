@@ -306,5 +306,347 @@
     "position": "48% 50%",
     "credit": "KEYSTONE / Melanie Duchene (via College Hockey Inc.)",
     "source": "https://www.collegehockeyinc.com/2026/04/college-hockey-invited-to-return-to-spengler-cup/"
+  },
+  "test-escape-artist-2025-12-27_hc-davos_us-collegiate-selects-hc-davos-90": {
+    "image_url": "/specials/test-escape-artist-2025-12-27_hc-davos_us-collegiate-selects-hc-davos-90.jpg",
+    "position": "38% 40%",
+    "credit": "HC Ajoie / Colin Girard (via HC Davos)",
+    "source": "https://www.hcd.ch/de/news/hcd-spielt-pruntrut-sein-einziges-spiel-dieser-woche"
+  },
+  "test-workhorse-2025-12-27_hc-davos_us-collegiate-selects-hc-davos-6": {
+    "image_url": "/specials/test-workhorse-2025-12-27_hc-davos_us-collegiate-selects-hc-davos-6.jpg",
+    "position": "100% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/der-hcd-durchbricht-die-zuercher-festung"
+  },
+  "test-playmaker-2025-12-28_team-canada_hc-davos-hc-davos-70": {
+    "image_url": "/specials/test-playmaker-2025-12-28_team-canada_hc-davos-hc-davos-70.jpg",
+    "position": "26% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/zwischen-hockeyfest-und-titelambition-enzo-corvi-im-gespraech"
+  },
+  "test-go-to-scorer-2025-12-28_team-canada_hc-davos-hc-davos-22": {
+    "image_url": "/specials/test-go-to-scorer-2025-12-28_team-canada_hc-davos-hc-davos-22.jpg",
+    "position": "40% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/lemieux-schiesst-davos-ins-finale"
+  },
+  "test-puck-hunter-2025-12-28_team-canada_hc-davos-hc-davos-20": {
+    "image_url": "/specials/test-puck-hunter-2025-12-28_team-canada_hc-davos-hc-davos-20.jpg",
+    "position": "56% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/erfolgreicher-davoser-schlussspurt"
+  },
+  "test-go-to-scorer-2025-12-29_hc-davos_ifk-helsinki-hc-davos-44": {
+    "image_url": "/specials/test-go-to-scorer-2025-12-29_hc-davos_ifk-helsinki-hc-davos-44.jpg",
+    "position": "55% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/matej-stransky-der-schwerstarbeiter"
+  },
+  "test-pass-thief-2025-12-29_hc-davos_ifk-helsinki-hc-davos-66": {
+    "image_url": "/specials/test-pass-thief-2025-12-29_hc-davos_ifk-helsinki-hc-davos-66.jpg",
+    "position": "10% 35%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/es-wollte-nicht-heute-davos-verliert-gegen-kloten"
+  },
+  "test-chance-creator-2025-12-29_hc-davos_ifk-helsinki-hc-davos-72": {
+    "image_url": "/specials/test-chance-creator-2025-12-29_hc-davos_ifk-helsinki-hc-davos-72.jpg",
+    "position": "54% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/duell-der-gejagten-hcd-empfaengt-die-lakers"
+  },
+  "test-attack-launcher-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-davos-18": {
+    "image_url": "/specials/test-attack-launcher-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-davos-18.jpg",
+    "position": "48% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/mit-zadina-hattrick-zum-naechsten-sieg"
+  },
+  "test-chance-architect-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-davos-74": {
+    "image_url": "/specials/test-chance-architect-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-davos-74.jpg",
+    "position": "46% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/der-zsc-kommt-bleibt-der-hcd-standhaft"
+  },
+  "test-pass-thief-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-davos-55": {
+    "image_url": "/specials/test-pass-thief-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-davos-55.jpg",
+    "position": "31% 40%",
+    "credit": "HC Davos",
+    "source": "https://www.hcd.ch/de/news/hcd-verpflichtet-calle-andersson"
+  },
+  "test-speedster-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-fribourg-gott-ron-22": {
+    "image_url": "/specials/test-speedster-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-fribourg-gott-ron-22.jpg",
+    "position": "3% 30%",
+    "credit": "Keystone (via La Liberté)",
+    "source": "https://www.laliberte.ch/articles/sports/hockey-sur-glace/ca-dependra-des-negociations-dit-gerd-zenhausern-1273467"
+  },
+  "test-playmaker-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-fribourg-gott-ron-21": {
+    "image_url": "/specials/test-playmaker-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-fribourg-gott-ron-21.jpg",
+    "position": "62% 40%",
+    "credit": "Keystone (via La Liberté)",
+    "source": "https://www.laliberte.ch/articles/sports/hockey-sur-glace/henrik-borgstrom-toujours-plus-percutant-toujours-plus-precieux-1273611"
+  },
+  "test-sniper-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-fribourg-gott-ron-86": {
+    "image_url": "/specials/test-sniper-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-fribourg-gott-ron-86.jpg",
+    "position": "85% 30%",
+    "credit": "Keystone (via La Liberté)",
+    "source": "https://www.laliberte.ch/articles/sports/hockey-sur-glace/davos-destination-finale-pour-julien-sprunger-et-reto-berra-1358473"
+  },
+  "test-gamewinner-2025-12-28_hc-fribourg-gotteron_ifk-helsinki": {
+    "image_url": "/specials/test-gamewinner-2025-12-28_hc-fribourg-gotteron_ifk-helsinki.jpg",
+    "position": "78% 40%",
+    "credit": "Chloé Lambert / La Liberté",
+    "source": "https://www.laliberte.ch/articles/sports/hockey-sur-glace/battu-a-herning-gotteron-defiera-geneve-servette-en-huitieme-de-finale-1465517"
+  },
+  "test-chance-creator-2025-12-28_hc-fribourg-gotteron_ifk-helsinki-hc-fribourg-gott-ron-42": {
+    "image_url": "/specials/test-chance-creator-2025-12-28_hc-fribourg-gotteron_ifk-helsinki-hc-fribourg-gott-ron-42.jpg",
+    "position": "55% 30%",
+    "credit": "Keystone (via La Liberté)",
+    "source": "https://www.laliberte.ch/articles/sports/hockey-sur-glace/ca-dependra-des-negociations-dit-gerd-zenhausern-1273467"
+  },
+  "test-sniper-2025-12-28_hc-fribourg-gotteron_ifk-helsinki-hc-fribourg-gott-ron-23": {
+    "image_url": "/specials/test-sniper-2025-12-28_hc-fribourg-gotteron_ifk-helsinki-hc-fribourg-gott-ron-23.jpg",
+    "position": "55% 40%",
+    "credit": "Melanie Duchene / Keystone via AP (ČTK gallery, ceskenoviny.cz)",
+    "source": "https://www.ceskenoviny.cz/fotogalerie/?id=4868"
+  },
+  "test-workhorse-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-fribourg-gott-ron-12": {
+    "image_url": "/specials/test-workhorse-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-fribourg-gott-ron-12.jpg",
+    "position": "55% 40%",
+    "credit": "Andreas Haas / swisshockeynews.ch",
+    "source": "https://swisshockeynews.ch/images/IMAGES/Players/N/nemethp_hcfg_2526_AndreasHaas.jpg"
+  },
+  "test-pressure-breaker-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-fribourg-gott-ron-96": {
+    "image_url": "/specials/test-pressure-breaker-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-fribourg-gott-ron-96.jpg",
+    "position": "45% 30%",
+    "credit": "RvS.Media / swisshockeynews.ch",
+    "source": "https://swisshockeynews.ch/images/IMAGES/Players/G/glausera_hcfg_2526_RvSmm.jpg"
+  },
+  "test-chance-creator-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-fribourg-gott-ron-97": {
+    "image_url": "/specials/test-chance-creator-2025-12-30_hc-fribourg-gotteron_hc-davos-hc-fribourg-gott-ron-97.jpg",
+    "position": "58% 30%",
+    "credit": "RvS.Media / swisshockeynews.ch",
+    "source": "https://swisshockeynews.ch/en/shn/medical/fribourg-lost-nathan-marchon-last-night"
+  },
+  "test-pass-thief-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-sparta-praha-24": {
+    "image_url": "/specials/test-pass-thief-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-sparta-praha-24.jpg",
+    "position": "55% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/irving-zbytecne-jsme-panikarili-17213"
+  },
+  "test-workhorse-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-sparta-praha-97": {
+    "image_url": "/specials/test-workhorse-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-sparta-praha-97.jpg",
+    "position": "38% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/masin-verime-ze-ctyrku-udelame-17537"
+  },
+  "test-progression-master-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-sparta-praha-36": {
+    "image_url": "/specials/test-progression-master-2025-12-26_hc-fribourg-gotteron_hc-sparta-praha-hc-sparta-praha-36.jpg",
+    "position": "43% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/krejcik-tahali-jsme-za-kratsi-konec-17318"
+  },
+  "test-attack-launcher-2025-12-27_ifk-helsinki_hc-sparta-praha-hc-sparta-praha-37": {
+    "image_url": "/specials/test-attack-launcher-2025-12-27_ifk-helsinki_hc-sparta-praha-hc-sparta-praha-37.jpg",
+    "position": "42% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/michal-vitouch-tohle-byla-prvni-bitka-v-zivote-17243"
+  },
+  "test-chance-architect-2025-12-27_ifk-helsinki_hc-sparta-praha-hc-sparta-praha-26": {
+    "image_url": "/specials/test-chance-architect-2025-12-27_ifk-helsinki_hc-sparta-praha-hc-sparta-praha-26.jpg",
+    "position": "55% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/repik-dobre-odehrany-cely-zapas-17284"
+  },
+  "test-puck-hunter-2025-12-27_ifk-helsinki_hc-sparta-praha-hc-sparta-praha-34": {
+    "image_url": "/specials/test-puck-hunter-2025-12-27_ifk-helsinki_hc-sparta-praha-hc-sparta-praha-34.jpg",
+    "position": "42% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/spacek-super-tymova-prace-17398"
+  },
+  "test-speedster-2025-12-29_hc-sparta-praha_team-canada-hc-sparta-praha-93": {
+    "image_url": "/specials/test-speedster-2025-12-29_hc-sparta-praha_team-canada-hc-sparta-praha-93.jpg",
+    "position": "58% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/mbl-spa-2-3-o-vyhre-rozhodl-vesalainen-17580"
+  },
+  "test-escape-artist-2025-12-29_hc-sparta-praha_team-canada-hc-sparta-praha-77": {
+    "image_url": "/specials/test-escape-artist-2025-12-29_hc-sparta-praha_team-canada-hc-sparta-praha-77.jpg",
+    "position": "44% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/nemecek-hrajeme-moc-na-krasu-to-nejde-17250"
+  },
+  "test-playmaker-2025-12-29_hc-sparta-praha_team-canada-hc-sparta-praha-74": {
+    "image_url": "/specials/test-playmaker-2025-12-29_hc-sparta-praha_team-canada-hc-sparta-praha-74.jpg",
+    "position": "37% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/raska-byli-jsme-vystraseni-17437"
+  },
+  "test-progression-master-2025-12-30_us-collegiate-selects_hc-sparta-praha-hc-sparta-praha-10": {
+    "image_url": "/specials/test-progression-master-2025-12-30_us-collegiate-selects_hc-sparta-praha-hc-sparta-praha-10.jpg",
+    "position": "50% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/pysyk-rivalita-nas-bavi-17722"
+  },
+  "test-attack-launcher-2025-12-30_us-collegiate-selects_hc-sparta-praha-hc-sparta-praha-16": {
+    "image_url": "/specials/test-attack-launcher-2025-12-30_us-collegiate-selects_hc-sparta-praha-hc-sparta-praha-16.jpg",
+    "position": "45% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/dzierkals-ceska-extraliga-lotyse-zlepsuje-17793"
+  },
+  "test-shot-stopper-2025-12-30_us-collegiate-selects_hc-sparta-praha-hc-sparta-praha-43": {
+    "image_url": "/specials/test-shot-stopper-2025-12-30_us-collegiate-selects_hc-sparta-praha-hc-sparta-praha-43.jpg",
+    "position": "62% 30%",
+    "credit": "HC Sparta Praha (club photo)",
+    "source": "https://www.hcsparta.cz/article/kovar-mam-strasnou-radost-ze-jsme-vyhrali-17447"
+  },
+  "test-shot-stopper-2025-12-27_ifk-helsinki_hc-sparta-praha-hifk-60": {
+    "image_url": "/specials/test-shot-stopper-2025-12-27_ifk-helsinki_hc-sparta-praha-hifk-60.jpg",
+    "position": "36% 50%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2025/11/20251101-HIFK-Assat-0661.jpg"
+  },
+  "test-chance-creator-2025-12-27_ifk-helsinki_hc-sparta-praha-hifk-47": {
+    "image_url": "/specials/test-chance-creator-2025-12-27_ifk-helsinki_hc-sparta-praha-hifk-47.jpg",
+    "position": "78% 50%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2025/11/14.11.-aamujaat-18.jpg"
+  },
+  "test-pressure-breaker-2025-12-27_ifk-helsinki_hc-sparta-praha-hifk-96": {
+    "image_url": "/specials/test-pressure-breaker-2025-12-27_ifk-helsinki_hc-sparta-praha-hifk-96.jpg",
+    "position": "46% 50%",
+    "credit": "Keystone/Gian Ehrenzeller (via Südostschweiz)",
+    "source": "https://www.suedostschweiz.ch/schweiz-und-welt/joshua-fahrni-beendet-seine-karriere-per-sofort-2185772"
+  },
+  "test-wall-2025-12-28_hc-fribourg-gotteron_ifk-helsinki": {
+    "image_url": "/specials/test-wall-2025-12-28_hc-fribourg-gotteron_ifk-helsinki.jpg",
+    "position": "52% 50%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2026/01/20250924-HIFK-Pelicans-1190.jpg"
+  },
+  "test-chance-architect-2025-12-28_hc-fribourg-gotteron_ifk-helsinki-hifk-91": {
+    "image_url": "/specials/test-chance-architect-2025-12-28_hc-fribourg-gotteron_ifk-helsinki-hifk-91.jpg",
+    "position": "53% 50%",
+    "credit": "Keystone-ATS (via La Télé)",
+    "source": "https://latele.ch/articles/geneve-prete-akeson-a-la-chaux-de-fonds"
+  },
+  "test-attack-launcher-2025-12-28_hc-fribourg-gotteron_ifk-helsinki-hifk-52": {
+    "image_url": "/specials/test-attack-launcher-2025-12-28_hc-fribourg-gotteron_ifk-helsinki-hifk-52.jpg",
+    "position": "61% 50%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2025/09/20250808-HIFK-Assat-2501.jpg"
+  },
+  "test-chance-architect-2025-12-29_hc-davos_ifk-helsinki-hifk-54": {
+    "image_url": "/specials/test-chance-architect-2025-12-29_hc-davos_ifk-helsinki-hifk-54.jpg",
+    "position": "46% 50%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2026/06/20251217-HIFK-HPK-2663.jpg"
+  },
+  "test-pressure-breaker-2025-12-29_hc-davos_ifk-helsinki-hifk-65": {
+    "image_url": "/specials/test-pressure-breaker-2025-12-29_hc-davos_ifk-helsinki-hifk-65.jpg",
+    "position": "42% 50%",
+    "credit": "EV Zug (evz.ch)",
+    "source": "https://www.evz.ch/en/news/teams/men/2025/11/evz-signs-eric-schneller-until-2028/"
+  },
+  "test-shot-blocker-2025-12-29_hc-davos_ifk-helsinki-hifk-10": {
+    "image_url": "/specials/test-shot-blocker-2025-12-29_hc-davos_ifk-helsinki-hifk-10.jpg",
+    "position": "42% 50%",
+    "credit": "HIFK (club photographer)",
+    "source": "https://hifk.fi/wp-content/uploads/2026/02/20251121-HPK-HIFK-1985-scaled.jpg"
+  },
+  "test-escape-artist-2025-12-26_team-canada_us-collegiate-selects-team-canada-21": {
+    "image_url": "/specials/test-escape-artist-2025-12-26_team-canada_us-collegiate-selects-team-canada-21.jpg",
+    "position": "42% 30%",
+    "credit": "Hockey Canada Images",
+    "source": "https://cdn.hockeycanada.ca/hockey-canada/MediaGroupings/4209/2025-spenlger-cup-can-uscs-10.jpg"
+  },
+  "test-pass-thief-2025-12-28_team-canada_hc-davos-team-canada-96": {
+    "image_url": "/specials/test-pass-thief-2025-12-28_team-canada_hc-davos-team-canada-96.jpg",
+    "position": "22% 30%",
+    "credit": "Hockey Canada Images",
+    "source": "https://cdn.hockeycanada.ca/hockey-canada/MediaGroupings/4210/2025-spenlger-cup-can-dav-10.jpg"
+  },
+  "test-shot-blocker-2025-12-28_team-canada_hc-davos-team-canada-5": {
+    "image_url": "/specials/test-shot-blocker-2025-12-28_team-canada_hc-davos-team-canada-5.jpg",
+    "position": "72% 30%",
+    "credit": "Hockey Canada Images",
+    "source": "https://cdn.hockeycanada.ca/hockey-canada/MediaGroupings/4210/2025-spenlger-cup-can-dav-11.jpg"
+  },
+  "test-workhorse-2025-12-29_hc-sparta-praha_team-canada-team-canada-62": {
+    "image_url": "/specials/test-workhorse-2025-12-29_hc-sparta-praha_team-canada-team-canada-62.jpg",
+    "position": "85% 45%",
+    "credit": "Hockey Canada Images",
+    "source": "https://cdn.hockeycanada.ca/hockey-canada/MediaGroupings/4215/2025-spenlger-cup-can-spa-10.jpg"
+  },
+  "test-sniper-2025-12-29_hc-sparta-praha_team-canada-team-canada-16": {
+    "image_url": "/specials/test-sniper-2025-12-29_hc-sparta-praha_team-canada-team-canada-16.jpg",
+    "position": "41% 50%",
+    "credit": "KEYSTONE / Gian Ehrenzeller (via suedostschweiz.ch)",
+    "source": "https://c02.purpledshub.com/uploads/sites/88/2026/03/704637670_highres-scaled.jpg"
+  },
+  "test-puck-hunter-2025-12-29_hc-sparta-praha_team-canada-team-canada-2": {
+    "image_url": "/specials/test-puck-hunter-2025-12-29_hc-sparta-praha_team-canada-team-canada-2.jpg",
+    "position": "15% 35%",
+    "credit": "Hockey Canada Images",
+    "source": "https://cdn.hockeycanada.ca/hockey-canada/MediaGroupings/4210/2025-spenlger-cup-can-dav-05.jpg"
+  },
+  "test-volume-shooter-2025-12-26_team-canada_us-collegiate-selects-u-s-collegiate-selects-86": {
+    "image_url": "/specials/test-volume-shooter-2025-12-26_team-canada_us-collegiate-selects-u-s-collegiate-selects-86.jpg",
+    "position": "50% 40%",
+    "credit": "Penn State Athletics (gopsusports.com)",
+    "source": "https://gopsusports.com/news/2025/10/9/wiebusch-nets-four-in-losing-effort-as-no-4-mens-hockey-falls-to-clarkson-6-4"
+  },
+  "test-go-to-scorer-2025-12-26_team-canada_us-collegiate-selects-u-s-collegiate-selects-9": {
+    "image_url": "/specials/test-go-to-scorer-2025-12-26_team-canada_us-collegiate-selects-u-s-collegiate-selects-9.jpg",
+    "position": "49% 30%",
+    "credit": "Simon French (via The Boston Globe)",
+    "source": "https://www.bostonglobe.com/2025/12/31/sports/united-states-collegiate-selects-spengler-cup/"
+  },
+  "test-shot-blocker-2025-12-26_team-canada_us-collegiate-selects-u-s-collegiate-selects-4": {
+    "image_url": "/specials/test-shot-blocker-2025-12-26_team-canada_us-collegiate-selects-u-s-collegiate-selects-4.jpg",
+    "position": "65% 40%",
+    "credit": "Melanie Duchene / Keystone (via Grand Forks Herald)",
+    "source": "https://www.grandforksherald.com/sports/und-hockey/u-s-collegiate-selects-beat-sparta-praha-to-reach-spengler-cup-championship"
+  },
+  "test-shot-stopper-2025-12-27_hc-davos_us-collegiate-selects-u-s-collegiate-selects-30": {
+    "image_url": "/specials/test-shot-stopper-2025-12-27_hc-davos_us-collegiate-selects-u-s-collegiate-selects-30.jpg",
+    "position": "62% 40%",
+    "credit": "Clint Austin / Duluth Media Group (Duluth News Tribune)",
+    "source": "https://www.duluthnewstribune.com/sports/bulldogs-hockey/bulldogs-gajan-plante-excited-to-experience-spengler-cup"
+  },
+  "test-progression-master-2025-12-27_hc-davos_us-collegiate-selects-u-s-collegiate-selects-23": {
+    "image_url": "/specials/test-progression-master-2025-12-27_hc-davos_us-collegiate-selects-u-s-collegiate-selects-23.jpg",
+    "position": "55% 30%",
+    "credit": "Chris Swann / Clarkson Creative Photography (University of Denver Athletics)",
+    "source": "https://denverpioneers.com/news/2026/3/16/du-pioneers-hockey-eric-pohlkamp-earns-nchc-offensive-defenseman-of-the-year-honors"
+  },
+  "test-volume-shooter-2025-12-27_hc-davos_us-collegiate-selects-u-s-collegiate-selects-15": {
+    "image_url": "/specials/test-volume-shooter-2025-12-27_hc-davos_us-collegiate-selects-u-s-collegiate-selects-15.jpg",
+    "position": "50% 40%",
+    "credit": "Penn State Athletics (gopsusports.com)",
+    "source": "https://gopsusports.com/news/2026/05/12/cerrato-inks-three-year-entry-level-contract-with-nhls-carolina-hurricanes"
+  },
+  "test-speedster-2025-12-30_us-collegiate-selects_hc-sparta-praha-u-s-collegiate-selects-27": {
+    "image_url": "/specials/test-speedster-2025-12-30_us-collegiate-selects_hc-sparta-praha-u-s-collegiate-selects-27.jpg",
+    "position": "39% 50%",
+    "credit": "Cameron Boon / USCS (via Grand Forks Herald)",
+    "source": "https://www.grandforksherald.com/sports/und-hockey/team-canada-edges-u-s-collegiate-selects-3-2-in-spengler-cup-opener"
+  },
+  "test-volume-shooter-2025-12-30_us-collegiate-selects_hc-sparta-praha-u-s-collegiate-selects-11": {
+    "image_url": "/specials/test-volume-shooter-2025-12-30_us-collegiate-selects_hc-sparta-praha-u-s-collegiate-selects-11.jpg",
+    "position": "60% 40%",
+    "credit": "Notre Dame Athletics (fightingirish.com)",
+    "source": "https://fightingirish.com/danny-nelson-named-to-team-usa-for-2026-iihf-world-championships/"
+  },
+  "test-pressure-breaker-2025-12-28_team-canada_hc-davos-team-canada-27": {
+    "image_url": "/specials/test-pressure-breaker-2025-12-28_team-canada_hc-davos-team-canada-27.jpg",
+    "position": "50% 40%",
+    "credit": "Sandro Halank / Wikimedia Commons (CC BY-SA 4.0)",
+    "source": "https://commons.wikimedia.org/wiki/File:2024-12-04_Eisb%C3%A4ren_Berlin_gegen_ZSC_Lions_(Champions_Hockey_League_2024-25)_by_Sandro_Halank%E2%80%93113.jpg"
+  },
+  "player-of-the-match": {
+    "image_url": "/specials/player-of-the-match.jpg",
+    "position": "27% 50%",
+    "credit": "SRF Sport (TV broadcast still)",
+    "source": "https://www.srf.ch/sport/eishockey/spengler-cup/final-97-spengler-cup-junge-wilde-gezaehmt-hcd-mit-17-titeln-alleiniger-rekordsieger"
   }
 }

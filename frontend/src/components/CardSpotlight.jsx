@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ordinal } from '../format'
 import { teamStyle } from '../teams'
-import CardFace from './CardFace'
+import CardFace, { accentOf } from './CardFace'
 
 const MAX_CLIPS = 3
 // Which moments best show off a card, best first. Shots and saves are ranked by xG within their tier.
@@ -146,7 +146,7 @@ function rankText(kpi) {
 // The back holds only the archetype and the three KPIs that earned it.
 function CardBack({ card }) {
   return (
-    <span className="spotlight-back card-face" style={teamStyle(card.player.team)}>
+    <span className="spotlight-back card-face" style={{ ...teamStyle(card.player.team), '--c2': accentOf(card) }}>
       <span className="back-title">{card.title}</span>
       <span className="back-kpis">
         {kpisOf(card).map((kpi) => (

@@ -144,9 +144,10 @@ export default function CardSpotlight({ card, onClose, detailPath = `/cards/${ca
   )
 }
 
-// Best in the game, else best on the player's team, else the plain game rank.
+// Best in the game, else best on the player's team, else the plain game rank. A KPI from before the tournament
+// (Ones to Watch) says which season it is from instead.
 function rankText(kpi) {
-  if (!kpi.match_rank) return null
+  if (!kpi.match_rank) return kpi.note ?? null
   if (kpi.match_rank === 1) return 'Best in the game'
   if (kpi.team_rank === 1) return `Best on team · ${ordinal(kpi.match_rank)} in game`
   return `${ordinal(kpi.match_rank)} of ${kpi.players_in_match} ${kpi.rank_pool}`

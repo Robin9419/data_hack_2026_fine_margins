@@ -953,6 +953,13 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .legend-figure figcaption { margin-top: 12px; font-size: 0.85rem; font-style: italic; color: var(--muted); }
 .legend-eyebrow { color: #a07a1c; font-weight: 700; }
 .legend-detail h1 { font-family: Georgia, 'Times New Roman', serif; }
+.table-scroll { overflow-x: auto; margin: 8px 0 12px; }
+.pre-stats { width: 100%; border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.pre-stats th, .pre-stats td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+.pre-stats th:nth-child(-n+3), .pre-stats td:nth-child(-n+3) { text-align: left; }
+.pre-stats th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.pre-stats small { opacity: 0.7; }
+.pre-facts { margin-bottom: 8px; }
 .legend-facts { padding-left: 1.2rem; margin: 0; }
 .legend-facts li { margin: 4px 0; }
 .legend-facts li::marker { content: '★  '; color: #c9971f; }

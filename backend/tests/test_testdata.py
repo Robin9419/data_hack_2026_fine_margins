@@ -95,6 +95,15 @@ class RoadToFinalTests(unittest.TestCase):
         self.assertTrue(all(c["road"]["stage"] == 0 and c["road"]["played"] == 0 for c in cards))
         self.assertTrue(all(c["match"] is None and c["rating"]["mr"] is None for c in cards))
 
+    def test_ones_to_watch_back_shows_the_stats_before_the_tournament(self):
+        before = {c["id"]: c for c in self.road.cards_for([])}
+        self.assertTrue(all(c["pre_tournament"] and c["archetype_kpis"] for c in before.values()))
+        davos = next(c for c in before.values() if c["player"]["last_name"] == "Stransky")
+        self.assertEqual([k["display_value"] for k in davos["archetype_kpis"]], ["35", "19", "1.03"])
+        self.assertEqual(davos["archetype_kpis"][0]["note"], "NL 2025–26 so far · 34 games")
+        after = self.road.cards_for(self.all_games)
+        self.assertTrue(all(c["archetype_kpis"] is None and c["pre_tournament"] for c in after))  # back: the tournament
+
     def test_stage_follows_how_far_the_team_got(self):
         stages = self.stages(self.all_games)
         self.assertEqual(stages["HC Davos"], 4)  # won the final

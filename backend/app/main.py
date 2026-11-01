@@ -136,13 +136,17 @@ def open_daily_card(user: dict) -> list[dict]:
     return open_random_base_cards(user, DAILY_CARDS)
 
 
-def open_random_base_cards(user: dict, count: int) -> list[dict]:
-    """Random base cards, one draw each, so duplicates are possible. The last one can be a special card."""
+def open_random_base_cards(user: dict, count: int, packs: int = 1) -> list[dict]:
+    """Random base cards, one draw each, so duplicates are possible. Each of the packs holds count cards and has its
+    own SPECIAL_CHANCE roll for the last card to be a special card."""
     content = get_content()
     base_ids = [cid for cid, card in content.cards.items() if card["type"] == "base"]
     roads = road_cards_for(user)
-    drawn = with_special_card(user, roads, [random.choice(base_ids) for _ in range(count)])
-    return pack_entries(user, drawn, roads)
+    entries = []
+    for _ in range(packs):
+        drawn = with_special_card(user, roads, [random.choice(base_ids) for _ in range(count)])
+        entries += pack_entries(user, drawn, roads)
+    return entries
 
 
 # Free cards: following a Spengler Cup social channel and buying match tickets (per ticket). Every stage of the
@@ -169,14 +173,14 @@ def bonus_social(user: dict = Depends(current_user)):
     if not db.follow_social(user["id"], platform):
         raise HTTPException(409, f"You already follow Spengler Cup on {name}")
     pack = open_random_base_cards(user, SOCIAL_CARDS)
-    return {"pack": pack + award_legends(user), "progress": progress_for(user), "title": f"Thanks for following on {name}!"}
+    return {"pack": pack + award_earned(user), "progress": progress_for(user), "title": f"Thanks for following on {name}!"}
 
 
 @app.post("/api/bonus/tickets")
 def bonus_tickets(body: TicketBonusRequest, user: dict = Depends(current_user)):
-    pack = open_random_base_cards(user, CARDS_PER_TICKET * body.tickets)
+    pack = open_random_base_cards(user, CARDS_PER_TICKET, body.tickets)
     title = f'{body.tickets} {"ticket" if body.tickets == 1 else "tickets"}, {len(pack)} free cards'
-    return {"pack": pack + award_legends(user), "progress": progress_for(user), "title": title}
+    return {"pack": pack + award_earned(user), "progress": progress_for(user), "title": title}
 
 
 def with_rewards(owned: dict[str, str]) -> dict[str, str]:
@@ -265,6 +269,23 @@ def award_legends(user: dict) -> list[dict]:
     return granted
 
 
+def award_collectors(user: dict) -> list[dict]:
+    """Collector cards are earned by owning all base cards of a club (see content._add_reward_cards). Returns the ones
+    the user has not been shown the unlock of yet, and marks them as shown."""
+    content = get_content()
+    announced = db.announced_collectors(user["id"])
+    now = owned_now(user)
+    new = [cid for cid, c in content.cards.items()
+           if c["type"] == "reward" and c.get("kind") == "collector" and cid in now and cid not in announced]
+    db.add_announced_collectors(user["id"], new)
+    return [{**content.cards[cid], "owned": True, "is_new": True} for cid in new]
+
+
+def award_earned(user: dict) -> list[dict]:
+    """The earned cards (legends, then collectors) a pack response adds after its drawn cards."""
+    return award_legends(user) + award_collectors(user)
+
+
 def played_for(user: dict) -> set[str]:
     """The games already played at the user's stage of the tournament timeline."""
     return get_content().tournament.played(user["stage"])
@@ -292,7 +313,7 @@ def login(body: LoginRequest):
     """Dummy sign-in: any username works. Only a brand new account gets a starter pack."""
     user, created = db.get_or_create_user(body.username.strip(), body.favorite_team)
     token = db.create_session(user["id"])
-    pack = open_pack(user) + award_legends(user) if created else None
+    pack = open_pack(user) + award_earned(user) if created else None
     return {"token": token, "user": user, "new_user": created, "pack": pack}
 
 
@@ -301,7 +322,7 @@ def daily_claim(user: dict = Depends(current_user)):
     """Three free base cards per day, where a day is a stage of the simulated tournament timeline."""
     if not db.claim_daily(user["id"], user["stage"]):
         raise HTTPException(409, "You already claimed today's card. Come back tomorrow!")
-    return {"pack": open_daily_card(user) + award_legends(user), "progress": progress_for(user),
+    return {"pack": open_daily_card(user) + award_earned(user), "progress": progress_for(user),
             "title": "Your daily card"}
 
 
@@ -326,7 +347,7 @@ def trade(body: TradeRequest, user: dict = Depends(current_user)):
     if not db.remove_copies(user["id"], body.card_ids):
         raise HTTPException(409, "You don't have those cards to trade")
     outcome, card = roll_trade(user, body.card_ids)
-    return {"outcome": outcome, "pack": [card] + award_legends(user), "progress": progress_for(user)}
+    return {"outcome": outcome, "pack": [card] + award_earned(user), "progress": progress_for(user)}
 
 
 @app.get("/api/teams")
@@ -436,7 +457,7 @@ def reset(user: dict = Depends(current_user)):
     """Empty the user's collection and open a fresh starter pack (for demos/testing)."""
     db.clear_cards(user["id"])  # also clears the predictions and goes back to before the tournament
     user = {**user, "stage": "pre"}
-    pack = open_pack(user) + award_legends(user)
+    pack = open_pack(user) + award_earned(user)
     return {"pack": pack, "progress": progress_for(user)}
 
 
@@ -523,7 +544,9 @@ def quiz_answer(question_id: int, body: QuizAnswer, user: dict = Depends(current
     result = db.grant_card(user["id"], question["card_id"], edition)
     card = {**get_content().cards[question["card_id"]], "owned": True, "edition": edition}
     legends = award_legends(user)
-    return {"correct": True, "result": result, "card": card, "legends": legends, "progress": progress_for(user)}
+    collectors = award_collectors(user)
+    return {"correct": True, "result": result, "card": card, "legends": legends, "collectors": collectors,
+            "progress": progress_for(user)}
 
 
 class StageRequest(BaseModel):
@@ -547,8 +570,10 @@ def tournament_view(user: dict) -> dict:
     index = t.stages.index(stage)
     timeline = [{**stop, "state": "current" if i == index else ("past" if i < index else "future")}
                 for i, stop in enumerate(t.timeline())]
+    watch = db.watch_packs(user["id"])
     today = [t.game_view(g, False, predictions.get(g["id"], {}), packs.get(g["id"])) for g in t.today(stage)]
-    results = [t.game_view(g, True, predictions.get(g["id"], {}), packs.get(g["id"]))
+    results = [{**t.game_view(g, True, predictions.get(g["id"], {}), packs.get(g["id"])),
+                "watch_packs": watch_packs_of(g["id"], watch)}
                for g in reversed(t.games) if g["id"] in played]
     final = t.final
     champion = None
@@ -556,8 +581,36 @@ def tournament_view(user: dict) -> dict:
         champion = final["home_team"] if final["home_score"] > final["away_score"] else final["away_team"]
     return {
         "stage": stage, "timeline": timeline, "today": today, "results": results, "champion": champion,
-        "packs_waiting": sum(r["packs"] for r in results if not r["packs_claimed"]),
+        "packs_waiting": sum(r["packs"] for r in results if not r["packs_claimed"])
+                         + sum(w["packs"] for r in results for w in r["watch_packs"] if not w["claimed"]),
     }
+
+
+# Ones to Watch packs: owning a Road to Final card pays out a pack for each goal or assist its player has in a game.
+# The packs are drawn like the base-only packs (see open_random_base_cards).
+WATCH_PACK_CARDS = 3
+
+
+def watch_packs_of(game_id: str, watch: dict[str, dict[str, dict]]) -> list[dict]:
+    """The Ones to Watch packs a played game earned (see db.watch_packs): the player, his points, how many packs and if
+    they are opened."""
+    earned = watch.get(game_id, {})
+    return [{**p, **earned[p["card_id"]]}
+            for p in get_content().road_to_final.pointed(game_id) if p["card_id"] in earned]
+
+
+def record_watch_packs(user: dict, game_ids: set[str]):
+    """When games are played: a pack for each goal or assist of an owned Road to Final card's player."""
+    owned = db.owned_cards(user["id"])
+    road = get_content().road_to_final
+    for game_id in game_ids:
+        db.add_watch_packs(user["id"], game_id,
+                           [(p["card_id"], p["goals"] + p["assists"]) for p in road.pointed(game_id)
+                            if p["card_id"] in owned])
+
+
+def open_watch_packs(user: dict, packs: int) -> list[dict]:
+    return [card for _ in range(packs) for card in open_random_base_cards(user, WATCH_PACK_CARDS)]
 
 
 @app.get("/api/tournament")
@@ -578,8 +631,10 @@ def set_stage(body: StageRequest, user: dict = Depends(current_user)):
     predictions = db.predictions(user["id"])
     resolved = {game_id for game_id in t.played(body.stage)
                 if db.resolve_game(user["id"], game_id, t.correct_count(game_id, predictions.get(game_id, {})))}
-    packs = db.game_packs(user["id"])
-    just_played = [t.game_view(g, True, predictions.get(g["id"], {}), packs.get(g["id"]))
+    record_watch_packs(user, resolved)
+    packs, watch = db.game_packs(user["id"]), db.watch_packs(user["id"])
+    just_played = [{**t.game_view(g, True, predictions.get(g["id"], {}), packs.get(g["id"])),
+                    "watch_packs": watch_packs_of(g["id"], watch)}
                    for g in t.games if g["id"] in resolved]
     return {"tournament": tournament_view(user), "progress": progress_for(user), "just_played": just_played}
 
@@ -617,20 +672,24 @@ def open_packs_of(user: dict, game_id: str, packs: int) -> list[dict]:
 
 @app.post("/api/tournament/packs/{game_id}")
 def open_game_packs(game_id: str, user: dict = Depends(current_user)):
-    """Opens the packs a played game earned."""
+    """Opens the packs a played game earned: the prediction packs and the Ones to Watch packs."""
     if game_id not in played_for(user):
         raise HTTPException(409, "This game has not been played yet")
-    packs = db.claim_game_packs(user["id"], game_id)
-    if not packs:
+    packs = db.claim_game_packs(user["id"], game_id) or 0
+    watch = db.claim_watch_packs(user["id"], game_id)
+    if not packs and not watch:
         raise HTTPException(409, "No packs to open for this game")
     game = get_content().tournament.by_id[game_id]
-    return {"pack": open_packs_of(user, game_id, packs) + award_legends(user), "progress": progress_for(user),
-            "title": f'{packs} {"pack" if packs == 1 else "packs"} from {game["home_team"]} – {game["away_team"]}'}
+    pack = (open_packs_of(user, game_id, packs) if packs else []) + open_watch_packs(user, watch)
+    total = packs + watch
+    return {"pack": pack + award_earned(user), "progress": progress_for(user),
+            "title": f'{total} {"pack" if total == 1 else "packs"} from {game["home_team"]} – {game["away_team"]}'}
 
 
 @app.post("/api/tournament/packs")
 def open_all_packs(user: dict = Depends(current_user)):
-    """Opens, in one go, every pack the played games earned that the user has not opened yet."""
+    """Opens, in one go, every pack the played games earned that the user has not opened yet: the prediction packs
+    and the Ones to Watch packs."""
     played = played_for(user)
     pack, total = [], 0
     for game_id, info in db.game_packs(user["id"]).items():
@@ -639,10 +698,17 @@ def open_all_packs(user: dict = Depends(current_user)):
             if packs:
                 pack += open_packs_of(user, game_id, packs)
                 total += packs
-    if not total:
+    watch_total = 0
+    for game_id in db.watch_packs(user["id"]):
+        if game_id in played:
+            watch_total += db.claim_watch_packs(user["id"], game_id)
+    pack += open_watch_packs(user, watch_total)
+    if not total and not watch_total:
         raise HTTPException(409, "No packs to open")
-    return {"pack": pack + award_legends(user), "progress": progress_for(user),
-            "title": f'Your {total} prediction {"pack" if total == 1 else "packs"}'}
+    kind = "prediction " if not watch_total else "Ones to Watch " if not total else ""
+    count = total + watch_total
+    return {"pack": pack + award_earned(user), "progress": progress_for(user),
+            "title": f'Your {count} {kind}{"pack" if count == 1 else "packs"}'}
 
 
 @app.get("/api/activities")
@@ -668,7 +734,9 @@ def activities(user: dict = Depends(current_user)):
         "social": None if platform in db.followed_socials(user["id"])
                   else {"id": platform, "name": name, "cards": SOCIAL_CARDS},
         "predictions": {"games": len(open_games), "picks": picks, "questions": questions} if picks < questions else None,
-        "packs_waiting": sum(p["correct"] for gid, p in packs.items() if gid in played and not p["claimed"]),
+        "packs_waiting": sum(p["correct"] for gid, p in packs.items() if gid in played and not p["claimed"])
+                         + sum(c["packs"] for gid, cards in db.watch_packs(user["id"]).items() if gid in played
+                               for c in cards.values() if not c["claimed"]),
         "trivia": 0 if db.trivia_played(user["id"], stage) else len(trivia_cards(user, "home")),
         "trade": {"cost": TRADE_COST, "base_copies": base_copies},
         "tickets": {"cards_per_ticket": CARDS_PER_TICKET},

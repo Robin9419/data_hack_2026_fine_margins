@@ -70,6 +70,21 @@ class RoadToFinal:
         return [self._card(key, included) for key in self.stars]
 
     @staticmethod
+    def _card_id(key: tuple[str, int]) -> str:
+        return f'test-road-{re.sub(r"[^a-z]+", "-", key[0].lower().replace("ö", "o")).strip("-")}-{key[1]}'
+
+    def pointed(self, game_id: str) -> list[dict]:
+        """The stars with a goal or an assist in the game: their card id, name and points in that game."""
+        result = []
+        for key in self.stars:
+            entry = self._player.get((game_id, key))
+            goals, assists = (entry["stats"].get("goals") or 0, entry["stats"].get("assists") or 0) if entry else (0, 0)
+            if goals or assists:
+                result.append({"card_id": self._card_id(key), "name": f'{entry["first_name"]} {entry["last_name"]}',
+                               "goals": goals, "assists": assists})
+        return result
+
+    @staticmethod
     def _label(game: dict, index: int) -> str:
         return {"Quarterfinal": "QF", "Semifinal": "Semi", "Final": "Final"}.get(game["stage"], f"G{index + 1}")
 
@@ -112,7 +127,7 @@ class RoadToFinal:
         info = STAGES[stage - 1] if stage else PRE_STAGE
         goals = sum(self._player[(g["id"], key)]["stats"].get("goals", 0) for g, _ in played)
         assists = sum(self._player[(g["id"], key)]["stats"].get("assists", 0) for g, _ in played)
-        card_id = f'test-road-{re.sub(r"[^a-z]+", "-", team.lower().replace("ö", "o")).strip("-")}-{key[1]}'
+        card_id = self._card_id(key)
         return {
             "id": card_id, "type": "special",
             "kind": "road", "special_type": None, "test": True, "test_game": None,

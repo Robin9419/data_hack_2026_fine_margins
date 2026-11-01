@@ -17,7 +17,7 @@ export default function Quiz() {
   const [missed, setMissed] = useState(null) // { chosen, answerId, answer, explanation } once answered wrong
   const [hinted, setHinted] = useState(false) // the hint of the current question is shown
   const [unlock, setUnlock] = useState(null) // { card, result, points, progress }
-  const [legends, setLegends] = useState([]) // legends earned by the last answer, shown after its unlock
+  const [queued, setQueued] = useState([]) // { card, result } of the legends and collectors earned by the last answer, shown after its unlock
   const [won, setWon] = useState(0)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
@@ -56,7 +56,10 @@ export default function Quiz() {
           points: data.progress.points - progress.points,
           progress: data.progress,
         })
-        setLegends(data.legends ?? [])
+        setQueued([
+          ...(data.legends ?? []).map((card) => ({ card, result: 'legend' })),
+          ...(data.collectors ?? []).map((card) => ({ card, result: 'collector' })),
+        ])
         setWon((n) => n + 1)
       }
     } catch (err) {
@@ -68,10 +71,10 @@ export default function Quiz() {
 
   // The bar fills when the unlock screen is dismissed, so the player sees it move.
   const next = () => {
-    if (legends.length > 0) {
-      const [legend, ...rest] = legends
-      setUnlock({ ...unlock, card: legend, result: 'legend', points: null })
-      setLegends(rest)
+    if (queued.length > 0) {
+      const [{ card, result }, ...rest] = queued
+      setUnlock({ ...unlock, card, result, points: null })
+      setQueued(rest)
       return
     }
     if (unlock) setProgress(unlock.progress)
@@ -219,7 +222,7 @@ export default function Quiz() {
           result={unlock.result}
           points={unlock.points}
           onContinue={next}
-          continueLabel={legends.length > 0 ? 'Continue' : last ? 'Finish' : 'Next question'}
+          continueLabel={queued.length > 0 ? 'Continue' : last ? 'Finish' : 'Next question'}
         />
       )}
     </section>

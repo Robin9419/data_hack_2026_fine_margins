@@ -41,7 +41,7 @@ class TournamentTests(unittest.TestCase):
     def test_game_cards_only_exist_once_the_game_is_played(self):
         cards = lambda: {c['id']: c for c in main.list_cards(self.user)['cards']}
         before = cards()
-        self.assertTrue(all(c['type'] in ('base', 'legend') or c.get('context_type') == 'stadium' or c.get('kind') == 'road'
+        self.assertTrue(all(c['type'] in ('base', 'legend', 'reward') or c.get('context_type') == 'stadium' or c.get('kind') == 'road'
                             for c in before.values()))
         self.go('2025-12-27')
         after_day_one = cards()
@@ -123,6 +123,8 @@ class TournamentTests(unittest.TestCase):
             self.assertEqual(len(question['option_ids']), 3)
             teams = {self.content.cards[o]['player']['team'] for o in question['option_ids']}
             self.assertTrue(teams <= {'HC Fribourg-Gottéron', 'HC Sparta Praha'})
+            self.assertIn(question['eliminate'], set(question['option_ids']) - {cid})  # the hint never strikes the answer
+            self.assertNotIn(card['title'], question['prompt'])  # the question describes the playstyle, not the name
             goalie = card['player']['position'] == 'Goalkeeper'
             for o in question['option_ids']:
                 self.assertEqual(self.content.cards[o]['player']['position'] == 'Goalkeeper', goalie)

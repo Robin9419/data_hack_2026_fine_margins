@@ -14,7 +14,8 @@ export default function Quiz() {
   const [questions, setQuestions] = useState(null)
   const [gamesPlayed, setGamesPlayed] = useState(0)
   const [index, setIndex] = useState(0)
-  const [missed, setMissed] = useState(null) // { chosen, answer } once the current question was answered wrong
+  const [missed, setMissed] = useState(null) // { chosen, answerId, answer, explanation } once answered wrong
+  const [hinted, setHinted] = useState(false) // the hint of the current question is shown
   const [unlock, setUnlock] = useState(null) // { card, result, points, progress }
   const [legends, setLegends] = useState([]) // legends earned by the last answer, shown after its unlock
   const [won, setWon] = useState(0)
@@ -31,6 +32,7 @@ export default function Quiz() {
       setGamesPlayed(data.games_played)
       setIndex(0)
       setMissed(null)
+      setHinted(false)
       setWon(0)
     } catch (err) {
       setError(err.message)
@@ -46,7 +48,7 @@ export default function Quiz() {
     try {
       const data = await api.quizAnswer(question.id, option.id)
       if (!data.correct) {
-        setMissed({ chosen: option.id, answer: data.answer })
+        setMissed({ chosen: option.id, answerId: data.answer_id, answer: data.answer, explanation: data.explanation })
       } else {
         setUnlock({
           card: data.card,
@@ -75,6 +77,7 @@ export default function Quiz() {
     if (unlock) setProgress(unlock.progress)
     setUnlock(null)
     setMissed(null)
+    setHinted(false)
     setIndex((i) => i + 1)
   }
 
@@ -165,7 +168,13 @@ export default function Quiz() {
       </p>
       <h1>{question.prompt}</h1>
       {question.match && <p className="quiz-match">{question.match}</p>}
-      <p className="quiz-clue">💡 {question.clue}</p>
+      {hinted ? (
+        <p className="quiz-clue">💡 {question.hint}</p>
+      ) : (
+        <button type="button" className="quiz-hint" disabled={Boolean(missed)} onClick={() => setHinted(true)}>
+          💡 Need a hint?
+        </button>
+      )}
       <p className="muted small">
         {question.reward === 'upgrade'
           ? 'Correct answer upgrades your card to the Stadium edition.'
@@ -175,12 +184,15 @@ export default function Quiz() {
       <ul className="quiz-options">
         {question.options.map((option) => {
           const isWrong = missed?.chosen === option.id
+          const isRight = missed?.answerId === option.id
+          const ruledOut = hinted && option.id === question.eliminate && !isWrong
+          const state = isWrong ? 'wrong' : isRight ? 'right' : ruledOut ? 'ruled-out' : ''
           return (
             <li key={option.id}>
               <button
                 type="button"
-                className={`quiz-option ${isWrong ? 'wrong' : ''}`}
-                disabled={Boolean(missed) || busy}
+                className={`quiz-option ${state}`}
+                disabled={Boolean(missed) || busy || ruledOut}
                 onClick={() => answer(question, option)}
               >
                 <strong>{option.name}</strong>
@@ -193,6 +205,7 @@ export default function Quiz() {
       {missed && (
         <>
           <p className="quiz-retry">Not quite. It was {missed.answer}.</p>
+          {missed.explanation && <p className="quiz-explain">{missed.explanation}</p>}
           <button type="button" className="pack-button" onClick={next}>
             {last ? 'Finish' : 'Next question'}
           </button>

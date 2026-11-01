@@ -491,7 +491,8 @@ def quiz_start(body: QuizStart, user: dict = Depends(current_user)):
         {
             "id": qid,
             "prompt": q["prompt"],
-            "clue": q["clue"],
+            "hint": q["hint"],
+            "eliminate": q["eliminate"],
             "match": q["match"],
             "reward": "upgrade" if cid in owned else "new",
             "options": [option(oid) for oid in q["option_ids"]],
@@ -515,7 +516,8 @@ def quiz_answer(question_id: int, body: QuizAnswer, user: dict = Depends(current
     if body.option_id != question["card_id"]:
         content = get_content()
         player = content.cards[question["card_id"]]["player"]
-        return {"correct": False, "answer": f'{player["first_name"]} {player["last_name"]}'}
+        return {"correct": False, "answer_id": question["card_id"], "answer": f'{player["first_name"]} {player["last_name"]}',
+                "explanation": content.explain_answer(question["card_id"])}
 
     edition = _edition(question["venue"])
     result = db.grant_card(user["id"], question["card_id"], edition)

@@ -706,7 +706,13 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .quiz-option span { color: var(--muted); font-size: 0.85rem; }
 .quiz-option:hover:not(:disabled) { border-color: var(--accent); transform: translateX(3px); }
 .quiz-option.wrong { border-color: #e5a29b; background: #fdeceb; text-decoration: line-through; opacity: 0.7; animation: quiz-shake 400ms; }
-.quiz-retry { color: #b42318; font-weight: 600; }
+.quiz-option.right { border-color: #6fbf73; background: #eaf6ea; }
+.quiz-option.ruled-out { opacity: 0.4; text-decoration: line-through; cursor: not-allowed; }
+.quiz-hint { margin: 8px 0; padding: 4px 12px; border-radius: 999px; border: 1px dashed #e8c766; background: transparent; font: inherit; font-size: 0.85rem; color: inherit; cursor: pointer; }
+.quiz-hint:hover:not(:disabled) { background: #fff3cd; }
+.quiz-hint:disabled { opacity: 0.5; cursor: default; }
+.quiz-retry { color: #b42318; font-weight: 600; margin-bottom: 4px; }
+.quiz-explain { margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--border); background: var(--surface); }
 @keyframes quiz-shake { 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
 
 /* Card unlocked */

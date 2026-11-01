@@ -66,6 +66,7 @@ class Content:
         self.archetypes = cards_doc["archetypes"]
         self.archetype_metrics = {k: v for k, v in cards_doc["archetype_metrics"].items() if not k.startswith("_")}
         self.award_categories = _load_json('award_categories.json')['categories']
+        self.trivia = _load_json("trivia.json")
         rewards_doc = _load_json("rewards.json")
         self.card_points = rewards_doc["card_points"]
         self.stadium_multiplier = rewards_doc["stadium_multiplier"]
@@ -876,8 +877,9 @@ class Content:
         """Multiple choice question: the card's player plus two other players, shuffled. option_ids are card ids.
         For a card from a game the other options are players of that game in the same role (goalkeeper or skater):
         at most one with another special card of the game (so the questions of one game don't all list the same
-        names), the rest from the base cards of both teams. Special cards ask 'who was the <archetype>?', base cards
-        'who is this player?' with a profile clue."""
+        names), the rest from the base cards of both teams. Special cards describe the playstyle in plain words (see
+        trivia.json), base cards ask 'who is this player?'. The hint button shows 'hint' and strikes out 'eliminate',
+        one of the wrong options."""
         card = self.cards[card_id]
         player_of = lambda cid: (self.cards[cid]["player"]["team"], self.cards[cid]["player"]["jersey"])
         player = player_of(card_id)
@@ -904,15 +906,36 @@ class Content:
         rng.shuffle(option_ids)
         m = card["match"]
         if card["type"] == "base":
-            prompt, clue = "Who is this player?", self._profile_clue(card)
+            prompt, hint = "Who is this player?", self._profile_clue(card)
         else:
-            prompt, clue = f'Who was the "{card["title"]}" in this game?', card["archetype"] or self.archetypes[card["title"]]
+            wording = self.trivia["titles"].get(card["title"])
+            prompt = wording["prompt"] if wording else f'Who was the "{card["title"]}" in this game?'
+            hint = wording["hint"] if wording else card["archetype"] or self.archetypes[card["title"]]
         return {
             "option_ids": option_ids,
             "prompt": prompt,
-            "clue": clue,
+            "hint": hint,
+            "eliminate": rng.choice(others) if others else None,
             "match": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}' if m else None,
         }
+
+    def explain_answer(self, card_id: str) -> str:
+        """Why the card's player is the right answer, shown after a wrong one: the playstyle the card stands for and
+        the player's numbers from the game (zeros left out, they would only confuse)."""
+        card = self.cards[card_id]
+        if card["type"] == "base":
+            return self._profile_clue(card)
+        wording = self.trivia["titles"].get(card["title"])
+        why = wording["why"] if wording else card["archetype"] or self.archetypes[card["title"]]
+        phrases = self.trivia["stat_phrases"]
+        stats = []
+        for attr in card.get("archetype_kpis") or card.get("attributes") or []:
+            shown = attr.get("display_value")
+            if attr.get("metric_id") not in phrases or shown in (None, "–") or not _to_number(shown.replace(":", "")):
+                continue
+            singular, plural = phrases[attr["metric_id"]]
+            stats.append((singular if shown == "1" else plural).format(shown))
+        return f'{why} In this game: {", ".join(stats)}.' if stats else why
 
     @staticmethod
     def _profile_clue(card: dict) -> str:

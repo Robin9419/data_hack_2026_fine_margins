@@ -131,10 +131,6 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
     return (
       <div className={`card-face mystery ${state}`}>
         <span className="mystery-mark">?</span>
-        <div className="card-info">
-          <p className="card-archetype">? ? ?</p>
-          <p className="card-name">Mystery player</p>
-        </div>
       </div>
     )
   }

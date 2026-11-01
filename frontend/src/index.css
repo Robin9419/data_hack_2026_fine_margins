@@ -837,7 +837,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 }
 
 /* Duplicates: copy count on base cards */
-.copies-tag { position: absolute; top: 10px; right: 10px; z-index: 3; min-width: 28px; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; text-align: center; color: #0d1b2a; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
+.copies-tag { position: absolute; top: 15px; left: 10px; z-index: 3; min-width: 28px; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; text-align: center; color: #0d1b2a; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
 .trade-cta { background: linear-gradient(90deg, #6b3fa0, #13284f); }
 
 /* Pack opening: a special card gets a rainbow glow instead of gold */

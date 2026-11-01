@@ -223,7 +223,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
         <div className="card-corner">
           {team.logo && (
             <span className="card-logo">
-              <img src={team.logo} alt={team.name} />
+              <img src={team.logo} alt={team.name} style={team.logoScale ? { transform: `scale(${team.logoScale})` } : undefined} />
             </span>
           )}
           {pos && <span className="card-pos">{pos}</span>}
@@ -406,7 +406,7 @@ function LegendFace({ card, locked }) {
         <div className="card-corner">
           {team.logo && (
             <span className="card-logo">
-              <img src={team.logo} alt={team.name} />
+              <img src={team.logo} alt={team.name} style={team.logoScale ? { transform: `scale(${team.logoScale})` } : undefined} />
             </span>
           )}
           {pos && <span className="card-pos">{pos}</span>}

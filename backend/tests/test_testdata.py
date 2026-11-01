@@ -18,6 +18,14 @@ class TestDataTests(unittest.TestCase):
         self.assertEqual((final["home_score"], final["away_score"], final["has_wisehockey"]), (3, 6, True))
         self.assertEqual(games["2025-12-26_hc-fribourg-gotteron_hc-sparta-praha"]["home_score"], 5)
 
+    def test_every_goal_has_a_highlight_clip(self):
+        for game in self.testdata.games:
+            video = self.testdata.highlights[game["id"]]
+            self.assertEqual(len(video["clips"]), len(game["goals"]), game["id"])
+            starts = [c["start"] for c in video["clips"]]
+            self.assertEqual(starts, sorted(starts), game["id"])  # the highlights show the goals in game order
+            self.assertTrue(all(0 <= c["start"] < c["end"] <= video["duration"] for c in video["clips"]), game["id"])
+
     def test_three_awards_per_team_and_game_spread_evenly(self):
         awards = [c for c in self.testdata.cards.values() if c["special_type"] != "motm"]
         per_team_game = {}

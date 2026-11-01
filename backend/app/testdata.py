@@ -14,6 +14,7 @@ from pathlib import Path
 from .ratings import tier_of
 
 TESTDATA_FILE = Path(__file__).resolve().parents[1] / "content" / "testdata.json"
+HIGHLIGHTS_FILE = Path(__file__).resolve().parents[1] / "content" / "game_highlights.json"  # official video per game
 SOURCE = "Official game statistics, spenglercup.ch (test data)"
 # The official statistics have no expected goals, so Brick Wall counts all saves here.
 TEST_RULES = {"wall": "The goalkeeper who made the most saves in the game, even if his team lost."}
@@ -111,7 +112,32 @@ class TestData:
         self._archetypes = archetypes
         self.cards: dict[str, dict] = {}
         self.game_cards: dict[str, list[str]] = {g["id"]: [] for g in self.games}
+        self.highlights = {h["game_id"]: h for h in json.loads(HIGHLIGHTS_FILE.read_text(encoding="utf-8"))["games"]}
+        self._broadcasts = self._load_broadcasts()
         self._build()
+
+    def _load_broadcasts(self) -> dict[tuple[str, int], dict]:
+        """(game id, goal index) -> the stretch of the game's highlight video showing that goal. Fails fast if a clip
+        names a game or a score that is not in the test data."""
+        broadcasts = {}
+        for game_id, video in self.highlights.items():
+            if game_id not in self.by_id:
+                raise ValueError(f"Highlights for an unknown game: {game_id}")
+            scores = [f'{g["home_score"]}-{g["away_score"]}' for g in self.by_id[game_id]["goals"]]
+            for clip in video["clips"]:
+                if clip["score"] not in scores:
+                    raise ValueError(f'Clip in {game_id} points to no goal: {clip["score"]}')
+                broadcasts[(game_id, scores.index(clip["score"]))] = {
+                    "video_id": f"highlights-{game_id}", "youtube_id": video["youtube_id"],
+                    "start": clip["start"], "end": clip["end"]}
+        return broadcasts
+
+    def highlight_sources(self, game_ids) -> list[dict]:
+        """The highlight videos of the given games, for the source line under a clip (VideoSlot)."""
+        return [{"id": f"highlights-{gid}", "youtube_id": h["youtube_id"], "title": h["title"], "channel": h["channel"],
+                 "url": h["url"], "permission": f'Official highlights, embedded with the YouTube player from the '
+                                                f'{h["channel"]} channel. Not downloaded or re-edited.'}
+                for gid in dict.fromkeys(game_ids) if (h := self.highlights.get(gid))]
 
     def action_of(self, key: tuple[str, int]) -> dict:
         media = self._action_media.get(key, {})
@@ -250,7 +276,8 @@ class TestData:
             else:
                 continue
             moments.append(self._moment(game, f"goal-{i}", kind, title, goal["clock"], text,
-                                        [f'{goal["home_score"]}–{goal["away_score"]}', STRENGTH.get(goal["strength"] or "")]))
+                                        [f'{goal["home_score"]}–{goal["away_score"]}', STRENGTH.get(goal["strength"] or "")],
+                                        self._broadcasts.get((game["id"], i))))
         for i, pen in enumerate(game["penalties"]):
             if pen["player"] and (pen["team"], pen["player"]["jersey"]) == key:
                 moments.append(self._moment(game, f"pen-{i}", "penalty", "Penalty", pen["clock"],
@@ -258,15 +285,16 @@ class TestData:
         return sorted(moments, key=lambda m: m["game_seconds"])
 
     @staticmethod
-    def _moment(game: dict, suffix: str, kind: str, title: str, clock: str, text: str, facts: list) -> dict:
+    def _moment(game: dict, suffix: str, kind: str, title: str, clock: str, text: str, facts: list,
+                broadcast: dict | None = None) -> dict:
         seconds = _seconds(clock)
         period = min(seconds // 1200 + 1, 3)
         in_period = seconds - (period - 1) * 1200
         return {
-            "id": f"{game['id']}-{suffix}", "timestamp": str(seconds), "game_seconds": seconds, "kind": kind,
+            "id": f"{game['id']}-{suffix}", "game_id": game["id"], "timestamp": str(seconds), "game_seconds": seconds, "kind": kind,
             "period": period, "period_label": f"{ORDINALS[period]} period",
             "clock": f"{in_period // 60}:{in_period % 60:02d}", "game_time": clock, "title": title, "text": text,
-            "facts": [f for f in facts if f], "shot_speed": None, "xg": None, "clip": None, "broadcast": None,
+            "facts": [f for f in facts if f], "shot_speed": None, "xg": None, "clip": None, "broadcast": broadcast,
         }
 
     def _attribute(self, game: dict, metric_id: str, player: dict, moments: list[dict]) -> dict:
@@ -315,7 +343,7 @@ class TestData:
                 "opponent": opponent,
             },
             "attributes": [self._attribute(game, m, player, moments) for m in spec["attributes"]],
-            "explanation": explanation, "achievement": None, "video": None, "video_sources": [],
+            "explanation": explanation, "achievement": None, "video": None, "video_sources": self.highlight_sources([game["id"]]),
             "moments": moments, "edition": "standard", "source": SOURCE,
         }
 
@@ -347,6 +375,6 @@ class TestData:
             "attributes": [self._attribute(game, m, player, moments) for m in attributes],
             "explanation": f"{title} for {_name(player)}. There is no tracking data for this game, so the award and "
                            "its winner are picked for the demo.",
-            "achievement": None, "video": None, "video_sources": [],
+            "achievement": None, "video": None, "video_sources": self.highlight_sources([game["id"]]),
             "moments": moments, "edition": "standard", "source": SOURCE,
         }

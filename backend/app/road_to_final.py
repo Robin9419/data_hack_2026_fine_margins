@@ -154,7 +154,8 @@ class RoadToFinal:
             ],
             "explanation": (f'Stage {stage}, {info["name"]}: {n} {"game" if n == 1 else "games"} played, '
                             f'{f"average match rating {average}" if n else "no match rating yet"}. {info["trigger"]}'),
-            "achievement": None, "video": self._highlight(key), "video_sources": self._highlight_sources(key),
+            "achievement": None, "video": self._highlight(key),
+            "video_sources": self._highlight_sources(key) + self._td.highlight_sources(g["id"] for g, _ in played),
             "moments": moments, "edition": "standard",
             "source": SOURCE,
             "road": {

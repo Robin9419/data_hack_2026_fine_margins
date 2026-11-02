@@ -703,6 +703,9 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
   mask: linear-gradient(180deg, #000 70%, transparent);
 }
 
+/* Label under the roof emblem; the title attribute is the tooltip. */
+.arena-mark { position: absolute; left: 50%; top: 22.5cqw; z-index: 4; transform: translateX(-50%); padding: 0.4cqw 2.4cqw; border-radius: 999px; font: 800 max(6px, 2.8cqw) / 1.3 var(--display); letter-spacing: 0.2em; text-transform: uppercase; color: #ffe3b0; background: rgba(32, 13, 3, 0.72); box-shadow: 0 0 0 1px rgba(255, 211, 107, 0.6); cursor: help; }
+
 /* Timber trim along the bottom edge: marks the Stadium edition next to the rarity. Drawn on the card outline, the mask clips the outer half. */
 .arena-sill {
   position: absolute;

@@ -1,0 +1,166 @@
+{
+  "_comment": "Stats of the Road to Final stars (Ones to Watch) before the 2025 Spengler Cup, keyed by team and jersey as in the stats CSV. Only competitions played from January 2024 up to the tournament (26 Dec 2025): the 2023-24 playoffs and spring 2024 tournaments, 2024-25, and 2025-26 'Season to date' summed from per-game logs or a source dated before the tournament (never the full 2025-26 season, which runs past it). A tournament's season is its year. Every number was read on the page in source_url (Elite Prospects blocked automated access, so hockeydb, collegehockeyinc, the official liiga.fi and data.sihf.ch feeds, club releases and Wikipedia were used). The backend refuses to start if goals and assists do not add up or a line falls outside that window. 'headline': the line the card back shows (else the latest league season). Researched Nov 2026.",
+  "players": [
+    {
+      "name": "Marcus Sörensen", "team": "HC Fribourg-Gottéron", "jersey": 9,
+      "summary": "One of Fribourg's top scorers: 43 points (22 goals) in 45 National League games in 2024-25, then 14 points in 14 playoff games. He had 6 assists in 4 games when Fribourg won the 2024 Spengler Cup, so he comes back as the defending champion.",
+      "seasons": [
+        {"season": "2024", "competition": "IIHF World Championship", "short": "WC", "club": "Sweden", "phase": "Tournament", "through": null, "gp": 8, "goals": 0, "assists": 0, "points": 0, "plus_minus": null, "pim": 2, "source_url": "https://en.wikipedia.org/wiki/Marcus_S%C3%B6rensen"},
+        {"season": "2024-25", "competition": "National League", "short": "NL", "club": "HC Fribourg-Gottéron", "phase": "Regular season", "through": null, "gp": 45, "goals": 22, "assists": 21, "points": 43, "plus_minus": -8, "pim": 24, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=127792", "headline": true},
+        {"season": "2024", "competition": "Spengler Cup", "short": "Spengler Cup", "club": "HC Fribourg-Gottéron", "phase": "Tournament", "through": null, "gp": 4, "goals": 0, "assists": 6, "points": 6, "plus_minus": null, "pim": null, "source_url": "https://en.wikipedia.org/wiki/2024_Spengler_Cup"},
+        {"season": "2024-25", "competition": "National League", "short": "NL", "club": "HC Fribourg-Gottéron", "phase": "Playoffs", "through": null, "gp": 14, "goals": 5, "assists": 9, "points": 14, "plus_minus": null, "pim": 0, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=127792"}
+      ],
+      "facts": [
+        {"text": "Won the 2024 Spengler Cup with Fribourg-Gottéron, the club's first title (7–2 over Straubing in the final)", "source_url": "https://en.wikipedia.org/wiki/2024_Spengler_Cup"},
+        {"text": "Tied for third in 2024 Spengler Cup scoring with 6 points (all assists) in 4 games", "source_url": "https://en.wikipedia.org/wiki/2024_Spengler_Cup"},
+        {"text": "World Championship bronze with Sweden in 2024", "source_url": "https://en.wikipedia.org/wiki/Marcus_S%C3%B6rensen"}
+      ]
+    },
+    {
+      "name": "Attilio Biasca", "team": "HC Fribourg-Gottéron", "jersey": 17,
+      "summary": "A young Swiss national-team forward who joined Fribourg from EV Zug for 2025-26 on a three-year deal, after 10 points (5 goals) in 42 National League games for Zug in 2024-25.",
+      "seasons": [
+        {"season": "2024-25", "competition": "National League", "short": "NL", "club": "EV Zug", "phase": "Regular season", "through": null, "gp": 42, "goals": 5, "assists": 5, "points": 10, "plus_minus": -8, "pim": 6, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=236662"},
+        {"season": "2024-25", "competition": "National League", "short": "NL", "club": "EV Zug", "phase": "Playoffs", "through": null, "gp": 4, "goals": 0, "assists": 0, "points": 0, "plus_minus": null, "pim": 0, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=236662"}
+      ],
+      "facts": [
+        {"text": "Signed a three-year contract with Fribourg-Gottéron, moving from EV Zug (announced November 2024)", "source_url": "https://www.bluewin.ch/en/sport/gotteron-brings-in-two-young-players-from-zug-2456974.html"},
+        {"text": "Six games for the Swiss national team by age 21", "source_url": "https://www.bluewin.ch/en/sport/gotteron-brings-in-two-young-players-from-zug-2456974.html"}
+      ]
+    },
+    {
+      "name": "Filip Chlapík", "team": "HC Sparta Praha", "jersey": 14,
+      "summary": "Sparta's captain and a former Ottawa Senators forward: 48 points (15 goals, 33 assists) in 49 Extraliga games in 2024-25 with a +25 rating, plus 11 points in 12 playoff games.",
+      "seasons": [
+        {"season": "2024-25", "competition": "Czech Extraliga", "short": "Extraliga", "club": "HC Sparta Praha", "phase": "Regular season", "through": null, "gp": 49, "goals": 15, "assists": 33, "points": 48, "plus_minus": 25, "pim": 36, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=176723"},
+        {"season": "2024-25", "competition": "Czech Extraliga", "short": "Extraliga", "club": "HC Sparta Praha", "phase": "Playoffs", "through": null, "gp": 12, "goals": 4, "assists": 7, "points": 11, "plus_minus": null, "pim": 10, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=176723"}
+      ],
+      "facts": [
+        {"text": "Captain of HC Sparta Praha in 2025-26", "source_url": "https://www.ceskenoviny.cz/index_view.php?id=2805663"}
+      ]
+    },
+    {
+      "name": "Pavel Kousal", "team": "HC Sparta Praha", "jersey": 23,
+      "summary": "A reliable Sparta forward with 26 points (10 goals, 16 assists) in 43 Extraliga games in 2024-25, who already played the 2024 Spengler Cup with HC Dynamo Pardubice.",
+      "seasons": [
+        {"season": "2024-25", "competition": "Czech Extraliga", "short": "Extraliga", "club": "HC Sparta Praha", "phase": "Regular season", "through": null, "gp": 43, "goals": 10, "assists": 16, "points": 26, "plus_minus": 4, "pim": 12, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=196300"},
+        {"season": "2024-25", "competition": "Czech Extraliga", "short": "Extraliga", "club": "HC Sparta Praha", "phase": "Playoffs", "through": null, "gp": 11, "goals": 1, "assists": 2, "points": 3, "plus_minus": null, "pim": 2, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=196300"}
+      ],
+      "facts": [
+        {"text": "Played the 2024 Spengler Cup with HC Dynamo Pardubice", "source_url": "https://en.wikipedia.org/wiki/2024_Spengler_Cup"}
+      ]
+    },
+    {
+      "name": "Nikolas Brouillard", "team": "Team Canada", "jersey": 15,
+      "summary": "A puck-moving AHL veteran with 38 points (7 goals, 31 assists) in 69 games for Coachella Valley in 2024-25. In December 2025 he became the first defenceman in San Diego Gulls history to reach 100 points for the club.",
+      "seasons": [
+        {"season": "2024-25", "competition": "American Hockey League", "short": "AHL", "club": "Coachella Valley Firebirds", "phase": "Regular season", "through": null, "gp": 69, "goals": 7, "assists": 31, "points": 38, "plus_minus": 3, "pim": 55, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=143813", "headline": true},
+        {"season": "2024-25", "competition": "American Hockey League", "short": "AHL", "club": "Coachella Valley Firebirds", "phase": "Playoffs", "through": null, "gp": 6, "goals": 0, "assists": 1, "points": 1, "plus_minus": null, "pim": 6, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=143813"},
+        {"season": "2025-26", "competition": "American Hockey League", "short": "AHL", "club": "San Diego Gulls", "phase": "Season to date", "through": "2025-12-21", "gp": 26, "goals": 1, "assists": 8, "points": 9, "plus_minus": 3, "pim": 16, "source_url": "https://www.oursportscentral.com/services/releases/nikolas-brouillard-selected-to-team-canadas-spengler-cup-roster/n-6311296"}
+      ],
+      "facts": [
+        {"text": "First Gulls defenceman to reach 100 points for the club (12 Dec 2025), their all-time leader among defencemen in points and assists", "source_url": "https://www.oursportscentral.com/services/releases/nikolas-brouillard-selected-to-team-canadas-spengler-cup-roster/n-6311296"},
+        {"text": "First Gulls defenceman picked for Team Canada at the Spengler Cup", "source_url": "https://www.oursportscentral.com/services/releases/nikolas-brouillard-selected-to-team-canadas-spengler-cup-roster/n-6311296"}
+      ]
+    },
+    {
+      "name": "Joe Hicketts", "team": "Team Canada", "jersey": 5,
+      "summary": "Captain of the AHL's Ontario Reign since October 2024, with 27 points in 62 games in 2024-25 and 12 points in 27 games before the Spengler Cup break. Hockey Canada made him Team Canada's captain for the tournament.",
+      "seasons": [
+        {"season": "2023-24", "competition": "American Hockey League", "short": "AHL", "club": "Ontario Reign", "phase": "Playoffs", "through": null, "gp": 8, "goals": 1, "assists": 5, "points": 6, "plus_minus": null, "pim": 4, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=146172"},
+        {"season": "2024-25", "competition": "American Hockey League", "short": "AHL", "club": "Ontario Reign", "phase": "Regular season", "through": null, "gp": 62, "goals": 3, "assists": 24, "points": 27, "plus_minus": 8, "pim": 47, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=146172", "headline": true},
+        {"season": "2024-25", "competition": "American Hockey League", "short": "AHL", "club": "Ontario Reign", "phase": "Playoffs", "through": null, "gp": 2, "goals": 0, "assists": 0, "points": 0, "plus_minus": null, "pim": 2, "source_url": "https://www.hockeydb.com/ihdb/stats/pdisplay.php?pid=146172"},
+        {"season": "2025-26", "competition": "American Hockey League", "short": "AHL", "club": "Ontario Reign", "phase": "Season to date", "through": "2025-12-21", "gp": 27, "goals": 3, "assists": 9, "points": 12, "plus_minus": null, "pim": 25, "source_url": "https://cdn.hockeycanada.ca/hockey-canada/Team-Canada/Men/National/2025-26/downloads/2025-nmt-can-spengler-cup-media-guide.pdf"}
+      ],
+      "facts": [
+        {"text": "Team Canada captain at the 2025 Spengler Cup", "source_url": "https://theahl.com/?p=95563"},
+        {"text": "Named the fourth captain in Ontario Reign history (October 2024)", "source_url": "https://lakingsinsider.com/2024/10/11/reign-preview-10-12-ontario-vs-san-jose/"},
+        {"text": "Signed a two-year contract extension with the LA Kings in March 2025", "source_url": "https://en.wikipedia.org/wiki/Joe_Hicketts"}
+      ]
+    },
+    {
+      "name": "Aiden Fink", "team": "U.S. Collegiate Selects", "jersey": 18,
+      "summary": "A Nashville Predators prospect who set Penn State's single-season scoring record in 2024-25 with 53 points (23 goals, 30 assists) and was the program's first Hobey Baker top-10 finalist. He came to Davos after missing November and December 2025 with an injury.",
+      "seasons": [
+        {"season": "2024-25", "competition": "NCAA Big Ten", "short": "NCAA", "club": "Penn State Nittany Lions", "phase": "Regular season", "through": null, "gp": 40, "goals": 23, "assists": 30, "points": 53, "plus_minus": 15, "pim": 12, "source_url": "https://collegehockeyinc.com/players/career/57132", "headline": true},
+        {"season": "2025-26", "competition": "NCAA Big Ten", "short": "NCAA", "club": "Penn State Nittany Lions", "phase": "Season to date", "through": "2025-10-30", "gp": 9, "goals": 2, "assists": 7, "points": 9, "plus_minus": -3, "pim": 6, "source_url": "https://collegehockeyinc.com/players/career/57132"}
+      ],
+      "facts": [
+        {"text": "Hobey Baker Award top-10 finalist in 2025, the first Penn State player to get there", "source_url": "https://gopsusports.com/news/2025/4/11/aiden-fink-named-ccmahca-second-team-all-american"},
+        {"text": "Led the Big Ten in points (53) and assists (30) in 2024-25: Second-Team All-American and First-Team All-Big Ten", "source_url": "https://gopsusports.com/news/2025/4/11/aiden-fink-named-ccmahca-second-team-all-american"},
+        {"text": "Out injured from 30 October 2025 until the Spengler Cup", "source_url": "https://nittanysportsnow.com/2025/11/penn-state-hockey-forward-aiden-fink-out-for-foreseeable-future/"}
+      ]
+    },
+    {
+      "name": "Eric Pohlkamp", "team": "U.S. Collegiate Selects", "jersey": 23,
+      "summary": "A San Jose Sharks prospect on Denver's blue line, All-NCHC Third Team in 2024-25 with 35 points in 44 games. Going into the Spengler Cup the defenceman had scored 12 goals in 19 games of 2025-26.",
+      "seasons": [
+        {"season": "2024-25", "competition": "NCAA NCHC", "short": "NCAA", "club": "Denver Pioneers", "phase": "Regular season", "through": null, "gp": 44, "goals": 11, "assists": 24, "points": 35, "plus_minus": 31, "pim": 22, "source_url": "https://collegehockeyinc.com/players/career/58993"},
+        {"season": "2025-26", "competition": "NCAA NCHC", "short": "NCAA", "club": "Denver Pioneers", "phase": "Season to date", "through": "2025-12-13", "gp": 19, "goals": 12, "assists": 8, "points": 20, "plus_minus": 19, "pim": 19, "source_url": "https://collegehockeyinc.com/players/career/58993"}
+      ],
+      "facts": [
+        {"text": "All-NCHC Third Team in 2024-25", "source_url": "https://en.wikipedia.org/wiki/Eric_Pohlkamp"},
+        {"text": "NCHC Preseason All-Conference Team (September 2025)", "source_url": "https://denverpioneers.com/news/2025/9/17/du-pioneers-hockey-sam-harris-eric-pohlkamp-named-to-nchc-preseason-all-conference-team.aspx"}
+      ]
+    },
+    {
+      "name": "Oliver Larsen", "team": "HIFK", "jersey": 98,
+      "summary": "A Danish national-team defenceman who played every game for Denmark at the 2024 World Championship, with 23 Liiga points (3 goals, 20 assists) in 50 games in 2024-25 for KalPa and HIFK.",
+      "seasons": [
+        {"season": "2024", "competition": "IIHF World Championship", "short": "WC", "club": "Denmark", "phase": "Tournament", "through": null, "gp": 7, "goals": 0, "assists": 0, "points": 0, "plus_minus": null, "pim": 2, "source_url": "https://en.wikipedia.org/wiki/Oliver_Larsen"},
+        {"season": "2024-25", "competition": "Liiga", "short": "Liiga", "club": "KalPa", "phase": "Regular season", "through": null, "gp": 33, "goals": 2, "assists": 14, "points": 16, "plus_minus": 6, "pim": 14, "source_url": "https://liiga.fi/api/v2/players/info/60578087"},
+        {"season": "2024-25", "competition": "Liiga", "short": "Liiga", "club": "HIFK", "phase": "Regular season", "through": null, "gp": 17, "goals": 1, "assists": 6, "points": 7, "plus_minus": 3, "pim": 0, "source_url": "https://liiga.fi/api/v2/players/info/60578087"},
+        {"season": "2024-25", "competition": "Liiga", "short": "Liiga", "club": "HIFK", "phase": "Playoffs", "through": null, "gp": 4, "goals": 0, "assists": 0, "points": 0, "plus_minus": -1, "pim": 0, "source_url": "https://liiga.fi/api/v2/players/info/60578087"},
+        {"season": "2025-26", "competition": "Liiga", "short": "Liiga", "club": "HIFK", "phase": "Season to date", "through": "2025-12-20", "gp": 31, "goals": 1, "assists": 4, "points": 5, "plus_minus": -13, "pim": 6, "source_url": "https://liiga.fi/api/v2/games?tournament=runkosarja&season=2026"}
+      ],
+      "facts": [
+        {"text": "Played every game for Denmark at the 2024 World Championship", "source_url": "https://en.wikipedia.org/wiki/Oliver_Larsen"},
+        {"text": "Moved from KalPa to HIFK during the 2024-25 Liiga season", "source_url": "https://liiga.fi/api/v2/players/info/60578087"}
+      ]
+    },
+    {
+      "name": "Petrus Palmu", "team": "HIFK", "jersey": 52,
+      "summary": "A playmaking forward with 25 points (7 goals, 18 assists) in 40 Liiga games in 2024-25 for TPS and HIFK, and 16 points (4 goals, 12 assists) in 31 games before the Spengler Cup break.",
+      "seasons": [
+        {"season": "2024-25", "competition": "Liiga", "short": "Liiga", "club": "TPS", "phase": "Regular season", "through": null, "gp": 22, "goals": 3, "assists": 8, "points": 11, "plus_minus": -5, "pim": 8, "source_url": "https://liiga.fi/api/v2/players/info/27900714"},
+        {"season": "2024-25", "competition": "Liiga", "short": "Liiga", "club": "HIFK", "phase": "Regular season", "through": null, "gp": 18, "goals": 4, "assists": 10, "points": 14, "plus_minus": 7, "pim": 4, "source_url": "https://liiga.fi/api/v2/players/info/27900714"},
+        {"season": "2024-25", "competition": "Liiga", "short": "Liiga", "club": "HIFK", "phase": "Playoffs", "through": null, "gp": 4, "goals": 1, "assists": 0, "points": 1, "plus_minus": -5, "pim": 2, "source_url": "https://liiga.fi/api/v2/players/info/27900714"},
+        {"season": "2025-26", "competition": "Liiga", "short": "Liiga", "club": "HIFK", "phase": "Season to date", "through": "2025-12-20", "gp": 31, "goals": 4, "assists": 12, "points": 16, "plus_minus": -9, "pim": 16, "source_url": "https://liiga.fi/api/v2/games?tournament=runkosarja&season=2026"}
+      ],
+      "facts": [
+        {"text": "14 points in 18 games after joining HIFK from TPS during the 2024-25 season", "source_url": "https://liiga.fi/api/v2/players/info/27900714"}
+      ]
+    },
+    {
+      "name": "Matej Stránský", "team": "HC Davos", "jersey": 44,
+      "summary": "Davos captain and a 2024 world champion with Czechia. He scored 24 National League goals in 2024-25, third in the league, and led Davos into the Spengler Cup with 35 points (19 goals, 16 assists) in 34 games.",
+      "seasons": [
+        {"season": "2024", "competition": "IIHF World Championship", "short": "WC", "club": "Czechia", "phase": "Tournament", "through": null, "gp": 10, "goals": 3, "assists": 1, "points": 4, "plus_minus": null, "pim": 6, "source_url": "https://en.wikipedia.org/wiki/Mat%C4%9Bj_Str%C3%A1nsk%C3%BD"},
+        {"season": "2024-25", "competition": "National League", "short": "NL", "club": "HC Davos", "phase": "Regular season", "through": null, "gp": 51, "goals": 24, "assists": 15, "points": 39, "plus_minus": 24, "pim": 30, "source_url": "https://data.sihf.ch/Statistic/api/cms/cache300?alias=player&searchQuery=1//1&filterQuery=2025/4595&orderBy=points&orderByDescending=true&take=500&filterBy=Season,Phase&skip=0&language=en"},
+        {"season": "2024-25", "competition": "National League", "short": "NL", "club": "HC Davos", "phase": "Playoffs", "through": null, "gp": 10, "goals": 3, "assists": 7, "points": 10, "plus_minus": 7, "pim": 2, "source_url": "https://data.sihf.ch/Statistic/api/cms/cache300?alias=player&searchQuery=1//1&filterQuery=2025/4886&orderBy=points&orderByDescending=true&take=500&filterBy=Season,Phase&skip=0&language=en"},
+        {"season": "2025", "competition": "IIHF World Championship", "short": "WC", "club": "Czechia", "phase": "Tournament", "through": null, "gp": 8, "goals": 3, "assists": 0, "points": 3, "plus_minus": null, "pim": 4, "source_url": "https://en.wikipedia.org/wiki/Mat%C4%9Bj_Str%C3%A1nsk%C3%BD"},
+        {"season": "2025-26", "competition": "National League", "short": "NL", "club": "HC Davos", "phase": "Season to date", "through": "2025-12-23", "gp": 34, "goals": 19, "assists": 16, "points": 35, "plus_minus": 19, "pim": 64, "source_url": "https://data.sihf.ch/Statistic/api/cms/cache300?alias=results&searchQuery=1/2026/&filterQuery=2026/1/4940&orderBy=date&orderByDescending=false&take=400&filterBy=Season,League,Phase&skip=0&language=en"}
+      ],
+      "facts": [
+        {"text": "World champion with Czechia in 2024", "source_url": "https://en.wikipedia.org/wiki/Mat%C4%9Bj_Str%C3%A1nsk%C3%BD"},
+        {"text": "HC Davos captain from the start of 2025-26", "source_url": "https://www.bluewin.ch/en/sport/davos-confirms-stranskys-departure-at-the-end-of-the-season-3140639.html"},
+        {"text": "Third in National League goals in the 2024-25 regular season (24), the most on Davos", "source_url": "https://data.sihf.ch/Statistic/api/cms/cache300?alias=player&searchQuery=1//1&filterQuery=2025/4595&orderBy=points&orderByDescending=true&take=500&filterBy=Season,Phase&skip=0&language=en"}
+      ]
+    },
+    {
+      "name": "Filip Zadina", "team": "HC Davos", "jersey": 18,
+      "summary": "He left the NHL (San Jose) for Davos in September 2024 and scored 21 goals in 43 National League games, then 6 in 10 playoff games. Before the Spengler Cup he had 17 goals and 29 points in 30 games.",
+      "seasons": [
+        {"season": "2024-25", "competition": "National League", "short": "NL", "club": "HC Davos", "phase": "Regular season", "through": null, "gp": 43, "goals": 21, "assists": 13, "points": 34, "plus_minus": 13, "pim": 66, "source_url": "https://data.sihf.ch/Statistic/api/cms/cache300?alias=player&searchQuery=1//1&filterQuery=2025/4595&orderBy=points&orderByDescending=true&take=500&filterBy=Season,Phase&skip=0&language=en"},
+        {"season": "2024-25", "competition": "National League", "short": "NL", "club": "HC Davos", "phase": "Playoffs", "through": null, "gp": 10, "goals": 6, "assists": 3, "points": 9, "plus_minus": 1, "pim": 10, "source_url": "https://data.sihf.ch/Statistic/api/cms/cache300?alias=player&searchQuery=1//1&filterQuery=2025/4886&orderBy=points&orderByDescending=true&take=500&filterBy=Season,Phase&skip=0&language=en"},
+        {"season": "2025", "competition": "IIHF World Championship", "short": "WC", "club": "Czechia", "phase": "Tournament", "through": null, "gp": 7, "goals": 1, "assists": 3, "points": 4, "plus_minus": null, "pim": 0, "source_url": "https://en.wikipedia.org/wiki/Filip_Zadina"},
+        {"season": "2025-26", "competition": "National League", "short": "NL", "club": "HC Davos", "phase": "Season to date", "through": "2025-12-20", "gp": 30, "goals": 17, "assists": 12, "points": 29, "plus_minus": 13, "pim": 41, "source_url": "https://data.sihf.ch/Statistic/api/cms/cache300?alias=results&searchQuery=1/2026/&filterQuery=2026/1/4940&orderBy=date&orderByDescending=false&take=400&filterBy=Season,League,Phase&skip=0&language=en"}
+      ],
+      "facts": [
+        {"text": "Signed with HC Davos in September 2024 after the 2023-24 NHL season with San Jose", "source_url": "https://en.wikipedia.org/wiki/Filip_Zadina"},
+        {"text": "Signed an early two-year extension with Davos in July 2025, through 2027-28", "source_url": "https://en.wikipedia.org/wiki/Filip_Zadina"},
+        {"text": "Played for Czechia at the 2025 World Championship", "source_url": "https://en.wikipedia.org/wiki/Filip_Zadina"}
+      ]
+    }
+  ]
+}

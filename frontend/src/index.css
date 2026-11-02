@@ -718,15 +718,6 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .card-face .form-bars .b span { margin-bottom: 1px; font-size: max(8px, 4cqw); }
 .card-face .form-labels { gap: 2cqw; font-size: max(6px, 2.5cqw); }
 .card-face.road .card-info .card-archetype.chip { margin-bottom: max(3px, 1.8cqw); }
-.road-detail { background: #0b1220; color: #fff; border-radius: 12px; padding: 16px; display: grid; gap: 16px; }
-.road-detail .form-bars { height: 110px; }
-.road-stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.road-stages li { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; opacity: 0.45; }
-.road-stages li.reached { opacity: 1; }
-.road-stages .dot { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #04070f; background: #5b6b7a; }
-.road-stages li.reached .dot { background: linear-gradient(150deg, #fbe7a0, #c9a03a); }
-.road-stages strong { display: block; }
-.road-stages small { display: block; color: #b8c4d0; }
 
 /* Performance specials: darker, glitter, surname along the right edge, label along the left edge */
 .card-face.performance { --s1: #ffd76a; --s2: #fff6d1; --rar: var(--s1); --frame: linear-gradient(150deg, var(--s1), #141414 28%, var(--s2) 50%, #0b0b0b 72%, var(--s1)); }
@@ -908,7 +899,12 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .venue-choice.stadium { background: rgba(255, 211, 107, 0.1); box-shadow: inset 0 0 0 1px var(--warn-line); }
 .venue-choice.stadium:hover:not(:disabled) { box-shadow: inset 0 0 0 1px var(--gold); }
 .quiz-options { list-style: none; margin: 16px 0; padding: 0; display: grid; gap: 10px; }
-.quiz-retry { color: var(--danger); font-weight: 600; }
+.quiz-retry { color: var(--danger); font-weight: 600; margin-bottom: 4px; }
+.choice.ruled-out { opacity: 0.4; text-decoration: line-through; cursor: not-allowed; }
+.quiz-hint { margin: 8px 0; padding: 4px 12px; border-radius: 999px; border: 1px dashed var(--warn-line); background: transparent; font: inherit; font-size: 0.85rem; color: inherit; cursor: pointer; }
+.quiz-hint:hover:not(:disabled) { background: var(--warn-bg); }
+.quiz-hint:disabled { opacity: 0.5; cursor: default; }
+.quiz-explain { margin: 0 0 12px; padding: 10px 14px; border-left: 3px solid var(--line); background: var(--surface-2); }
 @keyframes quiz-shake { 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
 
 /* Card unlocked */
@@ -991,9 +987,10 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .spotlight-front { display: block; }
 .spotlight-hint { margin: 0; font-size: 0.75rem; color: #9fb3c6; }
 
-.spotlight-back { transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 24px 18px; }
-.spotlight-back.card-face { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c2) 55%, transparent), 0 18px 40px rgba(0, 0, 0, 0.5); }
-.spotlight-back::after { display: none; }
+.spotlight-back { transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 8px 18px 40px; }
+.spotlight-back.card-face { box-shadow: none; }
+/* The border follows the shield outline (an inset box-shadow would be cut off by the mask on the chamfers and curves) */
+.spotlight-back::after { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--c2) 55%, transparent); pointer-events: none; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M13 0H87L100 11V121Q100 127 92 129L56 138Q50 140 44 138L8 129Q0 127 0 121V11Z' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M13 0H87L100 11V121Q100 127 92 129L56 138Q50 140 44 138L8 129Q0 127 0 121V11Z' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
 .back-title { align-self: center; padding: 6px 18px; border-radius: 999px; background: var(--c2); color: var(--c1); font-size: 1.15rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; }
 .spotlight-back.compact { box-sizing: border-box; justify-content: flex-start; align-items: stretch; gap: 4cqw; padding: 9cqw 8cqw 22cqw; overflow: hidden; }
 .spotlight-back.compact .back-title { align-self: center; max-width: 100%; padding: 1.2cqw 5cqw; font-size: max(0.7rem, 5cqw); box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1047,7 +1044,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 }
 
 /* Duplicates: copy count on base cards */
-.copies-tag { position: absolute; top: 10px; right: 10px; z-index: 3; min-width: 28px; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; text-align: center; color: #0d1b2a; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
+.copies-tag { position: absolute; top: 15px; left: 10px; z-index: 3; min-width: 28px; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; text-align: center; color: #0d1b2a; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
 .trade-cta { background: linear-gradient(90deg, #6b3fa0, #13284f); }
 
 /* Pack opening: a special card gets a rainbow glow instead of gold */
@@ -1148,6 +1145,9 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .club-legend { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 10px; background: #0e1830; border: 1px solid var(--border); }
 .card-tile .club-legend { position: absolute; top: 50%; left: 10px; right: 10px; z-index: 3; transform: translateY(-50%); visibility: hidden; opacity: 0; transition: opacity 150ms; box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.7); }
 .card-tile.locked:hover .club-legend, .card-tile.locked:focus .club-legend { visibility: visible; opacity: 1; }
+/* How to unlock a locked reward card (collector, context): only on hover or focus. */
+.unlock-hover { position: absolute; top: 50%; left: 10px; right: 10px; z-index: 3; transform: translateY(-50%); display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 10px; background: #14202e; border: 1px solid var(--border); font-size: 0.85rem; visibility: hidden; opacity: 0; transition: opacity 150ms; box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.7); }
+.card-tile.locked:hover .unlock-hover, .card-tile.locked:focus .unlock-hover { visibility: visible; opacity: 1; }
 .club-legend-head { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9rem; }
 .club-legend-stars span { color: rgba(255, 255, 255, 0.3); font-size: 1rem; }
 .club-legend-stars span.on { color: #c9971f; text-shadow: 0 0 6px rgba(232, 196, 106, 0.7); }
@@ -1163,6 +1163,13 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .legend-figure figcaption { margin-top: 12px; font-size: 0.85rem; font-style: italic; color: var(--muted); }
 .legend-eyebrow { color: var(--gold); font-weight: 700; }
 .legend-detail h1 { font-family: Georgia, 'Times New Roman', serif; }
+.table-scroll { overflow-x: auto; margin: 8px 0 12px; }
+.pre-stats { width: 100%; border-collapse: collapse; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.pre-stats th, .pre-stats td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+.pre-stats th:nth-child(-n+3), .pre-stats td:nth-child(-n+3) { text-align: left; }
+.pre-stats th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.pre-stats small { opacity: 0.7; }
+.pre-facts { margin-bottom: 8px; }
 .legend-facts { padding-left: 1.2rem; margin: 0; }
 .legend-facts li { margin: 4px 0; }
 .legend-facts li::marker { content: '★  '; color: #c9971f; }

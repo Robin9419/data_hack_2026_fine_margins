@@ -4,7 +4,8 @@ import CardFace from './CardFace'
 // onOpen: when given, an owned card opens in place (the spotlight). Without it the tile links to the admin card page.
 // club: the club's progress (from progress.clubs). Shown on hover or focus over a locked legend.
 // full: the card's full data (from allCards); a locked card then shows as a real card under a lock.
-export default function CardTile({ card, isNew, onOpen, club, full }) {
+// base: { owned, total } base cards of the club, shown over a locked collector card.
+export default function CardTile({ card, isNew, onOpen, club, full, base }) {
   if (!card.owned && card.type === 'legend') {
     return (
       <div className="card-tile locked" tabIndex={0} aria-label={`Locked ${card.player.team} legend. Collect the club's cards to unlock it.`}>
@@ -37,9 +38,21 @@ export default function CardTile({ card, isNew, onOpen, club, full }) {
       <div
         className="card-tile locked"
         aria-label={reward ? `Locked card. ${card.unlock}.` : 'Locked card. Answer trivia questions to unlock it.'}
+        tabIndex={reward ? 0 : undefined}
       >
         <CardFace card={card} state="locked" />
         <span className="lock-chip">🔒 Locked</span>
+        {reward && (
+          <div className="unlock-hover">
+            <strong>{card.title}</strong>
+            <span>{card.unlock}</span>
+            {base && (
+              <span className="muted small">
+                {base.owned} / {base.total} base cards collected
+              </span>
+            )}
+          </div>
+        )}
       </div>
     )
   }
@@ -48,7 +61,6 @@ export default function CardTile({ card, isNew, onOpen, club, full }) {
     return (
       <button type="button" className="card-tile" onClick={() => onOpen(card)}>
         {isNew && <span className="new-tag">NEW</span>}
-        {card.test && <span className="test-tag">TEST</span>}
         {card.copies > 1 && <span className="copies-tag" title={`You have ${card.copies} copies`}>×{card.copies}</span>}
         <CardFace card={card} />
       </button>

@@ -66,13 +66,13 @@ Awarded by a fixed rule from the match data, for a performance that stands out. 
 
 ### 4. Road to Final (evolving)
 
-One card per player that grows during the tournament. Starts as a normal profile card after the first game. Each stage is unlocked by a clear event and brings a visible upgrade (frame, glitter, final stage: Champion look).
+One card per star player that grows during the tournament. Available from the start of the tournament as an "Ones to Watch" card without a rating; it becomes a normal profile card after the first game. Each stage is unlocked by a clear event and brings a visible upgrade (frame, glitter, final stage: Champion look).
 
 - Front shows MR per game as small bars instead of any KPI.
 - Rarity symbol: ★★★.
 - Needs several games. Game 1 is real data, later games are a fictional example in the mockup.
 - Stages in the app: 1 Debut (first game), 2 In Form (every further game, MR is the average, trend arrow), 3 Finalist (the team wins its semi-final: one tier up and glitter), 4 Champion (the team wins the final: dark gold look with the surname on the side). The mockup's "Hot Streak" (three games with MR 90 or more) is replaced by Finalist because the test ratings rarely reach it.
-- Status: **in app with test data** (`backend/app/road_to_final.py`). The cards of the two best skaters of each team grow with every game played on the tournament timeline; the final uses the real data. They are collected like any other card: they come from any pack (game packs and base-only packs, 10% per pack) once their team has played, and are not handed out automatically.
+- Status: **in app with test data** (`backend/app/road_to_final.py`). The cards of the two best skaters of each team grow with every game played on the tournament timeline; the final uses the real data. They are collected like any other card: they come from the special-card chance of the packs (10% of the starter, daily, social and ticket packs, and the 25% special chance of every card of a prediction pack and of a trade-in) from the start of the tournament, and are not handed out automatically. Those base-only packs can also give a special card of a played game ("impact player"), except the ones the current gameday's trivia is about until the trivia has been played.
 
 ### 5. Collector card
 

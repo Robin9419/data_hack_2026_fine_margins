@@ -4,7 +4,6 @@ import { api } from '../api'
 import { useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
 import CardTile from '../components/CardTile'
-import FormBars from '../components/FormBars'
 import InstagramLink from '../components/InstagramLink'
 import MomentList from '../components/MomentList'
 import PlayerPhoto from '../components/PlayerPhoto'
@@ -58,6 +57,9 @@ export default function CardDetail({ preview = false }) {
   const linked = (attr) => attr.moment_ids && moments.filter((m) => attr.moment_ids.includes(m.id))
   const timeline = videoOnly ? moments.filter((m) => m.clip || m.broadcast) : moments
   const filmed = moments.some((m) => m.clip)
+  // A Ones to Watch card shows the player's stats before the tournament first until he has played a game.
+  const preFirst = card.road && card.road.played === 0
+  const pre = card.pre_tournament && <PreTournament pre={card.pre_tournament} />
 
   const play = (clip, label) => {
     setPlaying({ ...clip, label, nonce: Date.now() })
@@ -68,13 +70,6 @@ export default function CardDetail({ preview = false }) {
     <section className="detail">
       <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
       {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
-
-      {card.test && (
-        <div className="banner">
-          Test data: this card comes from the official statistics of another game of the 2025 Spengler Cup. Its match
-          rating is made up and it does not count towards your progress.
-        </div>
-      )}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
@@ -101,29 +96,32 @@ export default function CardDetail({ preview = false }) {
         </div>
       </header>
 
-      <div className="match-context">
-        <div>
-          <span className="label">Match</span>
-          {scoreline(match)}
-        </div>
-        <div>
-          <span className="label">Opponent</span>
-          {match.opponent}
-        </div>
-        <div>
-          <span className="label">Date</span>
-          {formatMatchDate(match.date)}
-        </div>
-        {match.stage && (
+      {match && (
+        <div className="match-context">
           <div>
-            <span className="label">Stage</span>
-            {match.stage}
+            <span className="label">Match</span>
+            {scoreline(match)}
           </div>
-        )}
-      </div>
+          <div>
+            <span className="label">Opponent</span>
+            {match.opponent}
+          </div>
+          <div>
+            <span className="label">Date</span>
+            {formatMatchDate(match.date)}
+          </div>
+          {match.stage && (
+            <div>
+              <span className="label">Stage</span>
+              {match.stage}
+            </div>
+          )}
+        </div>
+      )}
 
-      <h2>Performance</h2>
-      {card.road && <RoadDetail road={card.road} />}
+      {preFirst && pre}
+
+      <h2>{card.road ? 'At the Spengler Cup' : 'Performance'}</h2>
       <ul className="attributes">
         {card.attributes.map((attr) => (
           <AttributeRow key={attr.metric_id} attr={attr} moments={linked(attr)} onPlay={play} />
@@ -131,6 +129,8 @@ export default function CardDetail({ preview = false }) {
       </ul>
 
       <p className="explanation">{card.explanation}</p>
+
+      {!preFirst && pre}
 
       <h2>Highlight</h2>
       <div ref={videoRef}>
@@ -166,6 +166,68 @@ export default function CardDetail({ preview = false }) {
   )
 }
 
+// Why a Ones to Watch player was one to watch: his stat lines from 2024 up to the Spengler Cup, with sources.
+function PreTournament({ pre }) {
+  const sources = [...new Set([...pre.seasons, ...(pre.facts || [])].map((x) => x.source_url).filter(Boolean))]
+  const hasPlusMinus = pre.seasons.some((s) => s.plus_minus != null)
+  return (
+    <>
+      <h2>Before the Spengler Cup</h2>
+      {pre.summary && <p className="explanation">{pre.summary}</p>}
+      <div className="table-scroll">
+        <table className="pre-stats">
+          <thead>
+            <tr>
+              <th>Season</th>
+              <th>Team</th>
+              <th>League</th>
+              <th title="Games played">GP</th>
+              <th title="Goals">G</th>
+              <th title="Assists">A</th>
+              <th title="Points">PTS</th>
+              {hasPlusMinus && <th title="Plus/minus">+/−</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {pre.seasons.map((s) => (
+              <tr key={`${s.season}-${s.short}-${s.phase}-${s.club}`}>
+                <td>
+                  {s.season.replace('-', '–')}
+                  {s.phase === 'Season to date' && <small> to {formatMatchDate(s.through)}</small>}
+                </td>
+                <td>{s.club}</td>
+                <td>
+                  {s.short}
+                  {s.phase === 'Playoffs' && <small> Playoffs</small>}
+                </td>
+                <td>{s.gp}</td>
+                <td>{s.goals}</td>
+                <td>{s.assists}</td>
+                <td>
+                  <strong>{s.points}</strong>
+                </td>
+                {hasPlusMinus && <td>{s.plus_minus == null ? '–' : s.plus_minus > 0 ? `+${s.plus_minus}` : s.plus_minus}</td>}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {pre.facts?.length > 0 && (
+        <ul className="legend-facts pre-facts">
+          {pre.facts.map((f) => (
+            <li key={f.text}>{f.text}</li>
+          ))}
+        </ul>
+      )}
+      {sources.length > 0 && (
+        <p className="muted small">
+          Only games from 2024 up to the Spengler Cup. Sources: <SourceLinks urls={sources} />
+        </p>
+      )}
+    </>
+  )
+}
+
 // All cards of the player on the page, the ones owned and the ones still locked.
 function PlayerCards({ cardId }) {
   const [cards, setCards] = useState(null)
@@ -198,29 +260,6 @@ function PlayerCards({ cardId }) {
         ))}
       </div>
     </>
-  )
-}
-
-// The stages of a Road to Final card and the rating per game; later stages are greyed out until they are unlocked.
-function RoadDetail({ road }) {
-  return (
-    <div className="road-detail">
-      <FormBars road={road} />
-      <ol className="road-stages">
-        {road.stages.map((s) => (
-          <li key={s.n} className={s.reached ? 'reached' : ''}>
-            <span className="dot">{s.n}</span>
-            <span>
-              <strong>
-                {s.name} <small>{s.when}</small>
-              </strong>
-              <small>{s.trigger}</small>
-              <small>New on the card: {s.change}</small>
-            </span>
-          </li>
-        ))}
-      </ol>
-    </div>
   )
 }
 

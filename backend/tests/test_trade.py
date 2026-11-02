@@ -104,7 +104,8 @@ class TradeTests(unittest.TestCase):
         for _ in range(100):
             db.clear_cards(user['id'])
             db.grant_cards(user['id'], [self.base[0]] * 3)
-            self.assertEqual(main.trade(main.TradeRequest(card_ids=[self.base[0]] * 3), user)['pack'][0]['type'], 'base')
+            card = main.trade(main.TradeRequest(card_ids=[self.base[0]] * 3), user)['pack'][0]
+            self.assertTrue(card['type'] == 'base' or card.get('kind') == 'road')  # Ones to Watch are there from the start
 
     def test_odds_without_favorite_team(self):
         self.assertEqual([o['chance'] for o in main.trade_odds(None)], [0.75, 0.25])

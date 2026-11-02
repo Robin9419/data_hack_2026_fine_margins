@@ -1,0 +1,166 @@
+{
+  "_comment": "Trivia wording per special card title (see build_question in content.py). 'prompt' describes how the player played over the whole game (the KPIs that earn the card) in plain words without the card's name, so someone who has seen one game can follow it. 'hint' is behind the hint button: it adds hockey basics and a practical tip for newcomers, not the question reworded (the button also strikes out one wrong option). 'why' is shown after a wrong answer, followed by the card's numbers from 'stat_phrases'. Titles missing here fall back to the archetype text.",
+  "titles": {
+    "Sniper": {
+      "prompt": "Over the whole game, who made their shots count, scoring the most goals without needing many attempts?",
+      "hint": "Goalkeepers stop about 9 out of every 10 shots, so scoring twice in one game is a great night. Count goals here, not shots.",
+      "why": "They got the \"Sniper\" card for scoring the most goals."
+    },
+    "Playmaker": {
+      "prompt": "Throughout the game, who kept creating goals for teammates, with passes that almost always found their target?",
+      "hint": "When a goal is scored, up to two teammates who passed the puck just before it get an \"assist\". This player may not have scored at all.",
+      "why": "They got the \"Playmaker\" card for setting up the most goals (assists)."
+    },
+    "Volume Shooter": {
+      "prompt": "Who kept firing at the net all game long, with more attempts than anyone and some of them really hard?",
+      "hint": "Goals don't matter for this one. Even a shot the goalkeeper catches easily counts as an attempt. Think of the player who never stopped trying.",
+      "why": "They got the \"Volume Shooter\" card for taking more shots than anyone else."
+    },
+    "Chance Creator": {
+      "prompt": "Over the whole game, who kept turning up in the best scoring spots and got the most dangerous chances?",
+      "hint": "Shots from right in front of the net go in far more often than shots from far out. This player may not have scored, but kept getting into those close spots.",
+      "why": "They got the \"Chance Creator\" card: every shot is rated by how likely it is to become a goal (\"expected goals\"), and their chances added up to the most."
+    },
+    "Speedster": {
+      "prompt": "Who was the quickest and busiest skater all game, with the highest top speed, lots of ice covered and plenty of battles won?",
+      "hint": "Players can skate at almost 40 km/h, as fast as a car in town. It's usually a forward who darts up and down the ice.",
+      "why": "They got the \"Speedster\" card for the fastest skating in the game, plus winning battles for the puck."
+    },
+    "Shot Blocker": {
+      "prompt": "Which player spent the game putting their body on the line, blocking shot after shot?",
+      "hint": "Pucks fly at well over 100 km/h, so blocking one with your body hurts. It's usually a defender's job: the players who stay back near their own goal.",
+      "why": "They got the \"Shot Blocker\" card for blocking the most shots before they reached the goalkeeper."
+    },
+    "Workhorse": {
+      "prompt": "Who did the most work over the whole game, with the most time on the ice and the most distance skated?",
+      "hint": "Hockey is so tiring that players swap on and off every minute or so, and most play about 15 minutes in total. The coach keeps their most trusted player, often a defender, out much longer.",
+      "why": "They got the \"Workhorse\" card for the most time on the ice and the most distance skated."
+    },
+    "Go-To Scorer": {
+      "prompt": "Whose team relied on them to score all game, with the most shots and the best chances on their side?",
+      "hint": "Every team has one player the others try to get the puck to. It's not always the one who scored the most: it's the one who shot the most and got the best looks.",
+      "why": "They got the \"Go-To Scorer\" card for leading their team in shots and in quality of chances."
+    },
+    "Shot Stopper": {
+      "prompt": "Which goalkeeper faced the most shots over the game and stopped the most of them?",
+      "hint": "A busy goalkeeper usually means their team spent a lot of time defending. Think about which side was under more pressure.",
+      "why": "They got the \"Shot Stopper\" card for making the most saves."
+    },
+    "Brick Wall": {
+      "prompt": "Which goalkeeper, over the whole game, kept the most dangerous close-range chances out of the net?",
+      "hint": "Shots from close in front of the net are the hardest to stop. This goalkeeper may even have lost: they just kept stopping the dangerous ones.",
+      "why": "They got the \"Brick Wall\" card for stopping the most high-danger chances."
+    },
+    "Pressure Breaker": {
+      "prompt": "Who, throughout the game, kept escaping tight spots by passing the puck away from crowding opponents?",
+      "hint": "When two or three opponents close in on you, the smart move is a quick pass to a free teammate. This player did that calmly, again and again.",
+      "why": "They got the \"Pressure Breaker\" card: their passes moved the puck away from the most nearby opponents on average."
+    },
+    "Progression Master": {
+      "prompt": "Over the whole game, whose passes moved the puck forward past the most opponents?",
+      "hint": "Every opponent the puck goes past is suddenly out of the play, like skipping a queue. Backward and sideways passes don't help here.",
+      "why": "They got the \"Progression Master\" card: on average their passes skipped past more opponents than anyone else's."
+    },
+    "Chance Architect": {
+      "prompt": "Across the game, whose passes set up the most dangerous shots for teammates, goal or no goal?",
+      "hint": "This is about the pass before the shot. Setting up a teammate right in front of the net is a top chance, even if the goalkeeper saves it.",
+      "why": "They got the \"Chance Architect\" card for the passes that set up the most dangerous shots (\"expected assists\")."
+    },
+    "Attack Launcher": {
+      "prompt": "Over the game, whose attacks into the opponents' end led to the most dangerous chances?",
+      "hint": "Two blue lines split the rink into three zones. Bringing the puck over the opponents' blue line starts an attack, and good entries lead to shots soon after.",
+      "why": "They got the \"Attack Launcher\" card: the attacks they brought into the opponents' zone produced the most dangerous chances."
+    },
+    "Escape Artist": {
+      "prompt": "Who, time after time, got the puck out of their own end without losing it?",
+      "hint": "Under pressure, many players just smash the puck away and the other team picks it up. Skating or passing it out cleanly is harder, and usually a defender's skill.",
+      "why": "They got the \"Escape Artist\" card for the most times they moved the puck out of their own zone and kept it."
+    },
+    "Puck Hunter": {
+      "prompt": "Who spent the whole game chasing down the puck and winning the most battles for it?",
+      "hint": "Loose pucks along the boards are fought for with sticks and shoulders. This player kept coming out of those scrambles with the puck.",
+      "why": "They got the \"Puck Hunter\" card for winning the most puck battles."
+    },
+    "Pass Thief": {
+      "prompt": "Who read the opponents best over the game and intercepted the most of their passes?",
+      "hint": "Intercepting means guessing where a pass is going and stepping in to take it. Good defenders seem to know what the opponent will do next.",
+      "why": "They got the \"Pass Thief\" card for intercepting the most opponent passes."
+    },
+    "Man of the Match": {
+      "prompt": "On the winning team, who was involved in the most goals over the game, scoring them or setting them up?",
+      "hint": "The score above tells you who won, and each name shows the player's team, so you can rule out the losing side.",
+      "why": "They got the \"Man of the Match\" card for the most points (goals plus assists) on the winning team."
+    },
+    "Game Winner": {
+      "prompt": "Whose goal decided the game, the one after which the losing side never caught up?",
+      "hint": "Look at the score. If it ended 4–2, the deciding goal was the winning team's 3rd: one more than the losing team scored in total.",
+      "why": "They got the \"Game Winner\" card for scoring the goal that decided the game."
+    }
+  },
+  "stat_phrases": {
+    "goals": [
+      "{} goal",
+      "{} goals"
+    ],
+    "assists": [
+      "{} assist",
+      "{} assists"
+    ],
+    "points": [
+      "{} point",
+      "{} points"
+    ],
+    "shots": [
+      "{} shot",
+      "{} shots"
+    ],
+    "saves": [
+      "{} save",
+      "{} saves"
+    ],
+    "shots_on_goal_against": [
+      "{} shot faced",
+      "{} shots faced"
+    ],
+    "save_pct": [
+      "stopped {}% of the shots",
+      "stopped {}% of the shots"
+    ],
+    "blocks": [
+      "{} shot blocked",
+      "{} shots blocked"
+    ],
+    "puck_contest_wins": [
+      "{} puck battle won",
+      "{} puck battles won"
+    ],
+    "interceptions_total": [
+      "{} pass intercepted",
+      "{} passes intercepted"
+    ],
+    "controlled_exits": [
+      "{} clean exit from their own zone",
+      "{} clean exits from their own zone"
+    ],
+    "xa_assisted_shots": [
+      "{} shot set up for a teammate",
+      "{} shots set up for teammates"
+    ],
+    "skate_top_speed": [
+      "a top speed of {} km/h",
+      "a top speed of {} km/h"
+    ],
+    "shot_top_speed": [
+      "a hardest shot of {} km/h",
+      "a hardest shot of {} km/h"
+    ],
+    "toi": [
+      "{} minutes on the ice",
+      "{} minutes on the ice"
+    ],
+    "distance": [
+      "{} km skated",
+      "{} km skated"
+    ]
+  }
+}

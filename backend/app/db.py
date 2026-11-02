@@ -49,6 +49,23 @@ CREATE TABLE IF NOT EXISTS game_packs (
     claimed INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (user_id, game_id)
 );
+-- Ones to Watch packs: one per goal or assist of an owned Road to Final card's player in a game (packs = points),
+-- recorded when the game is played on the user's timeline.
+CREATE TABLE IF NOT EXISTS watch_packs (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    game_id TEXT NOT NULL,
+    card_id TEXT NOT NULL,
+    packs INTEGER NOT NULL DEFAULT 1,
+    claimed INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (user_id, game_id, card_id)
+);
+-- The collector cards the user has been shown the unlock of. A collector is earned by owning all base cards of a club
+-- and stays earned, so each is announced once.
+CREATE TABLE IF NOT EXISTS announced_collectors (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    card_id TEXT NOT NULL,
+    PRIMARY KEY (user_id, card_id)
+);
 -- The trivia rounds the user played, one per gameday: they watched those games live or in the stadium, so the round is
 -- offered once per stage of the timeline.
 CREATE TABLE IF NOT EXISTS trivia_rounds (
@@ -90,6 +107,9 @@ def init_db():
         card_columns = [r["name"] for r in conn.execute("PRAGMA table_info(owned_cards)")]
         if "copies" not in card_columns:
             conn.execute("ALTER TABLE owned_cards ADD COLUMN copies INTEGER NOT NULL DEFAULT 1")
+        watch_columns = [r["name"] for r in conn.execute("PRAGMA table_info(watch_packs)")]
+        if "packs" not in watch_columns:
+            conn.execute("ALTER TABLE watch_packs ADD COLUMN packs INTEGER NOT NULL DEFAULT 1")
 
 
 def last_daily_claim(user_id: int) -> str | None:
@@ -242,6 +262,7 @@ def clear_cards(user_id: int):
         conn.execute("DELETE FROM quiz_questions WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM predictions WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM game_packs WHERE user_id = ?", (user_id,))
+        conn.execute("DELETE FROM watch_packs WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM social_follows WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM trivia_rounds WHERE user_id = ?", (user_id,))
         conn.execute("UPDATE users SET stage = 'pre', last_daily_claim = NULL WHERE id = ?", (user_id,))
@@ -329,3 +350,42 @@ def claim_game_packs(user_id: int, game_id: str) -> int | None:
             return None
         return conn.execute("SELECT correct FROM game_packs WHERE user_id = ? AND game_id = ?",
                             (user_id, game_id)).fetchone()["correct"]
+
+
+def add_watch_packs(user_id: int, game_id: str, cards: list[tuple[str, int]]):
+    """cards: (card id, packs) pairs"""
+    with connect() as conn:
+        conn.executemany("INSERT OR IGNORE INTO watch_packs (user_id, game_id, card_id, packs) VALUES (?, ?, ?, ?)",
+                         [(user_id, game_id, cid, packs) for cid, packs in cards])
+
+
+def watch_packs(user_id: int) -> dict[str, dict[str, dict]]:
+    """game_id -> {card id -> {"packs": how many, "claimed": if opened}}"""
+    with connect() as conn:
+        rows = conn.execute("SELECT game_id, card_id, packs, claimed FROM watch_packs WHERE user_id = ?",
+                            (user_id,)).fetchall()
+    result: dict[str, dict[str, dict]] = {}
+    for r in rows:
+        result.setdefault(r["game_id"], {})[r["card_id"]] = {"packs": r["packs"], "claimed": bool(r["claimed"])}
+    return result
+
+
+def announced_collectors(user_id: int) -> set[str]:
+    with connect() as conn:
+        return {r["card_id"] for r in conn.execute("SELECT card_id FROM announced_collectors WHERE user_id = ?",
+                                                   (user_id,)).fetchall()}
+
+
+def add_announced_collectors(user_id: int, card_ids: list[str]):
+    with connect() as conn:
+        conn.executemany("INSERT OR IGNORE INTO announced_collectors (user_id, card_id) VALUES (?, ?)",
+                         [(user_id, cid) for cid in card_ids])
+
+
+def claim_watch_packs(user_id: int, game_id: str) -> int:
+    """Marks the game's Ones to Watch packs as opened and returns how many packs were waiting (atomic, like
+    claim_game_packs)."""
+    with connect() as conn:
+        rows = conn.execute("UPDATE watch_packs SET claimed = 1 WHERE user_id = ? AND game_id = ? AND claimed = 0 "
+                            "RETURNING packs", (user_id, game_id)).fetchall()
+    return sum(r["packs"] for r in rows)

@@ -2,6 +2,7 @@ import unittest
 from app.event_kpis import EventAnalysis, blc_xg, controlled_zone_exits
 from app.content import Content
 from test_event_kpis import row
+from test_defending_awards import profile_holders_before
 
 DIRECTIONS = {(1, 'Home'): 1, (1, 'Away'): -1, (2, 'Home'): -1, (2, 'Away'): 1}
 
@@ -147,14 +148,19 @@ class ZoneContentTests(unittest.TestCase):
                 card = content.cards[award['id']]
                 self.assertEqual(card['category_id'], category['id'])
                 calculation = content.derived_kpis[award['derived']]
+                held = profile_holders_before(content, award['id'])
                 candidates = [(pid, s) for pid, s in calculation['players'].items()
-                              if s['ranking_eligible'] and s[award['aggregate']] is not None and s[award['aggregate']] > 0]
+                              if s['ranking_eligible'] and s[award['aggregate']] is not None and s[award['aggregate']] > 0
+                              and pid not in held]
                 winner = max(candidates, key=lambda item: (item[1][award['aggregate']], item[1][award['tie_break_aggregate']], item[0]))
                 self.assertEqual(card['attributes'][0]['value'], winner[1][award['aggregate']])
                 self.assertEqual(content.events.player_id(card['player']['team'], card['player']['jersey']), winner[0])
                 moment_ids = {m['id'] for m in card['moments']}
                 self.assertTrue(set(card['attributes'][0]['moment_ids']) <= moment_ids)
-                self.assertEqual(card['attributes'][0]['match_rank'], 1)
+                # Rank 1 unless the better players already hold a profile card (one per player).
+                better = sum(1 for s in calculation['players'].values() if s['ranking_eligible']
+                             and s[award['aggregate']] is not None and s[award['aggregate']] > winner[1][award['aggregate']])
+                self.assertEqual(card['attributes'][0]['match_rank'], 1 + better)
                 self.assertEqual(content.card_game[card['id']], content.tournament.final['id'])
 
     def test_sequence_video_window_and_total_audit(self):

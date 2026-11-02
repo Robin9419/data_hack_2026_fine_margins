@@ -5,25 +5,55 @@ import CardFace from '../components/CardFace'
 // How long the card shakes before it flips (keep in sync with .pack-card.charging in index.css).
 const CHARGE_MS = 550
 
-// Legends earned by a pack are not part of it: they come as their own pack after the first one is fully opened.
+const isCollector = (c) => c.type === 'reward' && c.kind === 'collector'
+
+// Legends and collectors earned by a pack are not part of it: each comes as its own pack after the previous one is
+// fully opened.
+const EARNED = {
+  legend: {
+    title: 'Club legend earned!',
+    intro: 'You collected enough of a club to earn a legend! Tap a card to find out who you got.',
+    done: 'A club legend joined your collection!',
+    aria: 'club legend',
+  },
+  collector: {
+    title: 'Collector card earned!',
+    intro: 'You collected every base card of a club! Tap a card to find out what you earned.',
+    done: 'A collector card joined your collection!',
+    aria: 'collector card',
+  },
+}
+
 export default function PackOpening() {
   const location = useLocation()
   const all = location.state?.pack ?? []
-  const legends = all.filter((c) => c.type === 'legend')
-  const main = all.filter((c) => c.type !== 'legend')
-  const [showLegends, setShowLegends] = useState(main.length === 0)
+  const main = all.filter((c) => c.type !== 'legend' && !isCollector(c))
+  const extras = [
+    { kind: 'legend', cards: all.filter((c) => c.type === 'legend') },
+    { kind: 'collector', cards: all.filter(isCollector) },
+  ].filter((e) => e.cards.length > 0)
+  const [step, setStep] = useState(main.length === 0 ? 0 : -1) // -1 is the main pack, then one step per extra pack
   const [seenIds, setSeenIds] = useState([])
 
   if (!all.length) return <Navigate to="/" replace />
 
-  if (showLegends) {
+  const fromTrade = location.state?.from === 'trade'
+  const advance = (newIds) => {
+    setSeenIds(newIds)
+    setStep((s) => s + 1)
+  }
+
+  if (step >= 0) {
+    const extra = extras[step]
     return (
       <Pack
-        key="legends"
-        pack={legends}
-        title="Club legend earned!"
-        fromTrade={location.state?.from === 'trade'}
-        legendPack
+        key={extra.kind}
+        pack={extra.cards}
+        title={EARNED[extra.kind].title}
+        fromTrade={fromTrade}
+        earned={EARNED[extra.kind]}
+        hasMore={step + 1 < extras.length}
+        onMore={advance}
         previousNewIds={seenIds}
       />
     )
@@ -33,17 +63,14 @@ export default function PackOpening() {
       key="main"
       pack={main}
       title={location.state?.title}
-      fromTrade={location.state?.from === 'trade'}
-      hasLegends={legends.length > 0}
-      onLegends={(newIds) => {
-        setSeenIds(newIds)
-        setShowLegends(true)
-      }}
+      fromTrade={fromTrade}
+      hasMore={extras.length > 0}
+      onMore={advance}
     />
   )
 }
 
-function Pack({ pack, title, fromTrade, legendPack, hasLegends, onLegends, previousNewIds = [] }) {
+function Pack({ pack, title, fromTrade, earned, hasMore, onMore, previousNewIds = [] }) {
   const navigate = useNavigate()
   // Per card: 'hidden' -> 'charging' -> 'revealed'
   const [stages, setStages] = useState(() => (pack ?? []).map(() => 'hidden'))
@@ -63,17 +90,16 @@ function Pack({ pack, title, fromTrade, legendPack, hasLegends, onLegends, previ
   const allRevealed = stages.every((s) => s === 'revealed')
   const newCardIds = [...previousNewIds, ...pack.filter((c) => c.is_new).map((c) => c.id)]
   const special = pack.some((c) => c.type === 'special')
-  const legend = !!legendPack
 
   return (
     <section className="pack-stage">
       <h1>{title ?? 'Your starter pack'}</h1>
       <p className="pack-hint">{!allRevealed
-          ? legend
-            ? 'You collected enough of a club to earn a legend! Tap a card to find out who you got.'
+          ? earned
+            ? earned.intro
             : 'Tap a card to find out who you got.'
-          : legend
-            ? 'A club legend joined your collection!'
+          : earned
+            ? earned.done
             : special
               ? 'A special card!'
               : 'Nice pull!'}</p>
@@ -87,7 +113,7 @@ function Pack({ pack, title, fromTrade, legendPack, hasLegends, onLegends, previ
             style={{ '--delay': `${i * 120}ms` }}
             onClick={() => reveal(i)}
             disabled={stages[i] !== 'hidden'}
-            aria-label={`${card.player.first_name} ${card.player.last_name}${stages[i] === 'revealed' ? `, ${card.title ?? 'base card'}` : card.type === 'legend' ? ', club legend, tap to reveal' : ', tap to reveal'}`}
+            aria-label={`${card.player ? `${card.player.first_name} ${card.player.last_name}` : card.title}${stages[i] === 'revealed' ? `, ${card.title ?? 'base card'}` : earned ? `, ${earned.aria}, tap to reveal` : ', tap to reveal'}`}
           >
             <span className="pack-burst" aria-hidden="true" />
             <CardFace card={card} state={stages[i] === 'revealed' ? 'owned' : 'hidden'} />
@@ -102,8 +128,8 @@ function Pack({ pack, title, fromTrade, legendPack, hasLegends, onLegends, previ
       <div className="pack-actions">
         {allRevealed ? (
           <>
-            {hasLegends ? (
-              <button type="button" className="pack-button" onClick={() => onLegends(newCardIds)}>
+            {hasMore ? (
+              <button type="button" className="pack-button" onClick={() => onMore(newCardIds)}>
                 Continue
               </button>
             ) : (
@@ -111,7 +137,7 @@ function Pack({ pack, title, fromTrade, legendPack, hasLegends, onLegends, previ
                 Go to my collection
               </button>
             )}
-            {fromTrade && !hasLegends && (
+            {fromTrade && !hasMore && (
               <button type="button" className="pack-button secondary" onClick={() => navigate('/trade')}>
                 Trade again
               </button>

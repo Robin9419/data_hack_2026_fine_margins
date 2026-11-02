@@ -21,12 +21,12 @@ const TYPE_FILTERS = [
   { value: 'all', label: 'All cards' },
   { value: 'legend', label: 'Legends' },
   { value: 'base', label: 'Base' },
-  { value: 'profile', label: 'Profile specials' },
-  { value: 'performance', label: 'Performance specials' },
-  { value: 'road', label: 'Road to Final' },
+  { value: 'impact', label: 'Impact Specials' },
+  { value: 'road', label: 'Ones to Watch' },
   { value: 'collector', label: 'Collector' },
-  { value: 'context', label: 'Moment, stadium, trophy' },
 ]
+// The Impact Specials filter covers the profile and performance specials; Collector also shows the context cards (moment, stadium, trophy).
+const FILTER_KINDS = { impact: ['profile', 'performance'], collector: ['collector', 'context'] }
 // Within owned and within locked cards: legends, then special, then reward, then base.
 const TYPE_ORDER = { legend: 0, special: 1, reward: 2, base: 3 }
 
@@ -183,6 +183,13 @@ export default function Gallery() {
   const realCards = cards.filter((c) => c.kind !== 'road')
   const ownedCount = realCards.filter((c) => c.owned).length
   const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
+  const baseCounts = {} // per club, for a locked collector card's hover info
+  for (const c of cards) {
+    if (c.type !== 'base') continue
+    const t = (baseCounts[c.player.team] ??= { owned: 0, total: 0 })
+    t.total += 1
+    if (c.owned) t.owned += 1
+  }
   const fullOf = (c) => allCards?.get(c.id)
   // Locked cards are blanked in the list; the full card has the names.
   const playerOf = (c) => (c.owned ? c.player : fullOf(c)?.player ?? c.player)
@@ -196,7 +203,12 @@ export default function Gallery() {
   }
   // Owned cards first, then locked; within each, by TYPE_ORDER (otherwise API order).
   const shown = cards
-    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || (c.kind ?? c.type) === type) && matches(c))
+    .filter(
+      (c) =>
+        (team === 'all' || (c.player?.team ?? c.team) === team) &&
+        (type === 'all' || (FILTER_KINDS[type] ?? [type]).includes(c.kind ?? c.type)) &&
+        matches(c),
+    )
     .sort((a, b) => {
       if (a.owned !== b.owned) return a.owned ? -1 : 1
       return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]
@@ -330,6 +342,7 @@ export default function Gallery() {
                   isNew={newCardIds.includes(card.id)}
                   onOpen={setSpotlight}
                   full={fullOf(card)}
+                  base={card.kind === 'collector' ? baseCounts[card.team] : undefined}
                 />
               ))}
         </div>

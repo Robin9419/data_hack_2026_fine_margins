@@ -7,9 +7,11 @@ import { useTournament } from '../tournament'
 import TeamName from './TeamName'
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
+const points = (w) => [w.goals && plural(w.goals, 'goal'), w.assists && plural(w.assists, 'assist')].filter(Boolean).join(', ')
 
 // Pops up after a move along the timeline played games: the results, how each prediction went and the packs it
-// earned, with a button that opens all waiting packs at once.
+// earned, the Ones to Watch packs (an owned Road to Final card whose player scored or assisted), with a button that
+// opens all waiting packs at once.
 export default function ResultsModal() {
   const navigate = useNavigate()
   const { setProgress } = useAuth()
@@ -27,7 +29,8 @@ export default function ResultsModal() {
   if (!justPlayed.length) return null
 
   const earned = justPlayed.reduce((n, g) => n + g.packs, 0)
-  const waiting = tournament?.packs_waiting ?? earned
+  const watched = justPlayed.flatMap((g) => g.watch_packs ?? [])
+  const waiting = tournament?.packs_waiting ?? earned + watched.reduce((n, w) => n + w.packs, 0)
   const predicted = justPlayed.some((g) => g.questions.some((q) => q.prediction))
   const days = [...new Set(justPlayed.map((g) => g.date))]
 
@@ -67,6 +70,7 @@ export default function ResultsModal() {
             : earned
               ? `Your right picks earned ${plural(earned, 'pack')}.`
               : 'No right picks this time. Better luck on the next gameday!'}
+          {watched.length > 0 && ` Your Ones to Watch earned ${plural(watched.length, 'bonus pack')}.`}
         </p>
 
         <div className="results-games">
@@ -104,6 +108,11 @@ export default function ResultsModal() {
                 <p className="muted small">No predictions for this game.</p>
               )}
               {g.packs > 0 && <p className="results-earned">+ {plural(g.packs, 'pack')}</p>}
+              {g.watch_packs?.map((w) => (
+                <p key={w.card_id} className="results-earned">
+                  + {plural(w.packs, 'pack')} · Ones to Watch: {w.name} ({points(w)})
+                </p>
+              ))}
             </article>
           ))}
         </div>

@@ -1348,7 +1348,7 @@ window.CARD_KPIS = [
   "jersey": 8,
   "kind": "profile",
   "special": null,
-  "title": "Pressure Reliever",
+  "title": "Pressure Breaker",
   "archetype": "Highest average reduction in nearby opposing skaters through successful passes, with at least 10 evaluated passes. Snapshot-based estimate.",
   "explanation": "Reduced nearby opponent pressure by 0.82 skaters per evaluated pass on average. 11 of 11 eligible passes could be evaluated. This measures pressure relief, not overall passing or attacking quality.",
   "kpis": [
@@ -1589,17 +1589,28 @@ window.CARD_KPIS = [
  },
  {
   "team": "U.S. Collegiate Selects",
-  "jersey": 23,
+  "jersey": 4,
   "kind": "profile",
   "special": null,
   "title": "Progression Master",
   "archetype": "Highest positive average pass packing with at least 10 evaluated passes. Counts opposing skaters bypassed along the attacking axis, with positions frozen at release. Backward passes can reduce the score; ties favor more evaluated passes, then player ID.",
-  "explanation": "Averaged 1.64 net opposing skaters bypassed per evaluated pass, the highest qualifying average in this game. Signed total: 23. 14 of 14 eligible passes evaluated. Packing measures longitudinal progression, not overall passing quality.",
+  "explanation": "Averaged 1.39 net opposing skaters bypassed per evaluated pass, the highest qualifying average in this game. Signed total: 25. 18 of 18 eligible passes evaluated. Packing measures longitudinal progression, not overall passing quality.",
   "kpis": [
    {
     "metric_id": "packing_mean",
     "label": "Average pass packing",
-    "display_value": "1.64",
+    "display_value": "1.39",
+    "unit": "skaters",
+    "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+    "match_rank": 2,
+    "team_rank": 2,
+    "players_in_match": 25,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "packing_total",
+    "label": "Total pass packing",
+    "display_value": "25",
     "unit": "skaters",
     "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
     "match_rank": 1,
@@ -1608,24 +1619,13 @@ window.CARD_KPIS = [
     "rank_pool": "players"
    },
    {
-    "metric_id": "packing_total",
-    "label": "Total pass packing",
-    "display_value": "23",
-    "unit": "skaters",
-    "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
-    "match_rank": 2,
-    "team_rank": 2,
-    "players_in_match": 25,
-    "rank_pool": "players"
-   },
-   {
     "metric_id": "packing_positive_share",
     "label": "Positive-packing passes",
-    "display_value": "64",
+    "display_value": "83",
     "unit": "%",
     "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
-    "match_rank": 2,
-    "team_rank": 2,
+    "match_rank": 1,
+    "team_rank": 1,
     "players_in_match": 25,
     "rank_pool": "players"
    }
@@ -1634,126 +1634,162 @@ window.CARD_KPIS = [
    {
     "kind": "pass_packing",
     "period_label": "1st period",
-    "clock": "0:03",
+    "clock": "0:49",
     "title": "Packing pass",
-    "text": "To #19 Quinn Finley. Packing +3 opposing skaters (positions frozen at release).",
+    "text": "To #2 Gavin McCartthy. Packing +1 opposing skaters (positions frozen at release).",
     "facts": [],
     "xg": null
    },
    {
     "kind": "pass_packing",
     "period_label": "1st period",
-    "clock": "2:39",
+    "clock": "1:29",
     "title": "Packing pass",
-    "text": "To #22 Cole Knuble. Packing +0 opposing skaters (positions frozen at release).",
+    "text": "To #44 Vincent Borgesi. Packing +0 opposing skaters (positions frozen at release).",
     "facts": [],
     "xg": null
    },
    {
     "kind": "pass_packing",
     "period_label": "1st period",
-    "clock": "5:30",
+    "clock": "3:23",
     "title": "Packing pass",
-    "text": "To #11 Danny Nelson. Packing +3 opposing skaters (positions frozen at release).",
+    "text": "To #18 Aiden Fink. Packing +3 opposing skaters (positions frozen at release).",
     "facts": [],
     "xg": null
    },
    {
     "kind": "pass_packing",
     "period_label": "1st period",
-    "clock": "14:30",
+    "clock": "6:37",
     "title": "Packing pass",
-    "text": "To #13 T.J. Hughes. Packing +1 opposing skaters (positions frozen at release).",
+    "text": "To #18 Aiden Fink. Packing +1 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "1st period",
+    "clock": "7:16",
+    "title": "Packing pass",
+    "text": "To #13 T.J. Hughes. Packing +2 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "1st period",
+    "clock": "14:54",
+    "title": "Packing pass",
+    "text": "To #14 Matt Dimarsico. Packing +2 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "1st period",
+    "clock": "15:48",
+    "title": "Packing pass",
+    "text": "To #27 Zam Plante. Packing +1 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "1st period",
+    "clock": "15:59",
+    "title": "Packing pass",
+    "text": "To #27 Zam Plante. Packing +2 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "1st period",
+    "clock": "16:04",
+    "title": "Packing pass",
+    "text": "To #27 Zam Plante. Packing +2 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "1st period",
+    "clock": "19:07",
+    "title": "Packing pass",
+    "text": "To #11 Danny Nelson. Packing +1 opposing skaters (positions frozen at release).",
     "facts": [],
     "xg": null
    },
    {
     "kind": "pass_packing",
     "period_label": "2nd period",
-    "clock": "0:47",
+    "clock": "2:04",
     "title": "Packing pass",
-    "text": "To #19 Quinn Finley. Packing +1 opposing skaters (positions frozen at release).",
+    "text": "To #9 Jack Musa. Packing +3 opposing skaters (positions frozen at release).",
     "facts": [],
     "xg": null
    },
    {
     "kind": "pass_packing",
     "period_label": "2nd period",
-    "clock": "0:56",
+    "clock": "3:02",
+    "title": "Packing pass",
+    "text": "To #22 Cole Knuble. Packing +1 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "2nd period",
+    "clock": "4:42",
+    "title": "Packing pass",
+    "text": "To #18 Aiden Fink. Packing -5 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "2nd period",
+    "clock": "4:50",
+    "title": "Packing pass",
+    "text": "To #13 T.J. Hughes. Packing +3 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "2nd period",
+    "clock": "9:07",
+    "title": "Packing pass",
+    "text": "To #2 Gavin McCartthy. Packing +2 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "2nd period",
+    "clock": "9:12",
+    "title": "Packing pass",
+    "text": "To #18 Aiden Fink. Packing +3 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "3rd period",
+    "clock": "4:24",
+    "title": "Packing pass",
+    "text": "To #2 Gavin McCartthy. Packing +0 opposing skaters (positions frozen at release).",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "pass_packing",
+    "period_label": "3rd period",
+    "clock": "12:44",
     "title": "Packing pass",
     "text": "To #86 JJ Wiebusch. Packing +3 opposing skaters (positions frozen at release).",
-    "facts": [],
-    "xg": null
-   },
-   {
-    "kind": "pass_packing",
-    "period_label": "2nd period",
-    "clock": "3:31",
-    "title": "Packing pass",
-    "text": "To #18 Aiden Fink. Packing +0 opposing skaters (positions frozen at release).",
-    "facts": [],
-    "xg": null
-   },
-   {
-    "kind": "pass_packing",
-    "period_label": "2nd period",
-    "clock": "9:48",
-    "title": "Packing pass",
-    "text": "To #25 Abram Wiebe. Packing +0 opposing skaters (positions frozen at release).",
-    "facts": [],
-    "xg": null
-   },
-   {
-    "kind": "pass_packing",
-    "period_label": "2nd period",
-    "clock": "13:52",
-    "title": "Packing pass",
-    "text": "To #6 Martins Lavins. Packing +0 opposing skaters (positions frozen at release).",
-    "facts": [],
-    "xg": null
-   },
-   {
-    "kind": "pass_packing",
-    "period_label": "2nd period",
-    "clock": "19:04",
-    "title": "Packing pass",
-    "text": "To #27 Zam Plante. Packing +3 opposing skaters (positions frozen at release).",
-    "facts": [],
-    "xg": null
-   },
-   {
-    "kind": "pass_packing",
-    "period_label": "3rd period",
-    "clock": "5:56",
-    "title": "Packing pass",
-    "text": "To #44 Vincent Borgesi. Packing +2 opposing skaters (positions frozen at release).",
-    "facts": [],
-    "xg": null
-   },
-   {
-    "kind": "pass_packing",
-    "period_label": "3rd period",
-    "clock": "8:52",
-    "title": "Packing pass",
-    "text": "To #14 Matt Dimarsico. Packing +3 opposing skaters (positions frozen at release).",
-    "facts": [],
-    "xg": null
-   },
-   {
-    "kind": "pass_packing",
-    "period_label": "3rd period",
-    "clock": "16:54",
-    "title": "Packing pass",
-    "text": "To #18 Aiden Fink. Packing +4 opposing skaters (positions frozen at release).",
-    "facts": [],
-    "xg": null
-   },
-   {
-    "kind": "pass_packing",
-    "period_label": "3rd period",
-    "clock": "17:15",
-    "title": "Packing pass",
-    "text": "To #19 Quinn Finley. Packing +0 opposing skaters (positions frozen at release).",
     "facts": [],
     "xg": null
    }
@@ -1880,6 +1916,361 @@ window.CARD_KPIS = [
      8.1,
      -7.6
     ]
+   }
+  ]
+ },
+ {
+  "team": "HC Davos",
+  "jersey": 38,
+  "kind": "profile",
+  "special": null,
+  "title": "Attack Launcher",
+  "archetype": "Highest positive average BLCxG with at least three evaluated offensive entries. BLCxG sums own-team shot xG until the puck leaves the offensive zone or play stops, including shots after a puck recovery. Ties favor more evaluated entries, then player ID.",
+  "explanation": "Highest positive average BLCxG with at least three evaluated offensive entries. BLCxG sums own-team shot xG until the puck leaves the offensive zone or play stops, including shots after a puck recovery. Ties favor more evaluated entries, then player ID.",
+  "kpis": [
+   {
+    "metric_id": "blcxg_mean",
+    "label": "Average entry BLCxG",
+    "display_value": "0.093",
+    "unit": "xG",
+    "definition": "Average own-team shot xG generated per evaluated offensive entry. Opponent control inside the zone does not end the sequence; puck departure or stoppage does. Entries with missing shot xG or unknown sequence endings are excluded, not zero.",
+    "match_rank": 2,
+    "team_rank": 1,
+    "players_in_match": 29,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "blcxg_total",
+    "label": "Total entry BLCxG",
+    "display_value": "0.371",
+    "unit": "xG",
+    "definition": "Sum of BLCxG over fully evaluated offensive entries. Each shot credits at most one entry; Goal rows do not add xG again.",
+    "match_rank": 3,
+    "team_rank": 2,
+    "players_in_match": 29,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "blcxg_entries",
+    "label": "Evaluated offensive entries",
+    "display_value": "4",
+    "unit": "",
+    "definition": "Number of offensive entries with a known sequence ending and valid xG for every own-team shot. Completed sequences without shots count as zero BLCxG.",
+    "match_rank": 15,
+    "team_rank": 12,
+    "players_in_match": 29,
+    "rank_pool": "players"
+   }
+  ],
+  "moments": [
+   {
+    "kind": "zone_entry",
+    "period_label": "1st period",
+    "clock": "14:45",
+    "title": "Offensive zone entry",
+    "text": "BLCxG 0.000 from 0 own-team shots. Opponent possession inside the zone does not end the sequence.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "zone_entry",
+    "period_label": "2nd period",
+    "clock": "7:17",
+    "title": "Offensive zone entry",
+    "text": "BLCxG 0.000 from 0 own-team shots. Opponent possession inside the zone does not end the sequence.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "zone_entry",
+    "period_label": "2nd period",
+    "clock": "12:48",
+    "title": "Offensive zone entry",
+    "text": "BLCxG 0.000 from 0 own-team shots. Opponent possession inside the zone does not end the sequence.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "zone_entry",
+    "period_label": "2nd period",
+    "clock": "17:39",
+    "title": "Offensive zone entry",
+    "text": "BLCxG 0.371 from 3 own-team shots. Opponent possession inside the zone does not end the sequence.",
+    "facts": [],
+    "xg": null
+   }
+  ]
+ },
+ {
+  "team": "HC Davos",
+  "jersey": 96,
+  "kind": "profile",
+  "special": null,
+  "title": "Escape Artist",
+  "archetype": "Most controlled defensive zone exits with the exported outcome PossessionMaintained. Ties favor the higher controlled-exit share, then player ID. Possession is assessed at the crossing, without a later retention window.",
+  "explanation": "Most controlled defensive zone exits with the exported outcome PossessionMaintained. Ties favor the higher controlled-exit share, then player ID. Possession is assessed at the crossing, without a later retention window.",
+  "kpis": [
+   {
+    "metric_id": "controlled_exits",
+    "label": "Controlled zone exits",
+    "display_value": "5",
+    "unit": "",
+    "definition": "Defensive zone crossings towards the opponent with PossessionMaintained. No additional possession-retention window is required.",
+    "match_rank": 4,
+    "team_rank": 3,
+    "players_in_match": 37,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "controlled_exit_share",
+    "label": "Controlled exit share",
+    "display_value": "83",
+    "unit": "%",
+    "definition": "Controlled exits divided by defensive exit attempts with a known crossing outcome. PossessionLost and PuckDumpedIn count as uncontrolled; None and missing outcomes are excluded.",
+    "match_rank": 4,
+    "team_rank": 3,
+    "players_in_match": 37,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "zone_exit_attempts",
+    "label": "Zone exit attempts",
+    "display_value": "6",
+    "unit": "",
+    "definition": "Defensive zone exit attempts with PossessionMaintained, PossessionLost or PuckDumpedIn and an identified skater.",
+    "match_rank": 12,
+    "team_rank": 7,
+    "players_in_match": 37,
+    "rank_pool": "players"
+   }
+  ],
+  "moments": [
+   {
+    "kind": "zone_exit",
+    "period_label": "1st period",
+    "clock": "2:00",
+    "title": "Controlled zone exit",
+    "text": "Crossing outcome: PossessionMaintained.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "zone_exit",
+    "period_label": "2nd period",
+    "clock": "2:39",
+    "title": "Controlled zone exit",
+    "text": "Crossing outcome: PossessionMaintained.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "zone_exit",
+    "period_label": "2nd period",
+    "clock": "5:51",
+    "title": "Controlled zone exit",
+    "text": "Crossing outcome: PossessionMaintained.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "zone_exit",
+    "period_label": "2nd period",
+    "clock": "14:59",
+    "title": "Uncontrolled zone exit",
+    "text": "Crossing outcome: PuckDumpedIn.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "zone_exit",
+    "period_label": "3rd period",
+    "clock": "7:13",
+    "title": "Controlled zone exit",
+    "text": "Crossing outcome: PossessionMaintained.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "zone_exit",
+    "period_label": "3rd period",
+    "clock": "10:01",
+    "title": "Controlled zone exit",
+    "text": "Crossing outcome: PossessionMaintained.",
+    "facts": [],
+    "xg": null
+   }
+  ]
+ },
+ {
+  "team": "HC Davos",
+  "jersey": 93,
+  "kind": "profile",
+  "special": null,
+  "title": "Puck Hunter",
+  "archetype": "Most puck battles won (Wisehockey PCW) across all zones, requiring a positive count. Ties favor more interceptions, then the lexicographically greatest player ID. Interceptions and blocked shots are supporting context, not a weighted score.",
+  "explanation": "Most puck battles won (Wisehockey PCW) across all zones, requiring a positive count. Ties favor more interceptions, then the lexicographically greatest player ID. Interceptions and blocked shots are supporting context, not a weighted score.",
+  "kpis": [
+   {
+    "metric_id": "puck_contest_wins",
+    "label": "Puck battles won",
+    "display_value": "10",
+    "unit": "",
+    "definition": "How many times the player won a contested puck, a one-on-one fight for a loose puck.",
+    "match_rank": 2,
+    "team_rank": 2,
+    "players_in_match": 40,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "interceptions_total",
+    "label": "Passes intercepted",
+    "display_value": "4",
+    "unit": "",
+    "definition": "Opponent passes explicitly marked Intercepted, credited to the identified secondary skater on the opposing team, across all zones. Successful and Failed passes do not count. Goalkeepers are excluded.",
+    "match_rank": 5,
+    "team_rank": 2,
+    "players_in_match": 40,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "blocks",
+    "label": "Blocked shots",
+    "display_value": "0",
+    "unit": "",
+    "definition": "How many opponent shots the player stopped with their body or stick before they reached the goal. It is a defensive sacrifice.",
+    "match_rank": 16,
+    "team_rank": 7,
+    "players_in_match": 40,
+    "rank_pool": "players"
+   }
+  ],
+  "moments": [
+   {
+    "kind": "interception",
+    "period_label": "1st period",
+    "clock": "0:36",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #15 Charlie Cerrato.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "interception",
+    "period_label": "1st period",
+    "clock": "6:28",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #13 T.J. Hughes.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "interception",
+    "period_label": "2nd period",
+    "clock": "4:51",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #13 T.J. Hughes.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "interception",
+    "period_label": "3rd period",
+    "clock": "5:39",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #15 Charlie Cerrato.",
+    "facts": [],
+    "xg": null
+   }
+  ]
+ },
+ {
+  "team": "HC Davos",
+  "jersey": 6,
+  "kind": "profile",
+  "special": null,
+  "title": "Pass Thief",
+  "archetype": "Most intercepted opponent passes across all zones, requiring a positive count. PassResult=Intercepted credits the opposing secondary skater. Ties favor more puck battles won (PCW), then the lexicographically greatest player ID.",
+  "explanation": "Most intercepted opponent passes across all zones, requiring a positive count. PassResult=Intercepted credits the opposing secondary skater. Ties favor more puck battles won (PCW), then the lexicographically greatest player ID.",
+  "kpis": [
+   {
+    "metric_id": "interceptions_total",
+    "label": "Passes intercepted",
+    "display_value": "5",
+    "unit": "",
+    "definition": "Opponent passes explicitly marked Intercepted, credited to the identified secondary skater on the opposing team, across all zones. Successful and Failed passes do not count. Goalkeepers are excluded.",
+    "match_rank": 1,
+    "team_rank": 1,
+    "players_in_match": 40,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "puck_contest_wins",
+    "label": "Puck battles won",
+    "display_value": "7",
+    "unit": "",
+    "definition": "How many times the player won a contested puck, a one-on-one fight for a loose puck.",
+    "match_rank": 5,
+    "team_rank": 4,
+    "players_in_match": 40,
+    "rank_pool": "players"
+   },
+   {
+    "metric_id": "blocks",
+    "label": "Blocked shots",
+    "display_value": "0",
+    "unit": "",
+    "definition": "How many opponent shots the player stopped with their body or stick before they reached the goal. It is a defensive sacrifice.",
+    "match_rank": 16,
+    "team_rank": 7,
+    "players_in_match": 40,
+    "rank_pool": "players"
+   }
+  ],
+  "moments": [
+   {
+    "kind": "interception",
+    "period_label": "1st period",
+    "clock": "0:17",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #19 Quinn Finley.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "interception",
+    "period_label": "1st period",
+    "clock": "9:19",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #11 Danny Nelson.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "interception",
+    "period_label": "1st period",
+    "clock": "12:37",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #9 Jack Musa.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "interception",
+    "period_label": "3rd period",
+    "clock": "13:58",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #23 Eric Pohlkamp.",
+    "facts": [],
+    "xg": null
+   },
+   {
+    "kind": "interception",
+    "period_label": "3rd period",
+    "clock": "15:58",
+    "title": "Pass intercepted",
+    "text": "Intercepted a pass from #25 Abram Wiebe.",
+    "facts": [],
+    "xg": null
    }
   ]
  },

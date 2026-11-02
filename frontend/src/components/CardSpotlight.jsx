@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { formatMatchDate, ordinal } from '../format'
 import { teamStyle } from '../teams'
-import CardFace from './CardFace'
+import CardFace, { accentOf } from './CardFace'
 
 const MAX_CLIPS = 3
 // Which moments best show off a card, best first. Shots and saves are ranked by xG within their tier.
@@ -13,11 +13,20 @@ const kpisOf = (card) => card.archetype_kpis ?? card.attributes ?? []
 
 const describe = (m) => `${m.title} at ${m.clock} of the ${m.period_label}. ${m.text}`.trim()
 
+// A Ones to Watch card spans the whole tournament: the pop-out only shows its most recent game with a point on
+// video (moments are in game order); the card page lists them all.
+function latestGameMoments(card) {
+  const moments = card.moments || []
+  if (card.kind !== 'road') return moments
+  const latest = moments.filter((m) => m.broadcast).at(-1)?.game_id
+  return moments.filter((m) => m.game_id === latest)
+}
+
 // Up to three clips of the events behind the archetype's KPIs (arena camera first, else the TV replay),
 // falling back to the card's own highlight when none of those events are on video.
 function pickClips(card) {
   if (card.type !== 'special') return []
-  const moments = card.moments || []
+  const moments = latestGameMoments(card)
   const linked = new Set(kpisOf(card).flatMap((a) => a.moment_ids || []))
   const tier = (m) => (KIND_ORDER.includes(m.kind) ? KIND_ORDER.indexOf(m.kind) : KIND_ORDER.length)
   const rank = (m) => tier(m) * 10 - (m.xg || 0)
@@ -173,9 +182,10 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
   )
 }
 
-// Best in the game, else best on the player's team, else the plain game rank.
+// Best in the game, else best on the player's team, else the plain game rank. A KPI from before the tournament
+// (Ones to Watch) says which season it is from instead.
 function rankText(kpi) {
-  if (!kpi.match_rank) return null
+  if (!kpi.match_rank) return kpi.note ?? null
   if (kpi.match_rank === 1) return 'Best in the game'
   if (kpi.team_rank === 1) return `Best on team · ${ordinal(kpi.match_rank)} in game`
   return `${ordinal(kpi.match_rank)} of ${kpi.players_in_match} ${kpi.rank_pool}`
@@ -232,7 +242,7 @@ function CardBack({ card }) {
     )
   }
   return (
-    <span className="spotlight-back card-face" style={style}>
+    <span className="spotlight-back card-face" style={{ ...style, '--c2': accentOf(card) }}>
       <span className="back-title">{card.title}</span>
       <span className="back-kpis">
         {kpisOf(card).map((kpi) => (

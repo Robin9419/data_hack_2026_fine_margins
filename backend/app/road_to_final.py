@@ -5,6 +5,7 @@ the player's tournament looks like up to that point: the rating per game as bars
 See docs/CARD_TYPES.md. The game ratings are the made-up test ratings of testdata.py."""
 
 import re
+from datetime import date
 
 from .ratings import tier_of
 from .testdata import SOURCE, TestData, _key, _skater_rating, with_card_image
@@ -21,9 +22,45 @@ STAGES = [
     {"n": 4, "name": "Champion", "when": "After the final", "trigger": "The player's team wins the Spengler Cup.",
      "change": "Champion look: dark gold, surname on the side, champion label."},
 ]
+PRE_STAGE = {"n": 0, "name": "Ones to Watch", "when": "From the start of the tournament",
+             "trigger": "Available from the start. The card grows with every game the player plays.",
+             "change": "The first game gives it a match rating."}
 TIER_ORDER = ["bronze", "silver", "gold", "elite"]
 STARS_PER_TEAM = 2
 MIN_GAMES = 3  # to be a star of the tournament: played at least this many of his team's games
+# The stats before the tournament: only competitions played from the start of 2024 up to the Spengler Cup.
+PRE_FROM, PRE_UNTIL = date(2024, 1, 1), date(2025, 12, 26)
+PRE_PHASES = ("Regular season", "Playoffs", "Tournament", "Season to date")
+
+
+def _checked_pre(player: dict) -> dict:
+    """A player's stats before the tournament (watch_stats.json). Refuses lines that do not add up or fall outside
+    2024 up to the Spengler Cup: a 2023-24 line is only allowed for the playoffs or a tournament (spring 2024)."""
+    for line in player["seasons"]:
+        where = f'{player["name"]} {line["season"]} {line["short"]}'
+        if line["phase"] not in PRE_PHASES:
+            raise ValueError(f'{where}: unknown phase {line["phase"]}')
+        if line["goals"] + line["assists"] != line["points"]:
+            raise ValueError(f'{where}: goals and assists do not add up to the points')
+        start = int(line["season"][:4])
+        if start < 2023 or (start == 2023 and line["phase"] not in ("Playoffs", "Tournament")):
+            raise ValueError(f'{where}: before 2024')
+        if line["phase"] == "Season to date" and not PRE_FROM <= date.fromisoformat(line["through"]) < PRE_UNTIL:
+            raise ValueError(f'{where}: counted up to {line["through"]}, not before the Spengler Cup')
+    if sum(1 for line in player["seasons"] if line.get("headline")) > 1:
+        raise ValueError(f'{player["name"]}: more than one headline line')
+    return player
+
+
+def _headline(pre: dict) -> dict:
+    """The line the card back shows: the one marked as headline, else the latest league season (not a tournament)."""
+    lines = pre["seasons"]
+    return (next((line for line in lines if line.get("headline")), None)
+            or next((line for line in reversed(lines) if line["phase"] in ("Regular season", "Season to date")), lines[-1]))
+
+
+def _season_label(line: dict) -> str:
+    return line["season"].replace("-", "–")
 
 
 def _won(team: str, game: dict) -> bool:
@@ -32,10 +69,11 @@ def _won(team: str, game: dict) -> bool:
 
 
 class RoadToFinal:
-    def __init__(self, testdata: TestData, positions: dict, highlights: list[dict]):
+    def __init__(self, testdata: TestData, positions: dict, highlights: list[dict], pre_stats: list[dict]):
         self._td = testdata
         self._positions = positions
         self._highlights = {(h["team"], h["jersey"]): h for h in highlights}
+        self._pre = {(p["team"], p["jersey"]): _checked_pre(p) for p in pre_stats}
         self._player = {}  # (game id, (team, jersey)) -> the player's entry in that game
         self._rating = {}  # same key -> made-up match rating, only for skaters who got ice time
         for game in testdata.games:
@@ -62,15 +100,30 @@ class RoadToFinal:
         return stars
 
     def cards_for(self, played: set[str]) -> list[dict]:
-        """A card per star whose team has played at least one of the given games, built from those games."""
+        """A card per star, from the start of the tournament on, built from the given games that have been played."""
         included = {g for g in played if g in self._td.by_id}
-        return [card for key in self.stars if (card := self._card(key, included))]
+        return [self._card(key, included) for key in self.stars]
+
+    @staticmethod
+    def _card_id(key: tuple[str, int]) -> str:
+        return f'test-road-{re.sub(r"[^a-z]+", "-", key[0].lower().replace("ö", "o")).strip("-")}-{key[1]}'
+
+    def pointed(self, game_id: str) -> list[dict]:
+        """The stars with a goal or an assist in the game: their card id, name and points in that game."""
+        result = []
+        for key in self.stars:
+            entry = self._player.get((game_id, key))
+            goals, assists = (entry["stats"].get("goals") or 0, entry["stats"].get("assists") or 0) if entry else (0, 0)
+            if goals or assists:
+                result.append({"card_id": self._card_id(key), "name": f'{entry["first_name"]} {entry["last_name"]}',
+                               "goals": goals, "assists": assists})
+        return result
 
     @staticmethod
     def _label(game: dict, index: int) -> str:
         return {"Quarterfinal": "QF", "Semifinal": "Semi", "Final": "Final"}.get(game["stage"], f"G{index + 1}")
 
-    def _card(self, key: tuple[str, int], included: set[str]) -> dict | None:
+    def _card(self, key: tuple[str, int], included: set[str]) -> dict:
         team = key[0]
         games = self.team_games[team]
         slots, played = [], []
@@ -83,31 +136,33 @@ class RoadToFinal:
                 played.append((game, slots[-1]))
 
         n = len(played)
-        if n == 0:
-            return None
-        stage = 1 if n == 1 else 2
+        stage = 0 if n == 0 else 1 if n == 1 else 2
         semi = next((g for g, _ in played if g["stage"] == "Semifinal"), None)
         final = next((g for g, _ in played if g["stage"] == "Final"), None)
         if stage == 2 and semi and _won(team, semi):
             stage = 3
             if final and _won(team, final):
                 stage = 4
-        average = int(sum(s["mr"] for _, s in played) / n + 0.5)
-        tier = tier_of(average)
-        if stage >= 3:
-            tier = TIER_ORDER[min(TIER_ORDER.index(tier) + 1, len(TIER_ORDER) - 1)]
+        average = int(sum(s["mr"] for _, s in played) / n + 0.5) if n else None
+        tier = None
+        if n:
+            tier = tier_of(average)
+            if stage >= 3:
+                tier = TIER_ORDER[min(TIER_ORDER.index(tier) + 1, len(TIER_ORDER) - 1)]
         trend = average - played[0][1]["mr"] if n >= 2 else None
 
-        entry = self._player[(played[-1][0]["id"], key)]
+        # Before the first game the card shows the player from his first game in the schedule.
+        last = played[-1][0] if n else None
+        first_seen = next(g for g in games if (g["id"], key) in self._player)
+        entry = self._player[((last or first_seen)["id"], key)]
         moments = []
         for game, slot in played:
             for m in self._td._moments(game, entry):
                 moments.append({**m, "text": f'{slot["label"]} vs {slot["opponent"]}. {m["text"]}'})
-        last = played[-1][0]
-        info = STAGES[stage - 1]
+        info = STAGES[stage - 1] if stage else PRE_STAGE
         goals = sum(self._player[(g["id"], key)]["stats"].get("goals", 0) for g, _ in played)
         assists = sum(self._player[(g["id"], key)]["stats"].get("assists", 0) for g, _ in played)
-        card_id = f'test-road-{re.sub(r"[^a-z]+", "-", team.lower().replace("ö", "o")).strip("-")}-{key[1]}'
+        card_id = self._card_id(key)
         return {
             "id": card_id, "type": "special",
             "kind": "road", "special_type": None, "test": True, "test_game": None,
@@ -122,8 +177,10 @@ class RoadToFinal:
                 full_art=True),
             "title": "Spengler Cup Champion" if stage == 4 else info["name"],
             "archetype": "An evolving card: it grows with every game of the tournament the player plays.",
-            "archetype_kpis": None,
-            "match": {
+            # Before his first game the back shows why he is one to watch: his stats before the tournament.
+            "archetype_kpis": self._pre_kpis(key) if n == 0 else None,
+            "pre_tournament": self._pre.get(key),
+            "match": None if last is None else {
                 "id": last["id"], "date": last["date"], "stage": last["stage"], "home_team": last["home_team"],
                 "away_team": last["away_team"], "home_score": last["home_score"], "away_score": last["away_score"],
                 "opponent": last["away_team"] if last["home_team"] == team else last["home_team"],
@@ -132,9 +189,10 @@ class RoadToFinal:
                 self._total("goals", goals, moments), self._total("assists", assists, moments),
                 self._total("points", goals + assists, moments),
             ],
-            "explanation": (f'Stage {stage}, {info["name"]}: {n} {"game" if n == 1 else "games"} played, average match '
-                            f"rating {average}. {info['trigger']}"),
-            "achievement": None, "video": self._highlight(key), "video_sources": self._highlight_sources(key),
+            "explanation": (f'Stage {stage}, {info["name"]}: {n} {"game" if n == 1 else "games"} played, '
+                            f'{f"average match rating {average}" if n else "no match rating yet"}. {info["trigger"]}'),
+            "achievement": None, "video": self._highlight(key),
+            "video_sources": self._highlight_sources(key) + self._td.highlight_sources(g["id"] for g, _ in played),
             "moments": moments, "edition": "standard",
             "source": SOURCE,
             "road": {
@@ -158,6 +216,18 @@ class RoadToFinal:
         return [{"id": h["id"], "youtube_id": h["youtube_id"], "title": h["title"], "channel": h["channel"],
                  "url": h["url"], "permission": f'Player highlight embedded with the YouTube player from {h["channel"]}. '
                                                  "Not downloaded or re-edited."}]
+
+    def _pre_kpis(self, key: tuple[str, int]) -> list[dict] | None:
+        pre = self._pre.get(key)
+        if not pre:
+            return None
+        line = _headline(pre)
+        gp = line["gp"]
+        note = f'{line["short"]} {_season_label(line)}{" so far" if line["phase"] == "Season to date" else ""} · {gp} games'
+        values = [("points", "Points", str(line["points"])), ("goals", "Goals", str(line["goals"])),
+                  ("points_per_game", "Points per game", f'{line["points"] / gp:.2f}' if gp else "–")]
+        return [{"metric_id": f"pre-{metric_id}", "label": label, "value": value, "display_value": value, "unit": "",
+                 "note": note, "match_rank": None, "team_rank": None} for metric_id, label, value in values]
 
     def _total(self, metric_id: str, value: int, moments: list[dict]) -> dict:
         metric = self._td._metrics[metric_id]

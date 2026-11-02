@@ -58,7 +58,7 @@ Open http://localhost:5173. Vite forwards `/api` to the backend on port 8000. AP
 | Pack opening page and animation | `frontend/src/pages/PackOpening.jsx`, `.pack-*` in `frontend/src/index.css` |
 | KPI library (CSV column, label, plain-language definition) | `backend/content/metrics.json` |
 | Match metadata (teams, score, date) | `backend/content/match.json` |
-| Quiz clue per archetype (`archetypes`) | `backend/content/cards.json` |
+| Quiz wording per card title: plain-language question, hint and wrong-answer explanation | `backend/content/trivia.json` |
 | Reward milestones and points per card type | `backend/content/rewards.json` |
 | Trade-in page (pick 3 base cards, odds, slots) | `frontend/src/pages/Trade.jsx`, `.trade-*` in `index.css`; odds in `trade_odds` in `backend/app/main.py` |
 | Quiz page and unlock animation | `frontend/src/pages/Quiz.jsx`, `frontend/src/components/CardUnlock.jsx`, `.unlock-*` in `index.css` |

@@ -66,6 +66,7 @@ class Content:
         self.archetypes = cards_doc["archetypes"]
         self.archetype_metrics = {k: v for k, v in cards_doc["archetype_metrics"].items() if not k.startswith("_")}
         self.award_categories = _load_json('award_categories.json')['categories']
+        self.trivia = _load_json("trivia.json")
         rewards_doc = _load_json("rewards.json")
         self.card_points = rewards_doc["card_points"]
         self.stadium_multiplier = rewards_doc["stadium_multiplier"]
@@ -118,8 +119,10 @@ class Content:
         positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"]
                      for c in self.cards.values() if c["player"]}
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
-                                 self.nationalities, self.action_media, self.card_images)
-        self.road_to_final = RoadToFinal(self.testdata, positions, _load_json("road_videos.json")["players"])
+                                 self.nationalities, self.action_media, self.card_images,
+                                 self.archetypes)
+        self.road_to_final = RoadToFinal(self.testdata, positions, _load_json("road_videos.json")["players"],
+                                         _load_json("watch_stats.json")["players"])
         self.tournament = Tournament(self.testdata)
         # The game a card comes from (None: not tied to a game). Such a card only exists once its game is played on
         # the user's timeline. The cards built from the Wisehockey data, and the reward cards about them, are the final.
@@ -165,9 +168,18 @@ class Content:
         for moments in self.events.by_player.values():
             moments.sort(key=lambda m: (int(m['timestamp']), m['id']))
 
+    def _without_profile(self, candidates):
+        """A player holds one profile card per game: drop the candidates who already have one, so that an award
+        whose winner is taken goes to the next best player."""
+        held = {(c['player']['team'], c['player']['jersey']) for c in self.cards.values()
+                if c.get('kind') == 'profile' and c.get('player')}
+        return [(pid, stats) for pid, stats in candidates
+                if next((key for key, value in self.events.ids.items() if value == pid), None) not in held]
+
     def _add_pressure_card(self):
         candidates = [(pid, stats) for pid, stats in self.derived_kpis['pass_body_pressure']['players'].items()
                       if stats['ranking_eligible'] and stats['mean'] > 0]
+        candidates = self._without_profile(candidates)
         if not candidates:
             return
         # Deterministic tie break: more evaluated passes, then player ID.
@@ -188,6 +200,7 @@ class Content:
         calculation = self.derived_kpis['pass_packing']
         candidates = [(pid, stats) for pid, stats in calculation['players'].items()
                       if stats['ranking_eligible'] and stats['mean'] > 0]
+        candidates = self._without_profile(candidates)
         if not candidates:
             return
         pid, stats = max(candidates, key=lambda item: (item[1]['mean'], item[1]['evaluated_passes'], item[0]))
@@ -230,6 +243,7 @@ class Content:
     def _add_xa_card(self):
         candidates = [(pid, stats) for pid, stats in self.derived_kpis['expected_assists']['players'].items()
                       if stats['total'] > 0]
+        candidates = self._without_profile(candidates)
         if not candidates:
             return
         pid, stats = max(candidates, key=lambda item: (item[1]['total'], item[1]['assisted_shots'], item[0]))
@@ -302,6 +316,7 @@ class Content:
                         value = _to_number(row[metric['column']])
                         if pid and pid not in self.analysis.goalkeeper_ids and value is not None and math.isfinite(value) and value > 0:
                             candidates.append((pid, {award['aggregate']: value}))
+                candidates = self._without_profile(candidates)
                 if award.get('tie_break_metric'):
                     enriched = []
                     for pid, stats in candidates:
@@ -835,10 +850,14 @@ class Content:
         }
 
     def card_value(self, card_id: str, edition: str) -> int:
-        """Reward points for one owned card: base cards and legends by their own value, every other card (special,
-        collector, context) as a special. A stadium edition is worth the stadium multiplier."""
+        """Reward points for one owned card: base cards and legends by their own value, reward cards (collector and
+        context, the Collector filter) by the 'reward' value, every other card (special) as a special. A stadium edition
+        is worth the stadium multiplier."""
         card_type = self.cards[card_id]["type"]
-        value = self.card_points[card_type] if card_type in ("base", "legend") else self.card_points["special"]
+        if card_type in ("base", "legend", "reward"):
+            value = self.card_points[card_type]
+        else:
+            value = self.card_points["special"]
         return value * self.stadium_multiplier if edition == "stadium" else value
 
     def progress(self, owned: dict[str, str], available: set[str]) -> dict:
@@ -859,8 +878,9 @@ class Content:
         """Multiple choice question: the card's player plus two other players, shuffled. option_ids are card ids.
         For a card from a game the other options are players of that game in the same role (goalkeeper or skater):
         at most one with another special card of the game (so the questions of one game don't all list the same
-        names), the rest from the base cards of both teams. Special cards ask 'who was the <archetype>?', base cards
-        'who is this player?' with a profile clue."""
+        names), the rest from the base cards of both teams. Special cards describe the playstyle in plain words (see
+        trivia.json), base cards ask 'who is this player?'. The hint button shows 'hint' and strikes out 'eliminate',
+        one of the wrong options."""
         card = self.cards[card_id]
         player_of = lambda cid: (self.cards[cid]["player"]["team"], self.cards[cid]["player"]["jersey"])
         player = player_of(card_id)
@@ -887,15 +907,36 @@ class Content:
         rng.shuffle(option_ids)
         m = card["match"]
         if card["type"] == "base":
-            prompt, clue = "Who is this player?", self._profile_clue(card)
+            prompt, hint = "Who is this player?", self._profile_clue(card)
         else:
-            prompt, clue = f'Who was the "{card["title"]}" in this game?', card["archetype"] or self.archetypes[card["title"]]
+            wording = self.trivia["titles"].get(card["title"])
+            prompt = wording["prompt"] if wording else f'Who was the "{card["title"]}" in this game?'
+            hint = wording["hint"] if wording else card["archetype"] or self.archetypes[card["title"]]
         return {
             "option_ids": option_ids,
             "prompt": prompt,
-            "clue": clue,
+            "hint": hint,
+            "eliminate": rng.choice(others) if others else None,
             "match": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}' if m else None,
         }
+
+    def explain_answer(self, card_id: str) -> str:
+        """Why the card's player is the right answer, shown after a wrong one: the playstyle the card stands for and
+        the player's numbers from the game (zeros left out, they would only confuse)."""
+        card = self.cards[card_id]
+        if card["type"] == "base":
+            return self._profile_clue(card)
+        wording = self.trivia["titles"].get(card["title"])
+        why = wording["why"] if wording else card["archetype"] or self.archetypes[card["title"]]
+        phrases = self.trivia["stat_phrases"]
+        stats = []
+        for attr in card.get("archetype_kpis") or card.get("attributes") or []:
+            shown = attr.get("display_value")
+            if attr.get("metric_id") not in phrases or shown in (None, "–") or not _to_number(shown.replace(":", "")):
+                continue
+            singular, plural = phrases[attr["metric_id"]]
+            stats.append((singular if shown == "1" else plural).format(shown))
+        return f'{why} In this game: {", ".join(stats)}.' if stats else why
 
     @staticmethod
     def _profile_clue(card: dict) -> str:

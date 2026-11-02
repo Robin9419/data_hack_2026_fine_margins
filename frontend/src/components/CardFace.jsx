@@ -2,15 +2,15 @@ import { formatMatchDate } from '../format'
 import { nationOf } from '../nations'
 import { teamOf, teamStyle } from '../teams'
 import CardIcon from './CardIcon'
-import FormBars from './FormBars'
 import PlayerPhoto from './PlayerPhoto'
 
 // Card kinds are described in docs/CARD_TYPES.md. Front of a card, identity only, no KPIs (they are on the back):
 //   base         photo, name, position, team
 //   profile      team-colour frame, tag (Sniper, Playmaker, ...) as icon and line above the name
-//   performance  dark glitter card with its own accent colour, label on the side (Player of the Match, ...)
+//   performance  Player of the Match, Game Winner, ...: drawn as a profile card; as a Stadium edition (profile and
+//                performance alike) it is the dark glitter card with its accent colour and the label on the side
 //   collector    gold card with the club logo, for a club whose base cards are all collected
-//   road         Road to Final: evolving card with the rating per game as bars; the last stage is the Champion look
+//   road         Ones to Watch: evolving card; the last stage is the Champion look
 //   context      moment, stadium or trophy: a scene instead of a player portrait
 // state: 'owned' (full colour), 'locked' (gallery: grayed out photo only, no info) or 'hidden' (a mystery card in
 // a pack: no photo, name or archetype, so nothing leaks before it is revealed).
@@ -80,14 +80,21 @@ const ARCHETYPES = {
   'Shot Stopper': { icon: 'shield', color: '#7cc4ff' },
 }
 const PERFORMANCE_ICON = { motm: 'star', gamewinner: 'burst', wall: 'shield', recordbreaker: 'bolt' }
+const PERFORMANCE_COLOR = { motm: '#ffd76a', gamewinner: '#ff6a4a', wall: '#7cc4ff', recordbreaker: '#19e6ff' }
 // Label, icon, frame tier and rarity symbol per context card.
 const CONTEXT = {
   moment: { label: 'Moment', icon: 'star', tier: 'elite', rarity: '★★★' },
-  stadium: { label: 'Stadium', icon: 'flag', tier: 'silver', rarity: '◆' },
-  trophy: { label: 'Trophy', icon: 'trophy', tier: 'elite', rarity: '★★★' },
+  stadium: { label: 'Stadium', icon: 'flag', tier: 'silver', rarity: '◆◆' },
+  trophy: { label: 'Trophy', icon: 'trophy', tier: 'elite', rarity: '★★' },
 }
 
 const kindOf = (card) => card.kind ?? (card.type === 'base' ? 'base' : 'profile')
+
+// The accent colour of a card's front (its tag colour), for the back to match.
+export const accentOf = (card) =>
+  kindOf(card) === 'performance'
+    ? (PERFORMANCE_COLOR[card.special_type] ?? '#ffd76a')
+    : (ARCHETYPES[card.title]?.color ?? '#ffd76a')
 
 // The big club logo that stands in for a photo on a collector card.
 function ClubLogo({ team }) {
@@ -130,10 +137,6 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
     return (
       <div className={`card-face mystery ${state}`}>
         <span className="mystery-mark">?</span>
-        <div className="card-info">
-          <p className="card-archetype">? ? ?</p>
-          <p className="card-name">Mystery player</p>
-        </div>
       </div>
     )
   }
@@ -146,48 +149,61 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
   const nation = nationOf(player.nationality)
   const stadium = card.edition === 'stadium'
   const finish = FINISHES.includes(card.edition) ? card.edition : null
-  const archetype = ARCHETYPES[card.title] ?? { icon: 'star', color: '#ffd76a' }
   const road = kind === 'road' ? card.road : null
   const champion = road?.stage === 4
-  const dark = kind === 'performance' || champion // the dark glitter look with the surname on the side
+  // Impact specials (profile and performance cards) share one design: the profile look. Their Stadium edition is the
+  // dark glitter look with the surname on the side, in the accent colour of the tag.
+  const impact = kind === 'profile' || kind === 'performance'
+  const profileLook = impact && !stadium
+  const dark = (impact && stadium) || champion
+  const perf = kind === 'performance'
+  const archetype = perf
+    ? { icon: PERFORMANCE_ICON[card.special_type] ?? 'star', color: PERFORMANCE_COLOR[card.special_type] ?? '#ffd76a' }
+    : (ARCHETYPES[card.title] ?? { icon: 'star', color: '#ffd76a' })
   const sideText = champion ? 'Champion' : card.title
   const vertical = dark && nameLayout !== 'horizontal'
   const classes = [
     'card-face',
     'owned',
-    kind,
+    impact ? (profileLook ? 'profile' : 'performance') : kind,
     dark ? 'fa' : '',
     dark && !vertical ? 'hname' : '',
     kind === 'collector' ? 'tier-gold' : '',
-    kind === 'performance' ? `special-${card.special_type}` : '',
+    perf && stadium ? `special-${card.special_type}` : '',
     champion ? 'performance special-champion' : '',
-    stadium ? 'edition-stadium' : '',
+    stadium && !impact ? 'edition-stadium' : '',
     finish ? `finish-${finish}` : '',
   ]
   const rarity =
-    dark || kind === 'road' || kind === 'collector'
+    champion
       ? '★★★'
-      : kind === 'profile'
-        ? '◆'
+      : dark || kind === 'road' || kind === 'collector'
+        ? '★★'
+        : profileLook
+          ? '◆◆'
         : kind === 'base'
           ? BASE_SYMBOL
           : null
-  const game = match && (kind === 'profile' || kind === 'performance') ? match : null
+  const game = match && impact ? match : null
   const pos = POS_SHORT[player.position]
   // The tag (archetype etc.): an icon in the top left corner and its name as a line above the player name.
   const tag =
     dark
-      ? { icon: champion ? 'trophy' : PERFORMANCE_ICON[card.special_type], color: 'var(--s1)', line: false }
-      : kind === 'profile'
+      ? { icon: champion ? 'trophy' : archetype.icon, color: 'var(--s1)', line: false }
+      : profileLook
       ? { icon: archetype.icon, color: archetype.color, label: card.title }
       : road
-        ? { icon: 'flag', color: '#ffd76a', label: 'Road to Final' }
+        ? { icon: 'flag', color: '#ffd76a', label: 'Ones to Watch' }
         : kind === 'collector'
           ? { icon: 'gift', color: '#ffd76a', label: `Collector · ${card.requires.length}/${card.requires.length}` }
           : null
 
   return (
-    <div className={classes.filter(Boolean).join(' ')} style={{ ...teamStyle(player.team), ...(tag ? { '--tc': tag.color } : {}) }}>
+    <div className={classes.filter(Boolean).join(' ')} style={{
+        ...teamStyle(player.team),
+        ...(tag ? { '--tc': tag.color } : {}),
+        ...(dark && impact && !perf ? { '--s1': archetype.color, '--s2': '#fff' } : {}),
+      }}>
       <div className="card-inner" style={dark ? { '--llen': sideText.length } : undefined}>
         <PlayerPhoto player={player} className="card-art" />
         {dark && player.action_video_url && (
@@ -209,12 +225,11 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
         <div className="card-corner">
           {team.logo && (
             <span className="card-logo">
-              <img src={team.logo} alt={team.name} />
+              <img src={team.logo} alt={team.name} style={team.logoScale ? { transform: `scale(${team.logoScale})` } : undefined} />
             </span>
           )}
           {pos && <span className="card-pos">{pos}</span>}
         </div>
-        {stadium && <span className="edition-badge">🏟 Stadium</span>}
         {dark && (
           <span className="card-sidelabel">{sideText}</span>
         )}
@@ -249,7 +264,6 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
         )}
 
         <div className="card-info">
-          {road && <FormBars road={road} />}
           {tag && tag.line !== false && (
             <p className="card-tagline" style={{ '--tc': tag.color }}>
               <CardIcon name={tag.icon} />
@@ -259,16 +273,16 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
           {!dark && (
             <p className="card-name" style={{ '--nlen': player.last_name.length }}>
               <span className="card-first">
-                {kind === 'profile' && <i>#{player.jersey} </i>}
+                {profileLook && <i>#{player.jersey} </i>}
                 {player.first_name}
               </span>
               {player.last_name}
               {nation && <img className="card-flag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />}
             </p>
           )}
-          {(!(dark || kind === 'profile') || game) && (
+          {(!(dark || profileLook) || game) && (
             <p className="card-meta">
-              {!dark && kind !== 'profile' && (
+              {!dark && !profileLook && (
                 <span className="card-no">
                   <span>
                     <small>#</small>
@@ -318,7 +332,7 @@ function CollectorFace({ card }) {
           </p>
           <p className="card-name">{card.title}</p>
           <p className="card-foot">
-            <span className="card-rarity">★★★</span>
+            <span className="card-rarity">★★</span>
             <CardIcon name="trophy" />
           </p>
         </div>
@@ -394,7 +408,7 @@ function LegendFace({ card, locked }) {
         <div className="card-corner">
           {team.logo && (
             <span className="card-logo">
-              <img src={team.logo} alt={team.name} />
+              <img src={team.logo} alt={team.name} style={team.logoScale ? { transform: `scale(${team.logoScale})` } : undefined} />
             </span>
           )}
           {pos && <span className="card-pos">{pos}</span>}

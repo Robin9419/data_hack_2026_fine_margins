@@ -1,0 +1,517 @@
+{
+  "_comment": "Official highlight video per game of the 2025 Spengler Cup (YouTube, Spengler Cup Davos channel), keyed by the game id in testdata.json. Each clip ties a stretch of the video (start/end in seconds) to one goal, keyed by the score it made (home-away). The backend refuses to start if a clip names a goal that is not in the game. Goal times were read off the video's storyboard frames (2 s apart) by matching the on-screen game clock (it stops at the goal) and score to the official goals; a clip starts 6 s before the goal and runs up to 18 s after it or to the next goal's clip, so it can be off by a second or two. The final's stretches are the ones in videos.json. Embedded with the official YouTube player only: downloading, re-cutting or re-hosting the videos is NOT cleared.",
+  "games": [
+    {
+      "game_id": "2025-12-26_hc-fribourg-gotteron_hc-sparta-praha",
+      "youtube_id": "84RpAsI8nyg",
+      "title": "Highlights | HC Fribourg-Gottéron vs. HC Sparta Praha | Game 1 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=84RpAsI8nyg",
+      "duration": 186,
+      "clips": [
+        {
+          "score": "1-0",
+          "_goal": "1–0 Biasca",
+          "start": 1,
+          "end": 24
+        },
+        {
+          "score": "2-0",
+          "_goal": "2–0 Biasca",
+          "start": 24,
+          "end": 48
+        },
+        {
+          "score": "3-0",
+          "_goal": "3–0 Borgström",
+          "start": 48,
+          "end": 72
+        },
+        {
+          "score": "4-0",
+          "_goal": "4–0 Sörensen",
+          "start": 75,
+          "end": 97
+        },
+        {
+          "score": "4-1",
+          "_goal": "4–1 Kousal",
+          "start": 97,
+          "end": 119
+        },
+        {
+          "score": "5-1",
+          "_goal": "5–1 Sörensen",
+          "start": 119,
+          "end": 142
+        },
+        {
+          "score": "5-2",
+          "_goal": "5–2 Spacek",
+          "start": 142,
+          "end": 167
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-26_team-canada_us-collegiate-selects",
+      "youtube_id": "luG3xlTBysc",
+      "title": "Highlights | Team Canada vs. U.S. Collegiate Selects | Game 2 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=luG3xlTBysc",
+      "duration": 186,
+      "clips": [
+        {
+          "score": "1-0",
+          "_goal": "1–0 Schnarr",
+          "start": 1,
+          "end": 23
+        },
+        {
+          "score": "2-0",
+          "_goal": "2–0 Seney",
+          "start": 23,
+          "end": 47
+        },
+        {
+          "score": "3-0",
+          "_goal": "3–0 Shaw",
+          "start": 76,
+          "end": 95
+        },
+        {
+          "score": "3-1",
+          "_goal": "3–1 McCartthy",
+          "start": 95,
+          "end": 119
+        },
+        {
+          "score": "3-2",
+          "_goal": "3–2 Musa",
+          "start": 121,
+          "end": 145
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-27_ifk-helsinki_hc-sparta-praha",
+      "youtube_id": "H_AZIotJzAU",
+      "title": "Highlights | IFK Helsinki vs. HC Sparta Praha | Game 3 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=H_AZIotJzAU",
+      "duration": 186,
+      "clips": [
+        {
+          "score": "0-1",
+          "_goal": "0–1 Hrabík",
+          "start": 9,
+          "end": 31
+        },
+        {
+          "score": "0-2",
+          "_goal": "0–2 Dzierkals",
+          "start": 31,
+          "end": 55
+        },
+        {
+          "score": "1-2",
+          "_goal": "1–2 Mäkiaho",
+          "start": 70,
+          "end": 94
+        },
+        {
+          "score": "1-3",
+          "_goal": "1–3 Irving",
+          "start": 97,
+          "end": 121
+        },
+        {
+          "score": "1-4",
+          "_goal": "1–4 Kousal",
+          "start": 136,
+          "end": 161
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-27_hc-davos_us-collegiate-selects",
+      "youtube_id": "VvPMf3Dn8-Q",
+      "title": "Highlights | HC Davos vs. U.S. Collegiate Selects | Game 4 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=VvPMf3Dn8-Q",
+      "duration": 186,
+      "clips": [
+        {
+          "score": "0-1",
+          "_goal": "0–1 Finley",
+          "start": 6,
+          "end": 21
+        },
+        {
+          "score": "0-2",
+          "_goal": "0–2 Dimarsico",
+          "start": 21,
+          "end": 34
+        },
+        {
+          "score": "1-2",
+          "_goal": "1–2 Frehner",
+          "start": 34,
+          "end": 48
+        },
+        {
+          "score": "2-2",
+          "_goal": "2–2 Jung",
+          "start": 48,
+          "end": 72
+        },
+        {
+          "score": "2-3",
+          "_goal": "2–3 Dimarsico",
+          "start": 72,
+          "end": 93
+        },
+        {
+          "score": "2-4",
+          "_goal": "2–4 Finley",
+          "start": 93,
+          "end": 118
+        },
+        {
+          "score": "3-4",
+          "_goal": "3–4 Fora",
+          "start": 120,
+          "end": 142
+        },
+        {
+          "score": "3-5",
+          "_goal": "3–5 Pohlkamp",
+          "start": 142,
+          "end": 166
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-28_hc-fribourg-gotteron_ifk-helsinki",
+      "youtube_id": "tXQ-_oRVqbk",
+      "title": "Highlights | HC Fribourg-Gottéron vs. IFK Helsinki | Game 5 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=tXQ-_oRVqbk",
+      "duration": 190,
+      "clips": [
+        {
+          "score": "0-1",
+          "_goal": "0–1 Larsen",
+          "start": 5,
+          "end": 25
+        },
+        {
+          "score": "1-1",
+          "_goal": "1–1 Sörensen",
+          "start": 25,
+          "end": 49
+        },
+        {
+          "score": "1-2",
+          "_goal": "1–2 Somppi",
+          "start": 51,
+          "end": 75
+        },
+        {
+          "score": "2-2",
+          "_goal": "2–2 Biasca",
+          "start": 83,
+          "end": 107
+        },
+        {
+          "score": "3-2",
+          "_goal": "3–2 Friman",
+          "start": 118,
+          "end": 136
+        },
+        {
+          "score": "4-2",
+          "_goal": "4–2 De la Rose",
+          "start": 136,
+          "end": 152
+        },
+        {
+          "score": "4-3",
+          "_goal": "4–3 Palmu",
+          "start": 152,
+          "end": 177
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-28_team-canada_hc-davos",
+      "youtube_id": "KTlrU5EElmc",
+      "title": "Highlights | Team Canada vs. HC Davos | Game 6 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=KTlrU5EElmc",
+      "duration": 228,
+      "clips": [
+        {
+          "score": "0-1",
+          "_goal": "0–1 Zadina",
+          "start": 10,
+          "end": 34
+        },
+        {
+          "score": "1-1",
+          "_goal": "1–1 Brouillard",
+          "start": 43,
+          "end": 67
+        },
+        {
+          "score": "1-2",
+          "_goal": "1–2 Asplund",
+          "start": 75,
+          "end": 99
+        },
+        {
+          "score": "1-3",
+          "_goal": "1–3 Frehner",
+          "start": 106,
+          "end": 131
+        },
+        {
+          "score": "1-4",
+          "_goal": "1–4 Stransky",
+          "start": 154,
+          "end": 179
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-29_hc-sparta-praha_team-canada",
+      "youtube_id": "6N49q9d0NcA",
+      "title": "Highlights | HC Sparta Praha vs. Team Canada | Game 7 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=6N49q9d0NcA",
+      "duration": 186,
+      "clips": [
+        {
+          "score": "1-0",
+          "_goal": "1–0 Dzierkals",
+          "start": 7,
+          "end": 32
+        },
+        {
+          "score": "1-1",
+          "_goal": "1–1 Peca",
+          "start": 35,
+          "end": 59
+        },
+        {
+          "score": "2-1",
+          "_goal": "2–1 Chlapík",
+          "start": 68,
+          "end": 92
+        },
+        {
+          "score": "3-1",
+          "_goal": "3–1 Dzierkals",
+          "start": 93,
+          "end": 105
+        },
+        {
+          "score": "4-1",
+          "_goal": "4–1 Vesalainen",
+          "start": 105,
+          "end": 129
+        },
+        {
+          "score": "5-1",
+          "_goal": "5–1 Nemecek",
+          "start": 129,
+          "end": 153
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-29_hc-davos_ifk-helsinki",
+      "youtube_id": "63kfNiiRomw",
+      "title": "Highlights | HC Davos vs. IFK Helsinki | Game 8 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=63kfNiiRomw",
+      "duration": 186,
+      "clips": [
+        {
+          "score": "1-0",
+          "_goal": "1–0 Zadina",
+          "start": 9,
+          "end": 33
+        },
+        {
+          "score": "2-0",
+          "_goal": "2–0 Ryfors",
+          "start": 60,
+          "end": 84
+        },
+        {
+          "score": "3-0",
+          "_goal": "3–0 Kessler",
+          "start": 115,
+          "end": 139
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-30_us-collegiate-selects_hc-sparta-praha",
+      "youtube_id": "nB6WR72GljQ",
+      "title": "Highlights | U.S. Collegiate Selects vs. HC Sparta Praha | Game 9 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=nB6WR72GljQ",
+      "duration": 198,
+      "clips": [
+        {
+          "score": "1-0",
+          "_goal": "1–0 Pohlkamp",
+          "start": 5,
+          "end": 23
+        },
+        {
+          "score": "2-0",
+          "_goal": "2–0 Fink",
+          "start": 23,
+          "end": 41
+        },
+        {
+          "score": "2-1",
+          "_goal": "2–1 Vitouch",
+          "start": 41,
+          "end": 54
+        },
+        {
+          "score": "2-2",
+          "_goal": "2–2 Chlapík",
+          "start": 54,
+          "end": 76
+        },
+        {
+          "score": "3-2",
+          "_goal": "3–2 Cerrato",
+          "start": 76,
+          "end": 99
+        },
+        {
+          "score": "4-2",
+          "_goal": "4–2 Fink",
+          "start": 99,
+          "end": 123
+        },
+        {
+          "score": "5-2",
+          "_goal": "5–2 Fink",
+          "start": 123,
+          "end": 147
+        },
+        {
+          "score": "5-3",
+          "_goal": "5–3 Chlapík",
+          "start": 154,
+          "end": 179
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-30_hc-fribourg-gotteron_hc-davos",
+      "youtube_id": "niGYWW1Ae8Q",
+      "title": "Highlights | HC Fribourg-Gottéron vs. HC Davos | Game 10 | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=niGYWW1Ae8Q",
+      "duration": 186,
+      "clips": [
+        {
+          "score": "0-1",
+          "_goal": "0–1 Stransky",
+          "start": 5,
+          "end": 30
+        },
+        {
+          "score": "1-1",
+          "_goal": "1–1 Sörensen",
+          "start": 33,
+          "end": 52
+        },
+        {
+          "score": "1-2",
+          "_goal": "1–2 Kessler",
+          "start": 52,
+          "end": 77
+        },
+        {
+          "score": "1-3",
+          "_goal": "1–3 Ryfors",
+          "start": 91,
+          "end": 115
+        }
+      ]
+    },
+    {
+      "game_id": "2025-12-31_us-collegiate-selects_hc-davos",
+      "youtube_id": "O3rLScC5SKw",
+      "title": "Highlights | U.S. Collegiate Selects vs. HC Davos | FINAL | Spengler Cup Davos 2025",
+      "channel": "Spengler Cup Davos",
+      "url": "https://www.youtube.com/watch?v=O3rLScC5SKw",
+      "duration": 234,
+      "clips": [
+        {
+          "score": "0-1",
+          "_goal": "0–1 Asplund",
+          "start": 3,
+          "end": 19
+        },
+        {
+          "score": "1-1",
+          "_goal": "1–1 Walsh",
+          "start": 19,
+          "end": 41
+        },
+        {
+          "score": "1-2",
+          "_goal": "1–2",
+          "start": 41,
+          "end": 61
+        },
+        {
+          "score": "2-2",
+          "_goal": "2–2 Fink",
+          "start": 61,
+          "end": 79
+        },
+        {
+          "score": "2-3",
+          "_goal": "2–3",
+          "start": 79,
+          "end": 97
+        },
+        {
+          "score": "3-3",
+          "_goal": "3–3 Musa",
+          "start": 97,
+          "end": 117
+        },
+        {
+          "score": "3-4",
+          "_goal": "3–4 Zadina",
+          "start": 117,
+          "end": 151
+        },
+        {
+          "score": "3-5",
+          "_goal": "3–5 Corvi",
+          "start": 151,
+          "end": 185
+        },
+        {
+          "score": "3-6",
+          "_goal": "3–6 Stransky",
+          "start": 185,
+          "end": 199
+        }
+      ]
+    }
+  ]
+}

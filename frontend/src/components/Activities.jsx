@@ -129,7 +129,7 @@ export default function Activities() {
       key="tickets"
       icon="🎟"
       title="Buy match tickets"
-      text={`${ticketInfo.cards_per_ticket} free base cards for every ticket.`}
+      text={`${ticketInfo.cards_per_ticket} free cards for every ticket.`}
       action={
         <div className="activity-tickets">
           <button type="button" aria-label="Fewer tickets" disabled={tickets <= 1} onClick={() => setTickets(tickets - 1)}>

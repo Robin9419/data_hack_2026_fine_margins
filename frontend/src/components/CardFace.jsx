@@ -172,6 +172,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
     perf && stadium ? `special-${card.special_type}` : '',
     champion ? 'performance special-champion' : '',
     stadium && !impact ? 'edition-stadium' : '',
+    stadium ? 'edition-arena' : '',
     finish ? `finish-${finish}` : '',
   ]
   const rarity =

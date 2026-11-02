@@ -75,7 +75,7 @@ export default function Home() {
             {newCardIds.length} new {newCardIds.length === 1 ? 'card' : 'cards'} added to your collection.
           </span>
           <button type="button" className="link-button" onClick={() => navigate('/collection', { state: { newCardIds } })}>
-            Open collection ›
+            Open Collection ›
           </button>
         </div>
       )}
@@ -84,22 +84,22 @@ export default function Home() {
 
       <div className="home-highlights">
         <div className="section-header">
-          <h1>Your highlights</h1>
+          <h1>Your Collection Highlights</h1>
         </div>
-        {row('Best cards', best)}
-        {row('Latest performances', latest)}
+        {row('Best Cards', best)}
+        {row('Latest Performances', latest)}
         {best.length === 0 && latest.length === 0 && (
           <p className="muted">No special cards yet. Open packs and make predictions to win some.</p>
         )}
         <div className="home-collection-link">
           <Link to="/collection" className="pack-button">
-            View your whole collection ›
+            View Your Whole Collection ›
           </Link>
           <span className="muted">
             <strong>
               {ownedCount} / {realCards.length}
             </strong>{' '}
-            cards collected
+            Cards Collected
           </span>
         </div>
       </div>

@@ -1101,7 +1101,8 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 
 .trade-warning { margin: 16px auto 0; max-width: 460px; padding: 10px 14px; font-size: 0.85rem; color: #ffd36b; text-align: left; border: 1px solid #ffd36b; border-radius: 8px; background: rgba(255, 211, 107, 0.1); }
 .trade-warning ul { margin: 6px 0 0; padding-left: 18px; }
-.trade-card.last-copy .trade-count { color: #ffd36b; }
+.trade-card.last-copy .trade-count { border-color: var(--gold); color: var(--gold); }
+.trade-card.last-copy .trade-count button { background: var(--gold); color: #1a1405; }
 .trade-error { margin: 16px 0 0; color: #ff9b8f; }
 .trade-actions { margin-top: 24px; }
 .pack-button:disabled { cursor: default; opacity: 0.45; box-shadow: none; }
@@ -1117,8 +1118,10 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .trade-card .card-tile:not(:disabled):hover { transform: translateY(-4px); box-shadow: 0 14px 28px -12px rgba(10, 30, 60, 0.6); }
 .trade-card .card-name { font-size: 1.05rem; }
 .trade-card.picked .card-face { box-shadow: 0 0 0 3px var(--accent), 0 0 18px rgba(11, 92, 173, 0.5); }
-.trade-count { position: absolute; left: 50%; bottom: -12px; z-index: 4; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 2px 4px 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; color: #fff; background: var(--accent); white-space: nowrap; }
-.trade-count button { width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; font: inherit; font-weight: 800; line-height: 1; color: var(--accent); background: #fff; cursor: pointer; }
+.trade-count { position: absolute; left: 50%; bottom: -14px; z-index: 4; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 3px 0 12px; border: 1px solid var(--accent); border-radius: 999px; font-family: var(--display); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text); background: color-mix(in srgb, var(--surface-2) 92%, #000); box-shadow: var(--shadow); white-space: nowrap; }
+.trade-count em { font-style: normal; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.trade-count button { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; font: inherit; font-size: 1rem; font-weight: 700; line-height: 1; color: var(--accent-ink); background: var(--accent); cursor: pointer; }
+.trade-count button:hover { filter: brightness(1.12); }
 .trade-empty { margin-top: 24px; text-align: center; }
 
 @keyframes slot-in { from { opacity: 0; transform: translateY(30px) scale(0.85); } }

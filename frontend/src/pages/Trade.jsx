@@ -231,8 +231,8 @@ export default function Trade() {
                     <div className="trade-count">
                       <span>
                         {n} / {card.copies}
-                        {n >= card.copies && ' ⚠ all'}
                       </span>
+                      {n >= card.copies && <em>all copies</em>}
                       <button type="button" aria-label={`Take one ${fullName(card)} out of the trade`} onClick={() => removeOne(card.id)}>
                         −
                       </button>

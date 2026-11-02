@@ -311,6 +311,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
         </div>
         {stadium && <span className="arena-mark" title="Stadium edition: won at the stadium">Stadium</span>}
         {stadium && <span className="arena-sill" aria-hidden="true" />}
+        {stadium && <span className="arena-trim" aria-hidden="true" />}
       </div>
     </div>
   )

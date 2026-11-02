@@ -102,11 +102,11 @@ button[type='submit']:disabled { opacity: 0.5; cursor: default; }
 .ch-txt small { font-size: 0.8rem; font-weight: 400; color: var(--muted); }
 .ch-mark { flex: none; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--line); font-size: 0.75rem; font-weight: 800; color: var(--accent-ink); }
 .choice.selected .ch-mark, .choice.active .ch-mark { background: var(--accent); box-shadow: none; }
-.choice.selected .ch-mark::after, .choice.active .ch-mark::after { content: 'âœ“'; }
+.choice.selected .ch-mark::after, .choice.active .ch-mark::after { content: '✓'; }
 .choice.right .ch-mark { background: var(--ok); box-shadow: none; }
-.choice.right .ch-mark::after { content: 'âœ“'; }
+.choice.right .ch-mark::after { content: '✓'; }
 .choice.wrong .ch-mark { background: var(--danger); box-shadow: none; }
-.choice.wrong .ch-mark::after { content: 'âœ•'; }
+.choice.wrong .ch-mark::after { content: '✕'; }
 
 /* Login */
 .login { max-width: 420px; margin: 48px auto; }
@@ -262,7 +262,7 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .skip { color: var(--muted); }
 
 /* Predictions page: one question at a time, then a summary */
-.predict { max-width: 640px; margin: 0 auto; display: grid; gap: 16px; }
+.predict { max-width: none; margin: 0 auto; display: grid; gap: 16px; }
 .predict-head h1 { margin: 2px 0 4px; }
 .predict-head > p.muted { margin: 0 0 12px; }
 .predict-progress { height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
@@ -898,7 +898,7 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .activity-tickets button[aria-label]:disabled { opacity: 0.4; cursor: default; }
 
 /* Quiz */
-.quiz { max-width: 640px; margin: 0 auto; }
+.quiz { max-width: none; margin: 0 auto; }
 .quiz h1 { font-size: 1.6rem; }
 .quiz-match { margin: 0; font-weight: 600; }
 .quiz-clue { margin: 8px 0; padding: 10px 14px; background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 8px; }
@@ -1064,7 +1064,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .spotlight-panel, .results-modal { overscroll-behavior: contain; }
 
 /* Trade-in */
-.trade { max-width: 860px; margin: 0 auto; }
+.trade { max-width: none; margin: 0 auto; }
 .trade-machine {
   --gold: #ffd36b;
   margin: 12px -16px 0;
@@ -1089,7 +1089,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .odds-special { background: linear-gradient(90deg, #ff78c8, #fff096, #78dcff); }
 
 .trade-slots { display: flex; justify-content: center; gap: 14px; }
-.trade-slot { position: relative; width: 130px; aspect-ratio: 5 / 7; border-radius: 14px; }
+.trade-slot { position: relative; flex: 1; max-width: 130px; aspect-ratio: 5 / 7; border-radius: 14px; }
 .trade-slot.empty { display: flex; align-items: center; justify-content: center; border: 2px dashed rgba(255, 255, 255, 0.3); color: rgba(255, 255, 255, 0.35); font-size: 2rem; font-weight: 800; }
 .trade-slot.filled { padding: 0; border: 0; background: none; font: inherit; cursor: pointer; animation: slot-in 350ms cubic-bezier(0.2, 1.4, 0.4, 1); }
 .trade-slot.filled .card-name { font-size: 0.95rem; }
@@ -1106,8 +1106,10 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .trade-actions { margin-top: 24px; }
 .pack-button:disabled { cursor: default; opacity: 0.45; box-shadow: none; }
 
-.trade-pick-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.trade-pick-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 24px 0 12px; }
 .trade-pick-head h2 { margin: 0; }
+.trade .search { width: 100%; box-sizing: border-box; }
+.trade-dd { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 12px 0 20px; }
 .trade-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
 .trade-card { position: relative; }
 .trade-card .card-tile { width: 100%; padding: 0; border: 0; background: none; font: inherit; cursor: pointer; }
@@ -1123,6 +1125,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 @media (max-width: 520px) {
   .trade-slots { gap: 8px; }
   .trade-slot { width: 30%; }
+  .trade-dd { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .trade-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1182,7 +1185,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .pre-facts { margin-bottom: 8px; }
 .legend-facts { padding-left: 1.2rem; margin: 0; }
 .legend-facts li { margin: 4px 0; }
-.legend-facts li::marker { content: 'â˜…  '; color: #c9971f; }
+.legend-facts li::marker { content: '★  '; color: #c9971f; }
 
 @media (prefers-reduced-motion: reduce) {
   .tier-elite, .card-glitter { animation: none; }

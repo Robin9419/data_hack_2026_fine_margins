@@ -6,6 +6,7 @@ import { useAuth } from '../auth'
 import Activities from '../components/Activities'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
+import Dropdown from '../components/Dropdown'
 import { nationOf } from '../nations'
 import { TEAMS, teamOf, teamStyle } from '../teams'
 import { useTournament } from '../tournament'
@@ -45,32 +46,6 @@ function saveView(view) {
   } catch {
     // Storage can be blocked; the gallery still works without remembering the view.
   }
-}
-
-export function ChipFilter({ label, options, value, onChange, className = '' }) {
-  return (
-    <div className="fgroup">
-      <span className="fgroup-label" id={`fg-${label}`}>
-        {label}
-      </span>
-      <div className={`chips ${className}`} role="group" aria-labelledby={`fg-${label}`}>
-        {options.map((o) => (
-          <button
-            key={o.value}
-            type="button"
-            className={`gchip ${value === o.value ? 'active' : ''}`}
-            aria-pressed={value === o.value}
-            aria-label={o.title ?? o.label}
-            title={o.title ?? o.label}
-            onClick={() => onChange(o.value)}
-          >
-            {o.logo && <img src={o.logo} alt="" loading="lazy" />}
-            <span>{o.label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
 }
 
 // One tile per player (team + jersey) among the shown cards; progress counts all of his cards.
@@ -289,9 +264,9 @@ export default function Gallery() {
         </div>
       </div>
 
-      <div className="gallery-filters">
-        <ChipFilter label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} className="scroll" />
-        <ChipFilter label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
+      <div className="dd-row">
+        <Dropdown label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />
+        <Dropdown label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
       </div>
 
       <div className="card-pager">

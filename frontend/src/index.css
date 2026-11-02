@@ -1383,3 +1383,18 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .home-collection-link strong { color: var(--text); }
 @media (max-width: 700px) { .home-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
+
+/* Collection: the page fills the window, only the card list scrolls */
+@media (min-width: 700px) and (min-height: 640px) {
+  .app:has(.collection-page) { box-sizing: border-box; height: calc(100dvh - 61px); display: flex; flex-direction: column; padding-bottom: 76px; }
+  .app:has(.collection-page) > main { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: 0; }
+  .app:has(.collection-page) .reward-bar { flex: none; margin: 12px 0; }
+  .collection-page { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .collection-page > * { flex: none; }
+  .collection-page .collection-header { margin-top: 4px; }
+  .collection-page .card-pager { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+  .collection-page .card-pager .pager-arrow { align-self: center; }
+  .collection-page .card-pager .card-grid { margin: 0; padding: 8px 6px; overflow-y: auto; align-content: start; scrollbar-width: thin; }
+  .collection-page .pager-dots { margin: 8px 0; }
+  .collection-page .reset { margin-bottom: 8px; }
+}

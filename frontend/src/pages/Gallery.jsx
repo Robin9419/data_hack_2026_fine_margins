@@ -209,7 +209,7 @@ export default function Gallery() {
   }
 
   return (
-    <section>
+    <section className="collection-page">
       <div className="collection-header">
         <div>
           <p className="eyebrow">Spengler Cup 2025</p>

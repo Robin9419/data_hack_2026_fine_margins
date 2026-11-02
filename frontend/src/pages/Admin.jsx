@@ -28,6 +28,14 @@ const PHOTOS = [
   { value: 'all', label: 'All cards' },
   { value: 'action', label: 'Action photos only' },
 ]
+const EDITIONS = [
+  { value: 'standard', label: 'Standard' },
+  { value: 'stadium', label: 'Stadium' },
+  { value: 'both', label: 'Standard + Stadium' },
+]
+// Only the profile and performance specials come in a Stadium edition.
+const hasStadium = (c) => c.kind === 'profile' || c.kind === 'performance'
+const withEdition = (c, edition) => (hasStadium(c) ? { ...c, edition } : c)
 const NAME_LAYOUT = [
   { value: 'vertical', label: 'Vertical' },
   { value: 'horizontal', label: 'Horizontal' },
@@ -67,13 +75,14 @@ export default function Admin() {
   const [team, setTeam] = useState('all')
   const [photos, setPhotos] = useState('all')
   const [nameLayout, setNameLayout] = useState('vertical')
+  const [edition, setEdition] = useState('standard')
   const [mode, setMode] = useState('cards')
   const [query, setQuery] = useState('')
   const [spotlight, setSpotlight] = useState(null)
   const [page, setPage] = useState(0)
   const touchStartX = useRef(null)
   // Any change of filters, search or view starts again on the first page.
-  useEffect(() => setPage(0), [kind, team, photos, mode, query])
+  useEffect(() => setPage(0), [kind, team, photos, mode, query, edition])
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
 
   useEffect(() => {
@@ -114,7 +123,11 @@ export default function Admin() {
         (a.player?.jersey ?? 0) - (b.player?.jersey ?? 0),
     )
   const players = mode === 'players' ? groupPlayers(shown) : []
-  const items = mode === 'players' ? players : shown
+  const shownCards =
+    edition === 'both' ? shown.flatMap((c) => (hasStadium(c) ? [withEdition(c, 'standard'), withEdition(c, 'stadium')] : [c]))
+      : edition === 'stadium' ? shown.map((c) => withEdition(c, 'stadium'))
+        : shown
+  const items = mode === 'players' ? players : shownCards
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
   const current = Math.min(page, pageCount - 1)
   const pageItems = items.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
@@ -186,6 +199,7 @@ export default function Admin() {
         <Dropdown label="Card type" options={KIND_FILTERS} value={kind} onChange={setKind} />
         <Dropdown label="Photos" options={PHOTOS} value={photos} onChange={setPhotos} />
         <Dropdown label="Name on specials" options={NAME_LAYOUT} value={nameLayout} onChange={setNameLayout} />
+        <Dropdown label="Edition" options={EDITIONS} value={edition} onChange={setEdition} />
       </div>
       <p className="muted small">
         {mode === 'players' ? `${players.length} players · ` : ''}
@@ -221,7 +235,7 @@ export default function Admin() {
                 const { player, what, game } = caption(card)
                 const face = <CardFace card={card} nameLayout={nameLayout} />
                 return (
-                  <figure key={card.id} className="admin-cell">
+                  <figure key={`${card.id}-${card.edition}`} className="admin-cell">
                     {card.type === 'special' ? (
                       <button type="button" className="card-tile" onClick={() => setSpotlight(card)}>
                         {face}
@@ -230,7 +244,7 @@ export default function Admin() {
                       <div className="card-tile">{face}</div>
                     )}
                     <figcaption>
-                      <strong>{what}</strong>
+                      <strong>{what}{card.edition === 'stadium' ? ' · Stadium' : ''}</strong>
                       {hasProfile(card) ? (
                         <Link to={`/players/${card.id}`} className="plain-link">
                           {player}

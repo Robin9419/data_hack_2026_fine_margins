@@ -158,13 +158,10 @@ export default function PlayerProfile() {
   const bio = base?.bio ?? {}
   const goalie = player.position === 'Goalkeeper'
   const bioFacts = [
-    ['Born', bio.date_of_birth && `${formatMatchDate(bio.date_of_birth)} (age ${age(bio.date_of_birth)})`],
-    ['Birthplace', bio.place_of_birth],
+    ['Age', bio.date_of_birth && `${age(bio.date_of_birth)} years`],
+    [goalie ? 'Catches' : 'Shoots', bio.shoots && (bio.shoots === 'L' ? 'Left' : 'Right')],
     ['Height', bio.height_cm && `${bio.height_cm} cm`],
     ['Weight', bio.weight_kg && `${bio.weight_kg} kg`],
-    [goalie ? 'Catches' : 'Shoots', bio.shoots && (bio.shoots === 'L' ? 'Left' : 'Right')],
-    ['College 2025–26', bio.club],
-    ['Draft', bio.draft],
   ].filter(([, value]) => value)
   const lastName = named ? player.last_name : 'Locked player'
   const dataCards = owned.filter(hasData)

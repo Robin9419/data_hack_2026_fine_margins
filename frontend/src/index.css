@@ -62,7 +62,8 @@ h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
 .link-button { background: none; border: none; border-radius: 4px; color: var(--accent); cursor: pointer; padding: 0; font: inherit; font-weight: 600; text-decoration: none; }
 .link-button:hover:not(:disabled) { filter: brightness(1.15); text-decoration: underline; text-underline-offset: 3px; }
 .link-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.back-link { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 8px; padding: 6px 14px 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: color 120ms, border-color 120ms; }
+.page-back { display: flex; align-items: flex-start; min-height: 40px; margin: 0 0 12px; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; box-sizing: border-box; width: auto; height: 36px; margin: 0; padding: 0 14px 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: color 120ms, border-color 120ms; }
 .back-link::before { content: ''; width: 7px; height: 7px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); margin-left: 3px; }
 .back-link:hover { color: var(--text); border-color: var(--accent); }
 .back-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -101,11 +102,11 @@ button[type='submit']:disabled { opacity: 0.5; cursor: default; }
 .ch-txt small { font-size: 0.8rem; font-weight: 400; color: var(--muted); }
 .ch-mark { flex: none; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--line); font-size: 0.75rem; font-weight: 800; color: var(--accent-ink); }
 .choice.selected .ch-mark, .choice.active .ch-mark { background: var(--accent); box-shadow: none; }
-.choice.selected .ch-mark::after, .choice.active .ch-mark::after { content: '✓'; }
+.choice.selected .ch-mark::after, .choice.active .ch-mark::after { content: 'âœ“'; }
 .choice.right .ch-mark { background: var(--ok); box-shadow: none; }
-.choice.right .ch-mark::after { content: '✓'; }
+.choice.right .ch-mark::after { content: 'âœ“'; }
 .choice.wrong .ch-mark { background: var(--danger); box-shadow: none; }
-.choice.wrong .ch-mark::after { content: '✕'; }
+.choice.wrong .ch-mark::after { content: 'âœ•'; }
 
 /* Login */
 .login { max-width: 420px; margin: 48px auto; }
@@ -208,13 +209,22 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 
 /* Greyed out: cards not collected yet, and pack cards before the reveal */
 .card-face.locked { filter: grayscale(1) brightness(0.7); }
+.card-face.locked, .card-face.legend.locked-legend { --silver: linear-gradient(150deg, #ffffff, #9aa4b1 35%, #f4f7fb 55%, #7b8592 80%, #d5dbe3); box-shadow: none; background: var(--silver); }
+.card-face.locked::before, .card-face.legend.locked-legend::before { content: ''; position: absolute; inset: 3px; z-index: 0; -webkit-mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; background: radial-gradient(circle at 70% 20%, color-mix(in srgb, var(--c2) 30%, transparent), transparent 60%), linear-gradient(180deg, var(--c1), #02040a 115%); }
+.card-face.locked.reward-locked::before { background: radial-gradient(circle at 70% 20%, color-mix(in srgb, var(--c2) 30%, transparent), transparent 60%), linear-gradient(180deg, var(--c1), #02040a 115%); }
+.card-face.legend.locked-legend::before { background: radial-gradient(circle at 50% 30%, #1d2a3b, #050a14 75%); }
+.card-face.locked .card-art, .card-face.legend.locked-legend .card-art { inset: 3px; -webkit-mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; }
+.card-face.locked::after, .card-face.legend.locked-legend::after { inset: 40% 3px 3px; }
+.card-tile.is-locked .card-face { --frame: linear-gradient(150deg, #ffffff, #9aa4b1 35%, #f4f7fb 55%, #7b8592 80%, #d5dbe3); }
+.card-face.reward-locked .card-info { bottom: 17cqw; padding: 0 9cqw; text-align: center; }
+.card-face.reward-locked .card-name { font-size: max(13px, 8.5cqw); line-height: 1.05; }
+.card-face.reward-locked .card-info .card-meta.unlock-rule { margin-top: 1.5cqw; font-size: max(9px, 4.2cqw); line-height: 1.3; white-space: normal; text-transform: none; letter-spacing: 0; }
 .card-face.hidden { filter: grayscale(1) brightness(0.55) contrast(0.95); }
 .card-tile.locked { cursor: default; }
-.lock-chip { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 2; white-space: nowrap; padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; color: #fff; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.25); }
+.lock-chip { position: absolute; top: 7%; left: 50%; transform: translateX(-50%); z-index: 2; white-space: nowrap; padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; color: #fff; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.25); }
 .new-tag, .dup-tag { position: absolute; top: 10px; left: 10px; z-index: 3; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 999px; }
 .new-tag { background: #ffd36b; color: #2a1d00; }
 .dup-tag { background: #5b6b7a; color: #fff; }
-.test-tag { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 3; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 999px; background: #1d2b3a; color: #9fd3ff; border: 1px solid #9fd3ff; }
 .reset { font-size: 0.85rem; }
 
 /* Admin: overview of every card */
@@ -1129,7 +1139,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .card-face.legend .card-vtext small i, .card-face.legend .card-hname small i { color: #fff; }
 .legend-photo img { filter: grayscale(1) contrast(1.15) brightness(0.95); }
 /* Locked legend: no photo or name, only a star and the club. */
-.card-face.legend.locked-legend { filter: none; background: radial-gradient(circle at 50% 30%, #1d2a3b, #050a14 75%); box-shadow: inset 0 0 0 2px rgba(234, 244, 255, 0.45); }
+.card-face.legend.locked-legend { filter: none; }
 .legend-star { position: absolute; inset: 0 0 30% 0; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: rgba(234, 244, 255, 0.35); text-shadow: 0 0 24px rgba(190, 225, 255, 0.3); }
 .card-face.legend.locked-legend .card-archetype { background: rgba(234, 244, 255, 0.18); color: #eaf4ff; }
 .card-face.legend.locked-legend .card-name { font-size: max(14px, 9cqw); color: rgba(234, 244, 255, 0.8); }
@@ -1172,7 +1182,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .pre-facts { margin-bottom: 8px; }
 .legend-facts { padding-left: 1.2rem; margin: 0; }
 .legend-facts li { margin: 4px 0; }
-.legend-facts li::marker { content: '★  '; color: #c9971f; }
+.legend-facts li::marker { content: 'â˜…  '; color: #c9971f; }
 
 @media (prefers-reduced-motion: reduce) {
   .tier-elite, .card-glitter { animation: none; }

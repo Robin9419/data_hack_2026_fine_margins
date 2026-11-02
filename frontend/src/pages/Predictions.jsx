@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import BackLink from '../components/BackLink'
 import TeamName, { TeamLogo } from '../components/TeamName'
 import { formatMatchDate } from '../format'
 import { useTournament } from '../tournament'
@@ -20,9 +21,7 @@ export default function Predictions() {
 
   return (
     <section className="predict">
-      <Link to="/" className="back-link">
-        Back to collection
-      </Link>
+      <BackLink />
       {open.length > 0 ? (
         // Keyed by stage, so a new gameday starts at its first question.
         <Round key={stage} stage={stage} games={open} next={next} />

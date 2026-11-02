@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import BackLink from '../components/BackLink'
 import { api } from '../api'
 import { useAuth } from '../auth'
 import CardFace from '../components/CardFace'
@@ -74,9 +75,7 @@ export default function Trade() {
 
   return (
     <section className="trade">
-      <Link to="/" className="back-link">
-        Back to collection
-      </Link>
+      <BackLink />
 
       <div className="trade-machine">
         <h1>Trade-in</h1>

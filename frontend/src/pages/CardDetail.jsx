@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import BackLink from '../components/BackLink'
 import { api } from '../api'
 import { useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
@@ -42,11 +43,11 @@ export default function CardDetail({ preview = false }) {
   if (error)
     return (
       <section>
-        <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
+        <BackLink to={preview ? '/admin' : '/'} label={preview ? 'Back to admin' : 'Back to collection'} />
         <p className="error">{error}</p>
       </section>
     )
-  if (!card) return <p className="muted">Loading card…</p>
+  if (!card) return <p className="muted">Loading cardâ€¦</p>
   if (card.type === 'base') return <BaseCardDetail card={card} preview={preview} />
   if (card.type === 'reward') return <RewardCardDetail card={card} preview={preview} />
   if (card.type === 'legend') return <LegendCardDetail card={card} preview={preview} />
@@ -68,13 +69,13 @@ export default function CardDetail({ preview = false }) {
 
   return (
     <section className="detail">
-      <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
-      {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
+      <BackLink to={preview ? '/admin' : '/'} label={preview ? 'Back to admin' : 'Back to collection'} />
+      {preview && <> Â· <Link to={`/players/${card.id}`}>Player profile â€º</Link></>}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
         <div className="detail-heading">
-          <p className="eyebrow">{card.category ? `${card.category} · ` : ''}{card.title}</p>
+          <p className="eyebrow">{card.category ? `${card.category} Â· ` : ''}{card.title}</p>
           <h1>
             <Link to={`/players/${card.id}`} className="plain-link">
               #{player.jersey} {player.first_name} {player.last_name}
@@ -82,7 +83,7 @@ export default function CardDetail({ preview = false }) {
           </h1>
           <p className="muted">
             {player.team}
-            {player.position ? ` · ${player.position}` : ''}
+            {player.position ? ` Â· ${player.position}` : ''}
           </p>
           <InstagramLink player={player} />
           {card.achievement && (
@@ -158,7 +159,7 @@ export default function CardDetail({ preview = false }) {
       )}
 
       <p className="muted small">
-        Source: {card.source} · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
+        Source: {card.source} Â· Edition: {card.edition === 'stadium' ? 'ðŸŸ Stadium' : 'Standard'}
       </p>
 
       {!preview && <PlayerCards cardId={card.id} />}
@@ -185,14 +186,14 @@ function PreTournament({ pre }) {
               <th title="Goals">G</th>
               <th title="Assists">A</th>
               <th title="Points">PTS</th>
-              {hasPlusMinus && <th title="Plus/minus">+/−</th>}
+              {hasPlusMinus && <th title="Plus/minus">+/âˆ’</th>}
             </tr>
           </thead>
           <tbody>
             {pre.seasons.map((s) => (
               <tr key={`${s.season}-${s.short}-${s.phase}-${s.club}`}>
                 <td>
-                  {s.season.replace('-', '–')}
+                  {s.season.replace('-', 'â€“')}
                   {s.phase === 'Season to date' && <small> to {formatMatchDate(s.through)}</small>}
                 </td>
                 <td>{s.club}</td>
@@ -206,7 +207,7 @@ function PreTournament({ pre }) {
                 <td>
                   <strong>{s.points}</strong>
                 </td>
-                {hasPlusMinus && <td>{s.plus_minus == null ? '–' : s.plus_minus > 0 ? `+${s.plus_minus}` : s.plus_minus}</td>}
+                {hasPlusMinus && <td>{s.plus_minus == null ? 'â€“' : s.plus_minus > 0 ? `+${s.plus_minus}` : s.plus_minus}</td>}
               </tr>
             ))}
           </tbody>
@@ -250,7 +251,7 @@ function PlayerCards({ cardId }) {
   return (
     <>
       <h2>Other cards of this player</h2>
-      <p><Link to={`/players/${cardId}`}>Player profile ›</Link></p>
+      <p><Link to={`/players/${cardId}`}>Player profile â€º</Link></p>
       <p className="muted small">
         You own {ownedCount} of {others.length} other cards. Locked cards are still hidden.
       </p>
@@ -270,7 +271,7 @@ function RewardCardDetail({ card, preview }) {
   const { player, match } = card
   return (
     <section className="detail">
-      <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
+      <BackLink to={preview ? '/admin' : '/'} label={preview ? 'Back to admin' : 'Back to collection'} />
 
       <header className="detail-header">
         {card.kind === 'collector' ? (
@@ -310,7 +311,7 @@ function RewardCardDetail({ card, preview }) {
       {card.about && <AboutInfo heading={ABOUT_HEADING[card.context_type]} about={card.about} />}
       <p className="muted small">
         Source: {card.source}
-        {card.credit ? ` · Image: ${card.credit}` : ''}
+        {card.credit ? ` Â· Image: ${card.credit}` : ''}
       </p>
     </section>
   )
@@ -382,14 +383,14 @@ function BaseCardDetail({ card, preview }) {
     ['Height', bio.height_cm && `${bio.height_cm} cm`],
     ['Weight', bio.weight_kg && `${bio.weight_kg} kg`],
     [goalie ? 'Catches' : 'Shoots', bio.shoots && (bio.shoots === 'L' ? 'Left' : 'Right')],
-    ['College 2025–26', bio.club],
+    ['College 2025â€“26', bio.club],
     ['Draft', bio.draft],
   ].filter(([, value]) => value)
 
   return (
     <section className="detail">
-      <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
-      {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
+      <BackLink to={preview ? '/admin' : '/'} label={preview ? 'Back to admin' : 'Back to collection'} />
+      {preview && <> Â· <Link to={`/players/${card.id}`}>Player profile â€º</Link></>}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
@@ -429,7 +430,7 @@ function BaseCardDetail({ card, preview }) {
         ) : (
           card.source
         )}{' '}
-        · Edition: {card.edition === 'stadium' ? '🏟 Stadium' : 'Standard'}
+        Â· Edition: {card.edition === 'stadium' ? 'ðŸŸ Stadium' : 'Standard'}
       </p>
 
       <PlayerCards cardId={card.id} />
@@ -448,7 +449,7 @@ function LegendCardDetail({ card, preview }) {
 
   return (
     <section className="detail legend-detail">
-      <Link to={preview ? '/admin' : '/'} className="back-link">{preview ? 'Back to admin' : 'Back to collection'}</Link>
+      <BackLink to={preview ? '/admin' : '/'} label={preview ? 'Back to admin' : 'Back to collection'} />
 
       <header className="detail-header">
         <figure className="legend-figure">
@@ -456,7 +457,7 @@ function LegendCardDetail({ card, preview }) {
           {legend.moment && <figcaption>{legend.moment}</figcaption>}
         </figure>
         <div className="detail-heading">
-          <p className="eyebrow legend-eyebrow">★ Club legend · {player.team}</p>
+          <p className="eyebrow legend-eyebrow">â˜… Club legend Â· {player.team}</p>
           <h1>
             {player.jersey ? `#${player.jersey} ` : ''}
             {player.first_name} {player.last_name}
@@ -510,7 +511,7 @@ function LegendCardDetail({ card, preview }) {
         {legend.sources?.length > 0 && (
           <>
             {' '}
-            · Sources: <SourceLinks urls={legend.sources} />
+            Â· Sources: <SourceLinks urls={legend.sources} />
           </>
         )}
       </p>

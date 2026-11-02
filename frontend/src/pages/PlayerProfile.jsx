@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
+import BackLink from '../components/BackLink'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
 import { formatMatchDate, scoreline } from '../format'
@@ -115,7 +116,7 @@ export default function PlayerProfile() {
   if (error)
     return (
       <section>
-        <Link to="/" className="back-link">Back to collection</Link>
+        <BackLink />
         <p className="error">{error}</p>
       </section>
     )
@@ -123,7 +124,7 @@ export default function PlayerProfile() {
   if (cards.length === 0)
     return (
       <section>
-        <Link to="/" className="back-link">Back to collection</Link>
+        <BackLink />
         <p className="muted">No cards found for this player.</p>
       </section>
     )
@@ -176,6 +177,7 @@ export default function PlayerProfile() {
 
   return (
     <section className="pp">
+      <BackLink history />
       <div className={`pp-hero ${player.action_image_url || widePhoto ? '' : 'portrait'}`} style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
         <div className="pp-hero-in">
           <div className="pp-id">

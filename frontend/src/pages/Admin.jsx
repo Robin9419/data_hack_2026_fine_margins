@@ -24,18 +24,9 @@ const TEAM_FILTERS = [
   { value: 'all', label: 'All teams', title: 'All teams' },
   ...TEAMS.map((t) => ({ value: t.name, label: t.short, title: t.name, logo: t.logo })),
 ]
-const SOURCES = [
-  { value: 'all', label: 'Real and test data' },
-  { value: 'real', label: 'Real data only' },
-  { value: 'test', label: 'Test data only' },
-]
 const PHOTOS = [
   { value: 'all', label: 'All cards' },
   { value: 'action', label: 'Action photos only' },
-]
-const TEST_TAG = [
-  { value: 'show', label: 'Show' },
-  { value: 'hide', label: 'Hide' },
 ]
 const NAME_LAYOUT = [
   { value: 'vertical', label: 'Vertical' },
@@ -68,15 +59,13 @@ function groupPlayers(shown) {
 }
 
 // Every card that exists after the whole tournament, regardless of what the user owns or where they are on the
-// timeline: the card set, including the test cards of all 2025 games.
+// timeline: the card set of all games.
 export default function Admin() {
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
   const [kind, setKind] = useState('all')
   const [team, setTeam] = useState('all')
-  const [source, setSource] = useState('all')
   const [photos, setPhotos] = useState('all')
-  const [testTag, setTestTag] = useState('show')
   const [nameLayout, setNameLayout] = useState('vertical')
   const [mode, setMode] = useState('cards')
   const [query, setQuery] = useState('')
@@ -84,7 +73,7 @@ export default function Admin() {
   const [page, setPage] = useState(0)
   const touchStartX = useRef(null)
   // Any change of filters, search or view starts again on the first page.
-  useEffect(() => setPage(0), [kind, team, source, photos, mode, query])
+  useEffect(() => setPage(0), [kind, team, photos, mode, query])
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
 
   useEffect(() => {
@@ -95,8 +84,8 @@ export default function Admin() {
   }, [])
 
   const counts = useMemo(() => {
-    const rows = Object.fromEntries(KINDS.map(([k]) => [k, { real: 0, test: 0 }]))
-    for (const c of cards ?? []) rows[kindOf(c)][c.test ? 'test' : 'real'] += 1
+    const rows = Object.fromEntries(KINDS.map(([k]) => [k, 0]))
+    for (const c of cards ?? []) rows[kindOf(c)] += 1
     return rows
   }, [cards])
 
@@ -115,7 +104,6 @@ export default function Admin() {
       (c) =>
         (kind === 'all' || kindOf(c) === kind) &&
         (team === 'all' || c.player?.team === team) &&
-        (source === 'all' || (source === 'test') === Boolean(c.test)) &&
         (photos === 'all' || hasActionPhoto(c)) &&
         matches(c),
     )
@@ -138,7 +126,7 @@ export default function Admin() {
     touchStartX.current = null
     if (Math.abs(dx) > 50) goTo(current + (dx < 0 ? 1 : -1))
   }
-  const total = (key) => Object.values(counts).reduce((n, r) => n + r[key], 0)
+  const total = Object.values(counts).reduce((n, r) => n + r, 0)
 
   return (
     <section>
@@ -149,25 +137,18 @@ export default function Admin() {
         </div>
       </div>
       <p className="muted small">
-        Everything that exists in the app, whether or not a user owns it. Test cards come from the 2025 games without
-        Wisehockey data. Tap a special card to flip it.
+        Everything that exists in the app, whether or not a user owns it. Tap a special card to flip it.
       </p>
 
       <div className="stat-tiles">
         <div className="stat-tile total">
           <span className="stat-label">All cards</span>
-          <strong>{total('real') + total('test')}</strong>
-          <small>
-            {total('real')} real · {total('test')} test
-          </small>
+          <strong>{total}</strong>
         </div>
         {KINDS.map(([k, label]) => (
           <div key={k} className="stat-tile">
             <span className="stat-label">{label}</span>
-            <strong>{counts[k].real + counts[k].test}</strong>
-            <small>
-              {counts[k].real} real · {counts[k].test} test
-            </small>
+            <strong>{counts[k]}</strong>
           </div>
         ))}
       </div>
@@ -203,9 +184,7 @@ export default function Admin() {
       <div className="dd-row">
         <Dropdown label="Team" options={TEAM_FILTERS} value={team} onChange={setTeam} />
         <Dropdown label="Card type" options={KIND_FILTERS} value={kind} onChange={setKind} />
-        <Dropdown label="Source" options={SOURCES} value={source} onChange={setSource} />
         <Dropdown label="Photos" options={PHOTOS} value={photos} onChange={setPhotos} />
-        <Dropdown label="TEST tag" options={TEST_TAG} value={testTag} onChange={setTestTag} />
         <Dropdown label="Name on specials" options={NAME_LAYOUT} value={nameLayout} onChange={setNameLayout} />
       </div>
       <p className="muted small">
@@ -240,12 +219,7 @@ export default function Admin() {
               ))
             : pageItems.map((card) => {
                 const { player, what, game } = caption(card)
-                const face = (
-                  <>
-                    {card.test && testTag === 'show' && <span className="test-tag">TEST</span>}
-                    <CardFace card={card} nameLayout={nameLayout} />
-                  </>
-                )
+                const face = <CardFace card={card} nameLayout={nameLayout} />
                 return (
                   <figure key={card.id} className="admin-cell">
                     {card.type === 'special' ? (

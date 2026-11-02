@@ -309,6 +309,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
             <CardIcon name="trophy" />
           </p>
         </div>
+        {stadium && <span className="arena-sill" aria-hidden="true" />}
       </div>
     </div>
   )

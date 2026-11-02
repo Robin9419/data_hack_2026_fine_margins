@@ -704,7 +704,7 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 }
 
 /* Mirrored frame: the diagonal one of the normal specials makes the left edge look more gold than the right. */
-.card-face.owned.performance.edition-arena { --frame: linear-gradient(90deg, var(--s1), #141414 24%, var(--s2) 50%, #141414 76%, var(--s1)); }
+.card-face.owned.performance.edition-arena { --frame: linear-gradient(90deg, var(--s1), color-mix(in srgb, var(--s1) 35%, #000) 24%, color-mix(in srgb, var(--s1) 80%, #fff) 50%, color-mix(in srgb, var(--s1) 35%, #000) 76%, var(--s1)); }
 
 /* Thin edge lines along the roof and the bottom, in the accent colours of the card type (--s1, --s2). */
 .arena-trim {
@@ -712,7 +712,7 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  background: linear-gradient(90deg, var(--s1, #ffd76a), var(--s2, #fff6d1) 50%, var(--s1, #ffd76a));
+  background: var(--s1, #ffd76a);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M0 11L15 0L32 6L50 0L68 6L85 0L100 11' stroke='%23000' stroke-width='1.6' stroke-linejoin='miter'/%3E%3Cpath d='M0 15L15 4L32 10L50 4L68 10L85 4L100 15' stroke='%23000' stroke-opacity='.7' stroke-width='.7' stroke-linejoin='miter'/%3E%3Cpath d='M0 118V121Q0 127 8 129L44 138Q50 140 56 138L92 129Q100 127 100 121V118' stroke='%23000' stroke-width='2.6'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M0 11L15 0L32 6L50 0L68 6L85 0L100 11' stroke='%23000' stroke-width='1.6' stroke-linejoin='miter'/%3E%3Cpath d='M0 15L15 4L32 10L50 4L68 10L85 4L100 15' stroke='%23000' stroke-opacity='.7' stroke-width='.7' stroke-linejoin='miter'/%3E%3Cpath d='M0 118V121Q0 127 8 129L44 138Q50 140 56 138L92 129Q100 127 100 121V118' stroke='%23000' stroke-width='2.6'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
 }

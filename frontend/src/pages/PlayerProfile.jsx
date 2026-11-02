@@ -4,7 +4,7 @@ import { api } from '../api'
 import { useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
 import BackLink from '../components/BackLink'
-import CardSpotlight from '../components/CardSpotlight'
+import CardSpotlight, { pickClips } from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
 import MomentList from '../components/MomentList'
 import VideoSlot from '../components/VideoSlot'
@@ -22,6 +22,9 @@ function MatchData({ card: c, onOpen }) {
   const videoRef = useRef(null)
   const moments = c.moments || []
   const linked = (attr) => attr.moment_ids && moments.filter((m) => attr.moment_ids.includes(m.id))
+  // Same pick as the pop-up: the clip of the event behind the card's KPIs, else the card's own highlight.
+  const first = pickClips(c)[0]
+  const video = first && { ...first, poster: first.poster || (first.youtube_id && `https://i.ytimg.com/vi/${first.youtube_id}/hqdefault.jpg`), scope: 'game', description: first.caption }
   const play = (clip, label) => {
     setPlaying({ ...clip, label, nonce: Date.now() })
     videoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -43,7 +46,7 @@ function MatchData({ card: c, onOpen }) {
         </ul>
         <h3 className="pp-data-sub">Highlight</h3>
         <div ref={videoRef}>
-          <VideoSlot video={c.video} playing={playing} onPlay={play} sources={c.video_sources} />
+          <VideoSlot video={video} playing={playing} onPlay={play} sources={c.video_sources} />
         </div>
         {moments.length > 0 && (
           <>

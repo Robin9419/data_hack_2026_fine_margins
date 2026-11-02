@@ -24,7 +24,7 @@ function latestGameMoments(card) {
 
 // Up to three clips of the events behind the archetype's KPIs (arena camera first, else the TV replay),
 // falling back to the card's own highlight when none of those events are on video.
-function pickClips(card) {
+export function pickClips(card) {
   if (card.type !== 'special') return []
   const moments = latestGameMoments(card)
   const linked = new Set(kpisOf(card).flatMap((a) => a.moment_ids || []))

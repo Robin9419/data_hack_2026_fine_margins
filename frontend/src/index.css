@@ -214,7 +214,7 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .card-face.locked.reward-locked::before { background: radial-gradient(circle at 70% 20%, color-mix(in srgb, var(--c2) 30%, transparent), transparent 60%), linear-gradient(180deg, var(--c1), #02040a 115%); }
 .card-face.legend.locked-legend::before { background: radial-gradient(circle at 50% 30%, #1d2a3b, #050a14 75%); }
 .card-face.locked .card-art, .card-face.legend.locked-legend .card-art { inset: 3px; -webkit-mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; }
-.card-face.locked::after, .card-face.legend.locked-legend::after { inset: 40% 3px 3px; }
+.card-face.locked::after, .card-face.legend.locked-legend::after { inset: 3px; -webkit-mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; background: linear-gradient(180deg, transparent 40%, rgba(2, 4, 10, 0.85) 67%, #02040a); }
 .card-tile.is-locked .card-face { --frame: linear-gradient(150deg, #ffffff, #9aa4b1 35%, #f4f7fb 55%, #7b8592 80%, #d5dbe3); }
 .card-face.reward-locked .card-info { bottom: 17cqw; padding: 0 9cqw; text-align: center; }
 .card-face.reward-locked .card-name { font-size: max(13px, 8.5cqw); line-height: 1.05; }

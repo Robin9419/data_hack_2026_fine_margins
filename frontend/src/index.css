@@ -902,13 +902,16 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .reward-bar { margin: 28px 0; padding: 12px 16px 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 .reward-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 0.9rem; }
 .reward-head span { color: var(--muted); }
+.reward-next { display: inline-flex; align-items: center; gap: 7px; }
+.reward-icon { display: block; width: 19px; height: 19px; flex: none; }
+.reward-next .reward-icon { width: 16px; height: 16px; color: var(--accent); }
 .reward-track { position: relative; height: 10px; margin: 14px 16px 34px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); }
 .reward-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), #ffb347); transition: width 1200ms cubic-bezier(0.2, 0.8, 0.2, 1); }
 .reward-pin { position: absolute; top: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; outline: none; }
-.reward-mark { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #16233b; border: 2px solid rgba(255, 255, 255, 0.25); font-size: 1rem; filter: grayscale(1); transition: filter 400ms, border-color 400ms, transform 400ms; }
+.reward-mark { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #101c30; border: 1px solid var(--border); color: var(--muted); transition: color 200ms, background 200ms, border-color 200ms, transform 200ms; }
 .reward-mark small { position: absolute; top: 100%; margin-top: 2px; font-size: 0.7rem; color: var(--muted); }
-.reward-mark.reached { filter: none; border-color: #ffb347; transform: scale(1.15); box-shadow: 0 0 10px rgba(255, 179, 71, 0.7); }
-.reward-pin:hover .reward-mark, .reward-pin:focus-visible .reward-mark { filter: none; border-color: var(--accent); }
+.reward-mark.reached { color: var(--gold); border-color: var(--gold); background: #28251d; box-shadow: 0 0 0 3px rgba(255, 211, 107, 0.08); }
+.reward-pin:hover .reward-mark, .reward-pin:focus-visible .reward-mark { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
 .reward-pin:focus-visible .reward-mark { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent); }
 .reward-tip { position: absolute; z-index: 20; top: calc(100% + 28px); left: 50%; transform: translate(-50%, -6px); display: flex; align-items: center; gap: 10px; min-width: 170px; padding: 10px 14px 10px 10px; border-radius: 12px; background: rgba(9, 16, 30, 0.96); box-shadow: 0 0 0 1px var(--line), 0 14px 34px rgba(0, 0, 0, 0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); white-space: nowrap; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 160ms, transform 160ms, visibility 160ms; }
 .reward-tip::after { content: ''; position: absolute; bottom: 100%; left: 50%; width: 10px; height: 10px; margin: 0 0 -5px -5px; transform: rotate(45deg); background: rgba(9, 16, 30, 0.96); box-shadow: -1px -1px 0 var(--line); }
@@ -918,13 +921,13 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .reward-pin.edge-end .reward-tip::after { left: auto; right: 18px; margin: 0 0 -5px; }
 .reward-pin:hover .reward-tip, .reward-pin:focus-visible .reward-tip { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
 .reward-pin.edge-start:hover .reward-tip, .reward-pin.edge-start:focus-visible .reward-tip, .reward-pin.edge-end:hover .reward-tip, .reward-pin.edge-end:focus-visible .reward-tip { transform: none; }
-.reward-tip-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); font-size: 1.2rem; flex: none; }
+.reward-tip-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--line); color: var(--accent); flex: none; }
 .reward-tip-text { display: grid; gap: 2px; }
 .reward-tip-text strong { font-size: 0.88rem; color: var(--text); }
 .reward-tip-text small { font-size: 0.72rem; color: var(--muted); }
 .reward-tip-state { margin-left: auto; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
 .reward-tip-state.done { background: color-mix(in srgb, var(--gold) 22%, transparent); color: var(--gold); }
-@media (prefers-reduced-motion: reduce) { .reward-tip { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .reward-tip, .reward-mark, .reward-fill { transition: none; } }
 
 /* Gallery: activities, what the user can do right now */
 .activities { margin-bottom: 8px; }

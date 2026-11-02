@@ -1383,10 +1383,11 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 /* Home: highlights from the user's own cards */
 .home-banner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
 .home-highlights { margin-top: 32px; }
+.home-highlights .section-header { align-items: center; }
 .home-subtitle { margin: 20px 0 0; font-family: var(--display); font-size: 1.3rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
 .home-row { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 12px; }
-.home-collection-link { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; margin: 8px 0 24px; }
-.home-collection-link .pack-button { display: inline-block; text-decoration: none; }
+.home-collection-link { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; margin: 0; }
+.home-collection-link .pack-button { display: inline-block; padding: 8px 18px; font-size: 0.85rem; text-decoration: none; }
 .home-collection-link strong { color: var(--text); }
 @media (max-width: 700px) { .home-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 

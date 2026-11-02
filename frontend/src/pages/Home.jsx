@@ -85,23 +85,23 @@ export default function Home() {
       <div className="home-highlights">
         <div className="section-header">
           <h1>Your Collection Highlights</h1>
+          <div className="home-collection-link">
+            <span className="muted">
+              <strong>
+                {ownedCount} / {realCards.length}
+              </strong>{' '}
+              Cards Collected
+            </span>
+            <Link to="/collection" className="pack-button">
+              View Your Whole Collection ›
+            </Link>
+          </div>
         </div>
         {row('Best Cards', best)}
         {row('Latest Performances', latest)}
         {best.length === 0 && latest.length === 0 && (
           <p className="muted">No special cards yet. Open packs and make predictions to win some.</p>
         )}
-        <div className="home-collection-link">
-          <Link to="/collection" className="pack-button">
-            View Your Whole Collection ›
-          </Link>
-          <span className="muted">
-            <strong>
-              {ownedCount} / {realCards.length}
-            </strong>{' '}
-            Cards Collected
-          </span>
-        </div>
       </div>
 
       {spotlight && <CardSpotlight card={spotlight} onClose={closeSpotlight} />}

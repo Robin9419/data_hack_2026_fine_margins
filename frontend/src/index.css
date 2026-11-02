@@ -684,29 +684,30 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 :root { --shape-shield: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cpath d='M13 0H87L100 11V121Q100 127 92 129L56 138Q50 140 44 138L8 129Q0 127 0 121V11Z'/%3E%3C/svg%3E"); }
 .card-face, .card-inner { border-radius: 0; -webkit-mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; }
 
-/* Stadium edition: same shield with a shallow arched top (peak 4 units above the shoulders), like the glulam dome of
-   the Davos arena. Below it a band of timber ribs that fades into the card. Only stadium cards carry .edition-arena. */
+/* Stadium edition: the top is the pitched timber roof of the Davos arena (apex in the middle), filled with glulam beams
+   that fan down from the ridge. Only stadium cards carry .edition-arena. */
 :root {
-  --shape-shield-arena: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cpath d='M0 12L13 4L33 0H67L87 4L100 12V121Q100 127 92 129L56 138Q50 140 44 138L8 129Q0 127 0 121Z'/%3E%3C/svg%3E");
-  --arena-roof: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0 12L13 4L33 0H67L87 4L100 12' fill='none' stroke='%23fff1c8' stroke-opacity='1' stroke-width='1.6' stroke-linejoin='miter'/%3E%3Cpath d='M0 15L13 8L33 4H67L87 8L100 15' fill='none' stroke='%23ffd36b' stroke-opacity='.7' stroke-width='.7' stroke-linejoin='miter'/%3E%3C/svg%3E");
+  --shape-shield-arena: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'%3E%3Cpath d='M0 14L50 0L100 14V121Q100 127 92 129L56 138Q50 140 44 138L8 129Q0 127 0 121Z'/%3E%3C/svg%3E");
+  --arena-roof: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 26' preserveAspectRatio='none'%3E%3Cpath d='M0 14L50 0L100 14' fill='none' stroke='%23ffe3b0' stroke-width='1.6' stroke-linejoin='miter'/%3E%3Cpath d='M0 18L50 4L100 18' fill='none' stroke='%23ffd36b' stroke-opacity='.75' stroke-width='.7' stroke-linejoin='miter'/%3E%3Cpath d='M50 0V26' fill='none' stroke='%23200d03' stroke-opacity='.8' stroke-width='1.4'/%3E%3C/svg%3E");
 }
 .card-face.edition-arena, .card-face.edition-arena .card-inner { -webkit-mask: var(--shape-shield-arena) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield-arena) 0 0 / 100% 100% no-repeat; }
 .edition-arena .card-inner::before {
   content: '';
   position: absolute;
   inset: 0 0 auto;
-  height: 21cqw;
+  height: 26cqw;
   z-index: 2;
   pointer-events: none;
   background:
     var(--arena-roof) 0 0 / 100% 100% no-repeat,
-    repeating-conic-gradient(from -48deg at 50% 330%, rgba(60, 28, 6, 0.75) 0 0.8deg, rgba(255, 226, 160, 0.28) 0.8deg 1.5deg, transparent 1.5deg 3.6deg),
-    linear-gradient(180deg, #f0c27a, #c9883f 45%, #7a4a1e);
-  -webkit-mask: linear-gradient(180deg, #000 52%, transparent);
-  mask: linear-gradient(180deg, #000 52%, transparent);
+    repeating-linear-gradient(-58deg, #2b1105 0 0.7cqw, #e89a55 0.7cqw 1.3cqw, #b9622a 1.3cqw 3.6cqw) left top / 50% 100% no-repeat,
+    repeating-linear-gradient(58deg, #2b1105 0 0.7cqw, #e89a55 0.7cqw 1.3cqw, #b9622a 1.3cqw 3.6cqw) right top / 50% 100% no-repeat,
+    #8a4116;
+  -webkit-mask: linear-gradient(180deg, #000 58%, transparent);
+  mask: linear-gradient(180deg, #000 58%, transparent);
 }
-.edition-arena .card-corner { top: max(9px, 8cqw); }
-.edition-arena .card-tag:not(.card-tag-end) { top: max(9px, 8cqw); }
+.edition-arena .card-corner { top: max(14px, 13cqw); }
+.edition-arena .card-tag:not(.card-tag-end) { top: max(14px, 13cqw); }
 
 /* Ice hockey graphic: centre ice and skate scratches, faint, in the middle of the card */
 .card-rink { position: absolute; inset: 0; pointer-events: none; opacity: 0.16; mix-blend-mode: screen; }

@@ -706,6 +706,10 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 /* Mirrored frame: the diagonal one of the normal specials makes the left edge look more gold than the right. */
 .card-face.owned.performance.edition-arena { --frame: linear-gradient(90deg, var(--s1), color-mix(in srgb, var(--s1) 35%, #000) 24%, color-mix(in srgb, var(--s1) 80%, #fff) 50%, color-mix(in srgb, var(--s1) 35%, #000) 76%, var(--s1)); }
 
+/* The photo starts below the roof so the roof band does not cover faces. */
+.edition-arena .card-art { inset: 14cqw 0 0; }
+.edition-arena .card-action { top: 14cqw; height: calc(100% - 14cqw); }
+
 /* Thin edge lines along the roof and the bottom, in the accent colours of the card type (--s1, --s2). */
 .arena-trim {
   position: absolute;

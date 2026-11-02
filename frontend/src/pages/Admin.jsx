@@ -236,30 +236,16 @@ export default function Admin() {
                 const face = <CardFace card={card} nameLayout={nameLayout} />
                 return (
                   <figure key={`${card.id}-${card.edition}`} className="admin-cell">
-                    {card.type === 'special' ? (
-                      <button type="button" className="card-tile" onClick={() => setSpotlight(card)}>
-                        {face}
-                      </button>
-                    ) : (
-                      <div className="card-tile">{face}</div>
-                    )}
+                    <button type="button" className="card-tile" onClick={() => setSpotlight(card)}>
+                      {face}
+                    </button>
                     <figcaption>
                       <strong>{what}{card.edition === 'stadium' ? ' · Stadium' : ''}</strong>
-                      {hasProfile(card) ? (
-                        <Link to={`/players/${card.id}`} className="plain-link">
-                          {player}
-                        </Link>
-                      ) : (
-                        <span>{player}</span>
-                      )}
+                      <span>{player}</span>
                       <small className="muted">
                         {KIND_LABEL[kindOf(card)]}
                         {game ? ` · ${game}` : ''}
                       </small>
-                      <span className="admin-links">
-                        <Link to={`/admin/cards/${card.id}`}>Preview ›</Link>
-                        {hasProfile(card) && <Link to={`/players/${card.id}`}>Profile ›</Link>}
-                      </span>
                     </figcaption>
                   </figure>
                 )
@@ -285,7 +271,7 @@ export default function Admin() {
         </div>
       )}
 
-      {spotlight && <CardSpotlight card={spotlight} onClose={closeSpotlight} hideLink />}
+      {spotlight && <CardSpotlight card={spotlight} onClose={closeSpotlight} />}
     </section>
   )
 }

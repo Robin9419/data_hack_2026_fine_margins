@@ -152,7 +152,7 @@ export default function Quiz() {
           You unlocked {won} {won === 1 ? 'card' : 'cards'}.
         </p>
         <div className="pack-actions">
-          <button type="button" className="pack-button" onClick={() => navigate('/')}>
+          <button type="button" className="pack-button" onClick={() => navigate('/collection')}>
             Go to my collection
           </button>{' '}
           <button type="button" className="pack-button secondary" onClick={() => start(venue)} disabled={busy}>

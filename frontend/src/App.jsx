@@ -8,6 +8,7 @@ import TimelineBar from './components/TimelineBar'
 import Admin from './pages/Admin'
 import CardDetail from './pages/CardDetail'
 import Gallery from './pages/Gallery'
+import Home from './pages/Home'
 import Login from './pages/Login'
 import PackOpening from './pages/PackOpening'
 import PlayerProfile from './pages/PlayerProfile'
@@ -28,8 +29,8 @@ function CardRedirect() {
   useEffect(() => {
     api
       .card(id)
-      .then((c) => setTo(c.player && (c.type === 'base' || c.type === 'special') ? `/players/${id}?card=${id}` : `/?card=${id}`))
-      .catch(() => setTo('/'))
+      .then((c) => setTo(c.player && (c.type === 'base' || c.type === 'special') ? `/players/${id}?card=${id}` : `/collection?card=${id}`))
+      .catch(() => setTo('/collection'))
   }, [id])
   return to ? <Navigate to={to} replace /> : <p className="muted">Loading card…</p>
 }
@@ -47,7 +48,8 @@ export default function App() {
           </Link>
           {user && (
             <nav className="appnav" aria-label="Main">
-              <NavLink to="/" end>Collection</NavLink>
+              <NavLink to="/" end>Home</NavLink>
+              <NavLink to="/collection">Collection</NavLink>
               <NavLink to="/quiz">Quiz</NavLink>
               <NavLink to="/predict">Predictions</NavLink>
               <NavLink to="/trade">Trade</NavLink>
@@ -73,6 +75,14 @@ export default function App() {
           <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
           <Route
             path="/"
+            element={
+              <RequireAuth>
+                <Home />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/collection"
             element={
               <RequireAuth>
                 <Gallery />

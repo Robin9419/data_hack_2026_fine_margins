@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { api } from '../api'
 import { useAllCards } from '../allCards'
 import { useAuth } from '../auth'
-import Activities from '../components/Activities'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
 import Dropdown from '../components/Dropdown'
@@ -211,15 +210,6 @@ export default function Gallery() {
 
   return (
     <section>
-      {newCardIds.length > 0 && (
-        <div className="banner">
-          {newCardIds.length} new {newCardIds.length === 1 ? 'card' : 'cards'} added to your collection. Tap a card to
-          see its stats.
-        </div>
-      )}
-
-      <Activities />
-
       <div className="collection-header">
         <div>
           <p className="eyebrow">Spengler Cup 2025</p>

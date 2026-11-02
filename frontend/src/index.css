@@ -1243,6 +1243,10 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .pp-data { display: grid; grid-template-columns: 160px 1fr; gap: 18px; }
 .pp-data h2 { margin: 0 0 6px; font-size: 1.1rem; text-transform: none; letter-spacing: 0; color: var(--text); }
 .pp-data.locked { opacity: 0.8; }
+.pp-data-body { min-width: 0; }
+.pp-data-sub { margin: 18px 0 8px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.pp-open { display: block; margin: 6px auto 0; padding: 0; background: none; border: 0; color: var(--muted); font: inherit; font-size: 0.78rem; cursor: pointer; }
+.pp-open:hover { color: var(--accent); }
 
 @media (max-width: 760px) {
   .pp-cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }

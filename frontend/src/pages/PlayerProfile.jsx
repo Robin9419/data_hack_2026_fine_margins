@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAllCards } from '../allCards'
@@ -6,6 +6,8 @@ import AttributeRow from '../components/AttributeRow'
 import BackLink from '../components/BackLink'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
+import MomentList from '../components/MomentList'
+import VideoSlot from '../components/VideoSlot'
 import { formatMatchDate, scoreline } from '../format'
 import { nationOf } from '../nations'
 import { teamOf } from '../teams'
@@ -13,6 +15,46 @@ import { useTournament } from '../tournament'
 
 const hasData = (c) => c.owned && c.type === 'special' && Array.isArray(c.attributes)
 const gameOf = (c) => (c.match?.opponent ? `vs ${c.match.opponent}${c.match.date ? ` · ${formatMatchDate(c.match.date)}` : ''}` : null)
+
+// One performance card's numbers, with its highlight video and the game events behind them.
+function MatchData({ card: c, onOpen }) {
+  const [playing, setPlaying] = useState(null)
+  const videoRef = useRef(null)
+  const moments = c.moments || []
+  const linked = (attr) => attr.moment_ids && moments.filter((m) => attr.moment_ids.includes(m.id))
+  const play = (clip, label) => {
+    setPlaying({ ...clip, label, nonce: Date.now() })
+    videoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+  return (
+    <article id={`pp-data-${c.id}`} className="pp-box pp-data">
+      <div className="pp-data-card">
+        <CardTile card={c} onOpen={onOpen} />
+        <button type="button" className="pp-open" onClick={() => onOpen(c)}>Open card ›</button>
+      </div>
+      <div className="pp-data-body">
+        <h2>{c.title}</h2>
+        {c.match && <p className="muted small">{scoreline(c.match)} · {formatMatchDate(c.match.date)}</p>}
+        {c.explanation && <p className="explanation">{c.explanation}</p>}
+        <ul className="attributes">
+          {c.attributes.map((attr) => (
+            <AttributeRow key={attr.metric_id} attr={attr} moments={linked(attr)} onPlay={play} />
+          ))}
+        </ul>
+        <h3 className="pp-data-sub">Highlight</h3>
+        <div ref={videoRef}>
+          <VideoSlot video={c.video} playing={playing} onPlay={play} sources={c.video_sources} />
+        </div>
+        {moments.length > 0 && (
+          <>
+            <h3 className="pp-data-sub">Game events</h3>
+            <MomentList moments={moments} onPlay={play} limit={5} />
+          </>
+        )}
+      </div>
+    </article>
+  )
+}
 
 const age = (iso) => {
   const born = new Date(iso)
@@ -309,22 +351,7 @@ export default function PlayerProfile() {
                 </div>
               )}
               {dataCards.map((c) => (
-                <article key={c.id} id={`pp-data-${c.id}`} className="pp-box pp-data">
-                  <div className="pp-data-card">
-                    <CardTile card={c} onOpen={setSpotlight} />
-                  </div>
-                  <div className="pp-data-body">
-                    <h2>{c.title}</h2>
-                    {c.match && <p className="muted small">{scoreline(c.match)} · {formatMatchDate(c.match.date)}</p>}
-                    {c.explanation && <p className="explanation">{c.explanation}</p>}
-                    <ul className="attributes">
-                      {c.attributes.map((attr) => (
-                        <AttributeRow key={attr.metric_id} attr={attr} />
-                      ))}
-                    </ul>
-                    <button type="button" className="link-button" onClick={() => setSpotlight(c)}>Open card ›</button>
-                  </div>
-                </article>
+                <MatchData key={c.id} card={c} onOpen={setSpotlight} />
               ))}
               {lockedSpecials.map(({ card: c, full }) => (
                 <article key={c.id} id={`pp-data-${c.id}`} className="pp-box pp-data locked">

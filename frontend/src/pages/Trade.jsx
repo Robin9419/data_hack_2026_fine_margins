@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import BackLink from '../components/BackLink'
 import { api } from '../api'
 import { useAuth } from '../auth'
 import CardFace from '../components/CardFace'
+import Dropdown from '../components/Dropdown'
+import { TEAMS } from '../teams'
+
+const SORTS = [
+  { value: 'copies', label: 'Most copies' },
+  { value: 'name', label: 'Name A–Z' },
+  { value: 'team', label: 'Team' },
+]
 
 const percent = (chance) => `${Math.round(chance * 100)}%`
 const fullName = (card) => `${card.player.first_name} ${card.player.last_name}`
@@ -16,6 +25,9 @@ export default function Trade() {
   const [info, setInfo] = useState(null)
   const [selected, setSelected] = useState([])
   const [onlySpares, setOnlySpares] = useState(true)
+  const [query, setQuery] = useState('')
+  const [team, setTeam] = useState('all')
+  const [sort, setSort] = useState('copies')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
 
@@ -68,15 +80,29 @@ export default function Trade() {
     }
   }
 
+  const q = query.trim().toLowerCase()
+  const teamOptions = [
+    { value: 'all', label: 'All teams', title: 'All teams' },
+    ...TEAMS.filter((t) => cards.some((c) => c.player.team === t.name)).map((t) => ({ value: t.name, label: t.short, title: t.name, logo: t.logo })),
+  ]
+  const showOptions = [
+    { value: 'spares', label: `Duplicates (${spareCount})` },
+    { value: 'all', label: `All base cards (${cards.length})` },
+  ]
+  const matches = (c) =>
+    !q || [fullName(c), `#${c.player.jersey}`, c.player.team].some((s) => s && String(s).toLowerCase().includes(q))
+  const order = {
+    copies: (a, b) => b.copies - a.copies || fullName(a).localeCompare(fullName(b)),
+    name: (a, b) => (a.player.last_name ?? '').localeCompare(b.player.last_name ?? '') || (a.player.first_name ?? '').localeCompare(b.player.first_name ?? ''),
+    team: (a, b) => (a.player.team ?? '').localeCompare(b.player.team ?? '') || a.player.jersey - b.player.jersey,
+  }[sort]
   const shown = cards
-    .filter((c) => !onlySpares || c.copies > 1)
-    .sort((a, b) => b.copies - a.copies || fullName(a).localeCompare(fullName(b)))
+    .filter((c) => (!onlySpares || c.copies > 1) && (team === 'all' || c.player.team === team) && matches(c))
+    .sort(order)
 
   return (
     <section className="trade">
-      <Link to="/" className="back-link">
-        ← Back to collection
-      </Link>
+      <BackLink />
 
       <div className="trade-machine">
         <h1>Trade-in</h1>
@@ -156,17 +182,35 @@ export default function Trade() {
         <>
           <div className="trade-pick-head">
             <h2>Pick your cards</h2>
-            <div className="filter-group" role="group" aria-label="Which cards to show">
-              <button type="button" className={`filter-chip ${onlySpares ? 'active' : ''}`} onClick={() => setOnlySpares(true)}>
-                Duplicates ({spareCount})
+            <span className="muted small">{shown.length} of {cards.length} cards</span>
+          </div>
+          <label className="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            <input
+              type="search"
+              value={query}
+              placeholder="Search a player or jersey number"
+              aria-label="Search a player or jersey number"
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            {query && (
+              <button type="button" className="clear" aria-label="Clear search" onClick={() => setQuery('')}>
+                ×
               </button>
-              <button type="button" className={`filter-chip ${!onlySpares ? 'active' : ''}`} onClick={() => setOnlySpares(false)}>
-                All base cards ({cards.length})
-              </button>
-            </div>
+            )}
+          </label>
+          <div className="dd-row trade-dd">
+            <Dropdown label="Show" options={showOptions} value={onlySpares ? 'spares' : 'all'} onChange={(v) => setOnlySpares(v === 'spares')} />
+            <Dropdown label="Team" options={teamOptions} value={team} onChange={setTeam} />
+            <Dropdown label="Sort by" options={SORTS} value={sort} onChange={setSort} />
           </div>
 
-          {shown.length === 0 && <p className="muted">No duplicates yet. Show all base cards to trade singles.</p>}
+          {shown.length === 0 && (
+            <p className="muted">{onlySpares && !q && team === 'all' ? 'No duplicates yet. Show all base cards to trade singles.' : 'No cards match.'}</p>
+          )}
           <div className="card-grid trade-grid">
             {shown.map((card) => {
               const n = picked(card.id)
@@ -187,8 +231,8 @@ export default function Trade() {
                     <div className="trade-count">
                       <span>
                         {n} / {card.copies}
-                        {n >= card.copies && ' ⚠ all'}
                       </span>
+                      {n >= card.copies && <em>all copies</em>}
                       <button type="button" aria-label={`Take one ${fullName(card)} out of the trade`} onClick={() => removeOne(card.id)}>
                         −
                       </button>

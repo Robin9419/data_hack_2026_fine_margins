@@ -172,6 +172,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
     perf && stadium ? `special-${card.special_type}` : '',
     champion ? 'performance special-champion' : '',
     stadium && !impact ? 'edition-stadium' : '',
+    stadium ? 'edition-arena' : '',
     finish ? `finish-${finish}` : '',
   ]
   const rarity =
@@ -308,6 +309,17 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
             <CardIcon name="trophy" />
           </p>
         </div>
+        {stadium && (
+          <span className="arena-mark">
+            VAT Arena
+            <span className="arena-tip" role="tooltip">
+              <b>Stadium edition</b>
+              <small>Won at the VAT Arena in Davos</small>
+            </span>
+          </span>
+        )}
+        {stadium && <span className="arena-sill" aria-hidden="true" />}
+        {stadium && <span className="arena-trim" aria-hidden="true" />}
       </div>
     </div>
   )

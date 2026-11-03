@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import BackLink from '../components/BackLink'
 import TeamName, { TeamLogo } from '../components/TeamName'
 import { formatMatchDate } from '../format'
 import { useTournament } from '../tournament'
@@ -20,9 +21,7 @@ export default function Predictions() {
 
   return (
     <section className="predict">
-      <Link to="/" className="back-link">
-        ← Back to collection
-      </Link>
+      <BackLink />
       {open.length > 0 ? (
         // Keyed by stage, so a new gameday starts at its first question.
         <Round key={stage} stage={stage} games={open} next={next} />
@@ -66,7 +65,9 @@ function Round({ stage, games, next }) {
   return (
     <>
       <header className="predict-head">
-        <p className="eyebrow">Gameday · {games[0].stage}</p>
+        <p className="eyebrow">
+          <span className="badge">Prediction</span>Gameday · {games[0].stage}
+        </p>
         <h1>Your predictions</h1>
         <p className="muted">
           {dayName(stage)} · {plural(games.length, 'game')}. Every right pick earns a pack of three cards after the
@@ -81,7 +82,7 @@ function Round({ stage, games, next }) {
       </header>
 
       {current ? (
-        <article className="predict-card">
+        <article className="predict-card q-card">
           <div className="predict-game">
             <span className="muted small">
               Game {games.indexOf(current.game) + 1} of {games.length} · {current.game.start}
@@ -102,20 +103,25 @@ function Round({ stage, games, next }) {
               <button
                 key={o.id}
                 type="button"
-                className={`predict-option ${current.question.prediction === o.id ? 'active' : ''}`}
+                className={`choice predict-option ${current.question.prediction === o.id ? 'selected' : ''}`}
                 aria-pressed={current.question.prediction === o.id}
                 disabled={busy}
                 onClick={() => choose(current.game, current.question, o)}
               >
-                {o.team && <TeamLogo name={o.team} />}
-                <span>{o.label}</span>
+                {o.team && (
+                  <span className="ch-av">
+                    <TeamLogo name={o.team} />
+                  </span>
+                )}
+                <span className="ch-txt">{o.label}</span>
+                <span className="ch-mark" aria-hidden="true" />
               </button>
             ))}
           </div>
           {error && <p className="error small">{error}</p>}
           <nav className="predict-nav">
             <button type="button" className="link-button" disabled={step === 0} onClick={() => setStep(step - 1)}>
-              ← Previous
+              <span className="chev prev" aria-hidden="true" /> Previous
             </button>
             <button type="button" className="link-button" onClick={() => setStep(null)}>
               See all picks
@@ -125,12 +131,12 @@ function Round({ stage, games, next }) {
               className="link-button"
               onClick={() => setStep(step + 1 < steps.length ? step + 1 : null)}
             >
-              {current.question.prediction ? 'Next →' : 'Skip →'}
+              {current.question.prediction ? 'Next' : 'Skip'} <span className="chev next" aria-hidden="true" />
             </button>
           </nav>
         </article>
       ) : (
-        <article className="predict-card">
+        <article className="predict-card q-card">
           <h2 className="predict-prompt">{picked === steps.length ? 'All set!' : `${steps.length - picked} picks left`}</h2>
           <p className="muted small">
             {picked === steps.length

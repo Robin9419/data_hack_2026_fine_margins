@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
+import BackLink from '../components/BackLink'
 import CardUnlock from '../components/CardUnlock'
 
 // Trivia round: pick where you watched the game, then answer three questions. Each correct
@@ -86,26 +87,31 @@ export default function Quiz() {
 
   if (!venue) {
     return (
-      <section className="quiz">
+      <section className="quiz q-card">
+        <BackLink />
+        <p className="eyebrow"><span className="badge">Quiz</span></p>
         <h1>Trivia time</h1>
         <p className="muted">
           Answer three questions about the games played so far to win their special cards. Where are you watching? (In this demo you tell us. A real
           app would check your ticket.)
         </p>
         <div className="venue-choices">
-          <button type="button" className="venue-choice" disabled={busy} onClick={() => start('home')}>
-            <span className="venue-icon">📺</span>
-            <strong>At home</strong>
-            <span>Watching on TV. Win the standard card of each player.</span>
+          <button type="button" className="choice venue-choice" disabled={busy} onClick={() => start('home')}>
+            <span className="ch-av venue-icon">📺</span>
+            <span className="ch-txt">
+              <strong>At home</strong>
+              <small>Watching on TV. Win the standard card of each player.</small>
+            </span>
           </button>
-          <button type="button" className="venue-choice stadium" disabled={busy} onClick={() => start('stadium')}>
-            <span className="venue-icon">🏟</span>
-            <strong>At the stadium</strong>
-            <span>Win the exclusive Stadium edition of the card and more reward points.</span>
+          <button type="button" className="choice venue-choice stadium" disabled={busy} onClick={() => start('stadium')}>
+            <span className="ch-av venue-icon">🏟</span>
+            <span className="ch-txt">
+              <strong>At the stadium</strong>
+              <small>Win the exclusive Stadium edition of the card and more reward points.</small>
+            </span>
           </button>
         </div>
         {error && <p className="error">{error}</p>}
-        <Link to="/">← Back to collection</Link>
       </section>
     )
   }
@@ -113,14 +119,12 @@ export default function Quiz() {
   if (questions.length === 0 && gamesPlayed === 0) {
     return (
       <section className="quiz">
+        <BackLink />
         <h1>No games played yet</h1>
         <p className="muted">
           The trivia asks about the games of the tournament, so it opens after the first one. Make your predictions on
           a gameday, then move on in the timeline at the bottom to play the games.
         </p>
-        <button type="button" className="pack-button" onClick={() => navigate('/')}>
-          Back to collection
-        </button>
       </section>
     )
   }
@@ -128,15 +132,13 @@ export default function Quiz() {
   if (questions.length === 0) {
     return (
       <section className="quiz">
+        <BackLink />
         <h1>Nothing left to win</h1>
         <p className="muted">
           {venue === 'stadium'
             ? 'You already own every special card of the games so far as a Stadium edition.'
             : 'You already own every special card of the games so far. Come to the stadium to win the Stadium editions, or play the next games!'}
         </p>
-        <button type="button" className="pack-button" onClick={() => navigate('/')}>
-          Back to collection
-        </button>
       </section>
     )
   }
@@ -150,7 +152,7 @@ export default function Quiz() {
           You unlocked {won} {won === 1 ? 'card' : 'cards'}.
         </p>
         <div className="pack-actions">
-          <button type="button" className="pack-button" onClick={() => navigate('/')}>
+          <button type="button" className="pack-button" onClick={() => navigate('/collection')}>
             Go to my collection
           </button>{' '}
           <button type="button" className="pack-button secondary" onClick={() => start(venue)} disabled={busy}>
@@ -165,8 +167,9 @@ export default function Quiz() {
   const last = index === questions.length - 1
 
   return (
-    <section className="quiz">
+    <section className="quiz q-card">
       <p className="eyebrow">
+        <span className="badge">Quiz</span>
         Question {index + 1} of {questions.length} · {venue === 'stadium' ? '🏟 Stadium' : '📺 At home'}
       </p>
       <h1>{question.prompt}</h1>
@@ -194,12 +197,15 @@ export default function Quiz() {
             <li key={option.id}>
               <button
                 type="button"
-                className={`quiz-option ${state}`}
+                className={`choice quiz-option ${state} ${missed && !isWrong && !isRight ? 'dim' : ''}`}
                 disabled={Boolean(missed) || busy || ruledOut}
                 onClick={() => answer(question, option)}
               >
-                <strong>{option.name}</strong>
-                <span>{option.team}</span>
+                <span className="ch-txt">
+                  <strong>{option.name}</strong>
+                  <small>{option.team}</small>
+                </span>
+                <span className="ch-mark" aria-hidden="true" />
               </button>
             </li>
           )

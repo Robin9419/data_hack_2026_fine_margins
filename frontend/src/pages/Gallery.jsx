@@ -1,19 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
+import { useAllCards } from '../allCards'
 import { useAuth } from '../auth'
-import Activities from '../components/Activities'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
-import { TEAMS } from '../teams'
+import Dropdown from '../components/Dropdown'
+import { nationOf } from '../nations'
+import { TEAMS, teamOf, teamStyle } from '../teams'
 import { useTournament } from '../tournament'
 
 const PAGE_SIZE = 8
 const SWIPE_PX = 50
 
 const TEAM_FILTERS = [
-  { value: 'all', label: 'All teams' },
-  ...TEAMS.map((t) => ({ value: t.name, label: t.name })),
+  { value: 'all', label: 'All teams', title: 'All teams' },
+  ...TEAMS.map((t) => ({ value: t.name, label: t.short, title: t.name, logo: t.logo })),
 ]
 const TYPE_FILTERS = [
   { value: 'all', label: 'All cards' },
@@ -45,19 +47,47 @@ function saveView(view) {
   }
 }
 
-function FilterSelect({ label, options, value, onChange }) {
-  return (
-    <label className="filter-select">
-      <span>{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
-  )
+// One tile per player (team + jersey) among the shown cards; progress counts all of his cards.
+const POS_SHORT = { Forward: 'FWD', Defender: 'DEF', Goalkeeper: 'GK' }
+function groupPlayers(shown, cards, playerOf) {
+  const keyOf = (c) => (c.type === 'legend' || c.type === 'reward' || !c.player?.jersey ? null : `${c.player.team}|${c.player.jersey}`)
+  const groups = new Map()
+  for (const c of cards) {
+    const key = keyOf(c)
+    if (!key) continue
+    const g = groups.get(key) ?? { key, total: 0, owned: 0, cardId: c.id, ownedId: null, shown: false, p: null }
+    g.total += 1
+    if (c.owned) {
+      g.owned += 1
+      g.ownedId ??= c.id
+    }
+    const p = playerOf(c)
+    if (p?.last_name && (!g.p?.last_name || c.owned)) g.p = p
+    g.p ??= p
+    groups.set(key, g)
+  }
+  for (const c of shown) {
+    const g = groups.get(keyOf(c) ?? '')
+    if (g) g.shown = true
+  }
+  return [...groups.values()]
+    .filter((g) => g.shown)
+    .map((g) => ({
+      key: g.key,
+      cardId: g.ownedId ?? g.cardId,
+      owned: g.owned,
+      total: g.total,
+      team: g.p.team,
+      logo: teamOf(g.p.team)?.logo,
+      jersey: g.p.jersey,
+      first: g.p.first_name,
+      last: g.p.last_name ?? 'Locked player',
+      position: g.p.position,
+      image: g.p.image_url,
+      nation: nationOf(g.p.nationality),
+      nationality: g.p.nationality,
+    }))
+    .sort((a, b) => b.owned - a.owned || a.last.localeCompare(b.last))
 }
 
 export default function Gallery() {
@@ -73,14 +103,18 @@ export default function Gallery() {
   const [team, setTeam] = useState(view.team ?? 'all')
   const [type, setType] = useState(view.type ?? 'all')
   const [page, setPage] = useState(view.page ?? 0)
-  const [spotlight, setSpotlight] = useState(null) // special card popped out of the grid
+  const [mode, setMode] = useState(view.mode ?? 'cards')
+  const [query, setQuery] = useState(view.query ?? '')
+  const allCards = useAllCards()
+  const [spotlight, setSpotlight] = useState(null) // card popped out of the grid
+  const [params, setParams] = useSearchParams()
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
   const touchStartX = useRef(null)
   const lastStage = useRef(stage)
 
   useEffect(() => {
-    saveView({ team, type, page })
-  }, [team, type, page])
+    saveView({ team, type, page, mode, query })
+  }, [team, type, page, mode, query])
 
   const load = () =>
     api
@@ -99,6 +133,15 @@ export default function Gallery() {
     if (lastStage.current !== undefined && lastStage.current !== stage) setPage(0)
     lastStage.current = stage
   }, [stage])
+
+  // ?card=<id> (a link to a card) opens that card's spotlight once the cards are loaded.
+  useEffect(() => {
+    const id = params.get('card')
+    if (!id || !cards) return
+    const found = cards.find((c) => c.id === id && c.owned)
+    if (found) setSpotlight(found)
+    setParams((p) => { p.delete('card'); return p }, { replace: true })
+  }, [cards, params])
 
   const onReset = async () => {
     const data = await api.reset()
@@ -121,16 +164,34 @@ export default function Gallery() {
     t.total += 1
     if (c.owned) t.owned += 1
   }
+  const fullOf = (c) => allCards?.get(c.id)
+  // Locked cards are blanked in the list; the full card has the names.
+  const playerOf = (c) => (c.owned ? c.player : fullOf(c)?.player ?? c.player)
+  const q = query.trim().toLowerCase()
+  const matches = (c) => {
+    if (!q) return true
+    const p = playerOf(c)
+    if (!p) return false
+    return [p.first_name, p.last_name, p.jersey && String(p.jersey), p.jersey && `#${p.jersey}`, `${p.first_name ?? ''} ${p.last_name ?? ''}`]
+      .some((s) => s && String(s).toLowerCase().includes(q))
+  }
   // Owned cards first, then locked; within each, by TYPE_ORDER (otherwise API order).
   const shown = cards
-    .filter((c) => (team === 'all' || c.player?.team === team) && (type === 'all' || (FILTER_KINDS[type] ?? [type]).includes(c.kind ?? c.type)))
+    .filter(
+      (c) =>
+        (team === 'all' || (c.player?.team ?? c.team) === team) &&
+        (type === 'all' || (FILTER_KINDS[type] ?? [type]).includes(c.kind ?? c.type)) &&
+        matches(c),
+    )
     .sort((a, b) => {
       if (a.owned !== b.owned) return a.owned ? -1 : 1
       return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]
     })
-  const pageCount = Math.max(1, Math.ceil(shown.length / PAGE_SIZE))
+  const players = mode === 'players' ? groupPlayers(shown, cards, playerOf) : []
+  const items = mode === 'players' ? players : shown
+  const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
   const current = Math.min(page, pageCount - 1)
-  const pageCards = shown.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
+  const pageItems = items.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE)
   const goTo = (p) => setPage(Math.max(0, Math.min(pageCount - 1, p)))
   const filterBy = (setter) => (value) => {
     setter(value)
@@ -148,61 +209,119 @@ export default function Gallery() {
   }
 
   return (
-    <section>
-      {newCardIds.length > 0 && (
-        <div className="banner">
-          {newCardIds.length} new {newCardIds.length === 1 ? 'card' : 'cards'} added to your collection. Tap a card to
-          see its stats.
+    <section className="collection-page">
+      <div className="collection-header">
+        <div>
+          <p className="eyebrow">Spengler Cup 2025</p>
+          <h1>Your collection</h1>
         </div>
-      )}
-
-      <Activities />
-
-      <div className="section-header collection-header">
-        <h1>Your collection</h1>
-        <span className="progress">
-          {ownedCount} / {realCards.length} collected
-        </span>
+        <div className="progress">
+          <strong>
+            {ownedCount} / {realCards.length}
+          </strong>
+          <span>cards collected</span>
+        </div>
       </div>
 
-      <div className="gallery-filters">
-        <FilterSelect label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />
-        <FilterSelect label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
+      <div className="gallery-tools">
+        <label className="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+          <input
+            type="search"
+            value={query}
+            placeholder="Search a player or jersey number"
+            aria-label="Search a player or jersey number"
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setPage(0)
+            }}
+          />
+          {query && (
+            <button type="button" className="clear" aria-label="Clear search" onClick={() => { setQuery(''); setPage(0) }}>
+              ×
+            </button>
+          )}
+        </label>
+        <div className="seg" role="group" aria-label="View">
+          {[['players', 'Players'], ['cards', 'Cards']].map(([value, label]) => (
+            <button key={value} type="button" className={mode === value ? 'on' : ''} aria-pressed={mode === value} onClick={() => { setMode(value); setPage(0) }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="dd-row">
+        <Dropdown label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />
+        <Dropdown label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
       </div>
 
       <div className="card-pager">
         <button
           type="button"
           className="pager-arrow prev"
-          aria-label="Previous cards"
+          aria-label={mode === 'players' ? 'Previous players' : 'Previous cards'}
           disabled={current === 0}
           onClick={() => goTo(current - 1)}
         >
           ‹
         </button>
         <div className="card-grid" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-          {pageCards.map((card) => (
-            <CardTile
-              key={card.id}
-              card={card}
-              club={clubs[card.player?.team]}
-              base={card.kind === 'collector' ? baseCounts[card.team] : undefined}
-              isNew={newCardIds.includes(card.id)}
-              onOpen={setSpotlight}
-            />
-          ))}
+          {mode === 'players'
+            ? pageItems.map((p) => (
+                <Link key={p.key} to={`/players/${p.cardId}`} className={`ptile ${p.owned ? '' : 'unknown'}`} style={teamStyle(p.team)}>
+                  <div className="ph">
+                    {p.image && <img className="photo" src={p.image} alt="" referrerPolicy="no-referrer" loading="lazy" />}
+                  </div>
+                  <div className="pt-corner">
+                    {p.logo && <span className="pt-logo"><img src={p.logo} alt={p.team} /></span>}
+                    {p.position && <span className="pt-pos">{POS_SHORT[p.position] ?? p.position}</span>}
+                  </div>
+                  <div className="body">
+                    {p.first && <small className="pt-first">{p.first}</small>}
+                    <b>
+                      {p.last}
+                      {p.nation && <img className="pt-flag" src={`https://flagcdn.com/w80/${p.nation.iso}.png`} alt={p.nation.code} title={p.nationality} loading="lazy" />}
+                    </b>
+                    <p className="pt-meta">
+                      {p.jersey && <span className="pt-no"><span><small>#</small>{p.jersey}</span></span>}
+                      <span className="pt-team">{p.team}</span>
+                    </p>
+                    <div className="dots" aria-label={`${p.owned} of ${p.total} cards`}>
+                      {Array.from({ length: p.total }, (_, i) => (
+                        <i key={i} className={i < p.owned ? 'on' : ''} />
+                      ))}
+                      <span>{p.owned}/{p.total}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            : pageItems.map((card) => (
+                <CardTile
+                  key={card.id}
+                  card={card}
+                  club={clubs[card.player?.team]}
+                  isNew={newCardIds.includes(card.id)}
+                  onOpen={setSpotlight}
+                  full={fullOf(card)}
+                  base={card.kind === 'collector' ? baseCounts[card.team] : undefined}
+                />
+              ))}
         </div>
         <button
           type="button"
           className="pager-arrow next"
-          aria-label="Next cards"
+          aria-label={mode === 'players' ? 'Next players' : 'Next cards'}
           disabled={current >= pageCount - 1}
           onClick={() => goTo(current + 1)}
         >
           ›
         </button>
       </div>
-      {shown.length === 0 && <p className="muted">No cards match these filters.</p>}
+      {items.length === 0 && <p className="muted">{mode === 'players' ? 'No players match these filters.' : 'No cards match these filters.'}</p>}
       {pageCount > 1 && (
         <div className="pager-dots">
           {Array.from({ length: pageCount }, (_, i) => (

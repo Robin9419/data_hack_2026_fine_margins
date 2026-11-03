@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import BackLink from '../components/BackLink'
 import { api } from '../api'
+import { useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
 import CardTile from '../components/CardTile'
 import InstagramLink from '../components/InstagramLink'
@@ -12,6 +14,7 @@ import { teamOf } from '../teams'
 
 export default function CardDetail({ preview = false }) {
   const { id } = useParams()
+  const allCards = useAllCards()
   const [card, setCard] = useState(null)
   const [error, setError] = useState(null)
   const [playing, setPlaying] = useState(null) // clip picked from a game event
@@ -40,14 +43,14 @@ export default function CardDetail({ preview = false }) {
   if (error)
     return (
       <section>
-        <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+        <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
         <p className="error">{error}</p>
       </section>
     )
   if (!card) return <p className="muted">Loading card…</p>
-  if (card.type === 'base') return <BaseCardDetail card={card} />
-  if (card.type === 'reward') return <RewardCardDetail card={card} />
-  if (card.type === 'legend') return <LegendCardDetail card={card} />
+  if (card.type === 'base') return <BaseCardDetail card={card} preview={preview} />
+  if (card.type === 'reward') return <RewardCardDetail card={card} preview={preview} />
+  if (card.type === 'legend') return <LegendCardDetail card={card} preview={preview} />
 
   const { player, match } = card
   const moments = card.moments || []
@@ -66,14 +69,17 @@ export default function CardDetail({ preview = false }) {
 
   return (
     <section className="detail">
-      <Link to={preview ? '/admin' : '/'}>{preview ? '← Back to admin' : '← Back to collection'}</Link>
+      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
+      {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
         <div className="detail-heading">
           <p className="eyebrow">{card.category ? `${card.category} · ` : ''}{card.title}</p>
           <h1>
-            #{player.jersey} {player.first_name} {player.last_name}
+            <Link to={`/players/${card.id}`} className="plain-link">
+              #{player.jersey} {player.first_name} {player.last_name}
+            </Link>
           </h1>
           <p className="muted">
             {player.team}
@@ -245,12 +251,13 @@ function PlayerCards({ cardId }) {
   return (
     <>
       <h2>Other cards of this player</h2>
+      <p><Link to={`/players/${cardId}`}>Player profile ›</Link></p>
       <p className="muted small">
         You own {ownedCount} of {others.length} other cards. Locked cards are still hidden.
       </p>
       <div className="card-grid player-cards">
         {sorted.map((c) => (
-          <CardTile key={c.id} card={c} />
+          <CardTile key={c.id} card={c} full={allCards?.get(c.id)} />
         ))}
       </div>
     </>
@@ -260,11 +267,11 @@ function PlayerCards({ cardId }) {
 const REWARD_LABEL = { collector: 'Collector card', moment: 'Moment card', stadium: 'Stadium card', trophy: 'Trophy card' }
 
 // Reward cards are earned by owning other cards, not won in the trivia.
-function RewardCardDetail({ card }) {
+function RewardCardDetail({ card, preview }) {
   const { player, match } = card
   return (
     <section className="detail">
-      <Link to="/">← Back to collection</Link>
+      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
 
       <header className="detail-header">
         {card.kind === 'collector' ? (
@@ -365,7 +372,7 @@ const age = (iso) => {
 }
 
 // A base card has no archetype or game stats, only the player's profile (from Elite Prospects).
-function BaseCardDetail({ card }) {
+function BaseCardDetail({ card, preview }) {
   const { player, bio, match } = card
   const goalie = player.position === 'Goalkeeper'
   const facts = [
@@ -382,14 +389,17 @@ function BaseCardDetail({ card }) {
 
   return (
     <section className="detail">
-      <Link to="/">← Back to collection</Link>
+      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
+      {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
         <div className="detail-heading">
           <p className="eyebrow">Base card</p>
           <h1>
-            #{player.jersey} {player.first_name} {player.last_name}
+            <Link to={`/players/${card.id}`} className="plain-link">
+              #{player.jersey} {player.first_name} {player.last_name}
+            </Link>
           </h1>
           <p className="muted">{player.team}</p>
           <InstagramLink player={player} />
@@ -429,7 +439,7 @@ function BaseCardDetail({ card }) {
 }
 
 // A club legend: no game stats, only why the player is a legend, with their Spengler Cup record first.
-function LegendCardDetail({ card }) {
+function LegendCardDetail({ card, preview }) {
   const { player, legend } = card
   const facts = [
     ['Position', player.position],
@@ -439,7 +449,7 @@ function LegendCardDetail({ card }) {
 
   return (
     <section className="detail legend-detail">
-      <Link to="/">← Back to collection</Link>
+      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
 
       <header className="detail-header">
         <figure className="legend-figure">

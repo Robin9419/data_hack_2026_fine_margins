@@ -6,6 +6,7 @@ import { useAuth } from '../auth'
 import CardSpotlight from '../components/CardSpotlight'
 import CardTile from '../components/CardTile'
 import Dropdown from '../components/Dropdown'
+import PlayerPhoto from '../components/PlayerPhoto'
 import { nationOf } from '../nations'
 import { TEAMS, teamOf, teamStyle } from '../teams'
 import { useTournament } from '../tournament'
@@ -62,6 +63,7 @@ function groupPlayers(shown, cards, playerOf) {
       g.ownedId ??= c.id
     }
     const p = playerOf(c)
+    if (c.type === 'base' && p?.image_url) g.base = p // the tile shows the base card's photo
     if (p?.last_name && (!g.p?.last_name || c.owned)) g.p = p
     g.p ??= p
     groups.set(key, g)
@@ -83,7 +85,7 @@ function groupPlayers(shown, cards, playerOf) {
       first: g.p.first_name,
       last: g.p.last_name ?? 'Locked player',
       position: g.p.position,
-      image: g.p.image_url,
+      photo: g.base ?? g.p,
       nation: nationOf(g.p.nationality),
       nationality: g.p.nationality,
     }))
@@ -180,7 +182,7 @@ export default function Gallery() {
     .filter(
       (c) =>
         (team === 'all' || (c.player?.team ?? c.team) === team) &&
-        (type === 'all' || (FILTER_KINDS[type] ?? [type]).includes(c.kind ?? c.type)) &&
+        (mode === 'players' || type === 'all' || (FILTER_KINDS[type] ?? [type]).includes(c.kind ?? c.type)) &&
         matches(c),
     )
     .sort((a, b) => {
@@ -188,6 +190,8 @@ export default function Gallery() {
       return TYPE_ORDER[a.type] - TYPE_ORDER[b.type]
     })
   const players = mode === 'players' ? groupPlayers(shown, cards, playerOf) : []
+  const allPlayers = mode === 'players' ? groupPlayers(cards, cards, playerOf) : []
+  const ownedPlayers = allPlayers.filter((p) => p.owned > 0).length
   const items = mode === 'players' ? players : shown
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
   const current = Math.min(page, pageCount - 1)
@@ -217,9 +221,9 @@ export default function Gallery() {
         </div>
         <div className="progress">
           <strong>
-            {ownedCount} / {realCards.length}
+            {mode === 'players' ? `${ownedPlayers} / ${allPlayers.length}` : `${ownedCount} / ${realCards.length}`}
           </strong>
-          <span>cards collected</span>
+          <span>{mode === 'players' ? 'players collected' : 'cards collected'}</span>
         </div>
       </div>
 
@@ -256,7 +260,7 @@ export default function Gallery() {
 
       <div className="dd-row">
         <Dropdown label="Team" options={TEAM_FILTERS} value={team} onChange={filterBy(setTeam)} />
-        <Dropdown label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
+        {mode !== 'players' && <Dropdown label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />}
       </div>
 
       <div className="card-pager">
@@ -274,7 +278,7 @@ export default function Gallery() {
             ? pageItems.map((p) => (
                 <Link key={p.key} to={`/players/${p.cardId}`} className={`ptile ${p.owned ? '' : 'unknown'}`} style={teamStyle(p.team)}>
                   <div className="ph">
-                    {p.image && <img className="photo" src={p.image} alt="" referrerPolicy="no-referrer" loading="lazy" />}
+                    {p.photo?.image_url && <PlayerPhoto player={p.photo} className="card-art" />}
                   </div>
                   <div className="pt-corner">
                     {p.logo && <span className="pt-logo"><img src={p.logo} alt={p.team} /></span>}

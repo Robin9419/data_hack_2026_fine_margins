@@ -402,7 +402,7 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .dots i { flex: 1; height: 4px; border-radius: 4px; background: var(--surface-2, rgba(255,255,255,.14)); }
 .dots i.on { background: var(--accent); }
 .dots span { font-size: 11px; font-weight: 700; color: var(--muted); margin-left: 4px; white-space: nowrap; }
-.ptile.unknown .ph img.photo { filter: grayscale(1) brightness(.35); }
+.ptile.unknown .ph img { filter: grayscale(1) brightness(.35); }
 @media (max-width: 640px) { .pgrid { grid-template-columns: 1fr 1fr; gap: 12px; } .ptile .body b { font-size: 19px; } }
 /* In the collection pager a player tile takes the same 5:7 slot as a card, with the card's layout: logo and position
    top right, first name small, surname big with the flag, jersey plate and team, then the set progress. */

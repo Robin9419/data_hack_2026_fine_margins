@@ -348,6 +348,9 @@ class TestData:
         }
 
     def _award_card(self, game: dict, title: str, player: dict, attributes: list[str]) -> dict:
+        if title == "Puck Hunter" and player["last_name"] == "Fora":
+            # The demo Puck Hunter card goes to Nico Gross instead, when he played in the game.
+            player = next((p for p in game["players"] if (p["first_name"], p["last_name"]) == ("Nico", "Gross")), player)
         moments = self._moments(game, player)
         opponent = game["away_team"] if player["team"] == game["home_team"] else game["home_team"]
         team_slug = re.sub(r"[^a-z]+", "-", player["team"].lower()).strip("-")

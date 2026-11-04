@@ -190,8 +190,11 @@ export default function PlayerProfile() {
         status: ownedIds.has(c.id) ? 'owned' : 'locked',
       }))
     : cards.map((c) => ({ card: c, full: allCards?.get(c.id), status: c.owned ? 'owned' : 'locked' }))
+  // Base, then Ones to Watch, then impact specials, then legends. Impact specials go by game date, earliest first.
+  const group = ({ card: c }) => (c.type === 'base' ? 0 : c.type === 'legend' ? 3 : c.kind === 'road' ? 1 : 2)
+  const gameTime = ({ card: c, full }) => new Date((c.match ?? full?.match)?.date ?? 0).getTime()
   const rank = { owned: 0, locked: 1 }
-  const sorted = [...list].sort((a, b) => rank[a.status] - rank[b.status])
+  const sorted = [...list].sort((a, b) => group(a) - group(b) || gameTime(a) - gameTime(b) || rank[a.status] - rank[b.status])
   const availableCount = list.length
   const player = everyCard.find((c) => c.player.last_name)?.player ?? owned.find((c) => c.player?.last_name)?.player ?? source.player
   const named = Boolean(player.last_name)

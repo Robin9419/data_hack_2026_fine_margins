@@ -81,6 +81,9 @@ const ARCHETYPES = {
 }
 const PERFORMANCE_ICON = { motm: 'star', gamewinner: 'burst', wall: 'shield', recordbreaker: 'bolt' }
 const PERFORMANCE_COLOR = { motm: '#ffd76a', gamewinner: '#ff6a4a', wall: '#7cc4ff', recordbreaker: '#19e6ff' }
+// Impact specials: every Stadium edition is orange (the Workhorse), every other one purple (the Playmaker).
+const IMPACT_STADIUM = '#ff9a3c'
+const IMPACT_PROFILE = '#b98bff'
 // Label, icon, frame tier and rarity symbol per context card.
 const CONTEXT = {
   moment: { label: 'Moment', icon: 'star', tier: 'elite', rarity: '★★★' },
@@ -192,7 +195,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
     dark
       ? { icon: champion ? 'trophy' : archetype.icon, color: 'var(--s1)', line: false }
       : profileLook
-      ? { icon: archetype.icon, color: archetype.color, label: card.title }
+      ? { icon: archetype.icon, color: IMPACT_PROFILE, label: card.title }
       : road
         ? { icon: 'flag', color: '#ffd76a', label: 'Ones to Watch' }
         : kind === 'collector'
@@ -203,7 +206,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
     <div className={classes.filter(Boolean).join(' ')} style={{
         ...teamStyle(player.team),
         ...(tag ? { '--tc': tag.color } : {}),
-        ...(dark && impact && !perf ? { '--s1': archetype.color, '--s2': '#fff' } : {}),
+        ...(dark && impact ? { '--s1': IMPACT_STADIUM, '--s2': '#fff' } : {}),
       }}>
       <div className="card-inner" style={dark ? { '--llen': sideText.length } : undefined}>
         <PlayerPhoto player={player} className="card-art" />

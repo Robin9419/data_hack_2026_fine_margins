@@ -225,23 +225,56 @@ function NoRound({ stage, today, next }) {
 }
 
 function PastResults({ results }) {
+  const [openId, setOpenId] = useState(null)
   const predicted = results.filter((g) => g.questions.some((q) => q.prediction))
   if (!predicted.length) return null
   return (
     <details className="predict-past">
       <summary>Your past predictions ({predicted.length})</summary>
       <ul>
-        {predicted.map((g) => (
-          <li key={g.id}>
-            <span className="muted small">{formatMatchDate(g.date)}</span>
-            <span>
-              {g.home_team} {g.home_score}–{g.away_score} {g.away_team}
-            </span>
-            <strong>
-              {g.correct} of {g.questions.filter((q) => q.prediction).length} right
-            </strong>
-          </li>
-        ))}
+        {predicted.map((g) => {
+          const isOpen = openId === g.id
+          return (
+            <li key={g.id} className="predict-past-item">
+              <button
+                type="button"
+                className="predict-past-toggle"
+                aria-expanded={isOpen}
+                onClick={() => setOpenId(isOpen ? null : g.id)}
+              >
+                <span className="muted small">{formatMatchDate(g.date)}</span>
+                <span>
+                  {g.home_team} {g.home_score}–{g.away_score} {g.away_team}
+                </span>
+                <strong>
+                  {g.correct} of {g.questions.filter((q) => q.prediction).length} right
+                </strong>
+                <span className="chev next" aria-hidden="true" />
+              </button>
+              {isOpen && (
+                <ul className="predict-past-questions">
+                  {g.questions.map((q) => {
+                    const pick = q.options.find((o) => o.id === q.prediction)
+                    const answer = q.options.find((o) => o.id === q.answer)
+                    const right = q.prediction && q.prediction === q.answer
+                    return (
+                      <li key={q.id} className={right ? 'right' : q.prediction ? 'wrong' : 'missed'}>
+                        <span className="predict-past-prompt">{q.prompt}</span>
+                        <span className="small">
+                          Your answer: <strong>{pick ? pick.label : 'No pick'}</strong>
+                        </span>
+                        <span className="small">
+                          Correct answer: <strong>{answer ? answer.label : '—'}</strong>
+                        </span>
+                        {q.explanation && <span className="muted small">{q.explanation}</span>}
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </li>
+          )
+        })}
       </ul>
     </details>
   )

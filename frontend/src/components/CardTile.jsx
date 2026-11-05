@@ -6,7 +6,7 @@ import CardFace from './CardFace'
 // full: the card's full data (from allCards); a locked card then shows as a real card under a lock.
 // base: { owned, total } base cards of the club, shown over a locked collector card.
 export default function CardTile({ card, isNew, onOpen, club, full, base }) {
-  if (!card.owned && card.type === 'legend') {
+  if (!card.owned && card.type === 'legend' && !full) {
     return (
       <div className="card-tile locked" tabIndex={0} aria-label={`Locked ${card.player.team} legend. Collect the club's cards to unlock it.`}>
         <CardFace card={card} state="locked" />
@@ -15,7 +15,7 @@ export default function CardTile({ card, isNew, onOpen, club, full, base }) {
     )
   }
 
-  if (!card.owned && full && card.type !== 'reward') {
+  if (!card.owned && full) {
     return (
       <div className="card-tile locked is-locked" aria-label="Locked card. Answer trivia questions to unlock it.">
         <CardFace card={full} state="owned" />

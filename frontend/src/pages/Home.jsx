@@ -10,14 +10,27 @@ import { useTournament } from '../tournament'
 
 const ROW_SIZE = 4
 
-// Legends first, then stadium editions, then performance specials, then everything else that is not a base card.
-const rank = (c) => (c.type === 'legend' ? 0 : c.edition === 'stadium' ? 1 : c.kind === 'performance' ? 2 : 3)
+// Best cards order: legends, impact specials (profile and performance), ones to watch, collector, base cards.
+const category = (c) =>
+  c.type === 'legend' ? 0
+  : c.type === 'special' && (c.kind === 'profile' || c.kind === 'performance') ? 1
+  : c.kind === 'road' ? 2
+  : c.kind === 'collector' ? 3
+  : c.type === 'base' ? 4
+  : 5
 const byDateDesc = (a, b) => (b.match?.date ?? '').localeCompare(a.match?.date ?? '')
+// Within a category, cards of the favorite team come first, then the newest.
+const cardTeam = (c) => c.player?.team ?? c.team
+const bestOrder = (favorite) => (a, b) => {
+  const fa = favorite && cardTeam(a) === favorite ? 0 : 1
+  const fb = favorite && cardTeam(b) === favorite ? 0 : 1
+  return category(a) - category(b) || fa - fb || byDateDesc(a, b)
+}
 
 export default function Home() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { setProgress } = useAuth()
+  const { user, setProgress } = useAuth()
   const { tournament } = useTournament()
   const stage = tournament?.stage
   const newCardIds = location.state?.newCardIds ?? []
@@ -46,8 +59,8 @@ export default function Home() {
   const ownedCount = realCards.filter((c) => c.owned).length
   const owned = realCards.filter((c) => c.owned)
   const best = owned
-    .filter((c) => c.type !== 'base')
-    .sort((a, b) => rank(a) - rank(b) || byDateDesc(a, b))
+    .slice()
+    .sort(bestOrder(user?.favorite_team))
     .slice(0, ROW_SIZE)
   const bestIds = new Set(best.map((c) => c.id))
   const latest = owned

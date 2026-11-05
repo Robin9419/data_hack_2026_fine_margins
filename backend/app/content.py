@@ -774,6 +774,7 @@ class Content:
             "legend": {k: cfg.get(k) for k in ("era", "nationality", "summary", "spengler_cup", "honours", "moment",
                                                 "image_credit", "image_source_url", "sources")},
             "edition": "legend",
+            "intro_video": self._intro_video(cfg.get("video_id"), f"{cfg['first_name']} {cfg['last_name']}"),
             "source": doc["source"],
         }
 

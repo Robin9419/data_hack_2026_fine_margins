@@ -110,7 +110,7 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
           {card.type !== 'special' && (
             <>
               <h2>{card.title ?? 'Base card'}</h2>
-              {card.type !== 'reward' && (
+              {card.type !== 'reward' && card.type !== 'legend' && (
                 <dl className="spotlight-facts">
                   {factsOf(card).all.map(([label, value]) => (
                     <div key={label}>

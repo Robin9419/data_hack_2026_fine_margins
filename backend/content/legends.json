@@ -9,6 +9,7 @@
   "cards": [
     {
       "id": "legend-hcd-nash",
+      "video_id": "PceCe00qio4",
       "team": "HC Davos",
       "first_name": "Rick",
       "last_name": "Nash",
@@ -67,6 +68,7 @@
     },
     {
       "id": "legend-hcd-ambuehl",
+      "video_id": "FM-bOJ9dwlQ",
       "team": "HC Davos",
       "first_name": "Andres",
       "last_name": "Ambühl",
@@ -97,6 +99,7 @@
     },
     {
       "id": "legend-can-roy",
+      "video_id": "JZVIuhcogZY",
       "team": "Team Canada",
       "first_name": "Derek",
       "last_name": "Roy",
@@ -152,6 +155,7 @@
     },
     {
       "id": "legend-can-noreau",
+      "video_id": "0nKbX8cQ_kQ",
       "team": "Team Canada",
       "first_name": "Maxim",
       "last_name": "Noreau",
@@ -211,6 +215,7 @@
     },
     {
       "id": "legend-spa-kempny",
+      "video_id": "Zhh6XC3Odg4",
       "team": "HC Sparta Praha",
       "first_name": "Michal",
       "last_name": "Kempný",
@@ -241,6 +246,7 @@
     },
     {
       "id": "legend-spa-zabrodsky",
+      "video_id": "VtNOrET7DGU",
       "team": "HC Sparta Praha",
       "first_name": "Vladimír",
       "last_name": "Zábrodský",
@@ -272,6 +278,7 @@
     },
     {
       "id": "legend-hifk-hagman",
+      "video_id": "E8kw1aECKpw",
       "team": "HIFK",
       "first_name": "Matti",
       "last_name": "Hagman",
@@ -357,6 +364,7 @@
     },
     {
       "id": "legend-fri-berra",
+      "video_id": "IeEF1EsEQnE",
       "team": "HC Fribourg-Gottéron",
       "first_name": "Reto",
       "last_name": "Berra",
@@ -389,6 +397,7 @@
     },
     {
       "id": "legend-fri-soerensen",
+      "video_id": "9RU27Ax4oFU",
       "team": "HC Fribourg-Gottéron",
       "first_name": "Marcus",
       "last_name": "Sörensen",
@@ -422,6 +431,7 @@
     },
     {
       "id": "legend-fri-sprunger",
+      "video_id": "eu8KsOip4uE",
       "team": "HC Fribourg-Gottéron",
       "first_name": "Julien",
       "last_name": "Sprunger",
@@ -453,6 +463,7 @@
     },
     {
       "id": "legend-usc-celebrini",
+      "video_id": "f0OKb5R_5qA",
       "team": "U.S. Collegiate Selects",
       "first_name": "Macklin",
       "last_name": "Celebrini",
@@ -480,6 +491,7 @@
     },
     {
       "id": "legend-usc-fantilli",
+      "video_id": "qHd6A2A6Xws",
       "team": "U.S. Collegiate Selects",
       "first_name": "Adam",
       "last_name": "Fantilli",
@@ -506,6 +518,7 @@
     },
     {
       "id": "legend-usc-makar",
+      "video_id": "m2BiZRiiYDs",
       "team": "U.S. Collegiate Selects",
       "first_name": "Cale",
       "last_name": "Makar",

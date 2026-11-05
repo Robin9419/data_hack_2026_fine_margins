@@ -117,7 +117,7 @@ function Guide({ onClose }) {
   }, [onClose])
 
   return createPortal(
-    <div className="results-overlay" onClick={onClose}>
+    <div className="results-overlay guide-overlay" onClick={onClose}>
       <div className="results-modal guide-modal" role="dialog" aria-modal="true" aria-labelledby="guide-title" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="results-close" onClick={onClose} aria-label="Close">✕</button>
         <h2 id="guide-title">Card guide</h2>

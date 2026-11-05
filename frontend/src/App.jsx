@@ -1,6 +1,6 @@
 import { Link, Navigate, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { api } from './api'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAuth } from './auth'
 import CardGuide from './components/CardGuide'
 import RewardBar from './components/RewardBar'
@@ -38,7 +38,28 @@ function CardRedirect() {
 
 export default function App() {
   const { user, logout } = useAuth()
-  const inAdmin = useLocation().pathname.startsWith('/admin')
+  const { pathname } = useLocation()
+  const inAdmin = pathname.startsWith('/admin')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  // Close the menu after navigating (Admin, Exit admin) or signing out.
+  useEffect(() => setMenuOpen(false), [pathname, user])
+
+  // Close the menu on a click outside it or Escape.
+  useEffect(() => {
+    if (!menuOpen) return
+    const onDown = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target) && !e.target.closest('.menu-button')) setMenuOpen(false)
+    }
+    const onKey = (e) => e.key === 'Escape' && setMenuOpen(false)
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
 
   return (
     <>
@@ -60,15 +81,31 @@ export default function App() {
           {user && (
             <div className="topbar-user">
               <CardGuide />
-              <span>{user.username}</span>
-              {inAdmin ? (
-                <Link to="/" className="admin-link">Exit admin</Link>
-              ) : (
-                <Link to="/admin" className="admin-link">Admin</Link>
-              )}
-              <button className="link-button" onClick={logout}>
-                Sign out
+              <button
+                type="button"
+                className="menu-button"
+                aria-label="Menu"
+                aria-expanded={menuOpen}
+                aria-controls="user-menu"
+                onClick={() => setMenuOpen((o) => !o)}
+              >
+                <span aria-hidden="true" />
+                <span aria-hidden="true" />
+                <span aria-hidden="true" />
               </button>
+              {menuOpen && (
+                <div className="user-menu" id="user-menu" ref={menuRef}>
+                  <span className="user-menu-name">{user.username}</span>
+                  {inAdmin ? (
+                    <Link to="/" className="admin-link">Exit admin</Link>
+                  ) : (
+                    <Link to="/admin" className="admin-link">Admin</Link>
+                  )}
+                  <button className="link-button" onClick={logout}>
+                    Sign out
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

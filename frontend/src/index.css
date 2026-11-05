@@ -472,6 +472,7 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .pack-hint { color: #9fb3c6; margin: 0 0 28px; min-height: 1.4em; }
 .pack-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; }
 .pack-row > .pack-card { width: 220px; max-width: 100%; }
+.pack-row + .pack-row { margin-top: 24px; }
 
 .pack-card {
   position: relative;
@@ -1116,7 +1117,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 /* Pack opening: a special card gets a rainbow glow instead of gold */
 .pack-card.revealed.special .card-face { box-shadow: 0 0 0 2px #fff, 0 0 30px rgba(255, 120, 200, 0.6), 0 0 60px rgba(120, 220, 255, 0.5); }
 .pack-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-@media (max-height: 700px) { .pack-stage { padding: 16px 16px 24px; } .pack-stage h1, .trade-machine h1 { font-size: 1.6rem; } .pack-hint { margin-bottom: 14px; } .pack-row { gap: 14px; } .pack-row > .pack-card { width: min(220px, 40vh); } }
+@media (max-height: 700px) { .pack-stage { padding: 16px 16px 24px; } .pack-stage h1, .trade-machine h1 { font-size: 1.6rem; } .pack-hint { margin-bottom: 14px; } .pack-row { gap: 14px; } .pack-row + .pack-row { margin-top: 14px; } .pack-row > .pack-card { width: min(220px, 40vh); } }
 .spotlight-panel, .results-modal { overscroll-behavior: contain; }
 
 /* Trade-in */

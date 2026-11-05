@@ -116,8 +116,12 @@ function Pack({ pack, title, fromTrade, earned, hasMore, onMore, previousNewIds 
               ? 'A special card!'
               : 'Nice pull!'}</p>
 
-      <div className="pack-row">
-        {pack.map((card, i) => (
+      {/* Three cards on top, the rest below. */}
+      {[0, 3].filter((start) => start < pack.length).map((start) => (
+      <div className="pack-row" key={start}>
+        {pack.slice(start, start + 3).map((card, j) => {
+          const i = start + j
+          return (
           <button
             key={`${card.id}-${i}`}
             type="button"
@@ -134,8 +138,10 @@ function Pack({ pack, title, fromTrade, earned, hasMore, onMore, previousNewIds 
             )}
             <span className="pack-flash" aria-hidden="true" />
           </button>
-        ))}
+          )
+        })}
       </div>
+      ))}
 
       <div className="pack-actions">
         {allRevealed ? (

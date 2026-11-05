@@ -21,6 +21,7 @@ DATA_DIR = ROOT / "data"
 PLAYER_IMAGES_FILE = ROOT / "docs" / "player-images.json"
 MEDIA_DIR = ROOT / "backend" / "media"  # served at /api/media; not in git
 CLIPS_DIR = MEDIA_DIR / "clips"  # filled by scripts/cut_clips.py
+MOMENTS_PER_KPI = 5  # most moments (video clips) a final impact special shows per KPI
 
 
 def _load_json(name: str) -> dict:
@@ -481,10 +482,33 @@ class Content:
             attr["detail"] = f'{row[metric["count_column"]]} of {row[metric["total_column"]]}'
         return attr
 
+    @staticmethod
+    def _cap_moments(moments: list[dict], attributes: list[dict]) -> list[dict]:
+        """A card only shows the moments behind its own KPIs, at most MOMENTS_PER_KPI per KPI: the ones on video first,
+        then the highest KPI value. The KPIs' moment_ids are trimmed to the kept moments."""
+        by_id = {m["id"]: m for m in moments}
+
+        def rank(moment_id: str):
+            m = by_id[moment_id]
+            value = (m.get("kpi") or {}).get("value")
+            return (not (m["clip"] or m["broadcast"]), -(value if isinstance(value, (int, float)) else 0))
+
+        kept: set[str] = set()
+        for attr in attributes:
+            ids = [i for i in dict.fromkeys(attr.get("moment_ids") or []) if i in by_id]
+            if attr.get("moment_ids") is None:
+                continue
+            attr["moment_ids"] = [i for i in by_id if i in set(sorted(ids, key=rank)[:MOMENTS_PER_KPI])]
+            kept.update(attr["moment_ids"])
+        return [m for m in moments if m["id"] in kept]
+
     def _build_card(self, cfg: dict) -> dict:
         row = self._find_row(cfg["team"], cfg["jersey"])
         moments = self.events.moments(self.events.player_id(cfg["team"], cfg["jersey"]))
         m = self.match
+        archetype_kpis = [self._build_attribute(mid, row, moments) for mid in self.archetype_metrics[cfg["title"]]]
+        attributes = [self._build_attribute(mid, row, moments) for mid in cfg["attributes"]]
+        moments = self._cap_moments(moments, [*attributes, *archetype_kpis])
         return {
             "id": cfg["id"],
             "type": "special",
@@ -495,9 +519,9 @@ class Content:
             "title": cfg["title"],
             "archetype": self.archetypes.get(cfg["title"]),
             # The KPIs that earned the archetype, for the card back (may differ from the card's own attributes).
-            "archetype_kpis": [self._build_attribute(mid, row, moments) for mid in self.archetype_metrics[cfg["title"]]],
+            "archetype_kpis": archetype_kpis,
             "match": self._match(cfg["team"]),
-            "attributes": [self._build_attribute(mid, row, moments) for mid in cfg["attributes"]],
+            "attributes": attributes,
             "explanation": cfg["explanation"],
             "achievement": self.achievements.get(cfg["achievement"]) if cfg["achievement"] else None,
             "video": cfg["video"] or self._featured_video(moments),

@@ -202,7 +202,9 @@ export default function PlayerProfile() {
   const nationality = base?.bio?.nationality ?? player.nationality
   const nation = nationOf(nationality)
   const team = teamOf(player.team)
-  const photo = player.action_image_url ?? player.image_url
+  // The profile shows the player's Ones to Watch picture when he has that card.
+  const roadPlayer = list.find((x) => x.card.kind === 'road' && x.card.player?.image_url)?.card.player
+  const photo = roadPlayer ? roadPlayer.action_image_url ?? roadPlayer.image_url : player.action_image_url ?? player.image_url
   const bio = base?.bio ?? {}
   const goalie = player.position === 'Goalkeeper'
   const bioFacts = [
@@ -218,12 +220,13 @@ export default function PlayerProfile() {
   const playerGames = games?.[`${player.team}#${player.jersey}`]?.filter((g) => playedIds.has(g.game))
   const stats = games ? gameStats(playerGames ?? [], goalie) : null
   const noGames = !playerGames?.length
-  const gameCards = (g) => everyCard.filter((c) => c.type === 'special' && c.kind !== 'road' && c.title && c.match?.id === g.game && c.match.date === g.date)
+  // Matched by date and opponent: the final's card and the game list use different ids for the same game.
+  const gameCards = (g) => everyCard.filter((c) => c.type === 'special' && c.kind !== 'road' && c.title && c.match && c.match.date === g.date && c.match.opponent === g.opponent)
 
   return (
     <section className="pp">
       <BackLink history />
-      <div className={`pp-hero ${player.action_image_url || widePhoto ? '' : 'portrait'}`} style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
+      <div className={`pp-hero ${(roadPlayer ?? player).action_image_url || widePhoto ? '' : 'portrait'}`} style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
         <div className="pp-hero-in">
           <div className="pp-id">
             {named && <p className="pp-first">{player.first_name}</p>}

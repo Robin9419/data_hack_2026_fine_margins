@@ -407,7 +407,9 @@ def player_cards(card_id: str, user: dict = Depends(current_user)):
     """Every card of the same player that exists at the user's stage: the ones owned in full, the locked ones as a
     teaser (names are blanked, so the match has to be made here)."""
     content = get_content()
-    card = content.cards.get(card_id)
+    # Ones to Watch cards live outside content.cards: they exist once their team has played.
+    roads = content.road_to_final.cards_for(played_for(user))
+    card = content.cards.get(card_id) or next((c for c in roads if c["id"] == card_id), None)
     if not card or not card.get("player"):
         return {"cards": []}
     player = card["player"]
@@ -416,6 +418,14 @@ def player_cards(card_id: str, user: dict = Depends(current_user)):
     owned = owned_now(user)
     copies = db.card_copies(user["id"])
     result = []
+    for road in roads:
+        p = road["player"]
+        if (p.get("first_name"), p.get("last_name"), p.get("team")) != who:
+            continue
+        if road["id"] in copies:
+            result.append({**road, "owned": True})
+        else:
+            result.append({**content.card_summary(road), "owned": False})
     for other_id, other in content.cards.items():
         p = other.get("player")
         if other["type"] == "reward" or not p or other_id not in available:

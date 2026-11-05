@@ -299,14 +299,18 @@ function RewardCardDetail({ card, preview }) {
           <span className="label">How you earned it</span>
           {card.unlock}
         </div>
-        <div>
-          <span className="label">Match</span>
-          {scoreline(match)}
-        </div>
-        <div>
-          <span className="label">Date</span>
-          {formatMatchDate(match.date)}
-        </div>
+        {match && (
+          <>
+            <div>
+              <span className="label">Match</span>
+              {scoreline(match)}
+            </div>
+            <div>
+              <span className="label">Date</span>
+              {formatMatchDate(match.date)}
+            </div>
+          </>
+        )}
       </div>
       {card.club && <AboutInfo heading="About the club" about={card.club} />}
       {card.about && <AboutInfo heading={ABOUT_HEADING[card.context_type]} about={card.about} />}

@@ -12,7 +12,8 @@ export default function CardUnlock({ card, result, points, onContinue, continueL
   const stadium = card.edition === 'stadium'
   const legend = result === 'legend'
   const collector = result === 'collector'
-  const headline = legend ? 'Club legend earned!' : collector ? 'Collector card earned!' : result === 'upgraded' ? 'Card upgraded!' : 'New card unlocked!'
+  const context = result === 'context'
+  const headline = legend ? 'Club legend earned!' : collector ? 'Collector card earned!' : context ? 'Bonus card earned!' : result === 'upgraded' ? 'Card upgraded!' : 'New card unlocked!'
 
   return createPortal(
     <div className={`unlock ${stadium || legend ? 'stadium' : ''} ${legend ? 'legend' : ''}`} role="dialog" aria-modal="true" aria-label={headline}>
@@ -34,7 +35,9 @@ export default function CardUnlock({ card, result, points, onContinue, continueL
             ? `You collected enough ${card.player.team} cards`
             : collector
               ? `You collected every ${card.team} base card`
-              : `+${points} pts${stadium ? ' · Stadium bonus' : ''}`}
+              : context
+                ? card.unlock
+                : `+${points} pts${stadium ? ' · Stadium bonus' : ''}`}
         </p>
         <button type="button" className="pack-button" onClick={onContinue}>
           {continueLabel}

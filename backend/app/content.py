@@ -56,6 +56,9 @@ def format_value(value, fmt: str) -> str:
     return str(value)
 
 
+# Special cards a user must own to earn the trophy card.
+TROPHY_SPECIALS = 3
+
 class Content:
     def __init__(self):
         self.match = _load_json("match.json")
@@ -128,7 +131,7 @@ class Content:
         # the user's timeline. The cards built from the Wisehockey data, and the reward cards about them, are the final.
         final_id = self.tournament.final["id"]
         self.card_game = {cid: final_id for cid, c in self.cards.items()
-                          if c["type"] == "special" or c.get("context_type") in ("moment", "trophy")}
+                          if c["type"] == "special" or c.get("context_type") == "moment"}
         self.cards |= self.testdata.cards  # the specials of the other games (official game statistics)
         self.card_game |= {cid: c["test_game"] for cid, c in self.testdata.cards.items()}
         legends_doc = _load_json("legends.json")
@@ -596,7 +599,6 @@ class Content:
             }
             self.reward_rules[card_id] = lambda owned, ids=ids: all(i in owned for i in ids)
 
-        special_ids = [cid for cid, c in self.cards.items() if c["type"] == "special"]
         for cfg in doc["context"]:
             card = {
                 "id": cfg["id"], "type": "reward", "kind": "context", "context_type": cfg["context_type"],
@@ -605,6 +607,8 @@ class Content:
                 **{k: cfg[k] for k in ("headline", "text", "image_url", "image_alt", "image_position", "credit", "about")
                    if k in cfg},
             }
+            if cfg.get("video_id"):
+                card["intro_video"] = self._intro_video(cfg["video_id"], cfg.get("video_description", ""))
             if cfg["context_type"] == "moment":
                 scorer = self._add_moment_facts(card)
                 self.reward_rules[cfg["id"]] = lambda owned, who=scorer: any(
@@ -614,17 +618,31 @@ class Content:
             elif cfg["context_type"] == "stadium":
                 self.reward_rules[cfg["id"]] = lambda owned: "stadium" in owned.values()
             else:
-                self.reward_rules[cfg["id"]] = lambda owned: all(i in owned for i in special_ids)
+                # The trophy exists from the start of the tournament and is not about one game.
+                card["match"] = None
+                self.reward_rules[cfg["id"]] = lambda owned: sum(
+                    self.cards.get(c, {}).get("type") == "special" for c in owned) >= TROPHY_SPECIALS
             self.cards[cfg["id"]] = card
 
     @staticmethod
-    def _intro_video(youtube_id: str | None) -> dict | None:
-        """The official 'Welcome <team>' clip of the Spengler Cup channel, shown on a collector card's page."""
+    def _intro_video(youtube_id: str | None, description: str = "Official welcome video, Spengler Cup Davos") -> dict | None:
+        """A YouTube clip shown on a reward card's page and pop-up: the official 'Welcome <team>' video of a collector
+        card, or the video of a stadium or trophy card."""
         if not youtube_id:
             return None
         return {"youtube_id": youtube_id, "start": 0, "end": None, "scope": "game",
                 "poster": f"https://i.ytimg.com/vi/{youtube_id}/hqdefault.jpg",
-                "description": "Official welcome video, Spengler Cup Davos"}
+                "description": description}
+
+    def _goal_video(self, goal: dict | None) -> dict | None:
+        """The clip of a goal: the arena camera cut if there is one, else the TV replay of the highlights."""
+        if not goal:
+            return None
+        clip = goal["clip"] or goal["broadcast"]
+        if not clip:
+            return None
+        poster = clip.get("poster") or f'https://i.ytimg.com/vi/{clip["youtube_id"]}/hqdefault.jpg'
+        return {**clip, "poster": poster, "scope": "game", "description": "The last goal of the game"}
 
     def _add_moment_facts(self, card: dict) -> tuple[str, int]:
         """Fills the moment card from the last goal of the game and returns the scorer as (team, jersey)."""
@@ -642,6 +660,9 @@ class Content:
         row = self._find_row(team, jersey)
         card["player"] = self._player({"id": card["id"], "team": team, "jersey": jersey,
                                        "position": positions.get((team, jersey), "Skater")}, row)
+        goal = next((m for m in self.events.moments(last["EventPrimaryPlayerId"])
+                     if m["kind"] == "goal" and m["timestamp"] == last["Timestamp"]), None)
+        card["intro_video"] = self._goal_video(goal)
         card["headline"] = f'{score["Home"]}–{score["Away"]}'
         assist_text = f" Assisted by {' and '.join(assists)}." if assists else " Unassisted."
         card["text"] = (

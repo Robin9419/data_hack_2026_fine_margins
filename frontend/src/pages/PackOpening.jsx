@@ -6,8 +6,9 @@ import CardFace from '../components/CardFace'
 const CHARGE_MS = 550
 
 const isCollector = (c) => c.type === 'reward' && c.kind === 'collector'
+const isContext = (c) => c.type === 'reward' && c.kind !== 'collector'
 
-// Legends and collectors earned by a pack are not part of it: each comes as its own pack after the previous one is
+// Legends, collectors and context cards (final goal, stadium, trophy) earned by a pack are not part of it: each comes as its own pack after the previous one is
 // fully opened.
 const EARNED = {
   legend: {
@@ -22,15 +23,22 @@ const EARNED = {
     done: 'A collector card joined your collection!',
     aria: 'collector card',
   },
+  context: {
+    title: 'Bonus card earned!',
+    intro: 'You earned a bonus card! Tap a card to find out what you got.',
+    done: 'A bonus card joined your collection!',
+    aria: 'bonus card',
+  },
 }
 
 export default function PackOpening() {
   const location = useLocation()
   const all = location.state?.pack ?? []
-  const main = all.filter((c) => c.type !== 'legend' && !isCollector(c))
+  const main = all.filter((c) => c.type !== 'legend' && c.type !== 'reward')
   const extras = [
     { kind: 'legend', cards: all.filter((c) => c.type === 'legend') },
     { kind: 'collector', cards: all.filter(isCollector) },
+    { kind: 'context', cards: all.filter(isContext) },
   ].filter((e) => e.cards.length > 0)
   const [step, setStep] = useState(main.length === 0 ? 0 : -1) // -1 is the main pack, then one step per extra pack
   const [seenIds, setSeenIds] = useState([])

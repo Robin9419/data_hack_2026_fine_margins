@@ -27,7 +27,7 @@ class CollectorAnnouncementTests(unittest.TestCase):
 
         announced = main.award_collectors(user)
         self.assertIn(f'collector-{team.lower().replace(" ", "-")}', [c['id'] for c in announced])
-        self.assertTrue(all(c['kind'] == 'collector' for c in announced))
+        self.assertTrue(all(c['type'] == 'reward' for c in announced))
         self.assertEqual(main.award_collectors(user), [])
 
 

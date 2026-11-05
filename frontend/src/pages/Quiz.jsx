@@ -59,7 +59,7 @@ export default function Quiz() {
         })
         setQueued([
           ...(data.legends ?? []).map((card) => ({ card, result: 'legend' })),
-          ...(data.collectors ?? []).map((card) => ({ card, result: 'collector' })),
+          ...(data.collectors ?? []).map((card) => ({ card, result: card.kind === 'collector' ? 'collector' : 'context' })),
         ])
         setWon((n) => n + 1)
       }

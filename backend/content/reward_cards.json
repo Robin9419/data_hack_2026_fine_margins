@@ -188,6 +188,8 @@
       "image_position": "50% 40%",
       "credit": "Michael Petri, CC BY-SA 2.0 DE (Wikimedia Commons)",
       "unlock": "Win a card at the stadium (Stadium edition)",
+      "video_id": "a0YlI73Ntmc",
+      "video_description": "The ice stadium in Davos",
       "about": {
         "facts": {
           "Roof built": "1979",
@@ -227,7 +229,9 @@
       "image_alt": "The Spengler Cup trophy on a pedestal on the ice in Davos",
       "image_position": "50% 50%",
       "credit": "Melanie Duchene / KEYSTONE, via spenglercup.ch media library",
-      "unlock": "Collect every special card of the match",
+      "unlock": "Collect three special cards",
+      "video_id": "8JxhxU4CEo4",
+      "video_description": "The Spengler Cup",
       "about": {
         "facts": {
           "First played": "1923",

@@ -270,13 +270,14 @@ def award_legends(user: dict) -> list[dict]:
 
 
 def award_collectors(user: dict) -> list[dict]:
-    """Collector cards are earned by owning all base cards of a club (see content._add_reward_cards). Returns the ones
-    the user has not been shown the unlock of yet, and marks them as shown."""
+    """Reward cards (a club's collector card, the final goal, the stadium and the trophy) are earned by what the user
+    owns (see content._add_reward_cards). Returns the ones the user has not been shown the unlock of yet, and marks
+    them as shown."""
     content = get_content()
     announced = db.announced_collectors(user["id"])
     now = owned_now(user)
     new = [cid for cid, c in content.cards.items()
-           if c["type"] == "reward" and c.get("kind") == "collector" and cid in now and cid not in announced]
+           if c["type"] == "reward" and cid in now and cid not in announced]
     db.add_announced_collectors(user["id"], new)
     return [{**content.cards[cid], "owned": True, "is_new": True} for cid in new]
 

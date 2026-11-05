@@ -42,7 +42,7 @@ export default function Home() {
   if (error) return <p className="error">{error}</p>
   if (!cards) return <p className="muted">Loading cards…</p>
 
-  const realCards = cards.filter((c) => c.kind !== 'road')
+  const realCards = cards
   const ownedCount = realCards.filter((c) => c.owned).length
   const owned = realCards.filter((c) => c.owned)
   const best = owned

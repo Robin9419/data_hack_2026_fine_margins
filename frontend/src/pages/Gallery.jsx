@@ -155,8 +155,7 @@ export default function Gallery() {
   if (error) return <p className="error">{error}</p>
   if (!cards) return <p className="muted">Loading cards…</p>
 
-  // Road to Final cards change with every game and are not collected, so they don't count.
-  const realCards = cards.filter((c) => c.kind !== 'road')
+  const realCards = cards
   const ownedCount = realCards.filter((c) => c.owned).length
   const clubs = Object.fromEntries((progress?.clubs ?? []).map((c) => [c.team, c])) // for a locked legend's hover info
   const baseCounts = {} // per club, for a locked collector card's hover info

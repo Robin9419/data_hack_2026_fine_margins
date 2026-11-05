@@ -1,4 +1,4 @@
-import { Link, Navigate, NavLink, Route, Routes, useParams } from 'react-router-dom'
+import { Link, Navigate, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { api } from './api'
 import { useEffect, useState } from 'react'
 import { useAuth } from './auth'
@@ -37,6 +37,7 @@ function CardRedirect() {
 
 export default function App() {
   const { user, logout } = useAuth()
+  const inAdmin = useLocation().pathname.startsWith('/admin')
 
   return (
     <>
@@ -58,7 +59,11 @@ export default function App() {
           {user && (
             <div className="topbar-user">
               <span>{user.username}</span>
-              <NavLink to="/admin">Admin</NavLink>
+              {inAdmin ? (
+                <Link to="/" className="admin-link">Exit admin</Link>
+              ) : (
+                <Link to="/admin" className="admin-link">Admin</Link>
+              )}
               <button className="link-button" onClick={logout}>
                 Sign out
               </button>

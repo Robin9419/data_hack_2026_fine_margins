@@ -1,66 +1,49 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
-import CardFace from '../components/CardFace'
+import CardTile from '../components/CardTile'
 import CardSpotlight from '../components/CardSpotlight'
 import { TEAMS, teamOf, teamStyle } from '../teams'
 import Dropdown from '../components/Dropdown'
+import PlayerPhoto from '../components/PlayerPhoto'
 
 const KINDS = [
   ['legend', 'Legends'],
   ['base', 'Base'],
-  ['profile', 'Profile specials'],
-  ['performance', 'Performance specials'],
+  ['impact', 'Impact Specials'],
   ['road', 'Ones to Watch'],
   ['collector', 'Collector'],
-  ['context', 'Moment, stadium, trophy'],
 ]
-const KIND_LABEL = Object.fromEntries(KINDS)
+// Same grouping as the collection page: Impact Specials are the profile and performance specials; Collector also
+// covers the context cards (moment, stadium, trophy).
+const FILTER_KINDS = { impact: ['profile', 'performance'], collector: ['collector', 'context'] }
+const groupOf = (c) => KINDS.find(([k]) => (FILTER_KINDS[k] ?? [k]).includes(c.kind ?? c.type))?.[0]
 const KIND_ORDER = Object.fromEntries(KINDS.map(([k], i) => [k, i]))
 const PAGE_SIZE = 8
 const POS_SHORT = { Forward: 'FWD', Defender: 'DEF', Goalkeeper: 'GK' }
-const KIND_FILTERS = [{ value: 'all', label: 'All kinds' }, ...KINDS.map(([value, label]) => ({ value, label }))]
+const KIND_FILTERS = [{ value: 'all', label: 'All cards' }, ...KINDS.map(([value, label]) => ({ value, label }))]
 const TEAM_FILTERS = [
   { value: 'all', label: 'All teams', title: 'All teams' },
   ...TEAMS.map((t) => ({ value: t.name, label: t.short, title: t.name, logo: t.logo })),
 ]
-const PHOTOS = [
-  { value: 'all', label: 'All cards' },
-  { value: 'action', label: 'Action photos only' },
-]
-const EDITIONS = [
-  { value: 'standard', label: 'Standard' },
-  { value: 'stadium', label: 'Stadium' },
-  { value: 'both', label: 'Standard + Stadium' },
-]
-// Only the profile and performance specials come in a Stadium edition.
-const hasStadium = (c) => c.kind === 'profile' || c.kind === 'performance'
-const withEdition = (c, edition) => (hasStadium(c) ? { ...c, edition } : c)
-const NAME_LAYOUT = [
-  { value: 'vertical', label: 'Vertical' },
-  { value: 'horizontal', label: 'Horizontal' },
-]
-const hasActionPhoto = (c) => c.kind === 'performance' && Boolean(c.player?.action_image_url)
+const EDITION = 'standard'
+const withEdition = (c, edition) => (c.kind === 'profile' || c.kind === 'performance' ? { ...c, edition } : c)
+
 
 const kindOf = (c) => c.kind ?? c.type
 // Legends and rewards have no player profile page.
 const hasProfile = (c) => c.type !== 'legend' && c.type !== 'reward' && Boolean(c.player?.jersey)
 const playerKey = (c) => `${c.player.team}|${c.player.jersey}`
 
-const caption = (card) => {
-  const player = card.player ? `${card.player.jersey != null ? `#${card.player.jersey} ` : ''}${card.player.first_name} ${card.player.last_name}` : card.title
-  const what = card.kind === 'base' ? 'Base' : card.title
-  return { player, what, game: card.match?.stage }
-}
-
 // One tile per player (team + jersey) among the shown cards.
 function groupPlayers(shown) {
   const groups = new Map()
   for (const c of shown) {
     if (!hasProfile(c)) continue
-    const g = groups.get(playerKey(c)) ?? { key: playerKey(c), cardId: c.id, count: 0, p: c.player }
+    const g = groups.get(playerKey(c)) ?? { key: playerKey(c), cardId: c.id, count: 0, p: c.player, base: null }
     g.count += 1
     if (!g.p.last_name && c.player.last_name) g.p = c.player
+    if (c.type === 'base' && c.player.image_url) g.base = c.player // the tile shows the base card's photo, like the collection
     groups.set(g.key, g)
   }
   return [...groups.values()].sort((a, b) => (a.p.team ?? '').localeCompare(b.p.team ?? '') || a.p.jersey - b.p.jersey)
@@ -73,16 +56,13 @@ export default function Admin() {
   const [error, setError] = useState(null)
   const [kind, setKind] = useState('all')
   const [team, setTeam] = useState('all')
-  const [photos, setPhotos] = useState('all')
-  const [nameLayout, setNameLayout] = useState('vertical')
-  const [edition, setEdition] = useState('standard')
   const [mode, setMode] = useState('cards')
   const [query, setQuery] = useState('')
   const [spotlight, setSpotlight] = useState(null)
   const [page, setPage] = useState(0)
   const touchStartX = useRef(null)
   // Any change of filters, search or view starts again on the first page.
-  useEffect(() => setPage(0), [kind, team, photos, mode, query, edition])
+  useEffect(() => setPage(0), [kind, team, mode, query])
   const closeSpotlight = useCallback(() => setSpotlight(null), [])
 
   useEffect(() => {
@@ -94,7 +74,7 @@ export default function Admin() {
 
   const counts = useMemo(() => {
     const rows = Object.fromEntries(KINDS.map(([k]) => [k, 0]))
-    for (const c of cards ?? []) rows[kindOf(c)] += 1
+    for (const c of cards ?? []) rows[groupOf(c)] += 1
     return rows
   }, [cards])
 
@@ -111,22 +91,18 @@ export default function Admin() {
   const shown = cards
     .filter(
       (c) =>
-        (kind === 'all' || kindOf(c) === kind) &&
+        (mode === 'players' || kind === 'all' || groupOf(c) === kind) &&
         (team === 'all' || c.player?.team === team) &&
-        (photos === 'all' || hasActionPhoto(c)) &&
         matches(c),
     )
     .sort(
       (a, b) =>
-        KIND_ORDER[kindOf(a)] - KIND_ORDER[kindOf(b)] ||
+        KIND_ORDER[groupOf(a)] - KIND_ORDER[groupOf(b)] ||
         (a.player?.team ?? '').localeCompare(b.player?.team ?? '') ||
         (a.player?.jersey ?? 0) - (b.player?.jersey ?? 0),
     )
   const players = mode === 'players' ? groupPlayers(shown) : []
-  const shownCards =
-    edition === 'both' ? shown.flatMap((c) => (hasStadium(c) ? [withEdition(c, 'standard'), withEdition(c, 'stadium')] : [c]))
-      : edition === 'stadium' ? shown.map((c) => withEdition(c, 'stadium'))
-        : shown
+  const shownCards = shown.map((c) => withEdition(c, EDITION))
   const items = mode === 'players' ? players : shownCards
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
   const current = Math.min(page, pageCount - 1)
@@ -196,10 +172,7 @@ export default function Admin() {
 
       <div className="dd-row">
         <Dropdown label="Team" options={TEAM_FILTERS} value={team} onChange={setTeam} />
-        <Dropdown label="Card type" options={KIND_FILTERS} value={kind} onChange={setKind} />
-        <Dropdown label="Photos" options={PHOTOS} value={photos} onChange={setPhotos} />
-        <Dropdown label="Name on specials" options={NAME_LAYOUT} value={nameLayout} onChange={setNameLayout} />
-        <Dropdown label="Edition" options={EDITIONS} value={edition} onChange={setEdition} />
+        {mode !== 'players' && <Dropdown label="Card type" options={KIND_FILTERS} value={kind} onChange={setKind} />}
       </div>
       <p className="muted small">
         {mode === 'players' ? `${players.length} players · ` : ''}
@@ -210,12 +183,12 @@ export default function Admin() {
         <button type="button" className="pager-arrow prev" aria-label="Previous page" disabled={current === 0} onClick={() => goTo(current - 1)}>
           ‹
         </button>
-        <div className="card-grid admin-page" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <div className="card-grid" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           {mode === 'players'
-            ? pageItems.map(({ key, cardId, count, p }) => (
+            ? pageItems.map(({ key, cardId, count, p, base }) => (
                 <Link key={key} to={`/players/${cardId}`} className="ptile" style={teamStyle(p.team)}>
                   <div className="ph">
-                    {p.image_url && <img className="photo" src={p.image_url} alt="" referrerPolicy="no-referrer" loading="lazy" />}
+                    {(base ?? p).image_url && <PlayerPhoto player={base ?? p} className="card-art" />}
                   </div>
                   <div className="pt-corner">
                     {teamOf(p.team)?.logo && <span className="pt-logo"><img src={teamOf(p.team).logo} alt={p.team} /></span>}
@@ -231,25 +204,7 @@ export default function Admin() {
                   </div>
                 </Link>
               ))
-            : pageItems.map((card) => {
-                const { player, what, game } = caption(card)
-                const face = <CardFace card={card} nameLayout={nameLayout} />
-                return (
-                  <figure key={`${card.id}-${card.edition}`} className="admin-cell">
-                    <button type="button" className="card-tile" onClick={() => setSpotlight(card)}>
-                      {face}
-                    </button>
-                    <figcaption>
-                      <strong>{what}{card.edition === 'stadium' ? ' · Stadium' : ''}</strong>
-                      <span>{player}</span>
-                      <small className="muted">
-                        {KIND_LABEL[kindOf(card)]}
-                        {game ? ` · ${game}` : ''}
-                      </small>
-                    </figcaption>
-                  </figure>
-                )
-              })}
+            : pageItems.map((card) => <CardTile key={card.id} card={card} onOpen={setSpotlight} />)}
         </div>
         <button type="button" className="pager-arrow next" aria-label="Next page" disabled={current >= pageCount - 1} onClick={() => goTo(current + 1)}>
           ›

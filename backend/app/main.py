@@ -66,16 +66,24 @@ def road_cards_for(user: dict) -> dict[str, dict]:
     return {c["id"]: c for c in get_content().road_to_final.cards_for(played_for(user))}
 
 
-def trivia_reserved(user: dict) -> set[str]:
-    """The special cards the gameday's trivia is about: those of the latest games played at the user's stage. They are
-    for the trivia to give, so packs leave them out until the user has played the trivia of this stage."""
+def latest_day_cards(user: dict) -> set[str]:
+    """The special cards of the latest gameday played at the user's stage. Only these can be won in the trivia."""
     content = get_content()
     played = played_for(user)
-    if not played or db.trivia_played(user["id"], user["stage"]):
+    if not played:
         return set()
     games = content.tournament.by_id
     latest = max(games[gid]["date"] for gid in played)
     return {cid for gid in played if games[gid]["date"] == latest for cid in content.game_cards(gid)}
+
+
+def trivia_reserved(user: dict) -> set[str]:
+    """The special cards the gameday's trivia is about: those of the latest gameday. They are for the trivia to give,
+    so every other draw leaves them out until the user has played the trivia of this stage. Older special cards are
+    ordinary packable cards."""
+    if db.trivia_played(user["id"], user["stage"]):
+        return set()
+    return latest_day_cards(user)
 
 
 def special_pool(user: dict, roads: dict[str, dict]) -> list[str]:
@@ -228,7 +236,7 @@ def roll_trade(user: dict, traded_ids: list[str], teams: tuple[str, ...] | None 
     user_id, favorite_team = user["id"], user["favorite_team"]
     odds = trade_odds(favorite_team)
     rolled = random.choices([o["id"] for o in odds], weights=[o["chance"] for o in odds])[0]
-    available = set(tradeable_cards(user, traded_ids))
+    available = set(tradeable_cards(user, traded_ids)) - trivia_reserved(user)
     roads = road_cards_for(user)
     base = [cid for cid in available if cid not in roads and content.cards[cid]["type"] == "base"
             and (teams is None or content.cards[cid]["player"]["team"] in teams)]
@@ -491,12 +499,12 @@ def _edition(venue: str) -> str:
 
 
 def trivia_cards(user: dict, venue: str) -> list[str]:
-    """The special cards the trivia can still give: of games already played and not owned yet (at the stadium, also
+    """The special cards the trivia can still give: of the latest gameday played and not owned yet (at the stadium, also
     the ones owned only as the home edition)."""
     owned = db.owned_cards(user["id"])
-    available = available_for(user)
+    available, latest = available_for(user), latest_day_cards(user)
     return [cid for cid, card in get_content().cards.items()
-            if card["type"] == "special" and cid in available
+            if card["type"] == "special" and cid in available and cid in latest
             and (cid not in owned or (venue == "stadium" and owned[cid] != "stadium"))]
 
 

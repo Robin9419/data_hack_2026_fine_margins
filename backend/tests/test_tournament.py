@@ -117,6 +117,17 @@ class TournamentTests(unittest.TestCase):
         asked = [db.get_question(self.user['id'], q['id'])['card_id'] for q in quiz['questions']]
         self.assertTrue(all(self.content.card_game[cid] in latest for cid in asked))
 
+    def test_trivia_only_wins_the_latest_gameday_and_older_specials_are_packable(self):
+        self.go('2025-12-28')  # the games of the 27th are the latest played
+        latest = {c for gid in self.t.games if gid['date'] == '2025-12-27' for c in self.content.game_cards(gid['id'])}
+        self.assertEqual(set(main.trivia_cards(self.user, 'home')), latest)
+        self.assertTrue(latest <= main.trivia_reserved(self.user))
+        older = {c for g in self.t.games if g['date'] < '2025-12-27' for c in self.content.game_cards(g['id'])}
+        self.assertFalse(older & main.trivia_reserved(self.user))
+        self.assertTrue(older <= set(main.special_pool(self.user, {})) | set(db.owned_cards(self.user['id'])))
+        main.quiz_start(main.QuizStart(venue='home'), self.user)
+        self.assertEqual(main.trivia_reserved(self.user), set())  # after the trivia the latest day is packable too
+
     def test_game_trivia_options_are_players_of_that_game(self):
         rng = random.Random(4)
         for cid in self.content.game_cards(FRI_SPA):

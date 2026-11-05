@@ -32,7 +32,7 @@ export default function ResultsModal() {
   const watched = justPlayed.flatMap((g) => g.watch_packs ?? [])
   const waiting = tournament?.packs_waiting ?? earned + watched.reduce((n, w) => n + w.packs, 0)
   const predicted = justPlayed.some((g) => g.questions.some((q) => q.prediction))
-  const days = [...new Set(justPlayed.map((g) => g.date))]
+  const days = [...new Set(justPlayed.filter((g) => g.kind !== 'outlook').map((g) => g.date))]
 
   const openPacks = async () => {
     setBusy(true)
@@ -76,13 +76,17 @@ export default function ResultsModal() {
         <div className="results-games">
           {justPlayed.map((g) => (
             <article key={g.id} className="results-game">
-              <div className="game-teams">
-                <TeamName name={g.home_team} />
-                <strong className="game-score">
-                  {g.home_score}–{g.away_score}
-                </strong>
-                <TeamName name={g.away_team} right />
-              </div>
+              {g.kind === 'outlook' ? (
+                <strong className="predict-outlook-title">🏆 Your tournament predictions</strong>
+              ) : (
+                <div className="game-teams">
+                  <TeamName name={g.home_team} />
+                  <strong className="game-score">
+                    {g.home_score}–{g.away_score}
+                  </strong>
+                  <TeamName name={g.away_team} right />
+                </div>
+              )}
               {g.questions.some((q) => q.prediction) ? (
                 <ul className="results-picks">
                   {g.questions.map((q) => {
@@ -105,7 +109,9 @@ export default function ResultsModal() {
                   })}
                 </ul>
               ) : (
-                <p className="muted small">No predictions for this game.</p>
+                <p className="muted small">
+                  {g.kind === 'outlook' ? 'You made no tournament predictions.' : 'No predictions for this game.'}
+                </p>
               )}
               {g.packs > 0 && <p className="results-earned">+ {plural(g.packs, 'pack')}</p>}
               {g.watch_packs?.map((w) => (

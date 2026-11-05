@@ -3,7 +3,8 @@
 A user is always at one stage: before the tournament, on one of the gamedays (26 to 31 December) or after it. On a
 gameday that day's games are still to be played: the user predicts three things per game (the winner, a goal question
 and a KPI question; the last two rotate from game to game). Moving on in the timeline plays the games: the predictions are resolved and every correct one earns a
-pack. Cards that come from a game (its specials, and for the final the Wisehockey cards) only exist once the game is
+pack. Before the tournament the user predicts the tournament as a whole (champion, top scorer, penalties drawn, overtime
+games, total goals); those predictions are resolved with the final. Cards that come from a game (its specials, and for the final the Wisehockey cards) only exist once the game is
 played, and the post-game trivia asks about them. The results come from testdata.json (official game pages)."""
 
 
@@ -232,6 +233,91 @@ GOAL_QUESTIONS = [_goal_first_scorer, _goal_total, _goal_first_time, _goal_first
                   _goal_both_score, _goal_hat_trick]
 
 
+# Tournament predictions: made before the tournament starts (the pre stage), resolved once the final is played. They
+# are stored like a game's predictions, under the id OUTLOOK, and every right one earns a pack.
+OUTLOOK = "tournament"
+TOP_SCORER_CANDIDATES = 2  # per team, plus "someone else"
+OVERTIME_BUCKETS = [("0", "None", 0), ("1", "1 game", 1), ("2", "2 games", 2), ("3", "3 games", 3),
+                    ("4", "4 or more", float("inf"))]
+TOURNAMENT_GOAL_BUCKETS = [("40", "Under 50", 49), ("50", "50 to 59", 59), ("60", "60 to 69", 69),
+                           ("70", "70 to 79", 79), ("80", "80 or more", float("inf"))]
+
+
+def _winner(game: dict) -> str:
+    return game["home_team"] if game["home_score"] > game["away_score"] else game["away_team"]
+
+
+def _scorers(games: list[dict]) -> list[tuple[int, int, dict]]:
+    """Every skater's tournament (points, goals, player), best first: the scoring ranking goes by points, then goals."""
+    totals: dict[tuple[str, int], list] = {}
+    for game in games:
+        for p in game["players"]:
+            if not p["goalkeeper"]:
+                entry = totals.setdefault(_key(p), [0, 0, p])
+                entry[0] += p["stats"].get("points") or 0
+                entry[1] += p["stats"].get("goals") or 0
+    return sorted((tuple(v) for v in totals.values()), key=lambda v: (-v[0], -v[1], v[2]["team"], v[2]["jersey"]))
+
+
+def _team_options(teams: list[str]) -> list[dict]:
+    return [{"id": team, "label": team, "team": team} for team in teams]
+
+
+def _outlook_questions(games: list[dict]) -> list[dict]:
+    final = next(g for g in games if g["stage"] == "Final")
+    teams = sorted({g["home_team"] for g in games} | {g["away_team"] for g in games})
+    champion = _winner(final)
+
+    scorers = _scorers(games)
+    points, goals, top = scorers[0]
+    named = []
+    for team in teams:
+        named += [p for _, _, p in scorers if p["team"] == team][:TOP_SCORER_CANDIDATES]
+    top_id = f'{top["team"]}#{top["jersey"]}'
+    scorer_options = [{"id": f'{p["team"]}#{p["jersey"]}', "label": _name(p), "team": p["team"]} for p in named]
+
+    # Drawing a penalty: an opponent is sent to the box for a foul on you. A team draws every penalty its opponents take.
+    drawn = {team: 0 for team in teams}
+    for game in games:
+        for pen in game["penalties"]:
+            drawn[game["away_team"] if pen["team"] == game["home_team"] else game["home_team"]] += 1
+    most_drawn = max(drawn.values())
+    drawers = [team for team in teams if drawn[team] == most_drawn]
+
+    overtime = sum(1 for g in games if g["overtime"])
+    total = sum(g["home_score"] + g["away_score"] for g in games)
+    ranking = sorted(teams, key=lambda t: -drawn[t])
+    return [
+        {"id": "champion", "prompt": "Who will win the Spengler Cup?",
+         "hint": "Six teams, two groups, then quarter-finals, semi-finals and the final on 31 December.",
+         "options": _team_options(teams), "answer": champion,
+         "explanation": f'{champion} won the final {final["home_score"]}–{final["away_score"]} against '
+                        f'{final["away_team"] if champion == final["home_team"] else final["home_team"]}.'},
+        {"id": "top_scorer", "prompt": "Who will be the tournament's top scorer?",
+         "hint": "The player with the most points (goals plus assists) over the whole tournament. "
+                 "Two candidates per team, or anyone else.",
+         "options": scorer_options + [{"id": OTHER, "label": "Someone else"}],
+         "answer": top_id if top_id in {o["id"] for o in scorer_options} else OTHER,
+         "explanation": f'{_name(top)} ({top["team"]}) with {points} points ({goals} goals).'},
+        {"id": "penalties_drawn", "prompt": "Which team will draw the most penalties?",
+         "hint": "A team draws a penalty when an opponent is sent to the penalty box for a foul against it.",
+         # A tie is not expected; should one happen, the first of the tied teams counts.
+         "options": _team_options(teams), "answer": drawers[0],
+         "explanation": "Penalties drawn: " + ", ".join(f"{t} {drawn[t]}" for t in ranking) + "."},
+        {"id": "overtime", "prompt": "How many games will go to overtime?",
+         "hint": f"A game tied after 60 minutes goes to overtime, then to a shootout. {len(games)} games in total.",
+         "options": [{"id": b, "label": label} for b, label, _ in OVERTIME_BUCKETS],
+         "answer": _bucket(overtime, OVERTIME_BUCKETS),
+         "explanation": f'{overtime} of {len(games)} games went to overtime.' if overtime
+                        else f"All {len(games)} games were decided in regulation time."},
+        {"id": "total_goals", "prompt": "How many goals will be scored in the whole tournament?",
+         "hint": f"All {len(games)} games together. A Spengler Cup game usually sees 5 to 7 goals.",
+         "options": [{"id": b, "label": label} for b, label, _ in TOURNAMENT_GOAL_BUCKETS],
+         "answer": _bucket(total, TOURNAMENT_GOAL_BUCKETS),
+         "explanation": f"{total} goals in {len(games)} games, {total / len(games):.1f} per game."},
+    ]
+
+
 class Tournament:
     def __init__(self, testdata: TestData):
         self.games = testdata.games
@@ -241,6 +327,11 @@ class Tournament:
         self.final = next(g for g in self.games if g["stage"] == "Final")
         self._candidates = self._first_goal_candidates()
         self.questions = {g["id"]: self._questions(g, i) for i, g in enumerate(self.games)}
+        self.questions[OUTLOOK] = _outlook_questions(self.games)
+        # The tournament predictions as a round of their own, shown like a game without teams.
+        first = self.games[0]
+        self.outlook = {"id": OUTLOOK, "kind": "outlook", "date": first["date"], "start": first["start"],
+                        "stage": "Tournament", "arena": first["arena"], "home_team": None, "away_team": None}
 
     # Stages
 
@@ -250,8 +341,22 @@ class Tournament:
             return {g["id"] for g in self.games}
         return {g["id"] for g in self.games if stage != PRE and g["date"] < stage}
 
+    def resolved(self, stage: str) -> set[str]:
+        """Ids of the prediction rounds decided at this stage: the games played, plus the tournament predictions once
+        the final is played."""
+        played = self.played(stage)
+        return played | {OUTLOOK} if self.final["id"] in played else played
+
     def today(self, stage: str) -> list[dict]:
         return [g for g in self.games if g["date"] == stage]
+
+    def rounds(self, stage: str) -> list[dict]:
+        """The prediction rounds open at this stage: the tournament predictions before the tournament, else the
+        gameday's games."""
+        return [self.outlook] if stage == PRE else self.today(stage)
+
+    def round_by_id(self, round_id: str) -> dict | None:
+        return self.outlook if round_id == OUTLOOK else self.by_id.get(round_id)
 
     def timeline(self) -> list[dict]:
         stops = [{"id": PRE, "label": "Pre", "sub": "Before", "games": 0}]
@@ -306,9 +411,10 @@ class Tournament:
         return sum(predictions.get(q["id"]) == q["answer"] for q in self.questions[game_id])
 
     def game_view(self, game: dict, played: bool, predictions: dict[str, str], pack: dict | None) -> dict:
-        """What the gameday panel shows for a game. Results and right answers only once the game is played."""
+        """What the gameday panel shows for a game (or the tournament predictions). Results and right answers only once
+        the game is played."""
         keys = ("id", "date", "start", "stage", "arena", "home_team", "away_team")
-        view = {k: game[k] for k in keys}
+        view = {k: game[k] for k in keys} | {"kind": game.get("kind", "game")}
         questions = []
         for q in self.questions[game["id"]]:
             shown = {k: q[k] for k in ("id", "prompt", "hint", "options")}
@@ -320,7 +426,8 @@ class Tournament:
         view["played"] = played
         view["locked"] = pack is not None  # resolved: predictions can no longer change
         if played:
-            view |= {"home_score": game["home_score"], "away_score": game["away_score"], "overtime": game["overtime"]}
+            if game["id"] != OUTLOOK:
+                view |= {"home_score": game["home_score"], "away_score": game["away_score"], "overtime": game["overtime"]}
             view["correct"] = self.correct_count(game["id"], predictions)
             view["packs"] = view["correct"]
             view["packs_claimed"] = bool(pack and pack["claimed"])

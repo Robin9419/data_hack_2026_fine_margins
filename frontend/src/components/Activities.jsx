@@ -65,9 +65,13 @@ export default function Activities() {
       <Activity
         key="predict"
         icon="🎯"
-        title="Make your predictions"
+        title={predictions.tournament ? 'Predict the tournament' : 'Make your predictions'}
         text={
-          predictions.picks === 0
+          predictions.tournament
+            ? predictions.picks === 0
+              ? `Champion, top scorer and more: ${predictions.questions} calls before the first game. Every right pick earns a pack.`
+              : `${predictions.picks} of ${predictions.questions} picks made. They lock when the tournament starts.`
+            : predictions.picks === 0
             ? `${plural(predictions.games, 'game')} today, ${predictions.questions} quick questions. Every right pick earns a pack.`
             : `${predictions.picks} of ${predictions.questions} picks made. Finish them before the games start.`
         }

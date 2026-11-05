@@ -252,6 +252,7 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 
 /* Tournament: shared game header (predictions page, results pop-up) */
 .game-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-top: 4px; }
+.predict-outlook-title { display: block; margin-top: 4px; font-size: 1.05rem; }
 .game-team { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.9rem; min-width: 0; }
 .game-team.right { flex-direction: row-reverse; text-align: right; }
 .game-score { font-family: var(--display); font-size: 1.6rem; line-height: 1; }

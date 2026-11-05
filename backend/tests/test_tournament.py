@@ -6,6 +6,7 @@ from unittest import mock
 
 from app import db, main
 from app.content import get_content
+from app.tournament import OUTLOOK
 
 FIRST_DAY = '2025-12-26'
 FRI_SPA = '2025-12-26_hc-fribourg-gotteron_hc-sparta-praha'  # 5:2, Biasca scored first
@@ -180,7 +181,7 @@ class TournamentTests(unittest.TestCase):
         acts = main.activities(self.user)
         self.assertTrue(acts['daily'])
         self.assertEqual(acts['social']['id'], 'facebook')
-        self.assertEqual(acts['predictions'], {'games': 2, 'picks': 0, 'questions': 6})
+        self.assertEqual(acts['predictions'], {'games': 2, 'picks': 0, 'questions': 6, 'tournament': False})
         main.daily_claim(self.user)
         main.bonus_social(self.user)
         for game in self.t.today(FIRST_DAY):
@@ -194,6 +195,40 @@ class TournamentTests(unittest.TestCase):
         acts = main.activities(self.user)
         self.assertTrue(acts['daily'])
         self.assertEqual(acts['social']['id'], 'tiktok')
+
+    def test_tournament_predictions_open_before_the_tournament(self):
+        outlook = self.t.questions[OUTLOOK]
+        self.assertEqual([q['id'] for q in outlook],
+                         ['champion', 'top_scorer', 'penalties_drawn', 'overtime', 'total_goals'])
+        answers = {q['id']: q['answer'] for q in outlook}
+        self.assertEqual(answers, {'champion': 'HC Davos', 'top_scorer': 'U.S. Collegiate Selects#18',
+                                   'penalties_drawn': 'HC Davos', 'overtime': '0', 'total_goals': '60'})
+        for q in outlook:
+            self.assertIn(q['answer'], {o['id'] for o in q['options']})
+        view = main.tournament(self.user)
+        self.assertEqual([g['id'] for g in view['today']], [OUTLOOK])
+        self.assertNotIn('answer', view['today'][0]['questions'][0])  # no spoilers
+        self.assertEqual(main.activities(self.user)['predictions'],
+                         {'games': 0, 'picks': 0, 'questions': 5, 'tournament': True})
+
+    def test_tournament_predictions_lock_on_the_first_gameday_and_pay_out_after_the_final(self):
+        self.predict(OUTLOOK, 'champion', 'HC Davos')
+        self.predict(OUTLOOK, 'overtime', '0')
+        self.predict(OUTLOOK, 'top_scorer', 'other')
+        self.go(FIRST_DAY)
+        with self.assertRaises(main.HTTPException):
+            self.predict(OUTLOOK, 'total_goals', '60')
+        self.go('2025-12-31')
+        self.assertNotIn(OUTLOOK, {r['id'] for r in main.tournament(self.user)['results']})
+        result = main.set_stage(main.StageRequest(stage='post'), self.user)
+        self.user = {**self.user, 'stage': 'post'}
+        played = {g['id']: g for g in result['just_played']}
+        self.assertEqual(played[OUTLOOK]['correct'], 2)
+        self.assertEqual(result['tournament']['results'][0]['id'], OUTLOOK)
+        before = main.activities(self.user)['packs_waiting']
+        opened = main.open_game_packs(OUTLOOK, self.user)
+        self.assertEqual(len([c for c in opened['pack'] if c['type'] not in ('legend', 'reward')]), 10)
+        self.assertEqual(main.activities(self.user)['packs_waiting'], before - 2)
 
 
 if __name__ == '__main__':

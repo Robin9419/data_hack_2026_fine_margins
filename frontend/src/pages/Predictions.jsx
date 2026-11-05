@@ -10,7 +10,21 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
 
 // The gameday's predictions, one question at a time: pick an answer and the next question follows. A summary of the
 // picks closes the round. Every right pick earns a pack once the games are played (the next stop on the timeline),
-// and the results arrive in a pop-up.
+// and the results arrive in a pop-up. Before the tournament the round is the tournament predictions (kind
+// 'outlook'): they close on the first gameday and pay out after the final.
+const isOutlook = (g) => g.kind === 'outlook'
+
+// The teams of a game, or the title of the tournament predictions.
+function RoundTeams({ game, score }) {
+  if (isOutlook(game)) return <strong className="predict-outlook-title">🏆 Spengler Cup 2025</strong>
+  return (
+    <div className="game-teams">
+      <TeamName name={game.home_team} />
+      <strong className="game-score">{score ?? 'vs'}</strong>
+      <TeamName name={game.away_team} right />
+    </div>
+  )
+}
 export default function Predictions() {
   const { tournament } = useTournament()
   if (!tournament) return <p className="muted">Loading…</p>
@@ -42,6 +56,7 @@ function Round({ stage, games, next }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
   const picked = steps.filter((s) => s.question.prediction).length
+  const outlook = games.some(isOutlook)
 
   const choose = async (game, question, option) => {
     if (busy) return
@@ -66,12 +81,14 @@ function Round({ stage, games, next }) {
     <>
       <header className="predict-head">
         <p className="eyebrow">
-          <span className="badge">Prediction</span>Gameday · {games[0].stage}
+          <span className="badge">Prediction</span>
+          {outlook ? 'Before the tournament' : `Gameday · ${games[0].stage}`}
         </p>
-        <h1>Your predictions</h1>
+        <h1>{outlook ? 'Predict the tournament' : 'Your predictions'}</h1>
         <p className="muted">
-          {dayName(stage)} · {plural(games.length, 'game')}. Every right pick earns a pack after the
-          game.
+          {outlook
+            ? 'Five calls on the whole Spengler Cup. They lock when the first game starts, and every right pick earns a pack after the final.'
+            : `${dayName(stage)} · ${plural(games.length, 'game')}. Every right pick earns a pack after the game.`}
         </p>
         <div className="predict-progress" aria-label={`${picked} of ${steps.length} picks made`}>
           <span style={{ width: `${(picked / steps.length) * 100}%` }} />
@@ -85,13 +102,11 @@ function Round({ stage, games, next }) {
         <article className="predict-card q-card">
           <div className="predict-game">
             <span className="muted small">
-              Game {games.indexOf(current.game) + 1} of {games.length} · {current.game.start}
+              {isOutlook(current.game)
+                ? `Tournament · 26 to 31 December`
+                : `Game ${games.indexOf(current.game) + 1} of ${games.length} · ${current.game.start}`}
             </span>
-            <div className="game-teams">
-              <TeamName name={current.game.home_team} />
-              <strong className="game-score">vs</strong>
-              <TeamName name={current.game.away_team} right />
-            </div>
+            <RoundTeams game={current.game} />
           </div>
           <p className="predict-count">
             Question {current.game.questions.indexOf(current.question) + 1} of {current.game.questions.length}
@@ -140,16 +155,12 @@ function Round({ stage, games, next }) {
           <h2 className="predict-prompt">{picked === steps.length ? 'All set!' : `${steps.length - picked} picks left`}</h2>
           <p className="muted small">
             {picked === steps.length
-              ? `Up to ${plural(picked, 'pack')} to win. The results come once the games are played.`
+              ? `Up to ${plural(picked, 'pack')} to win. The results come once ${outlook ? 'the final is' : 'the games are'} played.`
               : 'Tap a question to make your pick. Every pick is a chance at a pack.'}
           </p>
           {games.map((game) => (
             <div key={game.id} className="predict-summary">
-              <div className="game-teams">
-                <TeamName name={game.home_team} />
-                <strong className="game-score">vs</strong>
-                <TeamName name={game.away_team} right />
-              </div>
+              <RoundTeams game={game} />
               <ul>
                 {game.questions.map((q) => {
                   const option = q.options.find((o) => o.id === q.prediction)
@@ -177,7 +188,7 @@ function Round({ stage, games, next }) {
             </button>
             {next && (
               <button type="button" className="pack-button secondary-light" disabled={stageBusy} onClick={() => setStage(next.id)}>
-                Play today's games →
+                {outlook ? 'Start the tournament →' : "Play today's games →"}
               </button>
             )}
           </div>
@@ -194,10 +205,10 @@ function NoRound({ stage, today, next }) {
       <p className="eyebrow">Predictions</p>
       {stage === 'pre' ? (
         <>
-          <h1>Predictions open on Friday 26 December</h1>
+          <h1>Game predictions open on Friday 26 December</h1>
           <p className="muted">
-            On every gameday you predict the winner, a goal question and one stat of each game. Every right pick
-            earns a pack after the game.
+            Your tournament predictions are locked in. On every gameday you predict the winner, a goal question and
+            one stat of each game. Every right pick earns a pack after the game.
           </p>
         </>
       ) : stage === 'post' ? (
@@ -242,9 +253,9 @@ function PastResults({ results }) {
                 aria-expanded={isOpen}
                 onClick={() => setOpenId(isOpen ? null : g.id)}
               >
-                <span className="muted small">{formatMatchDate(g.date)}</span>
+                <span className="muted small">{isOutlook(g) ? 'Before the tournament' : formatMatchDate(g.date)}</span>
                 <span>
-                  {g.home_team} {g.home_score}–{g.away_score} {g.away_team}
+                  {isOutlook(g) ? 'Tournament predictions' : `${g.home_team} ${g.home_score}–${g.away_score} ${g.away_team}`}
                 </span>
                 <strong>
                   {g.correct} of {g.questions.filter((q) => q.prediction).length} right

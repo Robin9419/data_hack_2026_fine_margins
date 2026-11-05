@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from . import db
 from .content import MEDIA_DIR, get_content
-from .tournament import PACK_CARDS, SPECIAL_CHANCE
+from .tournament import OUTLOOK, PACK_CARDS, SPECIAL_CHANCE
 
 app = FastAPI(title="Hockey Performance Cards")
 app.add_middleware(
@@ -568,16 +568,18 @@ def tournament_view(user: dict) -> dict:
     t = get_content().tournament
     stage = user["stage"]
     played = t.played(stage)
+    resolved = t.resolved(stage)
     predictions = db.predictions(user["id"])
     packs = db.game_packs(user["id"])
     index = t.stages.index(stage)
     timeline = [{**stop, "state": "current" if i == index else ("past" if i < index else "future")}
                 for i, stop in enumerate(t.timeline())]
     watch = db.watch_packs(user["id"])
-    today = [t.game_view(g, False, predictions.get(g["id"], {}), packs.get(g["id"])) for g in t.today(stage)]
+    today = [t.game_view(g, False, predictions.get(g["id"], {}), packs.get(g["id"])) for g in t.rounds(stage)]
+    # Most recent first: the tournament predictions, once resolved, come before the final.
     results = [{**t.game_view(g, True, predictions.get(g["id"], {}), packs.get(g["id"])),
                 "watch_packs": watch_packs_of(g["id"], watch)}
-               for g in reversed(t.games) if g["id"] in played]
+               for g in [t.outlook, *reversed(t.games)] if g["id"] in resolved]
     final = t.final
     champion = None
     if final["id"] in played:
@@ -632,23 +634,25 @@ def set_stage(body: StageRequest, user: dict = Depends(current_user)):
     db.set_stage(user["id"], body.stage)
     user = {**user, "stage": body.stage}
     predictions = db.predictions(user["id"])
-    resolved = {game_id for game_id in t.played(body.stage)
+    resolved = {game_id for game_id in t.resolved(body.stage)
                 if db.resolve_game(user["id"], game_id, t.correct_count(game_id, predictions.get(game_id, {})))}
-    record_watch_packs(user, resolved)
+    record_watch_packs(user, resolved - {OUTLOOK})
     packs, watch = db.game_packs(user["id"]), db.watch_packs(user["id"])
     just_played = [{**t.game_view(g, True, predictions.get(g["id"], {}), packs.get(g["id"])),
                     "watch_packs": watch_packs_of(g["id"], watch)}
-                   for g in t.games if g["id"] in resolved]
+                   for g in [*t.games, t.outlook] if g["id"] in resolved]
     return {"tournament": tournament_view(user), "progress": progress_for(user), "just_played": just_played}
 
 
 @app.post("/api/tournament/predict")
 def predict(body: PredictionRequest, user: dict = Depends(current_user)):
-    """Saves a prediction for a game of the current gameday. It can change until the game is played."""
+    """Saves a prediction for a game of the current gameday, or a tournament prediction before the tournament. It can
+    change until the game is played (the tournament predictions: until the first gameday)."""
     t = get_content().tournament
-    game = t.by_id.get(body.game_id)
-    if not game or game["date"] != user["stage"]:
-        raise HTTPException(409, "Predictions are only open for today's games")
+    game = t.round_by_id(body.game_id)
+    if not game or game["id"] not in {g["id"] for g in t.rounds(user["stage"])}:
+        raise HTTPException(409, "Predictions are only open for today's games"
+                            if body.game_id != OUTLOOK else "Tournament predictions close when the tournament starts")
     question = next((q for q in t.questions[game["id"]] if q["id"] == body.question_id), None)
     if not question or body.option_id not in {o["id"] for o in question["options"]}:
         raise HTTPException(400, "Not one of the options")
@@ -659,11 +663,13 @@ def predict(body: PredictionRequest, user: dict = Depends(current_user)):
 
 def open_packs_of(user: dict, game_id: str, packs: int) -> list[dict]:
     """Draws and grants the packs a game earned, one per correct prediction: PACK_CARDS cards, each rolled like a
-    trade-in (see trade_odds), with the base cards limited to the two teams that played."""
+    trade-in (see trade_odds), with the base cards limited to the two teams that played (any team for the tournament
+    predictions)."""
     content = get_content()
-    game = content.tournament.by_id[game_id]
-    teams = (game["home_team"], game["away_team"])
-    base_ids = [cid for cid, c in content.cards.items() if c["type"] == "base" and c["player"]["team"] in teams]
+    game = content.tournament.round_by_id(game_id)
+    teams = (game["home_team"], game["away_team"]) if game_id != OUTLOOK else None
+    base_ids = [cid for cid, c in content.cards.items()
+                if c["type"] == "base" and (teams is None or c["player"]["team"] in teams)]
     pack = []
     for _ in range(packs * PACK_CARDS):
         if tradeable_cards(user, []):
@@ -676,17 +682,19 @@ def open_packs_of(user: dict, game_id: str, packs: int) -> list[dict]:
 @app.post("/api/tournament/packs/{game_id}")
 def open_game_packs(game_id: str, user: dict = Depends(current_user)):
     """Opens the packs a played game earned: the prediction packs and the Ones to Watch packs."""
-    if game_id not in played_for(user):
+    t = get_content().tournament
+    if game_id not in t.resolved(user["stage"]):
         raise HTTPException(409, "This game has not been played yet")
     packs = db.claim_game_packs(user["id"], game_id) or 0
     watch = db.claim_watch_packs(user["id"], game_id)
     if not packs and not watch:
         raise HTTPException(409, "No packs to open for this game")
-    game = get_content().tournament.by_id[game_id]
+    game = t.round_by_id(game_id)
     pack = (open_packs_of(user, game_id, packs) if packs else []) + open_watch_packs(user, watch)
     total = packs + watch
+    source = "your tournament predictions" if game_id == OUTLOOK else f'{game["home_team"]} – {game["away_team"]}'
     return {"pack": pack + award_earned(user), "progress": progress_for(user),
-            "title": f'{total} {"pack" if total == 1 else "packs"} from {game["home_team"]} – {game["away_team"]}'}
+            "title": f'{total} {"pack" if total == 1 else "packs"} from {source}'}
 
 
 @app.post("/api/tournament/packs")
@@ -694,9 +702,10 @@ def open_all_packs(user: dict = Depends(current_user)):
     """Opens, in one go, every pack the played games earned that the user has not opened yet: the prediction packs
     and the Ones to Watch packs."""
     played = played_for(user)
+    resolved = get_content().tournament.resolved(user["stage"])
     pack, total = [], 0
     for game_id, info in db.game_packs(user["id"]).items():
-        if game_id in played and info["correct"] and not info["claimed"]:
+        if game_id in resolved and info["correct"] and not info["claimed"]:
             packs = db.claim_game_packs(user["id"], game_id)
             if packs:
                 pack += open_packs_of(user, game_id, packs)
@@ -724,8 +733,8 @@ def activities(user: dict = Depends(current_user)):
     stage = user["stage"]
     predictions = db.predictions(user["id"])
     packs = db.game_packs(user["id"])
-    played = t.played(stage)
-    open_games = [g for g in t.today(stage) if g["id"] not in packs]
+    resolved = t.resolved(stage)
+    open_games = [g for g in t.rounds(stage) if g["id"] not in packs]
     picks = sum(len(predictions.get(g["id"], {})) for g in open_games)
     questions = sum(len(t.questions[g["id"]]) for g in open_games)
     platform, name = social_for(stage)
@@ -736,9 +745,10 @@ def activities(user: dict = Depends(current_user)):
         "daily": db.last_daily_claim(user["id"]) != stage,
         "social": None if platform in db.followed_socials(user["id"])
                   else {"id": platform, "name": name, "cards": SOCIAL_CARDS},
-        "predictions": {"games": len(open_games), "picks": picks, "questions": questions} if picks < questions else None,
-        "packs_waiting": sum(p["correct"] for gid, p in packs.items() if gid in played and not p["claimed"])
-                         + sum(c["packs"] for gid, cards in db.watch_packs(user["id"]).items() if gid in played
+        "predictions": {"games": sum(g["id"] != OUTLOOK for g in open_games), "picks": picks, "questions": questions,
+                        "tournament": any(g["id"] == OUTLOOK for g in open_games)} if picks < questions else None,
+        "packs_waiting": sum(p["correct"] for gid, p in packs.items() if gid in resolved and not p["claimed"])
+                         + sum(c["packs"] for gid, cards in db.watch_packs(user["id"]).items() if gid in resolved
                                for c in cards.values() if not c["claimed"]),
         "trivia": 0 if db.trivia_played(user["id"], stage) else len(trivia_cards(user, "home")),
         "trade": {"cost": TRADE_COST, "base_copies": base_copies},

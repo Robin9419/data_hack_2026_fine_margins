@@ -1431,3 +1431,8 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
   .collection-page .pager-dots { margin: 8px 0; }
   .collection-page .reset { margin-bottom: 8px; }
 }
+
+/* Collector card page: the club logo stays small and the welcome video is capped in width. */
+.detail-photo.logo { width: 96px; aspect-ratio: 1; padding: 14px; box-sizing: border-box; }
+.detail-photo.logo img { object-fit: contain; object-position: center; }
+.intro-video { max-width: 640px; margin: 16px 0; }

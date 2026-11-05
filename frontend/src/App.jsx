@@ -130,6 +130,14 @@ export default function App() {
             }
           />
           <Route
+            path="/cards/:id/info"
+            element={
+              <RequireAuth>
+                <CardDetail />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/players/:cardId"
             element={
               <RequireAuth>

@@ -43,7 +43,7 @@ export default function CardDetail({ preview = false }) {
   if (error)
     return (
       <section>
-        <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
+        <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} history />
         <p className="error">{error}</p>
       </section>
     )
@@ -69,7 +69,7 @@ export default function CardDetail({ preview = false }) {
 
   return (
     <section className="detail">
-      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
+      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} history />
       {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
 
       <header className="detail-header">
@@ -271,11 +271,11 @@ function RewardCardDetail({ card, preview }) {
   const { player, match } = card
   return (
     <section className="detail">
-      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
+      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} history />
 
       <header className="detail-header">
         {card.kind === 'collector' ? (
-          <div className="detail-photo">
+          <div className="detail-photo logo">
             <img src={teamOf(card.team).logo} alt={card.team} />
           </div>
         ) : card.image_url ? (
@@ -293,6 +293,7 @@ function RewardCardDetail({ card, preview }) {
       </header>
 
       <p className="explanation">{card.text ?? card.explanation}</p>
+      {card.intro_video && <IntroVideo video={card.intro_video} />}
       <div className="match-context">
         <div>
           <span className="label">How you earned it</span>
@@ -314,6 +315,16 @@ function RewardCardDetail({ card, preview }) {
         {card.credit ? ` · Image: ${card.credit}` : ''}
       </p>
     </section>
+  )
+}
+
+// The team's official welcome video; plays only after a click.
+function IntroVideo({ video }) {
+  const [playing, setPlaying] = useState(null)
+  return (
+    <div className="intro-video">
+      <VideoSlot video={video} playing={playing} onPlay={(clip, label) => setPlaying({ ...clip, label, nonce: Date.now() })} />
+    </div>
   )
 }
 
@@ -389,7 +400,7 @@ function BaseCardDetail({ card, preview }) {
 
   return (
     <section className="detail">
-      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
+      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} history />
       {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
 
       <header className="detail-header">
@@ -449,7 +460,7 @@ function LegendCardDetail({ card, preview }) {
 
   return (
     <section className="detail legend-detail">
-      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} />
+      <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} history />
 
       <header className="detail-header">
         <figure className="legend-figure">

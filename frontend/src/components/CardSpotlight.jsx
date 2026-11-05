@@ -45,8 +45,9 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
   const { pathname } = useLocation()
   const showLink = !hideLink && card.player?.last_name && (card.type === 'base' || card.type === 'special') && !pathname.startsWith('/players/')
   const [flipped, setFlipped] = useState(false)
-  // A base card's back only repeats the facts in the panel, so it has none.
-  const flippable = card.type !== 'base'
+  // Only special cards have a back (their KPIs). Base, legend and reward cards show everything on the page.
+  const flippable = card.type === 'special'
+  const profilePath = card.type === 'legend' || card.type === 'reward' ? `/cards/${card.id}/info` : null
   const [clipIndex, setClipIndex] = useState(0)
   const closeRef = useRef(null)
   const clips = pickClips(card)
@@ -73,8 +74,6 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
   const { player } = card
   const clip = clips[clipIndex]
   const name = player?.last_name ? `${player.first_name} ${player.last_name}` : ''
-  const about = card.type === 'legend' ? card.legend?.summary : card.type === 'reward' ? card.text ?? card.explanation : null
-  const lists = card.type === 'legend' ? [['At the Spengler Cup', card.legend?.spengler_cup], ['Career honours', card.legend?.honours]] : []
   return (
     <div className="spotlight" role="dialog" aria-modal="true" aria-label={[card.title, name].filter(Boolean).join(': ')} onClick={onClose}>
       <div className="spotlight-panel" onClick={(e) => e.stopPropagation()}>
@@ -111,21 +110,17 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
           {card.type !== 'special' && (
             <>
               <h2>{card.title ?? 'Base card'}</h2>
-              {about && <p className="explanation">{about}</p>}
-              <dl className="spotlight-facts">
-                {factsOf(card).all.map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-              {lists.map(([head, items]) => items?.length > 0 && (
-                <div key={head}>
-                  <h3>{head}</h3>
-                  <ul className="legend-facts">{items.map((f) => <li key={f}>{f}</li>)}</ul>
-                </div>
-              ))}
+              {card.type !== 'reward' && (
+                <dl className="spotlight-facts">
+                  {factsOf(card).all.map(([label, value]) => (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {card.intro_video && <SpotlightClip clip={{ ...card.intro_video, caption: card.intro_video.description }} />}
             </>
           )}
           {card.type === 'special' && <><div className="spotlight-clips-head">
@@ -166,6 +161,15 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
                 />
               ))}
             </div>
+          )}
+          {profilePath && (
+            <Link to={profilePath} onClick={onClose} className="spotlight-more">
+              <span>
+                <strong>{card.type === 'legend' ? 'Legend profile ›' : 'Card profile ›'}</strong>
+                <small>{card.type === 'legend' ? `Career, honours and Spengler Cup record of ${name}` : `The story behind ${card.title}`}</small>
+              </span>
+              <span aria-hidden="true">→</span>
+            </Link>
           )}
           {showLink && (
             <Link to={`/players/${card.id}`} onClick={onClose} className="spotlight-more">

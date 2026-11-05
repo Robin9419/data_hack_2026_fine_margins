@@ -591,6 +591,7 @@ class Content:
                 "requires": ids, "unlock": collector["unlock"],
                 "explanation": f"All {len(ids)} base cards of {team} in one collection.",
                 "club": doc["clubs"].get(team),
+                "intro_video": self._intro_video(collector.get("intro_videos", {}).get(team)),
                 "source": self.match["source"],
             }
             self.reward_rules[card_id] = lambda owned, ids=ids: all(i in owned for i in ids)
@@ -615,6 +616,15 @@ class Content:
             else:
                 self.reward_rules[cfg["id"]] = lambda owned: all(i in owned for i in special_ids)
             self.cards[cfg["id"]] = card
+
+    @staticmethod
+    def _intro_video(youtube_id: str | None) -> dict | None:
+        """The official 'Welcome <team>' clip of the Spengler Cup channel, shown on a collector card's page."""
+        if not youtube_id:
+            return None
+        return {"youtube_id": youtube_id, "start": 0, "end": None, "scope": "game",
+                "poster": f"https://i.ytimg.com/vi/{youtube_id}/hqdefault.jpg",
+                "description": "Official welcome video, Spengler Cup Davos"}
 
     def _add_moment_facts(self, card: dict) -> tuple[str, int]:
         """Fills the moment card from the last goal of the game and returns the scorer as (team, jersey)."""

@@ -1,7 +1,15 @@
 {
   "_comment": "Reward cards are never drawn or won in the trivia: they are earned by what the user already owns (see earned_cards in content.py). 'collector' = the club logo, earned with every base card of one club; 'context' cards are about the match and the tournament. Images are free-licence Wikimedia Commons files, for the demo only. 'about' (optional) holds the facts shown on a card's page, researched 2026-10-27 (sources per card).",
   "collector": {
-    "unlock": "Own every base card of this club"
+    "unlock": "Own every base card of this club",
+    "intro_videos": {
+      "HC Davos": "ya09n9ILEL0",
+      "Team Canada": "y6yiFrE3QVE",
+      "HC Sparta Praha": "O1qL0HOXRZc",
+      "HC Fribourg-Gottéron": "IJ48qZ6AwPo",
+      "HIFK": "T0Y6-2KO4Qw",
+      "U.S. Collegiate Selects": "pEeE03LxB-g"
+    }
   },
   "_clubs_comment": "Club facts (same shape as a context card's 'about': facts, summary, sections of bullet lists, sources) shown on each collector card's page. Researched 2026-10-27 on Wikipedia, club, league, federation and press sites (see sources per club). Fribourg-Gottéron's founding year differs between sources (1937 or 1938). HIFK's Spengler Cup list names the appearances that could be confirmed; it may not be complete.",
   "clubs": {

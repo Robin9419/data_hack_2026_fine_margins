@@ -2,6 +2,7 @@ import { Link, Navigate, NavLink, Route, Routes, useLocation, useParams } from '
 import { api } from './api'
 import { useEffect, useState } from 'react'
 import { useAuth } from './auth'
+import CardGuide from './components/CardGuide'
 import RewardBar from './components/RewardBar'
 import ResultsModal from './components/ResultsModal'
 import TimelineBar from './components/TimelineBar'
@@ -58,6 +59,7 @@ export default function App() {
           )}
           {user && (
             <div className="topbar-user">
+              <CardGuide />
               <span>{user.username}</span>
               {inAdmin ? (
                 <Link to="/" className="admin-link">Exit admin</Link>

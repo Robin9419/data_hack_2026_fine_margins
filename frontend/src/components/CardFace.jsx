@@ -65,7 +65,7 @@ function Rink() {
   )
 }
 
-const ARCHETYPES = {
+export const ARCHETYPES = {
   Sniper: { icon: 'target', color: '#ff6a4a' },
   'Volume Shooter': { icon: 'burst', color: '#ff6a4a' },
   'Chance Creator': { icon: 'burst', color: '#ffd76a' },
@@ -79,7 +79,7 @@ const ARCHETYPES = {
   Workhorse: { icon: 'flame', color: '#ff9a3c' },
   'Shot Stopper': { icon: 'shield', color: '#7cc4ff' },
 }
-const PERFORMANCE_ICON = { motm: 'star', gamewinner: 'burst', wall: 'shield', recordbreaker: 'bolt' }
+export const PERFORMANCE_ICON = { motm: 'star', gamewinner: 'burst', wall: 'shield', recordbreaker: 'bolt' }
 const PERFORMANCE_COLOR = { motm: '#ffd76a', gamewinner: '#ff6a4a', wall: '#7cc4ff', recordbreaker: '#19e6ff' }
 // Impact specials: every Stadium edition is orange (the Workhorse), every other one purple (the Playmaker).
 const IMPACT_STADIUM = '#ff9a3c'

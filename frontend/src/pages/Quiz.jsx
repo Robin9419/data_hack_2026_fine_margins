@@ -5,7 +5,7 @@ import { useAuth } from '../auth'
 import BackLink from '../components/BackLink'
 import CardUnlock from '../components/CardUnlock'
 
-// Trivia round: pick where you watched the game, then answer three questions. Each correct
+// Trivia round: pick where you watched the game, then answer five questions. One round per gameday. Each correct
 // answer unlocks a card. Each question has three options and one attempt. At the stadium you win the foil
 // edition of the card and more reward points.
 export default function Quiz() {
@@ -91,26 +91,25 @@ export default function Quiz() {
         <BackLink />
         <p className="eyebrow"><span className="badge">Quiz</span></p>
         <h1>Trivia time</h1>
-        <p className="muted">
-          Answer three questions about the games played so far to win their special cards. Where are you watching? (In this demo you tell us. A real
-          app would check your ticket.)
-        </p>
+        <p className="quiz-lede">Answer five questions about the games so far. Every right answer wins a special card. One round per gameday.</p>
+        <h2 className="quiz-subhead">Where are you watching?</h2>
         <div className="venue-choices">
           <button type="button" className="choice venue-choice" disabled={busy} onClick={() => start('home')}>
             <span className="ch-av venue-icon">📺</span>
             <span className="ch-txt">
               <strong>At home</strong>
-              <small>Watching on TV. Win the standard card of each player.</small>
+              <small>Win the standard card of each player.</small>
             </span>
           </button>
           <button type="button" className="choice venue-choice stadium" disabled={busy} onClick={() => start('stadium')}>
             <span className="ch-av venue-icon">🏟</span>
             <span className="ch-txt">
               <strong>At the stadium</strong>
-              <small>Win the exclusive Stadium edition of the card and more reward points.</small>
+              <small>Win the exclusive Stadium edition and more reward points.</small>
             </span>
           </button>
         </div>
+        <p className="quiz-footnote">Demo: you choose your venue here. The real app would check your ticket.</p>
         {error && <p className="error">{error}</p>}
       </section>
     )
@@ -118,7 +117,7 @@ export default function Quiz() {
 
   if (questions.length === 0 && gamesPlayed === 0) {
     return (
-      <section className="quiz">
+      <section className="quiz q-card">
         <BackLink />
         <h1>No games played yet</h1>
         <p className="muted">
@@ -131,7 +130,7 @@ export default function Quiz() {
 
   if (questions.length === 0) {
     return (
-      <section className="quiz">
+      <section className="quiz q-card">
         <BackLink />
         <h1>Nothing left to win</h1>
         <p className="muted">
@@ -146,17 +145,15 @@ export default function Quiz() {
   const done = index >= questions.length
   if (done) {
     return (
-      <section className="quiz">
+      <section className="quiz q-card">
         <h1>Round complete</h1>
         <p className="muted">
           You unlocked {won} {won === 1 ? 'card' : 'cards'}.
         </p>
+        <p className="muted small">One round per gameday. The next one opens when you move on in the timeline.</p>
         <div className="pack-actions">
           <button type="button" className="pack-button" onClick={() => navigate('/collection')}>
             Go to my collection
-          </button>{' '}
-          <button type="button" className="pack-button secondary" onClick={() => start(venue)} disabled={busy}>
-            Another round
           </button>
         </div>
       </section>
@@ -168,24 +165,40 @@ export default function Quiz() {
 
   return (
     <section className="quiz q-card">
-      <p className="eyebrow">
-        <span className="badge">Quiz</span>
-        Question {index + 1} of {questions.length} · {venue === 'stadium' ? '🏟 Stadium' : '📺 At home'}
-      </p>
-      <h1>{question.prompt}</h1>
-      {question.match && <p className="quiz-match">{question.match}</p>}
-      {hinted ? (
-        <p className="quiz-clue">💡 {question.hint}</p>
-      ) : (
-        <button type="button" className="quiz-hint" disabled={Boolean(missed)} onClick={() => setHinted(true)}>
-          💡 Need a hint?
-        </button>
-      )}
-      <p className="muted small">
-        {question.reward === 'upgrade'
-          ? 'Correct answer upgrades your card to the Stadium edition.'
-          : `Correct answer unlocks this player's ${venue === 'stadium' ? 'Stadium' : ''} card.`}
-      </p>
+      <div className="quiz-meta">
+        <p className="eyebrow">
+          <span className="badge">Quiz</span>
+          {venue === 'stadium' ? '🏟 Stadium' : '📺 At home'}
+        </p>
+        <div className="quiz-steps" aria-label={`Question ${index + 1} of ${questions.length}`}>
+          {questions.map((q, i) => (
+            <span key={q.id} className={i < index ? 'done' : i === index ? 'current' : ''} />
+          ))}
+          <span className="quiz-steps-label">
+            {index + 1} / {questions.length}
+          </span>
+        </div>
+      </div>
+
+      <div className="quiz-question">
+        {question.match && <p className="quiz-match">{question.match}</p>}
+        <h1>{question.prompt}</h1>
+      </div>
+
+      <div className="quiz-aids">
+        <span className="quiz-reward">
+          🎁{' '}
+          {question.reward === 'upgrade'
+            ? 'Upgrades your card to the Stadium edition'
+            : `Unlocks this player's ${venue === 'stadium' ? 'Stadium ' : ''}card`}
+        </span>
+        {!hinted && (
+          <button type="button" className="quiz-hint" disabled={Boolean(missed)} onClick={() => setHinted(true)}>
+            💡 Need a hint?
+          </button>
+        )}
+      </div>
+      {hinted && <p className="quiz-clue">💡 {question.hint}</p>}
 
       <ul className="quiz-options">
         {question.options.map((option) => {
@@ -212,13 +225,13 @@ export default function Quiz() {
         })}
       </ul>
       {missed && (
-        <>
+        <div className="quiz-feedback">
           <p className="quiz-retry">Not quite. It was {missed.answer}.</p>
           {missed.explanation && <p className="quiz-explain">{missed.explanation}</p>}
           <button type="button" className="pack-button" onClick={next}>
             {last ? 'Finish' : 'Next question'}
           </button>
-        </>
+        </div>
       )}
       {error && <p className="error">{error}</p>}
 

@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 import random
 import tempfile
 import unittest
@@ -111,7 +112,7 @@ class TournamentTests(unittest.TestCase):
         self.assertEqual(main.quiz_start(main.QuizStart(venue='home'), self.user)['questions'], [])
         self.go('2025-12-28')
         quiz = main.quiz_start(main.QuizStart(venue='home'), self.user)
-        self.assertEqual(len(quiz['questions']), 3)
+        self.assertEqual(len(quiz['questions']), 5)
         latest = {g['id'] for g in self.t.games if g['date'] == '2025-12-27'}
         asked = [db.get_question(self.user['id'], q['id'])['card_id'] for q in quiz['questions']]
         self.assertTrue(all(self.content.card_game[cid] in latest for cid in asked))
@@ -135,6 +136,9 @@ class TournamentTests(unittest.TestCase):
         self.assertGreater(main.activities(self.user)['trivia'], 0)
         main.quiz_start(main.QuizStart(venue='home'), self.user)
         self.assertEqual(main.activities(self.user)['trivia'], 0)
+        with self.assertRaises(HTTPException) as err:  # no replay on the same gameday
+            main.quiz_start(main.QuizStart(venue='home'), self.user)
+        self.assertEqual(err.exception.status_code, 409)
         self.go('2025-12-29')  # the next gameday offers its own round again
         self.assertGreater(main.activities(self.user)['trivia'], 0)
 

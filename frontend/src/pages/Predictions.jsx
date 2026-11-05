@@ -82,37 +82,42 @@ function Round({ stage, games, next }) {
       <header className="predict-head">
         <p className="eyebrow">
           <span className="badge">Prediction</span>
-          {outlook ? 'Before the tournament' : `Gameday · ${games[0].stage}`}
+          {outlook ? 'Before the tournament' : `${dayName(stage)} · ${plural(games.length, 'game')}`}
         </p>
         <h1>{outlook ? 'Predict the tournament' : 'Your predictions'}</h1>
-        <p className="muted">
+        <p className="predict-lede">
           {outlook
-            ? 'Five calls on the whole Spengler Cup. They lock when the first game starts, and every right pick earns a pack after the final.'
-            : `${dayName(stage)} · ${plural(games.length, 'game')}. Every right pick earns a pack after the game.`}
+            ? 'Five calls on the whole Spengler Cup. Every right pick earns a pack after the final.'
+            : 'Every right pick earns a pack once the game is played.'}
         </p>
-        <div className="predict-progress" aria-label={`${picked} of ${steps.length} picks made`}>
-          <span style={{ width: `${(picked / steps.length) * 100}%` }} />
+        {outlook && <p className="predict-note">🔒 Picks lock when the first game starts.</p>}
+        <div className="predict-meter">
+          <div className="predict-progress" aria-hidden="true">
+            <span style={{ width: `${(picked / steps.length) * 100}%` }} />
+          </div>
+          <span className="predict-meter-label">
+            <strong>{picked}</strong> / {steps.length} picks
+          </span>
         </div>
-        <p className="muted small">
-          {picked} of {steps.length} picks
-        </p>
       </header>
 
       {current ? (
         <article className="predict-card q-card">
           <div className="predict-game">
-            <span className="muted small">
+            <span className="predict-game-label">
               {isOutlook(current.game)
-                ? `Tournament · 26 to 31 December`
+                ? 'Tournament · 26 to 31 December'
                 : `Game ${games.indexOf(current.game) + 1} of ${games.length} · ${current.game.start}`}
             </span>
             <RoundTeams game={current.game} />
           </div>
-          <p className="predict-count">
-            Question {current.game.questions.indexOf(current.question) + 1} of {current.game.questions.length}
-          </p>
-          <h2 className="predict-prompt">{current.question.prompt}</h2>
-          <p className="muted small">{current.question.hint}</p>
+          <div className="predict-question">
+            <p className="predict-count">
+              Question {current.game.questions.indexOf(current.question) + 1} of {current.game.questions.length}
+            </p>
+            <h2 className="predict-prompt">{current.question.prompt}</h2>
+            {current.question.hint && <p className="predict-hint">{current.question.hint}</p>}
+          </div>
           <div className="predict-options">
             {current.question.options.map((o) => (
               <button
@@ -152,12 +157,14 @@ function Round({ stage, games, next }) {
         </article>
       ) : (
         <article className="predict-card q-card">
-          <h2 className="predict-prompt">{picked === steps.length ? 'All set!' : `${steps.length - picked} picks left`}</h2>
-          <p className="muted small">
-            {picked === steps.length
-              ? `Up to ${plural(picked, 'pack')} to win. The results come once ${outlook ? 'the final is' : 'the games are'} played.`
-              : 'Tap a question to make your pick. Every pick is a chance at a pack.'}
-          </p>
+          <div className="predict-question">
+            <h2 className="predict-prompt">{picked === steps.length ? 'All set!' : `${steps.length - picked} picks left`}</h2>
+            <p className="predict-hint">
+              {picked === steps.length
+                ? `Up to ${plural(picked, 'pack')} to win. Results arrive once ${outlook ? 'the final is' : 'the games are'} played.`
+                : 'Tap a question to make or change your pick.'}
+            </p>
+          </div>
           {games.map((game) => (
             <div key={game.id} className="predict-summary">
               <RoundTeams game={game} />
@@ -168,13 +175,14 @@ function Round({ stage, games, next }) {
                     <li key={q.id}>
                       <button
                         type="button"
-                        className="predict-summary-row"
+                        className={`predict-summary-row ${option ? '' : 'open'}`}
                         onClick={() => setStep(steps.findIndex((s) => s.question === q))}
                       >
-                        <span>{q.prompt}</span>
-                        <strong className={option ? '' : 'muted'}>
-                          {option ? option.label : 'Make a pick'} <span aria-hidden="true">›</span>
-                        </strong>
+                        <span className="predict-summary-q">{q.prompt}</span>
+                        <span className="predict-summary-a">
+                          {option ? option.label : 'Make a pick'}
+                          <span className="chev next" aria-hidden="true" />
+                        </span>
                       </button>
                     </li>
                   )
@@ -201,12 +209,14 @@ function Round({ stage, games, next }) {
 function NoRound({ stage, today, next }) {
   const { setStage, busy } = useTournament()
   return (
-    <header className="predict-head">
-      <p className="eyebrow">Predictions</p>
+    <header className="predict-head q-card">
+      <p className="eyebrow">
+        <span className="badge">Prediction</span>
+      </p>
       {stage === 'pre' ? (
         <>
           <h1>Game predictions open on Friday 26 December</h1>
-          <p className="muted">
+          <p className="predict-lede">
             Your tournament predictions are locked in. On every gameday you predict the winner, a goal question and
             one stat of each game. Every right pick earns a pack after the game.
           </p>
@@ -214,12 +224,12 @@ function NoRound({ stage, today, next }) {
       ) : stage === 'post' ? (
         <>
           <h1>The tournament is over</h1>
-          <p className="muted">There is nothing left to predict. See how your predictions went below.</p>
+          <p className="predict-lede">There is nothing left to predict. See how your predictions went below.</p>
         </>
       ) : (
         <>
           <h1>{dayName(stage)}</h1>
-          <p className="muted">
+          <p className="predict-lede">
             {today.length
               ? 'You already played these games further along the timeline, so their predictions are locked.'
               : 'No games today.'}
@@ -240,26 +250,33 @@ function PastResults({ results }) {
   const predicted = results.filter((g) => g.questions.some((q) => q.prediction))
   if (!predicted.length) return null
   return (
-    <details className="predict-past">
-      <summary>Your past predictions ({predicted.length})</summary>
+    <details className="predict-past q-card">
+      <summary>
+        <span>Your past predictions</span>
+        <span className="predict-past-count">{predicted.length}</span>
+        <span className="chev next" aria-hidden="true" />
+      </summary>
       <ul>
         {predicted.map((g) => {
           const isOpen = openId === g.id
+          const made = g.questions.filter((q) => q.prediction).length
           return (
-            <li key={g.id} className="predict-past-item">
+            <li key={g.id} className={`predict-past-item ${isOpen ? 'open' : ''}`}>
               <button
                 type="button"
                 className="predict-past-toggle"
                 aria-expanded={isOpen}
                 onClick={() => setOpenId(isOpen ? null : g.id)}
               >
-                <span className="muted small">{isOutlook(g) ? 'Before the tournament' : formatMatchDate(g.date)}</span>
-                <span>
-                  {isOutlook(g) ? 'Tournament predictions' : `${g.home_team} ${g.home_score}–${g.away_score} ${g.away_team}`}
+                <span className="predict-past-game">
+                  <span className="predict-past-date">{isOutlook(g) ? 'Before the tournament' : formatMatchDate(g.date)}</span>
+                  <span className="predict-past-title">
+                    {isOutlook(g) ? 'Tournament predictions' : `${g.home_team} ${g.home_score}–${g.away_score} ${g.away_team}`}
+                  </span>
                 </span>
-                <strong>
-                  {g.correct} of {g.questions.filter((q) => q.prediction).length} right
-                </strong>
+                <span className={`predict-past-score ${g.correct > 0 ? 'hit' : ''}`}>
+                  {g.correct} / {made} right
+                </span>
                 <span className="chev next" aria-hidden="true" />
               </button>
               {isOpen && (
@@ -268,16 +285,26 @@ function PastResults({ results }) {
                     const pick = q.options.find((o) => o.id === q.prediction)
                     const answer = q.options.find((o) => o.id === q.answer)
                     const right = q.prediction && q.prediction === q.answer
+                    const state = right ? 'right' : q.prediction ? 'wrong' : 'missed'
                     return (
-                      <li key={q.id} className={right ? 'right' : q.prediction ? 'wrong' : 'missed'}>
-                        <span className="predict-past-prompt">{q.prompt}</span>
-                        <span className="small">
-                          Your answer: <strong>{pick ? pick.label : 'No pick'}</strong>
+                      <li key={q.id} className={state}>
+                        <span className="predict-past-prompt">
+                          <span className="predict-past-mark" aria-hidden="true">
+                            {right ? '✓' : q.prediction ? '✕' : '–'}
+                          </span>
+                          {q.prompt}
                         </span>
-                        <span className="small">
-                          Correct answer: <strong>{answer ? answer.label : '—'}</strong>
-                        </span>
-                        {q.explanation && <span className="muted small">{q.explanation}</span>}
+                        <dl className="predict-past-answers">
+                          <div>
+                            <dt>Your pick</dt>
+                            <dd>{pick ? pick.label : 'No pick'}</dd>
+                          </div>
+                          <div>
+                            <dt>Answer</dt>
+                            <dd>{answer ? answer.label : '—'}</dd>
+                          </div>
+                        </dl>
+                        {q.explanation && <p className="predict-past-explain">{q.explanation}</p>}
                       </li>
                     )
                   })}

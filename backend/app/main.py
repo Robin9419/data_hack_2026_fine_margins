@@ -474,7 +474,7 @@ def reset(user: dict = Depends(current_user)):
     return {"pack": pack, "progress": progress_for(user)}
 
 
-QUESTIONS_PER_ROUND = 3
+QUESTIONS_PER_ROUND = 5
 
 
 class QuizStart(BaseModel):
@@ -502,9 +502,11 @@ def trivia_cards(user: dict, venue: str) -> list[str]:
 
 @app.post("/api/quiz/start")
 def quiz_start(body: QuizStart, user: dict = Depends(current_user)):
-    """Three questions (three options each), each about one special card of a game already played that the user can
-    still win. At home that is a special card they don't own; at the stadium it is also one they own only as the home
+    """Five questions (three options each), one per special card of a game already played that the user can still win.
+    One round per gameday: a second start on the same stage is refused, so the trivia cannot be replayed. At home that is a special card they don't own; at the stadium it is also one they own only as the home
     edition. The questions start with the most recent games. Base cards are not won through trivia."""
+    if db.trivia_played(user["id"], user["stage"]):
+        raise HTTPException(409, "You already played the trivia of this gameday")
     content = get_content()
     owned = db.owned_cards(user["id"])
     eligible = trivia_cards(user, body.venue)

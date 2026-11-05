@@ -40,6 +40,7 @@
     },
     {
       "id": "legend-hcd-rasmussen",
+      "video_id": "r2F1Az5pUYw",
       "team": "HC Davos",
       "first_name": "Dennis",
       "last_name": "Rasmussen",
@@ -127,6 +128,7 @@
     },
     {
       "id": "legend-can-hazen",
+      "video_id": "nS3lQ2735lk",
       "team": "Team Canada",
       "first_name": "Jonathan",
       "last_name": "Hazen",
@@ -185,6 +187,7 @@
     },
     {
       "id": "legend-spa-horak",
+      "video_id": "v7x0C0AIYGY",
       "team": "HC Sparta Praha",
       "first_name": "Roman",
       "last_name": "Horák",
@@ -308,6 +311,7 @@
     },
     {
       "id": "legend-hifk-riihiranta",
+      "video_id": "IryNckmPXTo",
       "team": "HIFK",
       "first_name": "Heikki",
       "last_name": "Riihiranta",
@@ -336,6 +340,7 @@
     },
     {
       "id": "legend-hifk-saarinen",
+      "video_id": "aeTKs9sjCys",
       "team": "HIFK",
       "first_name": "Simo",
       "last_name": "Saarinen",

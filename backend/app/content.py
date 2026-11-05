@@ -649,12 +649,14 @@ class Content:
             self.cards[cfg["id"]] = card
 
     @staticmethod
-    def _intro_video(youtube_id: str | None, description: str = "Official welcome video, Spengler Cup Davos") -> dict | None:
+    def _intro_video(youtube_id: str | None, description: str = "Official welcome video, Spengler Cup Davos",
+                     start: int = 0, end: int | None = None) -> dict | None:
         """A YouTube clip shown on a reward card's page and pop-up: the official 'Welcome <team>' video of a collector
-        card, or the video of a stadium or trophy card."""
+        card, the video of a stadium or trophy card, or a legend's video (optionally only the stretch start–end, in
+        seconds, of a longer video)."""
         if not youtube_id:
             return None
-        return {"youtube_id": youtube_id, "start": 0, "end": None, "scope": "game",
+        return {"youtube_id": youtube_id, "start": start or 0, "end": end, "scope": "game",
                 "poster": f"https://i.ytimg.com/vi/{youtube_id}/hqdefault.jpg",
                 "description": description}
 
@@ -774,7 +776,8 @@ class Content:
             "legend": {k: cfg.get(k) for k in ("era", "nationality", "summary", "spengler_cup", "honours", "moment",
                                                 "image_credit", "image_source_url", "sources")},
             "edition": "legend",
-            "intro_video": self._intro_video(cfg.get("video_id"), f"{cfg['first_name']} {cfg['last_name']}"),
+            "intro_video": self._intro_video(cfg.get("video_id"), f"{cfg['first_name']} {cfg['last_name']}",
+                                             cfg.get("video_start", 0), cfg.get("video_end")),
             "source": doc["source"],
         }
 

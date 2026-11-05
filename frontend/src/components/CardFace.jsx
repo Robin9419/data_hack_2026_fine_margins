@@ -95,8 +95,8 @@ const kindOf = (card) => card.kind ?? (card.type === 'base' ? 'base' : 'profile'
 
 // The accent colour of a card's front (its tag colour), for the back to match.
 export const accentOf = (card) =>
-  kindOf(card) === 'performance'
-    ? (PERFORMANCE_COLOR[card.special_type] ?? '#ffd76a')
+  ['profile', 'performance'].includes(kindOf(card))
+    ? (card.edition === 'stadium' ? IMPACT_STADIUM : IMPACT_PROFILE)
     : (ARCHETYPES[card.title]?.color ?? '#ffd76a')
 
 // The big club logo that stands in for a photo on a collector card.

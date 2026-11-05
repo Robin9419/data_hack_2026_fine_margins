@@ -245,8 +245,12 @@ function CardBack({ card }) {
       </span>
     )
   }
+  // Impact specials: tint the whole back orange (Stadium) or purple, like the front, instead of the team colours.
+  const accent = accentOf(card)
+  const impact = ['profile', 'performance'].includes(card.kind ?? 'profile')
+  const tint = impact ? { '--c1': `color-mix(in srgb, ${accent} 38%, #0a0612)` } : {}
   return (
-    <span className="spotlight-back card-face" style={{ ...style, '--c2': accentOf(card) }}>
+    <span className="spotlight-back card-face" style={{ ...style, ...tint, '--c2': accent }}>
       <span className="back-title">{card.title}</span>
       <span className="back-kpis">
         {kpisOf(card).map((kpi) => (

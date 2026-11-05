@@ -70,7 +70,7 @@ function Round({ stage, games, next }) {
         </p>
         <h1>Your predictions</h1>
         <p className="muted">
-          {dayName(stage)} · {plural(games.length, 'game')}. Every right pick earns a pack of three cards after the
+          {dayName(stage)} · {plural(games.length, 'game')}. Every right pick earns a pack after the
           game.
         </p>
         <div className="predict-progress" aria-label={`${picked} of ${steps.length} picks made`}>

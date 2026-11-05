@@ -90,9 +90,9 @@ class TournamentTests(unittest.TestCase):
         self.assertEqual(view['packs_waiting'], 2)
 
         opened = main.open_game_packs(FRI_SPA, self.user)
-        cards = [c for c in opened['pack'] if c['type'] != 'legend']
-        self.assertEqual(len(cards), 6)
-        self.assertLessEqual(sum(c['type'] == 'special' for c in cards), 2)  # each card: 25% a special
+        cards = [c for c in opened['pack'] if c['type'] not in ('legend', 'reward')]
+        self.assertEqual(len(cards), 10)
+        self.assertLess(sum(c['type'] == 'special' for c in cards), 10)  # each card: 25% a special
         teams = {'HC Fribourg-Gottéron', 'HC Sparta Praha'}
         self.assertTrue(all(c['player']['team'] in teams for c in cards if c['type'] == 'base'))
         with self.assertRaises(main.HTTPException):
@@ -169,8 +169,8 @@ class TournamentTests(unittest.TestCase):
         self.predict(FRI_SPA, 'goal', 'HC Fribourg-Gottéron#17')
         self.go('2025-12-27')
         self.assertEqual(main.activities(self.user)['packs_waiting'], 2)
-        cards = [c for c in main.open_all_packs(self.user)['pack'] if c['type'] != 'legend']
-        self.assertEqual(len(cards), 6)
+        cards = [c for c in main.open_all_packs(self.user)['pack'] if c['type'] not in ('legend', 'reward')]
+        self.assertEqual(len(cards), 10)
         self.assertEqual(main.activities(self.user)['packs_waiting'], 0)
         with self.assertRaises(main.HTTPException):
             main.open_all_packs(self.user)

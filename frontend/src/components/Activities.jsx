@@ -51,7 +51,7 @@ export default function Activities() {
         key="packs"
         icon="📦"
         title={`Open your ${plural(acts.packs_waiting, 'pack')}`}
-        text="Earned with your right predictions. Each pack holds three cards of the game."
+        text="Earned with your right predictions."
         action={
           <button type="button" className="activity-button" disabled={busy} onClick={() => claim(api.openAllPacks)}>
             Open
@@ -80,8 +80,8 @@ export default function Activities() {
       <Activity
         key="daily"
         icon="🎁"
-        title="Your daily card is ready"
-        text="Three free base cards every day of the tournament, duplicates included."
+        title="Your daily pack is ready"
+        text="A free pack every day of the tournament."
         action={
           <button type="button" className="activity-button" disabled={busy} onClick={() => claim(api.dailyClaim)}>
             Claim
@@ -95,7 +95,7 @@ export default function Activities() {
         key="social"
         icon="📣"
         title={`Follow Spengler Cup on ${social.name}`}
-        text={`${social.cards} free base cards. A new channel every day.`}
+        text={'A free pack for following. A new channel every day.'}
         action={
           <button type="button" className="activity-button" disabled={busy} onClick={() => claim(api.bonusSocial)}>
             Follow
@@ -129,7 +129,7 @@ export default function Activities() {
       key="tickets"
       icon="🎟"
       title="Buy match tickets"
-      text={`${ticketInfo.cards_per_ticket} free cards for every ticket.`}
+      text={`${ticketInfo.packs_per_ticket} free packs for every ticket.`}
       action={
         <div className="activity-tickets">
           <button type="button" aria-label="Fewer tickets" disabled={tickets <= 1} onClick={() => setTickets(tickets - 1)}>

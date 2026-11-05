@@ -176,7 +176,7 @@ export default function Trade() {
 
       {totalCopies < cost ? (
         <p className="muted trade-empty">
-          You need at least {cost} base cards to trade. Claim your daily card to collect more.
+          You need at least {cost} base cards to trade. Open your daily pack to collect more.
         </p>
       ) : (
         <>

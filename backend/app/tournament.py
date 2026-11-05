@@ -13,7 +13,7 @@ PRE, POST = "pre", "post"
 WEEKDAYS = {"2025-12-26": "Fri", "2025-12-27": "Sat", "2025-12-28": "Sun", "2025-12-29": "Mon", "2025-12-30": "Tue",
             "2025-12-31": "Wed"}
 SHORT_STAGE = {"Quarterfinal": "Quarter-finals", "Semifinal": "Semi-finals", "Final": "Final"}
-PACK_CARDS = 3  # per prediction pack: every card is rolled like a trade-in
+PACK_CARDS = 5  # per prediction pack: every card is rolled like a trade-in
 SPECIAL_CHANCE = 0.1  # per base-only pack (starter, daily, social, tickets): the chance the last card is a special card
 FIRST_GOAL_CANDIDATES = 2  # per team, plus "someone else"
 OTHER = "other"

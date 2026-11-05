@@ -40,7 +40,7 @@ class WatchPackTests(unittest.TestCase):
         before = result['tournament']['packs_waiting']
         opened = main.open_all_packs(user)
         cards = [c for c in opened['pack'] if c['type'] != 'legend']
-        self.assertEqual(len(cards), before * 3)  # prediction packs and Ones to Watch packs both hold three cards
+        self.assertEqual(len(cards), before * 5)  # prediction packs and Ones to Watch packs both hold five cards
         self.assertEqual(main.tournament_view(user)['packs_waiting'], 0)
 
     def test_a_pack_for_each_point(self):
@@ -72,8 +72,8 @@ class WatchPackTests(unittest.TestCase):
         last_cards, special = 0, 0
         for _ in range(30):
             db.clear_cards(user['id'])
-            cards = main.bonus_tickets(main.TicketBonusRequest(tickets=20), user)['pack']
-            # Every 5-card pack ends with its own roll: 20 packs a purchase, 600 rolls over 30 purchases at 10% each.
+            cards = main.bonus_tickets(main.TicketBonusRequest(tickets=10), user)['pack']
+            # Every 5-card pack ends with its own roll: 2 packs a ticket, 20 packs a purchase, 600 rolls over 30 purchases at 10% each.
             last_cards += len(cards) // main.CARDS_PER_TICKET
             special += sum(c['type'] == 'special' or c.get('kind') == 'road'
                            for c in cards[main.CARDS_PER_TICKET - 1::main.CARDS_PER_TICKET])

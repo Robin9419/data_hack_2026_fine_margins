@@ -128,7 +128,7 @@ def open_pack(user: dict) -> list[dict]:
     return pack_entries(user, drawn, roads)
 
 
-DAILY_CARDS = 3
+DAILY_CARDS = 5
 
 
 def open_daily_card(user: dict) -> list[dict]:
@@ -154,8 +154,9 @@ def open_random_base_cards(user: dict, count: int, packs: int = 1) -> list[dict]
 # shop yet, so for the demo the claim is taken on trust.
 SOCIALS = [("instagram", "Instagram"), ("facebook", "Facebook"), ("tiktok", "TikTok"), ("youtube", "YouTube"),
            ("x", "X"), ("threads", "Threads"), ("whatsapp", "WhatsApp"), ("linkedin", "LinkedIn")]
-SOCIAL_CARDS = 3
-CARDS_PER_TICKET = 5
+SOCIAL_CARDS = 5
+CARDS_PER_TICKET = 5  # cards in one pack
+PACKS_PER_TICKET = 2
 
 
 class TicketBonusRequest(BaseModel):
@@ -178,8 +179,9 @@ def bonus_social(user: dict = Depends(current_user)):
 
 @app.post("/api/bonus/tickets")
 def bonus_tickets(body: TicketBonusRequest, user: dict = Depends(current_user)):
-    pack = open_random_base_cards(user, CARDS_PER_TICKET, body.tickets)
-    title = f'{body.tickets} {"ticket" if body.tickets == 1 else "tickets"}, {len(pack)} free cards'
+    pack = open_random_base_cards(user, CARDS_PER_TICKET, body.tickets * PACKS_PER_TICKET)
+    packs = body.tickets * PACKS_PER_TICKET
+    title = f'{body.tickets} {"ticket" if body.tickets == 1 else "tickets"}, {packs} free packs'
     return {"pack": pack + award_earned(user), "progress": progress_for(user), "title": title}
 
 
@@ -324,7 +326,7 @@ def daily_claim(user: dict = Depends(current_user)):
     if not db.claim_daily(user["id"], user["stage"]):
         raise HTTPException(409, "You already claimed today's card. Come back tomorrow!")
     return {"pack": open_daily_card(user) + award_earned(user), "progress": progress_for(user),
-            "title": "Your daily card"}
+            "title": "Your daily pack"}
 
 
 class TradeRequest(BaseModel):
@@ -589,7 +591,7 @@ def tournament_view(user: dict) -> dict:
 
 # Ones to Watch packs: owning a Road to Final card pays out a pack for each goal or assist its player has in a game.
 # The packs are drawn like the base-only packs (see open_random_base_cards).
-WATCH_PACK_CARDS = 3
+WATCH_PACK_CARDS = 5
 
 
 def watch_packs_of(game_id: str, watch: dict[str, dict[str, dict]]) -> list[dict]:
@@ -740,7 +742,7 @@ def activities(user: dict = Depends(current_user)):
                                for c in cards.values() if not c["claimed"]),
         "trivia": 0 if db.trivia_played(user["id"], stage) else len(trivia_cards(user, "home")),
         "trade": {"cost": TRADE_COST, "base_copies": base_copies},
-        "tickets": {"cards_per_ticket": CARDS_PER_TICKET},
+        "tickets": {"cards_per_ticket": CARDS_PER_TICKET, "packs_per_ticket": PACKS_PER_TICKET},
     }
 
 

@@ -31,16 +31,25 @@ const EARNED = {
   },
 }
 
+const PACK_SIZE = 5
+
 export default function PackOpening() {
   const location = useLocation()
   const all = location.state?.pack ?? []
   const main = all.filter((c) => c.type !== 'legend' && c.type !== 'reward')
+  // Every pack holds five cards: the drawn cards are opened five at a time.
+  const mainPacks = []
+  for (let i = 0; i < main.length; i += PACK_SIZE) mainPacks.push(main.slice(i, i + PACK_SIZE))
   const extras = [
     { kind: 'legend', cards: all.filter((c) => c.type === 'legend') },
     { kind: 'collector', cards: all.filter(isCollector) },
     { kind: 'context', cards: all.filter(isContext) },
   ].filter((e) => e.cards.length > 0)
-  const [step, setStep] = useState(main.length === 0 ? 0 : -1) // -1 is the main pack, then one step per extra pack
+  const steps = [
+    ...mainPacks.map((cards, i) => ({ kind: `main-${i}`, cards, index: i })),
+    ...extras,
+  ]
+  const [step, setStep] = useState(0)
   const [seenIds, setSeenIds] = useState([])
 
   if (!all.length) return <Navigate to="/" replace />
@@ -51,29 +60,24 @@ export default function PackOpening() {
     setStep((s) => s + 1)
   }
 
-  if (step >= 0) {
-    const extra = extras[step]
-    return (
-      <Pack
-        key={extra.kind}
-        pack={extra.cards}
-        title={EARNED[extra.kind].title}
-        fromTrade={fromTrade}
-        earned={EARNED[extra.kind]}
-        hasMore={step + 1 < extras.length}
-        onMore={advance}
-        previousNewIds={seenIds}
-      />
-    )
-  }
+  const current = steps[step]
+  const earned = EARNED[current.kind]
+  const baseTitle = location.state?.title
+  const title = earned
+    ? earned.title
+    : mainPacks.length > 1
+      ? `${baseTitle ?? 'Your packs'} · Pack ${current.index + 1} of ${mainPacks.length}`
+      : baseTitle
   return (
     <Pack
-      key="main"
-      pack={main}
-      title={location.state?.title}
+      key={current.kind}
+      pack={current.cards}
+      title={title}
       fromTrade={fromTrade}
-      hasMore={extras.length > 0}
+      earned={earned}
+      hasMore={step + 1 < steps.length}
       onMore={advance}
+      previousNewIds={seenIds}
     />
   )
 }

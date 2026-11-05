@@ -3,6 +3,8 @@ import { nationOf } from '../nations'
 import { teamOf, teamStyle } from '../teams'
 import CardIcon from './CardIcon'
 import PlayerPhoto from './PlayerPhoto'
+import { LEGEND_STYLE, legendYears } from '../legend'
+import LegendFrame from './LegendFrame'
 
 // Card kinds are described in docs/CARD_TYPES.md. Front of a card, identity only, no KPIs (they are on the back):
 //   base         photo, name, position, team
@@ -15,7 +17,7 @@ import PlayerPhoto from './PlayerPhoto'
 // state: 'owned' (full colour), 'locked' (gallery: grayed out photo only, no info) or 'hidden' (a mystery card in
 // a pack: no photo, name or archetype, so nothing leaks before it is revealed).
 // Editions: 'stadium' gets the foil frame; 'fullart', 'ice' and 'gold' are print finishes.
-// A legend has its own black-and-gold design with a black and white photo; a locked legend shows only its club.
+// Legends share the Midnight Signature design; a locked legend shows only its club.
 
 const FINISHES = ['fullart', 'ice', 'gold']
 const BASE_SYMBOL = '●' // the basic rarity: a lightly filled dot, no tier, no special
@@ -393,67 +395,40 @@ function ContextFace({ card }) {
 
 function LegendFace({ card, locked }) {
   const { player } = card
-  if (locked) {
-    return (
-      <div className="card-face legend locked-legend">
-        <span className="legend-star" aria-hidden="true">★</span>
-        <div className="card-info">
-          <p className="card-archetype">Club legend</p>
-          <p className="card-name">{player.team}</p>
-          <p className="card-meta">Collect the club's cards to unlock</p>
-        </div>
-      </div>
-    )
-  }
   const team = teamOf(player.team)
-  const nation = nationOf(card.legend?.nationality)
-  const pos = POS_SHORT[player.position]
-  const years = card.legend?.era?.match(/\d{4}(?:[–-]\d{2,4})?/)?.[0]
-  const star = (
-    <span className="card-tag-icon">
-      <CardIcon name="star" />
-    </span>
-  )
+  const years = legendYears(card.legend?.era)
+
   return (
-    <div className="card-face owned legend fa" style={{ ...teamStyle(player.team), '--tc': 'var(--s1)' }}>
-      <div className="card-inner">
-        <PlayerPhoto player={player} className="card-art" />
-        <div className="card-glitter" aria-hidden="true" />
-        <div className="card-tag">{star}</div>
-        <div className="card-corner">
-          {team.logo && (
-            <span className="card-logo">
-              <img src={team.logo} alt={team.name} style={team.logoScale ? { transform: `scale(${team.logoScale})` } : undefined} />
-            </span>
-          )}
-          {pos && <span className="card-pos">{pos}</span>}
+    <div className={`card-face legend legend-retro legend-variant-midnight ${locked ? 'locked-legend' : 'owned'}`} style={LEGEND_STYLE}>
+      <div className="legend-paper">
+        <div className="legend-retro-header">
+          <span className="legend-retro-stamp"><CardIcon name="star" />Legend</span>
+          {team.logo && <img className="legend-retro-logo" src={team.logo} alt={team.name} loading="lazy" />}
         </div>
-        <span className="card-sidelabel">Legend</span>
-        <div className="card-tag card-tag-end">{star}</div>
-        <div className="card-hname" style={{ '--nlen': player.last_name.length }}>
-          <small>
-            {player.jersey != null && <i>#{player.jersey} </i>}
-            {player.first_name}
-          </small>
-          <b>{player.last_name}</b>
-        </div>
-        {nation && (
-          <img className="card-flag card-hflag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={card.legend.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />
+        <span className="legend-edition-title">Hall of Fame</span>
+        {!locked && years && <span className="legend-front-years" title={card.legend.era}>{years}</span>}
+        {locked ? (
+          <div className="legend-retro-photo legend-retro-placeholder" aria-hidden="true"><CardIcon name="star" /></div>
+        ) : (
+          <div className="legend-retro-photo">
+            <PlayerPhoto player={player} className="legend-retro-portrait" />
+            <div className="legend-retro-halftone" aria-hidden="true" />
+          </div>
         )}
-        <div className="card-info">
-          {years && (
-            <p className="card-meta">
-              <span className="card-game">
-                <b>{years}</b>
-              </span>
+        <div className="legend-retro-stripes" aria-hidden="true" />
+          <div className="card-info legend-aligned-info">
+            <p className="card-name" style={{ '--nlen': locked ? team.name.length : player.last_name.length }}>
+              <span className="card-first">{locked ? 'Club legend' : player.first_name}</span>
+              {locked ? team.short || team.name : player.last_name}
             </p>
-          )}
-          <p className="card-foot">
-            <span className="card-rarity">★★★</span>
-            <CardIcon name="trophy" />
-          </p>
-        </div>
+            <p className="card-meta">
+              <span className="card-no"><span>{!locked && player.jersey != null ? <><small>#</small>{player.jersey}</> : '★'}</span></span>
+              <span className="card-team">{locked ? 'Collect to unlock' : team.name}</span>
+            </p>
+            <p className="card-foot"><span className="card-rarity">★★★</span><CardIcon name="trophy" /></p>
+          </div>
       </div>
+      <LegendFrame />
     </div>
   )
 }

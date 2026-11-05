@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useAuth } from './auth'
 import CardGuide from './components/CardGuide'
 import RewardBar from './components/RewardBar'
+import RewardUnlock from './components/RewardUnlock'
 import ResultsModal from './components/ResultsModal'
 import TimelineBar from './components/TimelineBar'
 import Admin from './pages/Admin'
@@ -113,6 +114,7 @@ export default function App() {
 
       <div className="app">
       <RewardBar />
+      <RewardUnlock />
 
       <main>
         <Routes>

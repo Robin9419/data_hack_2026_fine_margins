@@ -92,10 +92,10 @@ A reward for owning cards. The card shows the collection, not a performance. It 
 
 Players from earlier Spengler Cup years.
 
-- Photo in black and white with a gold tint, year of the cup win or best season in the footer instead of a match result, label "Legend".
-- No match rating. The back tells the story, with the tournament and years.
-- Needs: list of legends, archive photos with cleared rights, short facts per player.
-- Status: **mockup with placeholder**. No data in the repo yet.
+- Midnight Signature front with a fixed petrol-and-champagne palette, monochrome archive photo, readable team logo and the "Legend" / "Hall of Fame" labels. Uses the same 5:7 dimensions, shield silhouette and name placement as other cards. Full season years appear on the front.
+- No match rating. Clicking the card in its spotlight flips it to a matching archive-style back with position, nationality, era, a biography excerpt and two Spengler Cup achievements (or career honours when no Cup record exists).
+- The separate "Legend profile" link retains the full biography, honours and sources; excerpts on the card are deliberately shortened to fit.
+- Status: **in app**, with 18 legends from `backend/content/legends.json`. The back is implemented in `LegendBack.jsx`; photo credits and source links remain on the full profile.
 
 ### 7. Context card
 
@@ -159,3 +159,9 @@ Rainbow and a reverse foil were left out on purpose: too colourful next to team 
 - Legends: which players, photos and facts.
 - Sets and the Duo, Rivals and Coach cards need a set definition beyond "complete player".
 - Road to Final needs data from more games.
+
+### Legend design
+
+All legend cards use **Midnight Signature**, labelled **Hall of Fame**: a fixed petrol-and-champagne palette, a monochrome portrait and a continuous champagne shield outline on both sides. Team logos retain their original colours on a light badge for readability. The player name, metadata and footer follow the base-card layout, with the same card dimensions.
+
+The front shows the seasons from `legend.era`, with abbreviated end years expanded (for example, `2004–05, 2012–13` becomes `2004–2005 · 2012–2013`). Open-ended tenures retain their open end. The reverse contains the archive record and the spotlight supports flipping. The temporary design comparison page and alternative variants have been removed.

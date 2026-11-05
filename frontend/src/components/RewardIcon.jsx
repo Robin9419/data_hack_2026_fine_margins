@@ -1,6 +1,7 @@
 // A consistent outline style for the reward milestones, independent of platform emoji fonts.
 const ICONS = {
-  soda: <><path d="M6 7h12l-2 14H8L6 7Z" /><path d="m12 7 1-5h5M6 11h12" /></>,
+  keychain: <><circle cx="9" cy="6" r="4" /><path d="M9 10v3" /><path d="m9 12 7 2v7H7v-7l2-2Z" /><path d="m9 17 2 2 3-3" /></>,
+  'vip-raffle': <><path d="M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4V5Z" /><path d="m12 8 1.2 2.4 2.8.4-2 2 .5 2.7-2.5-1.3-2.5 1.3.5-2.7-2-2 2.8-.4L12 8Z" /></>,
   pizza: <><path d="M4 5a21 21 0 0 1 16 0L12 22 4 5Z" /><path d="M5.5 8a17 17 0 0 1 13 0" /><circle cx="10" cy="12" r="1" /><circle cx="14" cy="10.5" r="1" /><circle cx="12" cy="16" r="1" /></>,
   merch: <><path d="M3 3h8l10 10a2 2 0 0 1 0 3l-5 5a2 2 0 0 1-3 0L3 11V3Z" /><circle cx="7.5" cy="7.5" r="1" /><path d="m11 17 6-6" /><circle cx="11.5" cy="11.5" r=".7" /><circle cx="16.5" cy="16.5" r=".7" /></>,
   scarf: <><path d="M7 3h10v5H7zM8 8v12h5V8m0 0 4 11 4-2-4-9M8 20v2m2.5-2v2M13 20v2m4-3 1 2m1-3 1 2m1-3 1 2" /><path d="M8 12h5m-5 4h5" /></>,

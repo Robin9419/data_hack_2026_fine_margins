@@ -9,10 +9,10 @@
   "stadium_multiplier": 2,
   "rewards": [
     {
-      "id": "soda",
-      "title": "Free drink",
+      "id": "keychain",
+      "title": "Club keychain of your favorite team",
       "points": 50,
-      "icon": "🥤"
+      "icon": "🔑"
     },
     {
       "id": "pizza",
@@ -31,6 +31,12 @@
       "title": "Fan scarf of your favorite team",
       "points": 600,
       "icon": "🧣"
+    },
+    {
+      "id": "vip-raffle",
+      "title": "VIP ticket raffle entry for your favorite team",
+      "points": 900,
+      "icon": "🎟️"
     },
     {
       "id": "time-out",

@@ -961,6 +961,14 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 }
 
 /* Reward bar */
+.reward-unlock { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 32px 24px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(160deg, #13253d, #0a1426 80%); color: var(--text); text-align: center; box-shadow: var(--shadow); }
+.reward-unlock::backdrop { background: #020714bd; backdrop-filter: blur(6px); }
+.reward-unlock-icon { display: grid; place-items: center; width: 80px; height: 80px; margin: 0 auto 20px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); }
+.reward-unlock-icon .reward-icon { width: 42px; height: 42px; }
+.reward-unlock h2 { margin: 8px 0 16px; font-family: var(--display); font-size: 2rem; text-transform: uppercase; }
+.reward-unlock-name { font-size: 1.15rem; font-weight: 600; line-height: 1.5; }
+.reward-unlock button { margin-top: 16px; padding: 12px 24px; border-radius: 10px; color: var(--accent-ink); background: var(--accent); border: none; font: inherit; font-weight: 700; cursor: pointer; }
+.reward-unlock button:focus-visible { outline: 2px solid var(--text); outline-offset: 4px; }
 .reward-bar { position: relative; z-index: 30; margin: 28px 0; padding: 12px 16px 6px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); box-shadow: var(--shadow); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 .reward-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 0.9rem; }
 .reward-head span { color: var(--muted); }
@@ -1275,7 +1283,7 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
   .trade-slot.filled { animation: none; }
 }
 
-/* Club legends: the full art layout of the specials, in a white, icy design with a black and white photo. */
+/* Legacy legend reveal/detail effects; the card face uses the retro layout below. */
 .card-face.legend { --s1: #eaf4ff; --s2: #ffffff; --rar: #ffffff; --frame: linear-gradient(150deg, #ffffff, #9db2c6 28%, #f6fbff 50%, #8199b0 74%, #ffffff); }
 .card-face.legend .card-art img { filter: grayscale(1) contrast(1.12) brightness(1.02); }
 .card-face.legend .card-art::before { filter: blur(22px) grayscale(1) brightness(0.8); }
@@ -1290,6 +1298,61 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .card-face.legend.locked-legend .card-archetype { background: rgba(234, 244, 255, 0.18); color: #eaf4ff; }
 .card-face.legend.locked-legend .card-name { font-size: max(14px, 9cqw); color: rgba(234, 244, 255, 0.8); }
 .card-face.legend.locked-legend .card-meta { margin-top: 1.5cqw; font-size: max(9px, 4.2cqw); line-height: 1.3; white-space: normal; text-transform: none; letter-spacing: 0; }
+
+/* Retro hockey legends: the same card dimensions and shield silhouette as the rest of the set. */
+.card-face.legend.legend-retro {
+  --paper: #f2e7ce;
+  --retro-ink: #253343;
+  --retro-team: color-mix(in srgb, var(--c1) 78%, #786c54);
+  --retro-accent: color-mix(in srgb, var(--c2) 65%, #bba77b);
+  padding: 0;
+  color: var(--retro-ink);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px #c0ad88;
+}
+.card-face.legend.legend-retro::before, .card-face.legend.legend-retro::after { display: none; }
+.legend-paper { position: absolute; inset: 0; background: radial-gradient(ellipse at 45% 35%, #fff8e9, transparent 75%), var(--paper); }
+.legend-paper::after { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: .14; background: repeating-linear-gradient(0deg, transparent 0 2px, #8e77501a 2px 3px), radial-gradient(#66502f 0.45px, transparent 0.8px) 0 0 / 4px 4px; }
+.legend-retro-header { position: absolute; top: 7cqw; left: 8cqw; right: 8cqw; display: flex; justify-content: space-between; align-items: center; height: 12cqw; border-bottom: 1px solid #c6b48e; padding-bottom: 2cqw; }
+.legend-retro-stamp { display: inline-flex; align-items: center; gap: 2cqw; color: var(--retro-team); font-family: var(--display); font-size: 7cqw; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.legend-retro-stamp .card-icon { width: 6cqw; height: 6cqw; }
+.legend-retro-logo { width: 11cqw; height: 11cqw; object-fit: contain; filter: saturate(.65); }
+.legend-retro-photo { position: absolute; top: 22cqw; bottom: 42cqw; left: 8cqw; right: 8cqw; overflow: hidden; border: 1px solid #b29c78; background: #d6ccb5; }
+.legend-retro-portrait { position: absolute; inset: 0; display: grid; place-items: center; background: var(--photo) center / cover no-repeat; }
+.legend-retro-portrait img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; filter: grayscale(1) sepia(.2) contrast(.95); }
+.legend-retro-portrait span { font-family: var(--display); font-size: 30cqw; color: var(--retro-team); }
+.legend-retro-halftone { position: absolute; inset: 0; pointer-events: none; opacity: .16; mix-blend-mode: multiply; background: radial-gradient(#253343 .6px, transparent .9px) 0 0 / 3px 3px; }
+.legend-retro-placeholder { display: grid; place-items: center; background: repeating-linear-gradient(135deg, #e1d3b8 0 6px, #e9ddc4 6px 12px); }
+.legend-retro-placeholder .card-icon { width: 26cqw; height: 26cqw; color: var(--retro-team); opacity: .4; }
+.legend-retro-stripes { position: absolute; left: 8cqw; right: 8cqw; bottom: 38cqw; height: 3cqw; background: linear-gradient(to bottom, var(--retro-team) 0 45%, var(--paper) 45% 65%, var(--retro-accent) 65%); }
+.legend-retro-name { position: absolute; left: 8cqw; right: 8cqw; bottom: 20cqw; min-height: 17cqw; padding: 2cqw 3cqw; display: flex; flex-direction: column; justify-content: center; background: var(--retro-team); color: #fff5df; }
+.legend-retro-first { font-family: var(--body); font-size: 3.6cqw; line-height: 1.3; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.legend-retro-name strong { font-family: var(--display); font-size: min(11cqw, calc(130cqw / max(var(--nlen, 8), 1))); line-height: 1.05; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; }
+.legend-retro-caption { position: absolute; left: 8cqw; right: 8cqw; bottom: 13cqw; height: 6cqw; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6cqw; font-size: 3cqw; font-weight: 600; line-height: 1.15; letter-spacing: .035em; text-align: center; }
+.legend-retro-caption span:first-child { text-transform: uppercase; }
+.legend-retro-footer { position: absolute; bottom: 7.8cqw; left: 22cqw; right: 22cqw; display: flex; align-items: center; justify-content: center; gap: 2cqw; font-family: var(--display); font-size: 2.8cqw; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.legend-retro-footer .card-icon { width: 3cqw; height: 3cqw; }
+
+/* The reverse is a printed player record in the same paper, ink and team colours. */
+.spotlight-back.legend-back { padding: 0; display: block; }
+.legend-back-sheet { position: absolute; inset: 8cqw 8cqw 18cqw; display: flex; flex-direction: column; gap: 2.6cqw; overflow: hidden; }
+.legend-back-label { display: flex; align-items: center; gap: 2cqw; padding-bottom: 2cqw; border-bottom: 2px solid var(--retro-team); color: var(--retro-team); font-family: var(--display); font-size: 5cqw; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.legend-back-label .card-icon { width: 4cqw; height: 4cqw; }
+.legend-back-heading { display: flex; flex-direction: column; gap: .7cqw; }
+.legend-back-heading > span { font-size: 3.5cqw; letter-spacing: .08em; text-transform: uppercase; }
+.legend-back-heading > strong { font-family: var(--display); font-size: min(8cqw, calc(140cqw / max(var(--nlen, 8), 1))); line-height: 1; text-transform: uppercase; white-space: nowrap; }
+.legend-back-heading small { font-size: 3.4cqw; color: var(--retro-team); }
+.legend-back-facts { display: flex; flex-direction: column; border-top: 1px solid #c6b48e; }
+.legend-back-row { display: grid; grid-template-columns: 25% 1fr; gap: 2cqw; padding: 1.5cqw 0; border-bottom: 1px solid #c6b48e; font-size: 3.3cqw; line-height: 1.3; }
+.legend-back-row > span { font-weight: 500; }
+.legend-back-row > strong { font-weight: 600; overflow-wrap: anywhere; }
+.legend-back-section { display: flex; flex-direction: column; gap: 1.3cqw; }
+.legend-back-subtitle { color: var(--retro-team); font-family: var(--display); font-size: 4.1cqw; line-height: 1; letter-spacing: .08em; text-transform: uppercase; }
+.legend-back-summary { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-family: Georgia, 'Times New Roman', serif; font-size: 3.5cqw; line-height: 1.35; }
+.legend-back-honour { display: flex; align-items: flex-start; gap: 1.7cqw; font-size: 3.3cqw; line-height: 1.3; }
+.legend-back-honour .card-icon { flex: none; width: 2.8cqw; height: 2.8cqw; margin-top: .4cqw; color: var(--retro-team); }
+.legend-back-honour > span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.legend-back-footnote { position: absolute; bottom: 13cqw; left: 8cqw; right: 8cqw; padding-top: 1.5cqw; border-top: 1px solid #c6b48e; font-size: 2.8cqw; text-align: center; font-style: italic; }
 
 /* Legend in a pack or unlock: icy glow instead of the rainbow of a special card. */
 .pack-card.revealed.legend .card-face, .unlock.legend .unlock-flip .card-face { box-shadow: 0 0 0 2px #fff, 0 0 40px rgba(190, 225, 255, 0.8), 0 0 90px rgba(150, 200, 255, 0.4); }
@@ -1553,3 +1616,34 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
   .guide-outline { width: 48px; }
   .guide-type { gap: 12px; }
 }
+
+/* Midnight Signature: the shared Hall of Fame legend design. */
+.legend-edition-title { position: absolute; top: 19cqw; left: 8cqw; z-index: 3; font-weight: 700; text-transform: uppercase; }
+.legend-front-years { position: absolute; top: 19cqw; right: 8cqw; max-width: 59cqw; z-index: 3; color: #e9dec6; font-size: 3cqw; font-weight: 600; line-height: 1.3; text-align: right; }
+
+/* Modern gallery portrait, geometric light and restrained champagne details. */
+.card-face.legend.legend-variant-midnight { --paper: #081d24; --retro-ink: #f0ede2; --retro-team: #d5bd8d; --retro-accent: #3e8e96; --rar: #d5bd8d; --legend-frame-ink: #d5bd8d; background: #d5bd8d; }
+.legend-variant-midnight .legend-paper { inset: 2px; background: radial-gradient(ellipse at 70% 30%, #245360, #081d24 65%); -webkit-mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; }
+.legend-variant-midnight .legend-paper::after { opacity: 1; background: linear-gradient(115deg, transparent 60%, #b8e6e609 60% 61%, transparent 61% 71%, #b8e6e608 71% 72%, transparent 72%); }
+.legend-variant-midnight .legend-retro-header { top: 5cqw; border-color: #d5bd8d55; z-index: 2; }
+.legend-variant-midnight .legend-retro-stamp { font-size: 5.5cqw; letter-spacing: .18em; }
+.legend-variant-midnight .legend-retro-logo { filter: none; padding: 1cqw; border-radius: 2cqw; background: #f0ede2; border: 1px solid #d5bd8d; }
+.legend-variant-midnight .legend-edition-title { top: 19cqw; color: #8eb9bd; font-size: 2.5cqw; letter-spacing: .23em; }
+.legend-variant-midnight .legend-retro-photo { top: 25cqw; bottom: 0; left: 0; right: 0; border: none; background: #17414b; }
+.legend-variant-midnight .legend-retro-portrait img { filter: grayscale(1) contrast(1.08) brightness(.82); }
+.legend-variant-midnight .legend-retro-halftone { opacity: 1; mix-blend-mode: normal; background: linear-gradient(180deg, #081d2422, transparent 30%, #081d24bb 62%, #081d24 80%); }
+.legend-variant-midnight .legend-retro-stripes { top: 24cqw; bottom: auto; left: 8cqw; right: 8cqw; height: .45cqw; background: var(--retro-team); }
+.legend-variant-midnight .legend-retro-footer { bottom: 8cqw; color: #d5bd8d; }
+
+/* Matching reverse and base-card name/meta/footer placement. */
+.legend-back.legend-variant-midnight .legend-paper { background: var(--paper); }
+.legend-back.legend-variant-midnight .legend-back-row, .legend-back.legend-variant-midnight .legend-back-facts, .legend-back.legend-variant-midnight .legend-back-footnote { border-color: #d5bd8d44; }
+.legend-back.legend-variant-midnight .legend-back-summary { font-family: var(--body); }
+.legend-back.legend-variant-midnight .legend-back-heading > strong { color: #d5bd8d; }
+.legend-back.legend-variant-midnight .legend-back-footnote { bottom: 11cqw; }
+
+.legend-outline { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 6; color: var(--legend-frame-ink); pointer-events: none; }
+.legend-variant-midnight .legend-aligned-info { color: #f0ede2; }
+.legend-variant-midnight .legend-aligned-info .card-first { color: #d5bd8d; }
+.legend-aligned-info .card-team { overflow: hidden; text-overflow: ellipsis; }
+.card-face.legend.locked-legend .legend-aligned-info { bottom: 0; padding: 0 max(8px, 5.7cqw) max(5px, 3.4cqw); text-align: left; }

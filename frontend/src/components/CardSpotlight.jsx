@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { formatMatchDate, ordinal } from '../format'
 import { teamStyle } from '../teams'
 import CardFace, { accentOf } from './CardFace'
+import LegendBack from './LegendBack'
 
 const MAX_CLIPS = 3
 // Which moments best show off a card, best first. Shots and saves are ranked by xG within their tier.
@@ -39,14 +40,12 @@ export function pickClips(card) {
   return clips
 }
 
-// Pop-out view of an owned card. It opens on the back: the KPIs that earned a special card its archetype (next to
-// clips that show it), or the key facts of a base, legend or reward card. Links on to the player profile.
+// Pop-out view of an owned card. Specials and legends flip from their front to KPIs or a career archive.
 export default function CardSpotlight({ card, onClose, hideLink = false }) {
   const { pathname } = useLocation()
   const showLink = !hideLink && card.player?.last_name && (card.type === 'base' || card.type === 'special') && !pathname.startsWith('/players/')
   const [flipped, setFlipped] = useState(false)
-  // Only special cards have a back (their KPIs). Base, legend and reward cards show everything on the page.
-  const flippable = card.type === 'special'
+  const flippable = card.type === 'special' || card.type === 'legend'
   const profilePath = card.type === 'legend' || card.type === 'reward' ? `/cards/${card.id}/info` : null
   const [clipIndex, setClipIndex] = useState(0)
   const closeRef = useRef(null)
@@ -89,12 +88,13 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
                 className={`spotlight-card ${flipped ? 'flipped' : ''}`}
                 onClick={() => setFlipped(!flipped)}
                 aria-label={flipped ? 'Show the front of the card' : 'Show the back of the card'}
+                aria-pressed={flipped}
               >
                 <span className="spotlight-flip">
                   <span className="spotlight-front">
                     <CardFace card={card} />
                   </span>
-                  <CardBack card={card} />
+                  {card.type === 'legend' ? <LegendBack card={card} /> : <CardBack card={card} />}
                 </span>
               </button>
               <p className="spotlight-hint">Tap the card to flip it</p>

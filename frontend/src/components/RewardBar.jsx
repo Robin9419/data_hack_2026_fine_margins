@@ -11,7 +11,7 @@ export default function RewardBar() {
   const next = rewards.find((r) => !r.reached)
 
   return (
-    <div className="reward-bar" aria-label="Reward progress">
+    <div className="reward-bar" aria-label="Reward progress" data-tour="rewards">
       <div className="reward-head">
         <strong>{points} pts</strong>
         <span className="reward-next">

@@ -1,4 +1,4 @@
-import { Link, Navigate, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { api } from './api'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from './auth'
@@ -7,6 +7,7 @@ import RewardBar from './components/RewardBar'
 import RewardUnlock from './components/RewardUnlock'
 import ResultsModal from './components/ResultsModal'
 import TimelineBar from './components/TimelineBar'
+import Tour, { markTourPending, startTour } from './components/Tour'
 import Admin from './pages/Admin'
 import CardDetail from './pages/CardDetail'
 import Gallery from './pages/Gallery'
@@ -40,6 +41,7 @@ function CardRedirect() {
 export default function App() {
   const { user, logout } = useAuth()
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const inAdmin = pathname.startsWith('/admin')
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
@@ -73,18 +75,21 @@ export default function App() {
           {user && (
             <nav className="appnav" aria-label="Main">
               <NavLink to="/" end>Home</NavLink>
-              <NavLink to="/collection">Collection</NavLink>
-              <NavLink to="/quiz">Quiz</NavLink>
-              <NavLink to="/predict">Predictions</NavLink>
-              <NavLink to="/trade">Trade</NavLink>
+              <NavLink to="/collection" data-tour="nav-collection">Collection</NavLink>
+              <NavLink to="/quiz" data-tour="nav-quiz">Quiz</NavLink>
+              <NavLink to="/predict" data-tour="nav-predict">Predictions</NavLink>
+              <NavLink to="/trade" data-tour="nav-trade">Trade</NavLink>
             </nav>
           )}
           {user && (
             <div className="topbar-user">
-              <CardGuide />
+              <span data-tour="guide" className="tour-anchor">
+                <CardGuide />
+              </span>
               <button
                 type="button"
                 className="menu-button"
+                data-tour="menu"
                 aria-label="Menu"
                 aria-expanded={menuOpen}
                 aria-controls="user-menu"
@@ -102,6 +107,21 @@ export default function App() {
                   ) : (
                     <Link to="/admin" className="admin-link">Admin</Link>
                   )}
+                  <button
+                    type="button"
+                    className="link-button"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      // The tour runs on Home: start it there, or go Home and let it start on arrival.
+                      if (pathname === '/') startTour()
+                      else {
+                        markTourPending(user.username)
+                        navigate('/')
+                      }
+                    }}
+                  >
+                    Take the tour
+                  </button>
                   <button className="link-button" onClick={logout}>
                     Sign out
                   </button>
@@ -213,6 +233,7 @@ export default function App() {
 
       {user && <TimelineBar />}
       {user && <ResultsModal />}
+      {user && <Tour />}
       </div>
     </>
   )

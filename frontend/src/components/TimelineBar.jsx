@@ -10,7 +10,7 @@ export default function TimelineBar() {
   const current = stops.findIndex((s) => s.state === 'current')
 
   return (
-    <nav className="timeline" aria-label="Tournament timeline">
+    <nav className="timeline" aria-label="Tournament timeline" data-tour="timeline">
       <div className="timeline-inner">
         <span className="timeline-title">
           Spengler Cup 2025

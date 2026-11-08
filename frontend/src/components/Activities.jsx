@@ -195,7 +195,7 @@ export default function Activities() {
   )
 
   return (
-    <section className="activities" aria-labelledby="activities-title">
+    <section className="activities" aria-labelledby="activities-title" data-tour="activities">
       <div className="section-header">
         <h1 id="activities-title">Activities</h1>
         <span className="muted">

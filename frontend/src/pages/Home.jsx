@@ -95,7 +95,7 @@ export default function Home() {
 
       <Activities />
 
-      <div className="home-highlights">
+      <div className="home-highlights" data-tour="highlights">
         <div className="section-header">
           <h1>Your Collection Highlights</h1>
           <div className="home-collection-link">

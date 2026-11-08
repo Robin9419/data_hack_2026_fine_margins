@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { api, clearToken, getToken, setToken } from './api'
+import { markTourPending } from './components/Tour'
 
 const AuthContext = createContext(null)
 
@@ -25,6 +26,8 @@ export function AuthProvider({ children }) {
   const login = async (username, favoriteTeam) => {
     const data = await api.login(username, favoriteTeam)
     setToken(data.token)
+    // Only a brand new account gets a starter pack: show it the tour once it reaches Home.
+    if (data.pack) markTourPending(data.user.username)
     setUser(data.user)
     api.me().then((me) => setProgress(me.progress))
     return data

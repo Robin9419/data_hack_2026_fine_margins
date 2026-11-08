@@ -130,7 +130,7 @@ function LockedReward({ card }) {
   )
 }
 
-export default function CardFace({ card, state = 'owned', nameLayout = 'vertical' }) {
+export default function CardFace({ card, state = 'owned' }) {
   if (card.type === 'legend' && state !== 'hidden') return <LegendFace card={card} locked={state === 'locked'} />
 
   if (state === 'locked') {
@@ -169,14 +169,11 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
   const archetype = perf
     ? { icon: PERFORMANCE_ICON[card.special_type] ?? 'star', color: PERFORMANCE_COLOR[card.special_type] ?? '#ffd76a' }
     : (ARCHETYPES[card.title] ?? { icon: 'star', color: '#ffd76a' })
-  const sideText = champion ? 'Champion' : card.title
-  const vertical = dark && nameLayout !== 'horizontal'
   const classes = [
     'card-face',
     'owned',
     impact ? (profileLook ? 'profile' : 'performance') : kind,
     dark ? 'fa' : '',
-    dark && !vertical ? 'hname' : '',
     kind === 'collector' ? 'tier-gold' : '',
     perf && stadium ? `special-${card.special_type}` : '',
     champion ? 'performance special-champion' : '',
@@ -199,7 +196,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
   // The tag (archetype etc.): an icon in the top left corner and its name as a line above the player name.
   const tag =
     dark
-      ? { icon: champion ? 'trophy' : archetype.icon, color: 'var(--s1)', line: false }
+      ? { icon: champion ? 'trophy' : archetype.icon, color: 'var(--s1)', label: champion ? 'Ones to Watch' : card.title }
       : profileLook
       ? { icon: archetype.icon, color: IMPACT_PROFILE, label: card.title }
       : road
@@ -214,7 +211,7 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
         ...(tag ? { '--tc': tag.color } : {}),
         ...(dark && impact ? { '--s1': IMPACT_STADIUM, '--s2': '#fff' } : {}),
       }}>
-      <div className="card-inner" style={dark ? { '--llen': sideText.length } : undefined}>
+      <div className="card-inner">
         <PlayerPhoto player={player} className="card-art" />
         {dark && player.action_video_url && (
           <video className="card-action" src={player.action_video_url} poster={player.action_image_url ?? undefined} autoPlay loop muted playsInline />
@@ -240,38 +237,6 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
           )}
           {pos && <span className="card-pos">{pos}</span>}
         </div>
-        {dark && (
-          <span className="card-sidelabel">{sideText}</span>
-        )}
-        {dark && tag && (
-          <div className="card-tag card-tag-end" style={{ '--tc': tag.color }}>
-            <span className="card-tag-icon">
-              <CardIcon name={tag.icon} />
-            </span>
-          </div>
-        )}
-        {dark && !vertical && (
-          <div className="card-hname" style={{ '--nlen': player.last_name.length }}>
-            <small>
-              <i>#{player.jersey}</i> {player.first_name}
-            </small>
-            <b>{player.last_name}</b>
-          </div>
-        )}
-        {dark && !vertical && nation && (
-          <img className="card-flag card-hflag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />
-        )}
-        {vertical && (
-          <div className="card-vname">
-            {nation && <img className="card-flag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />}
-            <span className="card-vtext" style={{ '--nlen': player.last_name.length }}>
-              <b>{player.last_name}</b>
-              <small>
-                <i>#{player.jersey}</i> {player.first_name}
-              </small>
-            </span>
-          </div>
-        )}
 
         <div className="card-info">
           {tag && tag.line !== false && (
@@ -280,19 +245,19 @@ export default function CardFace({ card, state = 'owned', nameLayout = 'vertical
               {tag.label}
             </p>
           )}
-          {!dark && (
+          {(
             <p className="card-name" style={{ '--nlen': player.last_name.length }}>
               <span className="card-first">
-                {profileLook && <i>#{player.jersey} </i>}
+                {impact && <i>#{player.jersey} </i>}
                 {player.first_name}
               </span>
               {player.last_name}
               {nation && <img className="card-flag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />}
             </p>
           )}
-          {(!(dark || profileLook) || game) && (
+          {(!impact || game) && (
             <p className="card-meta">
-              {!dark && !profileLook && (
+              {!impact && (
                 <span className="card-no">
                   <span>
                     <small>#</small>

@@ -876,7 +876,7 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 /* The shading sits above the action photo (z 1) and below all text (z 2+). The right strip carries the side label. */
 .card-face.fa .card-inner::after { z-index: 1; background: linear-gradient(270deg, rgba(0, 0, 0, 0.5), transparent 26%), linear-gradient(90deg, rgba(0, 0, 0, 0.6), transparent 34%), linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, transparent 16%, transparent 66%, rgba(1, 2, 4, 0.65) 82%, rgba(1, 2, 4, 0.92) 100%); }
 .card-face.fa .card-tag, .card-face.fa .card-corner, .card-face.fa .card-sidelabel { z-index: 2; }
-.card-face.fa .card-info { --pr: max(8px, 5.7cqw); z-index: 3; text-align: center; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 14px rgba(0, 0, 0, 0.85); }
+.card-face.fa .card-info { --pr: max(8px, 5.7cqw); z-index: 3; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 14px rgba(0, 0, 0, 0.85); }
 /* The name runs up the left edge, surname big; the match sits small above the stars in the point. */
 /* The same badge as top left, under the label on the right. */
 .card-tag-end { left: auto; top: auto; right: max(8px, 7cqw); bottom: 19cqw; }
@@ -887,7 +887,6 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .card-vtext small { position: absolute; top: 0; left: 100%; margin-left: 0.8cqw; font-size: max(8px, 3.6cqw); font-weight: 700; letter-spacing: 0.14em; white-space: nowrap; }
 .card-vtext small i { font-style: normal; font-weight: 800; color: var(--s1); }
 .card-vtext b { display: block; font-family: var(--display); font-size: max(18px, min(14cqw, calc(86cqw / (var(--nlen, 8) * 0.5)))); font-weight: 800; letter-spacing: 0.02em; white-space: nowrap; }
-.card-face.fa .card-meta { justify-content: center; margin: 0; }
 .card-face.fa .card-game { padding-right: max(4px, 2cqw); }
 .card-face.fa .card-game b { font-size: max(8px, 3.8cqw); }
 .card-face.fa .card-gl { width: max(11px, 5cqw); }
@@ -907,6 +906,9 @@ a.card-tile:hover, button.card-tile:hover { box-shadow: none; filter: drop-shado
 .card-face.fa .card-corner { filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.7)); }
 @keyframes fa-drift { from { transform: scale(1); } to { transform: scale(1.07) translate(-1%, -1.5%); } }
 @media (prefers-reduced-motion: reduce) { .card-face.fa .card-art img { animation: none; } }
+/* Ones to Watch (and the Champion): the yellow of the front outline is the card background. */
+.card-face { --road-bg: radial-gradient(120% 70% at 50% 0%, rgba(255, 244, 205, 0.55), transparent 60%), linear-gradient(170deg, #e2bd63 0%, #c19634 48%, #8a6420 100%); }
+.card-face.road .card-inner { background: var(--road-bg); }
 .card-glitter {
   position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: screen; opacity: 0.55;
   background-image:
@@ -1146,6 +1148,9 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .spotlight-back.card-face { box-shadow: none; }
 /* The border follows the shield outline (an inset box-shadow would be cut off by the mask on the chamfers and curves) */
 .spotlight-back::after { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--c2) 55%, transparent); pointer-events: none; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M13 0H87L100 11V121Q100 127 92 129L56 138Q50 140 44 138L8 129Q0 127 0 121V11Z' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M13 0H87L100 11V121Q100 127 92 129L56 138Q50 140 44 138L8 129Q0 127 0 121V11Z' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+.spotlight-back.road-back { background: var(--road-bg); color: #2a1d00; }
+.spotlight-back.road-back .back-kpi { background: rgba(255, 244, 205, 0.28); box-shadow: inset 0 0 0 1px rgba(42, 29, 0, 0.25); }
+.spotlight-back.road-back .back-kpi.top { box-shadow: inset 0 0 0 2px #2a1d00; }
 .back-title { align-self: center; padding: 6px 18px; border-radius: 999px; background: var(--c2); color: var(--c1); font-size: 1.15rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; }
 .spotlight-back.compact { box-sizing: border-box; justify-content: flex-start; align-items: stretch; gap: 4cqw; padding: 9cqw 8cqw 22cqw; overflow: hidden; }
 .spotlight-back.compact .back-title { align-self: center; max-width: 100%; padding: 1.2cqw 5cqw; font-size: max(0.7rem, 5cqw); box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

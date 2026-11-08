@@ -249,8 +249,10 @@ function CardBack({ card }) {
   const accent = accentOf(card)
   const impact = ['profile', 'performance'].includes(card.kind ?? 'profile')
   const tint = impact ? { '--c1': `color-mix(in srgb, ${accent} 38%, #0a0612)` } : {}
+  // Ones to Watch: the same yellow as the outline on the front, whatever the team.
+  const road = card.kind === 'road'
   return (
-    <span className="spotlight-back card-face" style={{ ...style, ...tint, '--c2': accent }}>
+    <span className={`spotlight-back card-face${road ? ' road-back' : ''}`} style={{ ...style, ...tint, '--c2': road ? '#2a1d00' : accent, ...(road ? { '--c1': '#ffd76a' } : {}) }}>
       <span className="back-title">{card.title}</span>
       <span className="back-kpis">
         {kpisOf(card).map((kpi) => (

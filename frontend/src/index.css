@@ -1613,9 +1613,14 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .guide-outline-rarity { position: absolute; left: 0; right: 0; bottom: 7%; text-align: center; font-size: 7px; line-height: 1; color: var(--gc); }
 .guide-awards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; padding: 0 0 16px; }
 .guide-award-group h4 { margin: 0 0 6px; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: #b98bff; }
-.guide-award-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.guide-award-group li { display: flex; gap: 8px; align-items: flex-start; font-size: 0.82rem; line-height: 1.35; color: var(--muted); }
-.guide-award-group li b { color: var(--text); font-weight: 600; }
+.guide-award-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.guide-award { display: flex; gap: 8px; align-items: flex-start; width: 100%; margin: 0 -6px; padding: 5px 6px; border: 0; border-radius: 8px; background: none; color: var(--muted); font: inherit; font-size: 0.82rem; line-height: 1.35; text-align: left; cursor: pointer; box-sizing: content-box; transition: background 120ms; }
+.guide-award:hover { background: var(--surface-2); }
+.guide-award:focus-visible { outline: 2px solid #b98bff; outline-offset: 0; }
+.guide-award > span:nth-child(2) { flex: 1; min-width: 0; }
+.guide-award-more { flex: none; color: #b98bff; font-size: 1.1rem; line-height: 1; opacity: 0.6; }
+.guide-award:hover .guide-award-more { opacity: 1; }
+.guide-award b { color: var(--text); font-weight: 600; }
 .guide-award-icon { flex: none; width: 18px; height: 18px; display: grid; place-items: center; margin-top: 1px; border-radius: 50%; background: color-mix(in srgb, #b98bff 22%, transparent); color: #b98bff; }
 .guide-award-icon .card-icon { width: 11px; height: 11px; }
 .guide-points { margin: 0; padding-top: 14px; border-top: 1px solid var(--line); }
@@ -1658,3 +1663,16 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .legend-variant-midnight .legend-aligned-info .card-first { color: #d5bd8d; }
 .legend-aligned-info .card-team { overflow: hidden; text-overflow: ellipsis; }
 .card-face.legend.locked-legend .legend-aligned-info { bottom: 0; padding: 0 max(8px, 5.7cqw) max(5px, 3.4cqw); text-align: left; }
+
+/* Card guide: pop-up with one award's KPIs explained */
+.results-overlay.guide-detail-overlay { z-index: 1110; }
+.guide-detail { max-width: 460px; }
+.guide-detail-kicker { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #b98bff; }
+.guide-detail-about { margin: 0; font-size: 0.95rem; line-height: 1.45; }
+.guide-detail-head { margin: 18px 0 8px; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+.guide-kpis { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: kpi; }
+.guide-kpis li { position: relative; display: grid; gap: 2px; padding: 10px 12px 10px 42px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--line); counter-increment: kpi; }
+.guide-kpis li::before { content: counter(kpi); position: absolute; left: 12px; top: 10px; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, #b98bff 22%, transparent); color: #b98bff; font-size: 0.75rem; font-weight: 800; }
+.guide-kpis b { font-weight: 600; }
+.guide-kpis span { font-size: 0.85rem; line-height: 1.45; color: var(--muted); }
+.guide-detail-note { margin: 12px 0 0; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--info-bg); border: 1px solid var(--info-line); font-size: 0.82rem; line-height: 1.45; }

@@ -103,8 +103,12 @@ export const accentOf = (card) =>
 
 // The big club logo that stands in for a photo on a collector card.
 function ClubLogo({ team }) {
-  const { logo, name } = teamOf(team)
-  return <div className="card-art club-art">{logo && <img src={logo} alt={name} />}</div>
+  const { logo, name, logoScale } = teamOf(team)
+  return (
+    <div className="card-art club-art">
+      {logo && <img src={logo} alt={name} style={logoScale ? { transform: `scale(${logoScale})` } : undefined} />}
+    </div>
+  )
 }
 
 function LockedReward({ card }) {
@@ -345,7 +349,7 @@ function CollectorFace({ card }) {
         <div className="card-info">
           <p className="card-tagline" style={{ '--tc': '#ffd76a' }}>
             <CardIcon name="gift" />
-            Collector · {card.requires.length}/{card.requires.length}
+            Collector
           </p>
           <p className="card-name">{card.title}</p>
           <p className="card-foot">

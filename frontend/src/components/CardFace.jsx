@@ -3,7 +3,7 @@ import { nationOf } from '../nations'
 import { teamOf, teamStyle } from '../teams'
 import CardIcon from './CardIcon'
 import PlayerPhoto from './PlayerPhoto'
-import { LEGEND_STYLE, legendYears } from '../legend'
+import { LEGEND_STYLE } from '../legend'
 import LegendFrame from './LegendFrame'
 
 // Card kinds are described in docs/CARD_TYPES.md. Front of a card, identity only, no KPIs (they are on the back):
@@ -365,17 +365,18 @@ function ContextFace({ card }) {
 function LegendFace({ card, locked }) {
   const { player } = card
   const team = teamOf(player.team)
-  const years = legendYears(card.legend?.era)
 
   return (
     <div className={`card-face legend legend-retro legend-variant-midnight ${locked ? 'locked-legend' : 'owned'}`} style={LEGEND_STYLE}>
       <div className="legend-paper">
         <div className="legend-retro-header">
           <span className="legend-retro-stamp"><CardIcon name="star" />Legend</span>
-          {team.logo && <img className="legend-retro-logo" src={team.logo} alt={team.name} loading="lazy" />}
+          {team.logo && (
+            <span className="card-logo">
+              <img src={team.logo} alt={team.name} loading="lazy" style={team.logoScale ? { transform: `scale(${team.logoScale})` } : undefined} />
+            </span>
+          )}
         </div>
-        <span className="legend-edition-title">Hall of Fame</span>
-        {!locked && years && <span className="legend-front-years" title={card.legend.era}>{years}</span>}
         {locked ? (
           <div className="legend-retro-photo legend-retro-placeholder" aria-hidden="true"><CardIcon name="star" /></div>
         ) : (
@@ -397,7 +398,7 @@ function LegendFace({ card, locked }) {
             <p className="card-foot"><span className="card-rarity">★★★</span><CardIcon name="trophy" /></p>
           </div>
       </div>
-      <LegendFrame />
+      <LegendFrame glint={!locked} />
     </div>
   )
 }

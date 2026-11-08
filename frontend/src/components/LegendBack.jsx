@@ -1,11 +1,11 @@
 import CardIcon from './CardIcon'
-import { LEGEND_STYLE, legendYears } from '../legend'
+import { LEGEND_STYLE } from '../legend'
 import LegendFrame from './LegendFrame'
 
 // A compact archive record; the legend profile retains the complete biography and sources.
 export default function LegendBack({ card }) {
   const { player, legend = {} } = card
-  const facts = [['Position', player.position], ['Nationality', legend.nationality], ['Era', legendYears(legend.era)]]
+  const facts = [['Position', player.position], ['Nationality', legend.nationality]]
     .filter(([, value]) => value)
   const cupHonours = legend.spengler_cup ?? []
   const honours = (cupHonours.length ? cupHonours : legend.honours ?? []).slice(0, 2)
@@ -45,7 +45,7 @@ export default function LegendBack({ card }) {
         <span className="legend-back-footnote">Full record in the legend profile</span>
         <span className="legend-retro-footer"><span>Spengler Cup</span><CardIcon name="star" /><span>Club legends</span></span>
       </span>
-      <LegendFrame />
+      <LegendFrame glint={false} />
     </span>
   )
 }

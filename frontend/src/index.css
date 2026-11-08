@@ -1630,14 +1630,13 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .card-face.legend.legend-variant-midnight { --paper: #081d24; --retro-ink: #f0ede2; --retro-team: #d5bd8d; --retro-accent: #3e8e96; --rar: #d5bd8d; --legend-frame-ink: #d5bd8d; background: #d5bd8d; }
 .legend-variant-midnight .legend-paper { inset: 2px; background: radial-gradient(ellipse at 70% 30%, #245360, #081d24 65%); -webkit-mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; mask: var(--shape-shield) 0 0 / 100% 100% no-repeat; }
 .legend-variant-midnight .legend-paper::after { opacity: 1; background: linear-gradient(115deg, transparent 60%, #b8e6e609 60% 61%, transparent 61% 71%, #b8e6e608 71% 72%, transparent 72%); }
-.legend-variant-midnight .legend-retro-header { top: 5cqw; border-color: #d5bd8d55; z-index: 2; }
+.legend-variant-midnight .legend-retro-header { top: 6cqw; left: 10cqw; right: 9.5cqw; border-bottom: 0; z-index: 2; }
 .legend-variant-midnight .legend-retro-stamp { font-size: 5.5cqw; letter-spacing: .18em; }
-.legend-variant-midnight .legend-retro-logo { filter: none; padding: 1cqw; border-radius: 2cqw; background: #f0ede2; border: 1px solid #d5bd8d; }
 .legend-variant-midnight .legend-edition-title { top: 19cqw; color: #8eb9bd; font-size: 2.5cqw; letter-spacing: .23em; }
 .legend-variant-midnight .legend-retro-photo { top: 25cqw; bottom: 0; left: 0; right: 0; border: none; background: #17414b; }
 .legend-variant-midnight .legend-retro-portrait img { filter: grayscale(1) contrast(1.08) brightness(.82); }
 .legend-variant-midnight .legend-retro-halftone { opacity: 1; mix-blend-mode: normal; background: linear-gradient(180deg, #081d2422, transparent 30%, #081d24bb 62%, #081d24 80%); }
-.legend-variant-midnight .legend-retro-stripes { top: 24cqw; bottom: auto; left: 8cqw; right: 8cqw; height: .45cqw; background: var(--retro-team); }
+.legend-variant-midnight .legend-retro-stripes { top: 19.5cqw; bottom: auto; left: 8cqw; right: 8cqw; height: .45cqw; background: var(--retro-team); }
 .legend-variant-midnight .legend-retro-footer { bottom: 8cqw; color: #d5bd8d; }
 
 /* Matching reverse and base-card name/meta/footer placement. */
@@ -1647,8 +1646,12 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .legend-back.legend-variant-midnight .legend-back-heading > strong { color: #d5bd8d; }
 .legend-back.legend-variant-midnight .legend-back-footnote { bottom: 11cqw; }
 
-.legend-outline { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 6; color: var(--legend-frame-ink); pointer-events: none; }
-.legend-variant-midnight .legend-aligned-info { color: #f0ede2; }
+.legend-outline { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 6; color: var(--legend-frame-ink); pointer-events: none; filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, .55)); }
+/* A spark of light that runs around the rim of the frame. */
+.legend-glint { stroke-dasharray: 5 95; stroke-dashoffset: 100; opacity: .75; filter: blur(.35px); animation: legend-glint 3.5s ease-in-out 0.4s 1 both; }
+@keyframes legend-glint { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .legend-glint { display: none; } }
+.legend-variant-midnight .legend-aligned-info { color: #f0ede2; padding-left: 8cqw; padding-right: 8cqw; }
 .legend-variant-midnight .legend-aligned-info .card-first { color: #d5bd8d; }
 .legend-aligned-info .card-team { overflow: hidden; text-overflow: ellipsis; }
 .card-face.legend.locked-legend .legend-aligned-info { bottom: 0; padding: 0 max(8px, 5.7cqw) max(5px, 3.4cqw); text-align: left; }

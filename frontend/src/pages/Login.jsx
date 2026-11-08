@@ -5,16 +5,11 @@ import { useAuth } from '../auth'
 import { TEAMS } from '../teams'
 
 
-const STEPS = [
-  { icon: '🎁', title: 'Open your starter pack', text: 'A free pack to begin: the players, the clubs and the legends of the Spengler Cup.' },
-  { icon: '🔮', title: 'Call the games', text: 'Before every gameday, predict the winner, the first goal and a key stat. Right calls earn you packs.' },
-  { icon: '🧠', title: 'Play the trivia', text: 'Clues from the games already played, from who scored to who stood tall. Each right answer unlocks a card.' },
-  { icon: '🏆', title: 'Collect all week', text: 'Come back every day for a free pack, trade spares for new finds and climb the reward bar. Win Stadium editions when you are at the rink.' },
-]
-
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const [mode, setMode] = useState('signup')
+  const signingUp = mode === 'signup'
   const [username, setUsername] = useState('')
   const [favorite, setFavorite] = useState(null)
   // team name -> number of cards the set has for that club
@@ -37,7 +32,7 @@ export default function Login() {
     setSubmitting(true)
     setError(null)
     try {
-      const data = await login(username.trim(), favorite)
+      const data = await login(username.trim(), signingUp ? favorite : null)
       // Only a brand new account gets a starter pack.
       if (data.pack) navigate('/pack', { state: { pack: data.pack } })
       else navigate('/')
@@ -48,29 +43,38 @@ export default function Login() {
   }
 
   return (
-    <div className="landing">
-      <section className="hero">
-        <div className="hero-glow" aria-hidden="true" />
+    <>
+      <div className="home-ghost" aria-hidden="true">
+        <h1>Your Collection Highlights</h1>
+        <div className="card-grid home-row">
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} className={`hero-card ${i % 2 ? 'team-usc' : 'team-hcd'}`}>?</span>
+          ))}
+        </div>
+        <h2 className="home-subtitle">Latest Performances</h2>
+        <div className="card-grid home-row">
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} className={`hero-card ${i % 2 ? 'team-hcd' : 'team-usc'}`}>?</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="auth-overlay">
+      <section className="signup q-card auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
         <p className="hero-eyebrow">Spengler Cup · Davos · 26–31 December</p>
-        <h1>
-          Your Spengler Cup,
-          <br />
-          one card at a time.
+        <h1 className="auth-hero">
+          Your Spengler Cup, one card at a time.
         </h1>
-        <p className="hero-lead">
+        <p className="muted auth-lead">
           The world’s oldest invitational hockey tournament, in your pocket. Collect the players and legends of every
           club, predict the games, test yourself with trivia and watch your collection grow with each day of the
           tournament.
         </p>
-        <div className="hero-cards" aria-hidden="true">
-          <span className="hero-card hc-1 team-hcd">?</span>
-          <span className="hero-card hc-2 team-usc">?</span>
-          <span className="hero-card hc-3 team-hcd">?</span>
+        <div className="auth-tabs" role="tablist">
+          <button type="button" role="tab" aria-selected={signingUp} className={signingUp ? 'active' : ''} onClick={() => { setMode('signup'); setError(null) }}>Sign up</button>
+          <button type="button" role="tab" aria-selected={!signingUp} className={!signingUp ? 'active' : ''} onClick={() => { setMode('login'); setError(null) }}>Log in</button>
         </div>
-      </section>
-
-      <section className="signup q-card">
-        <h2>Start your collection</h2>
+        <h2 id="auth-title" className="auth-title">{signingUp ? 'Start your collection' : 'Welcome back'}</h2>
         <form onSubmit={onSubmit} className="login-form">
           <label htmlFor="username">Username</label>
           <input
@@ -82,7 +86,7 @@ export default function Login() {
             autoFocus
           />
 
-          <fieldset className="team-picker">
+          {signingUp && <fieldset className="team-picker">
             <legend>
               Favorite team <span className="muted">(optional)</span>
             </legend>
@@ -109,29 +113,18 @@ export default function Login() {
               {favorite && !noCards && `Your free pack will include at least one ${favorite} card.`}
               {noCards && `${favorite} has no cards from this match yet, so your pack will be a surprise.`}
             </p>
-          </fieldset>
+          </fieldset>}
 
           <button type="submit" className="cta" disabled={submitting || !username.trim()}>
-            {submitting ? 'Opening…' : 'Open my free pack'}
+            {submitting ? (signingUp ? 'Opening…' : 'Logging in…') : signingUp ? 'Open my free pack' : 'Log in'}
           </button>
           {error && <p className="error">{error}</p>}
         </form>
         <p className="muted small">
-          Demo sign-in: no passwords and no real accounts. Use an existing name to pick up where you left off.
+          Demo sign-in: no passwords and no real accounts. Log in with an existing name to pick up where you left off.
         </p>
       </section>
-
-      <section className="steps">
-        {STEPS.map((s, i) => (
-          <div className="step" key={s.title}>
-            <span className="step-icon">{s.icon}</span>
-            <h3>
-              {i + 1}. {s.title}
-            </h3>
-            <p className="muted">{s.text}</p>
-          </div>
-        ))}
-      </section>
-    </div>
+      </div>
+    </>
   )
 }

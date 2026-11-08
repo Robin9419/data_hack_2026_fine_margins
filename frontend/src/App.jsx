@@ -22,7 +22,7 @@ import Trade from './pages/Trade'
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <p className="muted">Loading…</p>
-  return user ? children : <Navigate to="/login" replace />
+  return user ? children : <Navigate to="/" replace />
 }
 
 // Old card page: a card now opens as a spotlight on its player's profile, or on the collection for cards without one.
@@ -39,7 +39,7 @@ function CardRedirect() {
 }
 
 export default function App() {
-  const { user, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const inAdmin = pathname.startsWith('/admin')
@@ -138,14 +138,10 @@ export default function App() {
 
       <main>
         <Routes>
-          <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+          <Route path="/login" element={<Navigate to="/" replace />} />
           <Route
             path="/"
-            element={
-              <RequireAuth>
-                <Home />
-              </RequireAuth>
-            }
+            element={user ? <Home /> : loading ? <p className="muted">Loading…</p> : <Login />}
           />
           <Route
             path="/collection"

@@ -213,6 +213,9 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .card-info { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: 0 max(8px, 5.7cqw) max(8px, 4cqw); text-align: left; }
 .card-info p { margin: 0; }
 .card-info .card-archetype { display: inline-block; margin-bottom: 8px; padding: 3px 10px; border-radius: 999px; background: var(--c2); color: var(--c1); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.card-namerow { display: flex; align-items: center; justify-content: space-between; gap: max(4px, 2cqw); }
+.card-namerow .card-name { min-width: 0; flex: 1 1 auto; }
+.card-namerow .card-game { flex: none; margin-left: auto; }
 .card-name { font-family: var(--display); font-size: max(18px, 10.7cqw); font-weight: 800; line-height: 1; text-transform: uppercase; letter-spacing: 0.02em; overflow-wrap: anywhere; }
 .card-info .card-name[style*="--nlen"] { font-size: max(14px, min(10.7cqw, calc(64cqw / (var(--nlen, 8) * 0.5)))); white-space: nowrap; }
 .card-first { display: block; margin-bottom: max(1px, 0.8cqw); font-family: var(--body); font-size: max(8px, 3.6cqw); font-weight: 600; line-height: 1; letter-spacing: 0.14em; opacity: 0.8; }

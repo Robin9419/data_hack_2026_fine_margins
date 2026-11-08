@@ -166,6 +166,8 @@ export default function CardFace({ card, state = 'owned' }) {
   const profileLook = impact && !stadium
   const dark = (impact && stadium) || champion
   const perf = kind === 'performance'
+  // The jersey number sits before the first name on impact specials and Ones to Watch cards.
+  const numbered = impact || !!road
   const archetype = perf
     ? { icon: PERFORMANCE_ICON[card.special_type] ?? 'star', color: PERFORMANCE_COLOR[card.special_type] ?? '#ffd76a' }
     : (ARCHETYPES[card.title] ?? { icon: 'star', color: '#ffd76a' })
@@ -245,37 +247,35 @@ export default function CardFace({ card, state = 'owned' }) {
               {tag.label}
             </p>
           )}
-          {(
+          <div className="card-namerow">
             <p className="card-name" style={{ '--nlen': player.last_name.length }}>
               <span className="card-first">
-                {impact && <i>#{player.jersey} </i>}
+                {numbered && <i style={road ? { color: '#ffd76a' } : undefined}>#{player.jersey} </i>}
                 {player.first_name}
               </span>
               {player.last_name}
-              {nation && <img className="card-flag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />}
+              {nation && !numbered && <img className="card-flag" src={`https://flagcdn.com/w80/${nation.iso}.png`} alt={nation.code} title={player.nationality} loading="lazy" onError={(e) => e.currentTarget.remove()} />}
             </p>
-          )}
-          {(!impact || game) && (
+            {game && (
+              <span className="card-game">
+                <GameLogo name={game.home_team} />
+                <b>
+                  {game.home_score}–{game.away_score}
+                </b>
+                <GameLogo name={game.away_team} />
+                <GameTip game={game} />
+              </span>
+            )}
+          </div>
+          {!numbered && (
             <p className="card-meta">
-              {!impact && (
-                <span className="card-no">
-                  <span>
-                    <small>#</small>
-                    {player.jersey}
-                  </span>
+              <span className="card-no">
+                <span>
+                  <small>#</small>
+                  {player.jersey}
                 </span>
-              )}
+              </span>
               {kind === 'base' && <span className="card-team">{team.name}</span>}
-              {game && (
-                <span className="card-game">
-                  <GameLogo name={game.home_team} />
-                  <b>
-                    {game.home_score}–{game.away_score}
-                  </b>
-                  <GameLogo name={game.away_team} />
-                  <GameTip game={game} />
-                </span>
-              )}
             </p>
           )}
           <p className="card-foot">

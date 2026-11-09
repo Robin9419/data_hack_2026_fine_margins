@@ -6,7 +6,7 @@ import PlayerPhoto from './PlayerPhoto'
 import { LEGEND_STYLE } from '../legend'
 import LegendFrame from './LegendFrame'
 
-// Card kinds are described in docs/CARD_TYPES.md. Front of a card, identity only, no KPIs (they are on the back):
+// Front of a card: identity only; KPIs are on the back.
 //   base         photo, name, position, team
 //   profile      team-colour frame, tag (Sniper, Playmaker, ...) as icon and line above the name
 //   performance  Player of the Match, Game Winner, ...: drawn as a profile card; as a Stadium edition (profile and

@@ -1,5 +1,5 @@
 /* Deliberately plain skeleton styles. Replace freely during the design pass. */
-/* Ice Night theme (see docs/mockups/user-journey.html) */
+/* Ice Night theme */
 :root {
   --bg: #060b16;
   --bg-grad: radial-gradient(120% 600px at 50% -100px, #17345e 0%, #0a1426 50%, #060b16 100%);
@@ -675,7 +675,7 @@ a.card-tile:hover, button.card-tile:hover { transform: translateY(-4px); box-sha
 .edition-badge { position: absolute; top: calc(max(24px, 12.9cqw) + max(14px, 19cqw)); right: max(8px, 7cqw); z-index: 3; padding: 2px 8px; border-radius: 999px; font-size: max(7px, 3cqw); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #2a1d00; background: linear-gradient(90deg, #ffd36b, #fff1b8, #ffd36b); }
 @keyframes foil-sweep { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
 
-/* ---------- Card kinds, tiers, specials and finishes (docs/CARD_TYPES.md) ---------- */
+/* ---------- Card kinds, tiers, specials and finishes ---------- */
 @property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 @keyframes card-spin { to { --angle: 360deg; } }
 @keyframes card-twinkle { from { opacity: 0.3; } to { opacity: 0.7; } }

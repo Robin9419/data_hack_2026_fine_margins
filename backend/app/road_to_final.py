@@ -2,7 +2,7 @@
 
 The card is built from the games played so far on the user's tournament timeline (see tournament.py), so it shows what
 the player's tournament looks like up to that point: the rating per game as bars, an average rating and a stage.
-See docs/CARD_TYPES.md. The game ratings are the made-up test ratings of testdata.py."""
+The game ratings are the made-up test ratings of testdata.py."""
 
 import re
 from datetime import date

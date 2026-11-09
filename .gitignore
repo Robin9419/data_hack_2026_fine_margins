@@ -3,6 +3,11 @@ __pycache__/
 *.pyc
 backend/.venv/
 backend/*.sqlite3
+backend/*.sqlite3-*
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Node
 node_modules/
@@ -11,6 +16,14 @@ frontend/dist/
 # OS / editor
 .DS_Store
 .vscode/
+.idea/
+*.log
+.env
+.env.*
+!.env.example
+.aws/
+.codex/
+.agents/
 
 # Media: full-game recordings and the clips cut from them (backend/scripts/cut_clips.py)
 data/*.mp4

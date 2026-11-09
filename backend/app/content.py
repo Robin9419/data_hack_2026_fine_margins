@@ -18,7 +18,7 @@ from .tournament import Tournament
 ROOT = Path(__file__).resolve().parents[2]
 CONTENT_DIR = ROOT / "backend" / "content"
 DATA_DIR = ROOT / "data"
-PLAYER_IMAGES_FILE = ROOT / "docs" / "player-images.json"
+PLAYER_IMAGES_FILE = CONTENT_DIR / "player-images.json"
 MEDIA_DIR = ROOT / "backend" / "media"  # served at /api/media; not in git
 CLIPS_DIR = MEDIA_DIR / "clips"  # filled by scripts/cut_clips.py
 MOMENTS_PER_KPI = 5  # most moments (video clips) a final impact special shows per KPI

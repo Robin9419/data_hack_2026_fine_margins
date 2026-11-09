@@ -192,13 +192,14 @@ class Content:
         pid, stats = max(candidates, key=lambda item: (item[1]['mean'], item[1]['evaluated_passes'], item[0]))
         team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
         self.archetypes['Pressure Breaker'] = ('Highest average reduction in nearby opposing skaters through successful passes, '
-                                               'with at least 10 evaluated passes. Snapshot-based estimate.')
+                                               'with at least 10 passes that can be assessed. Compares pressure within 3 metres '
+                                               'of the passer with pressure on the receiver shortly afterwards, using tracking estimates.')
         self.archetype_metrics['Pressure Breaker'] = ['pbp_mean', 'packing_mean', 'packing_total']
         cfg = {'id': 'pressure-reliever', 'team': team, 'jersey': jersey, 'position': 'Skater',
                'title': 'Pressure Breaker', 'attributes': ['pbp_mean', 'packing_mean', 'packing_total'],
-               'explanation': f"Reduced nearby opponent pressure by {stats['mean']:.2f} skaters per evaluated pass on average. "
-                              f"{stats['evaluated_passes']} of {stats['eligible_passes']} eligible passes could be evaluated. "
-                              'This measures pressure relief, not overall passing or attacking quality.',
+               'explanation': f"Left teammates with {stats['mean']:.2f} fewer nearby opponents per completed pass on average. "
+                              f"Enough tracking information was available for {stats['evaluated_passes']} of "
+                              f"{stats['eligible_passes']} passes. This award recognises passes that relieve pressure.",
                'achievement': None, 'video': None}
         self.cards[cfg['id']] = self._build_card(cfg)
 
@@ -214,17 +215,17 @@ class Content:
         minimum = calculation['parameters']['min_evaluated']
         title = 'Progression Master'
         self.archetypes[title] = (
-            f'Highest positive average pass packing with at least {minimum} evaluated passes. '
-            'Counts opposing skaters bypassed along the attacking axis, with positions frozen at release. '
-            'Backward passes can reduce the score; ties favor more evaluated passes, then player ID.')
+            f'Highest average number of opponents bypassed towards the attacking goal, with a score above zero '
+            f'and at least {minimum} passes that can be assessed. Opponents are judged by where they stood '
+            'when the pass was released. Backward passes can reduce the score; ties favour more assessed passes.')
         metrics = ['packing_mean', 'packing_total', 'packing_positive_share']
         self.archetype_metrics[title] = metrics
         cfg = {'id': 'progression-master', 'team': team, 'jersey': jersey, 'position': 'Skater',
                'title': title, 'attributes': metrics,
-               'explanation': f"Averaged {stats['mean']:.2f} net opposing skaters bypassed per evaluated pass, "
-                              f"the highest qualifying average in this game. Signed total: {stats['total']}. "
-                              f"{stats['evaluated_passes']} of {stats['eligible_passes']} eligible passes evaluated. "
-                              'Packing measures longitudinal progression, not overall passing quality.',
+               'explanation': f"Bypassed an average of {stats['mean']:.2f} opponents per assessed pass towards the attacking goal, "
+                              f"the highest qualifying average in this game. The total was {stats['total']} after "
+                              f"subtracting the effect of backward passes. Enough tracking information was available "
+                              f"for {stats['evaluated_passes']} of {stats['eligible_passes']} passes.",
                'achievement': None, 'video': None}
         card = self._build_card(cfg)
         filmed = [m for m in card['moments'] if m['kind'] == 'pass_packing' and m['kpi']['value'] > 0 and m['clip']]
@@ -255,15 +256,17 @@ class Content:
         pid, stats = max(candidates, key=lambda item: (item[1]['total'], item[1]['assisted_shots'], item[0]))
         team, jersey = next(key for key, value in self.events.ids.items() if value == pid)
         title = 'Chance Architect'
-        self.archetypes[title] = ('Highest total expected assists (xA): the last successful pass to a shooter '
-                                 'within 4 seconds earns the shot xG, unless opponent possession intervenes.')
+        self.archetypes[title] = ('Highest total expected assists (xA): scoring-chance quality created by passes that set up shots. '
+                                 'The last completed pass within four seconds of a shot receives that shot\'s estimated '
+                                 'chance of scoring, provided the opponents do not gain control before the shot.')
         metrics = ['xa_total', 'xa_assisted_shots', 'xa_mean']
         self.archetype_metrics[title] = metrics
         cfg = {'id': 'chance-architect', 'team': team, 'jersey': jersey, 'position': 'Skater',
                'title': title, 'attributes': metrics,
                'explanation': f"Created {stats['total']:.3f} expected assists from {stats['assisted_shots']} shots. "
-                              'Credit comes from completed passes within four seconds before a shot, '
-                              'with no intervening opponent possession. This is a project-defined xA metric.',
+                              'Expected assists add up the scoring chances of shots set up by the player\'s passes. '
+                              'Only the last completed pass within four seconds before each shot counts, '
+                              'provided the opponents do not gain control before the shot.',
                'achievement': None, 'video': None}
         card = self._build_card(cfg)
         filmed = [m for m in card['moments'] if m['kind'] == 'expected_assist' and m['clip']]
@@ -451,6 +454,7 @@ class Content:
             "higher_is_better": metric["higher_is_better"],
             "definition": metric["definition"],
             "source_definition": metric["source_definition"],
+            "source_label": metric["source_label"],
             "match_rank": self._rank(metric, value) if value is not None else None,
             "team_rank": self._team_rank(metric, value, row["Team"]) if value is not None else None,
             "players_in_match": (sum(s['ranking_eligible'] for s in self.derived_kpis[metric['derived']]['players'].values())

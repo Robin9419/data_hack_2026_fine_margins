@@ -43,10 +43,12 @@ def format_value(value, fmt: str) -> str:
         return str(int(value))
     if fmt == "decimal1":
         return f"{value:.1f}"
-    if fmt == "decimal3":
-        return f"{value:.3f}"
-    if fmt == "decimal2":
-        return f"{value:.2f}"
+    if fmt in ("decimal2", "decimal3"):
+        display = f"{value:.2f}"
+        # Keep a third decimal only when two decimals would hide a small value.
+        if value != 0 and float(display) == 0:
+            display = f"{value:.3f}"
+        return display
     if fmt == "pct":
         return f"{round(value * 100)}"
     if fmt == "km":

@@ -7,7 +7,7 @@ export const TEAMS = [
   { name: 'HC Davos', short: 'HCD', logo: '/logos/davos.png', c1: '#0a2d6e', c2: '#ffd400' },
   { name: 'HC Sparta Praha', short: 'SPA', logo: '/logos/sparta.png', c1: '#9c1c2c', c2: '#f5c400', logoScale: 0.85 },
   { name: 'HC Fribourg-Gottéron', short: 'FRI', logo: '/logos/fribourg.png', c1: '#111111', c2: '#ffffff', logoScale: 0.85 },
-  { name: 'U.S. Collegiate Selects', short: 'USA', logo: '/logos/usa.png', c1: '#13284f', c2: '#ff4d5a', logoScale: 0.85 },
+  { name: 'U.S. Collegiate Selects', short: 'USA', logo: '/logos/usa.png', c1: '#13284f', c2: '#ff4d5a', logoScale: 0.78 },
 ]
 
 export const TEAMS_2026 = [

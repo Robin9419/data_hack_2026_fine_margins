@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
-import { useAllCards } from '../allCards'
+import { loadAllCards, useAllCards } from '../allCards'
 import AttributeRow from '../components/AttributeRow'
 import BackLink from '../components/BackLink'
 import CardSpotlight, { pickClips } from '../components/CardSpotlight'
@@ -12,6 +12,8 @@ import { formatMatchDate, scoreline } from '../format'
 import { nationOf } from '../nations'
 import { teamOf } from '../teams'
 import { useTournament } from '../tournament'
+import { adminPlayerCards, samePlayer, visiblePlayerGames } from '../playerProfileData'
+import AdminEditionSwitch, { editionQuery, useAdminEdition, withEdition } from '../components/AdminEditionSwitch'
 
 const hasData = (c) => c.owned && c.type === 'special' && Array.isArray(c.attributes)
 const gameOf = (c) => (c.match?.opponent ? `vs ${c.match.opponent}${c.match.date ? ` · ${formatMatchDate(c.match.date)}` : ''}` : null)
@@ -70,7 +72,6 @@ const age = (iso) => {
 const STAGES = { 'Group Torriani': 'Group', 'Group Cattini': 'Group', Quarterfinal: 'QF', Semifinal: 'SF', Final: 'Final' }
 const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`
 const sum = (rows, key) => rows.reduce((t, r) => t + (r[key] ?? 0), 0)
-const samePlayer = (a, b) => a.first_name === b.first_name && a.last_name === b.last_name && a.team === b.team
 
 // Static export of backend/scripts/player_games.py; null if it is not there.
 let gamesPromise = null
@@ -116,11 +117,13 @@ function Info({ id, text }) {
   )
 }
 
-export default function PlayerProfile() {
+export default function PlayerProfile({ admin = false }) {
+  const [edition, setEdition] = useAdminEdition()
   const { cardId } = useParams()
   const allCards = useAllCards()
   const { tournament } = useTournament()
-  const stage = tournament?.stage
+  const stage = admin ? undefined : tournament?.stage
+  const back = admin ? { to: `/admin${editionQuery(edition)}`, label: 'Back to admin' } : {}
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
   const [tab, setTab] = useState('cards')
@@ -151,17 +154,19 @@ export default function PlayerProfile() {
     setCards(null)
     setError(null)
     setTab('cards')
-    api
-      .playerCards(cardId)
+    const request = admin
+      ? loadAllCards().then((map) => ({ cards: adminPlayerCards(map, cardId) }))
+      : api.playerCards(cardId)
+    request
       .then(({ cards }) => { if (active) setCards(cards) })
       .catch((err) => { if (active) setError(err.message) })
     return () => { active = false }
-  }, [cardId, stage])
+  }, [cardId, stage, admin])
 
   if (error)
     return (
       <section>
-        <BackLink />
+        <BackLink {...back} />
         <p className="error">{error}</p>
       </section>
     )
@@ -169,12 +174,12 @@ export default function PlayerProfile() {
   if (cards.length === 0)
     return (
       <section>
-        <BackLink />
+        <BackLink {...back} />
         <p className="muted">No cards found for this player.</p>
       </section>
     )
 
-  const owned = cards.filter((c) => c.owned)
+  const owned = cards.filter((c) => c.owned).map((c) => admin ? withEdition(c, edition) : c)
   const availableIds = new Set(cards.map((c) => c.id))
   const ownedIds = new Set(owned.map((c) => c.id))
   const source = owned[0] ?? cards[0]
@@ -182,6 +187,7 @@ export default function PlayerProfile() {
   // Only cards that exist at the user's stage (owned or still locked); what comes later is not shown.
   const everyCard = allCards
     ? [...allCards.values()].filter((c) => c.type !== 'reward' && c.player && samePlayer(c.player, who) && availableIds.has(c.id))
+      .map((c) => admin ? withEdition(c, edition) : c)
     : []
   const list = everyCard.length > 0
     ? everyCard.map((c) => ({
@@ -217,7 +223,7 @@ export default function PlayerProfile() {
   const dataCards = owned.filter(hasData)
   const lockedSpecials = list.filter((x) => x.status !== 'owned' && x.card.type === 'special')
   const playedIds = new Set((tournament?.results ?? []).map((r) => r.id))
-  const playerGames = games?.[`${player.team}#${player.jersey}`]?.filter((g) => playedIds.has(g.game))
+  const playerGames = visiblePlayerGames(games, player, playedIds, admin)
   const stats = games ? gameStats(playerGames ?? [], goalie) : null
   const noGames = !playerGames?.length
   // Matched by date and opponent: the final's card and the game list use different ids for the same game.
@@ -225,7 +231,8 @@ export default function PlayerProfile() {
 
   return (
     <section className="pp">
-      <BackLink history />
+      <BackLink {...back} history={!admin} />
+      {admin && <div className="gallery-tools"><AdminEditionSwitch edition={edition} onChange={setEdition} /></div>}
       <div className={`pp-hero ${(roadPlayer ?? player).action_image_url || widePhoto ? '' : 'portrait'}`} style={{ '--pp-bg': photo ? `url("${photo}")` : 'none' }}>
         <div className="pp-hero-in">
           <div className="pp-id">
@@ -272,11 +279,11 @@ export default function PlayerProfile() {
           )}
           <div className="pp-set">
             <span className="pp-set-label">
-              Player set {owned.length} of {availableCount} cards
+              {admin ? `Admin preview · ${availableCount} cards` : `Player set ${owned.length} of ${availableCount} cards`}
             </span>
-            <div className="pp-bar" role="progressbar" aria-label="Player set" aria-valuemin={0} aria-valuemax={availableCount} aria-valuenow={owned.length}>
+            {!admin && <div className="pp-bar" role="progressbar" aria-label="Player set" aria-valuemin={0} aria-valuemax={availableCount} aria-valuenow={owned.length}>
               <div style={{ width: `${availableCount ? (owned.length / availableCount) * 100 : 0}%` }} />
-            </div>
+            </div>}
           </div>
         </div>
       </div>
@@ -377,7 +384,7 @@ export default function PlayerProfile() {
           )}
         </div>
       </div>
-      {spotlight && <CardSpotlight card={spotlight} onClose={closeSpotlight} />}
+      {spotlight && <CardSpotlight card={admin ? withEdition(spotlight, edition) : spotlight} onClose={closeSpotlight} />}
     </section>
   )
 }

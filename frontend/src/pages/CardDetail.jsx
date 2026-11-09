@@ -70,14 +70,14 @@ export default function CardDetail({ preview = false }) {
   return (
     <section className="detail">
       <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} history />
-      {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
+      {preview && <> · <Link to={`/admin/players/${card.id}`}>Player profile ›</Link></>}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
         <div className="detail-heading">
           <p className="eyebrow">{card.category ? `${card.category} · ` : ''}{card.title}</p>
           <h1>
-            <Link to={`/players/${card.id}`} className="plain-link">
+            <Link to={`${preview ? '/admin' : ''}/players/${card.id}`} className="plain-link">
               #{player.jersey} {player.first_name} {player.last_name}
             </Link>
           </h1>
@@ -405,14 +405,14 @@ function BaseCardDetail({ card, preview }) {
   return (
     <section className="detail">
       <BackLink to={preview ? '/admin' : '/collection'} label={preview ? 'Back to admin' : 'Back to collection'} history />
-      {preview && <> · <Link to={`/players/${card.id}`}>Player profile ›</Link></>}
+      {preview && <> · <Link to={`/admin/players/${card.id}`}>Player profile ›</Link></>}
 
       <header className="detail-header">
         <PlayerPhoto player={player} className="detail-photo" />
         <div className="detail-heading">
           <p className="eyebrow">Base card</p>
           <h1>
-            <Link to={`/players/${card.id}`} className="plain-link">
+            <Link to={`${preview ? '/admin' : ''}/players/${card.id}`} className="plain-link">
               #{player.jersey} {player.first_name} {player.last_name}
             </Link>
           </h1>

@@ -210,6 +210,14 @@ export default function App() {
             }
           />
           <Route
+            path="/admin/players/:cardId"
+            element={
+              <RequireAuth>
+                <PlayerProfile admin />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/players/:cardId"
             element={
               <RequireAuth>

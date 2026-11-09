@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { editionQuery } from './AdminEditionSwitch'
 import { formatMatchDate, ordinal } from '../format'
 import { teamStyle } from '../teams'
 import CardFace, { accentOf } from './CardFace'
@@ -42,11 +43,15 @@ export function pickClips(card) {
 
 // Pop-out view of an owned card. Specials and legends flip from their front to KPIs or a career archive.
 export default function CardSpotlight({ card, onClose, hideLink = false }) {
-  const { pathname } = useLocation()
-  const showLink = !hideLink && card.player?.last_name && (card.type === 'base' || card.type === 'special') && !pathname.startsWith('/players/')
+  const { pathname, search } = useLocation()
+  const admin = pathname.startsWith('/admin')
+  const adminQuery = editionQuery(new URLSearchParams(search).get('edition'))
+  const showLink = !hideLink && card.player?.last_name && (card.type === 'base' || card.type === 'special') && !pathname.startsWith('/players/') && !pathname.startsWith('/admin/players/')
   const [flipped, setFlipped] = useState(false)
   const flippable = card.type === 'special' || card.type === 'legend'
-  const profilePath = card.type === 'legend' || card.type === 'reward' ? `/cards/${card.id}/info` : null
+  const profilePath = card.type === 'legend' || card.type === 'reward'
+    ? admin ? `/admin/cards/${card.id}${adminQuery}` : `/cards/${card.id}/info`
+    : null
   const [clipIndex, setClipIndex] = useState(0)
   const closeRef = useRef(null)
   const clips = pickClips(card)
@@ -172,7 +177,7 @@ export default function CardSpotlight({ card, onClose, hideLink = false }) {
             </Link>
           )}
           {showLink && (
-            <Link to={`/players/${card.id}`} onClick={onClose} className="spotlight-more">
+            <Link to={`${admin ? '/admin' : ''}/players/${card.id}${admin ? adminQuery : ''}`} onClick={onClose} className="spotlight-more">
               <span>
                 <strong>Player profile ›</strong>
                 <small>All cards, stats and games of {name}</small>

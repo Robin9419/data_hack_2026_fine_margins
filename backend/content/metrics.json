@@ -9,10 +9,11 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many times the player put the puck in the opponent's net.",
-      "source_definition": "G \u2014 Number of goals scored by a player",
+      "source_definition": "G — Number of goals scored by a player",
       "events": [
         "goal"
-      ]
+      ],
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "assists",
@@ -22,10 +23,11 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "Credited when the player passed, shot or touched the puck in a way that set up a teammate's goal.",
-      "source_definition": "A \u2014 Number of assists received from shooting, passing or deflecting the puck towards the scoring teammate or touching it in any other way which enabled a goal",
+      "source_definition": "A — Number of assists received from shooting, passing or deflecting the puck towards the scoring teammate or touching it in any other way which enabled a goal",
       "events": [
         "assist"
-      ]
+      ],
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "points",
@@ -35,11 +37,12 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "Goals plus assists. The simplest measure of how many goals a player was directly involved in.",
-      "source_definition": "P \u2014 Number of points received by a player for goals scored or assists earned",
+      "source_definition": "P — Number of points received by a player for goals scored or assists earned",
       "events": [
         "goal",
         "assist"
-      ]
+      ],
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "shots",
@@ -49,11 +52,12 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many shots the player took. More shots usually means more pressure on the opposing goalkeeper.",
-      "source_definition": "S \u2014 Number of a player's shots",
+      "source_definition": "S — Number of a player's shots",
       "events": [
         "goal",
         "shot"
-      ]
+      ],
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "shot_top_speed",
@@ -63,10 +67,11 @@
       "unit": "km/h",
       "higher_is_better": true,
       "definition": "The speed of the player's fastest shot in the game, measured by puck tracking.",
-      "source_definition": "S TOP \u2014 Player's hardest shot",
+      "source_definition": "S TOP — Player's hardest shot",
       "events": [
         "hardest_shot"
-      ]
+      ],
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "xg_sum",
@@ -76,11 +81,12 @@
       "unit": "xG",
       "higher_is_better": true,
       "definition": "Every shot gets a probability of becoming a goal, based on distance, angle, passes before the shot, screens and the goalkeeper's position. xG adds those up: 0.60 xG means the player's chances were worth about 0.6 goals on average.",
-      "source_definition": "xGsum \u2014 Sum of a player's all shot xG values",
+      "source_definition": "xGsum — Sum of a player's all shot xG values",
       "events": [
         "goal",
         "shot"
-      ]
+      ],
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "skate_top_speed",
@@ -90,7 +96,8 @@
       "unit": "km/h",
       "higher_is_better": true,
       "definition": "The fastest the player skated at any moment in the game.",
-      "source_definition": "SPD TOP \u2014 Player's top speed (km/h)"
+      "source_definition": "SPD TOP — Player's top speed (km/h)",
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "distance",
@@ -100,7 +107,8 @@
       "unit": "km",
       "higher_is_better": true,
       "definition": "The total distance the player skated during the game. It reflects workload and ice time.",
-      "source_definition": "DIST \u2014 Total distance a player traveled on the ice (m)"
+      "source_definition": "DIST — Total distance a player traveled on the ice (m)",
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "toi",
@@ -110,7 +118,8 @@
       "unit": "min",
       "higher_is_better": true,
       "definition": "How long the player was on the ice in total. Coaches give the most ice time to players they trust.",
-      "source_definition": "TOI \u2014 Player's time on the ice in total"
+      "source_definition": "TOI — Player's time on the ice in total",
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "blocks",
@@ -120,7 +129,8 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many opponent shots the player stopped with their body or stick before they reached the goal. It is a defensive sacrifice.",
-      "source_definition": "BKS \u2014 Number of shots blocked by a player"
+      "source_definition": "BKS — Number of shots blocked by a player",
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "faceoff_win_pct",
@@ -132,10 +142,11 @@
       "unit": "%",
       "higher_is_better": true,
       "definition": "Share of faceoffs (the puck drop that restarts play) the player won. Winning the faceoff gives your team the puck.",
-      "source_definition": "FOW% \u2014 Faceoff win percentage (per a player's all faceoffs)",
+      "source_definition": "FOW% — Faceoff win percentage (per a player's all faceoffs)",
       "events": [
         "faceoff_win"
-      ]
+      ],
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "pass_pct",
@@ -147,7 +158,8 @@
       "unit": "%",
       "higher_is_better": true,
       "definition": "Share of the player's passes that reached a teammate.",
-      "source_definition": "Pass% \u2014 Percentage of successful passes per a player's all passes"
+      "source_definition": "Pass% — Percentage of successful passes per a player's all passes",
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "passes",
@@ -157,7 +169,8 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many of the player's passes reached a teammate.",
-      "source_definition": "Passes \u2014 Successful passes per a player's all passes"
+      "source_definition": "Passes — Successful passes per a player's all passes",
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "puck_contest_wins",
@@ -167,7 +180,8 @@
       "unit": "",
       "higher_is_better": true,
       "definition": "How many times the player won a contested puck, a one-on-one fight for a loose puck.",
-      "source_definition": "PCW \u2014 Number of a player's puck contest wins"
+      "source_definition": "PCW — Number of a player's puck contest wins",
+      "source_label": "Wisehockey match statistics"
     },
     {
       "id": "saves",
@@ -181,7 +195,8 @@
       "source_definition": "Counted from match events: Shot events with ShotResult 'Saved' where the player is the goalkeeper",
       "events": [
         "save"
-      ]
+      ],
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "shots_on_goal_against",
@@ -196,7 +211,8 @@
       "events": [
         "save",
         "goal_against"
-      ]
+      ],
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "shot_attempts_against",
@@ -212,7 +228,8 @@
         "save",
         "goal_against",
         "shot_against"
-      ]
+      ],
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "save_pct",
@@ -229,21 +246,24 @@
       "events": [
         "save",
         "goal_against"
-      ]
+      ],
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "pbp_mean",
-      "label": "Average pass body pressure relief",
+      "label": "Average pressure reduction",
       "derived": "pass_body_pressure",
       "aggregate": "mean",
       "format": "decimal2",
       "unit": "skaters",
       "higher_is_better": true,
-      "definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "definition": "Average reduction in nearby opponents achieved by a completed pass. Compares opponents within 3 metres of the passer when the puck is released with opponents within 3 metres of the receiver shortly afterwards. Fewer nearby opponents means less pressure. Only completed passes with enough tracking information count; goalkeepers are excluded. The receiver's situation is estimated from the first available position reading within two seconds.",
       "source_definition": "Project-defined PBP using Wisehockey event snapshots; reception time is estimated, not directly observed.",
       "events": [
         "pass_pressure"
-      ]
+      ],
+      "technical_definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "pbp_positive_share",
@@ -253,11 +273,13 @@
       "format": "pct",
       "unit": "%",
       "higher_is_better": true,
-      "definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "definition": "Share of assessed passes that leave the receiver with fewer nearby opponents than the passer had. Compares opponents within 3 metres of the passer when the puck is released with opponents within 3 metres of the receiver shortly afterwards. Fewer nearby opponents means less pressure. Only completed passes with enough tracking information count; goalkeepers are excluded. The receiver's situation is estimated from the first available position reading within two seconds.",
       "source_definition": "Project-defined PBP using Wisehockey event snapshots; reception time is estimated, not directly observed.",
       "events": [
         "pass_pressure"
-      ]
+      ],
+      "technical_definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "pbp_evaluated",
@@ -267,11 +289,13 @@
       "format": "int",
       "unit": "",
       "higher_is_better": true,
-      "definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "definition": "Number of completed passes with enough tracking information to compare pressure on the passer and receiver. Compares opponents within 3 metres of the passer when the puck is released with opponents within 3 metres of the receiver shortly afterwards. Fewer nearby opponents means less pressure. Only completed passes with enough tracking information count; goalkeepers are excluded. The receiver's situation is estimated from the first available position reading within two seconds.",
       "source_definition": "Project-defined PBP using Wisehockey event snapshots; reception time is estimated, not directly observed.",
       "events": [
         "pass_pressure"
-      ]
+      ],
+      "technical_definition": "Opposing skaters within 3 m at pass release minus those within 3 m of the receiver in the first later snapshot within 2 seconds. Only successful passes; goalkeepers excluded. Positive values indicate pressure relief. Missing observations are excluded.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "packing_mean",
@@ -281,11 +305,13 @@
       "format": "decimal2",
       "unit": "skaters",
       "higher_is_better": true,
-      "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "definition": "Average number of opponents bypassed per assessed pass, after subtracting the effect of backward passes. Counts opponents passed in the direction of the attacking goal. Their positions are judged when the pass is released, comparing how far forward the passer and receiver are. Forward passes add to the score; backward passes can subtract from it. Goalkeepers are excluded. The receiver's position is estimated from the first available position reading within two seconds.",
       "source_definition": "Project-defined longitudinal packing, with opponent positions frozen at pass release. Not a measure of passing lanes or defender movement.",
       "events": [
         "pass_packing"
-      ]
+      ],
+      "technical_definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "packing_total",
@@ -295,11 +321,13 @@
       "format": "int",
       "unit": "skaters",
       "higher_is_better": true,
-      "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "definition": "Total opponents bypassed through assessed passes, after subtracting the effect of backward passes. Counts opponents passed in the direction of the attacking goal. Their positions are judged when the pass is released, comparing how far forward the passer and receiver are. Forward passes add to the score; backward passes can subtract from it. Goalkeepers are excluded. The receiver's position is estimated from the first available position reading within two seconds.",
       "source_definition": "Project-defined longitudinal packing, with opponent positions frozen at pass release. Not a measure of passing lanes or defender movement.",
       "events": [
         "pass_packing"
-      ]
+      ],
+      "technical_definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "packing_positive_share",
@@ -309,11 +337,13 @@
       "format": "pct",
       "unit": "%",
       "higher_is_better": true,
-      "definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "definition": "Share of assessed passes that move the puck beyond at least one opponent towards the attacking goal. Counts opponents passed in the direction of the attacking goal. Their positions are judged when the pass is released, comparing how far forward the passer and receiver are. Forward passes add to the score; backward passes can subtract from it. Goalkeepers are excluded. The receiver's position is estimated from the first available position reading within two seconds.",
       "source_definition": "Project-defined longitudinal packing, with opponent positions frozen at pass release. Not a measure of passing lanes or defender movement.",
       "events": [
         "pass_packing"
-      ]
+      ],
+      "technical_definition": "Signed number of opposing skaters whose release-time x positions lie strictly between passer and reception positions. Forward bypasses are positive; backward passes restoring opponents ahead of the puck are negative. Goalkeepers excluded. Reception uses the first later snapshot within 2 seconds.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "xa_total",
@@ -323,11 +353,13 @@
       "format": "decimal3",
       "unit": "xA",
       "higher_is_better": true,
-      "definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "definition": "Total chance quality created by passes that set up shots. A completed pass that leads to a shot within four seconds earns the passer that shot's expected goals (xG): its estimated chance of becoming a goal. Only the last completed pass counts, and the opponents must not gain control before the shot. Shots without a chance estimate are left out.",
       "source_definition": "Project-defined expected assists using Wisehockey shot xG and pass/control events.",
       "events": [
         "expected_assist"
-      ]
+      ],
+      "technical_definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "xa_assisted_shots",
@@ -337,11 +369,13 @@
       "format": "int",
       "unit": "",
       "higher_is_better": true,
-      "definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "definition": "Number of shots set up by the player's completed passes. A completed pass that leads to a shot within four seconds earns the passer that shot's expected goals (xG): its estimated chance of becoming a goal. Only the last completed pass counts, and the opponents must not gain control before the shot. Shots without a chance estimate are left out.",
       "source_definition": "Project-defined expected assists using Wisehockey shot xG and pass/control events.",
       "events": [
         "expected_assist"
-      ]
+      ],
+      "technical_definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "xa_mean",
@@ -351,41 +385,47 @@
       "format": "decimal3",
       "unit": "xG",
       "higher_is_better": true,
-      "definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "definition": "Average chance of scoring for shots set up by the player's passes. A completed pass that leads to a shot within four seconds earns the passer that shot's expected goals (xG): its estimated chance of becoming a goal. Only the last completed pass counts, and the opponents must not gain control before the shot. Shots without a chance estimate are left out.",
       "source_definition": "Project-defined expected assists using Wisehockey shot xG and pass/control events.",
       "events": [
         "expected_assist"
-      ]
+      ],
+      "technical_definition": "The last successful pass to the shooter within four seconds before a shot receives its xG as expected assists, unless opponent possession intervenes. Each shot is credited once; missing xG is excluded.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "blcxg_mean",
-      "label": "Average entry BLCxG",
+      "label": "Average chance quality after entry",
       "derived": "blc_xg",
       "aggregate": "mean",
       "format": "decimal3",
       "unit": "xG",
       "higher_is_better": true,
-      "definition": "Average own-team shot xG generated per evaluated offensive entry. Opponent control inside the zone does not end the sequence; puck departure or stoppage does. Entries with missing shot xG or unknown sequence endings are excluded, not zero.",
+      "definition": "Average scoring-chance quality created by the team after the player brings the puck into the attacking zone. Add up the expected goals (xG) of the team's shots until the puck leaves the zone or play stops, including shots after winning the puck back. Entries without shots count as zero; entries with incomplete information are left out.",
       "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
       "category_id": "zone-entries-exits",
       "events": [
         "zone_entry"
-      ]
+      ],
+      "technical_definition": "Average own-team shot xG generated per evaluated offensive entry. Opponent control inside the zone does not end the sequence; puck departure or stoppage does. Entries with missing shot xG or unknown sequence endings are excluded, not zero.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "blcxg_total",
-      "label": "Total entry BLCxG",
+      "label": "Total chance quality after entries",
       "derived": "blc_xg",
       "aggregate": "total",
       "format": "decimal3",
       "unit": "xG",
       "higher_is_better": true,
-      "definition": "Sum of BLCxG over fully evaluated offensive entries. Each shot credits at most one entry; Goal rows do not add xG again.",
+      "definition": "Total expected goals (xG) from the team's shots following the player's assessed attacking-zone entries. Each shot is counted once, including a shot that becomes a goal. Count shots until the puck leaves the zone or play stops, including shots after winning the puck back.",
       "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
       "category_id": "zone-entries-exits",
       "events": [
         "zone_entry"
-      ]
+      ],
+      "technical_definition": "Sum of BLCxG over fully evaluated offensive entries. Each shot credits at most one entry; Goal rows do not add xG again.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "blcxg_entries",
@@ -395,12 +435,14 @@
       "format": "int",
       "unit": "",
       "higher_is_better": true,
-      "definition": "Number of offensive entries with a known sequence ending and valid xG for every own-team shot. Completed sequences without shots count as zero BLCxG.",
+      "definition": "Number of times the player brings the puck into the attacking zone where the resulting play can be assessed through to its end. The end must be known, and all of the team's shots must have a scoring-chance estimate. An entry that produces no shots still counts.",
       "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
       "category_id": "zone-entries-exits",
       "events": [
         "zone_entry"
-      ]
+      ],
+      "technical_definition": "Number of offensive entries with a known sequence ending and valid xG for every own-team shot. Completed sequences without shots count as zero BLCxG.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "controlled_exits",
@@ -410,12 +452,14 @@
       "format": "int",
       "unit": "",
       "higher_is_better": true,
-      "definition": "Defensive zone crossings towards the opponent with PossessionMaintained. No additional possession-retention window is required.",
+      "definition": "Number of times the player moves the puck out of the defensive zone while the team still controls it at the blue line. Control is judged at the crossing, without requiring possession for a set time afterwards.",
       "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
       "category_id": "zone-entries-exits",
       "events": [
         "zone_exit"
-      ]
+      ],
+      "technical_definition": "Defensive zone crossings towards the opponent with PossessionMaintained. No additional possession-retention window is required.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "controlled_exit_share",
@@ -425,12 +469,14 @@
       "format": "pct",
       "unit": "%",
       "higher_is_better": true,
-      "definition": "Controlled exits divided by defensive exit attempts with a known crossing outcome. PossessionLost and PuckDumpedIn count as uncontrolled; None and missing outcomes are excluded.",
+      "definition": "Share of assessed defensive-zone exits where the team still controls the puck at the blue line. Exits that lose possession or send the puck away without control count as unsuccessful. Exits whose outcome is unknown are left out.",
       "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
       "category_id": "zone-entries-exits",
       "events": [
         "zone_exit"
-      ]
+      ],
+      "technical_definition": "Controlled exits divided by defensive exit attempts with a known crossing outcome. PossessionLost and PuckDumpedIn count as uncontrolled; None and missing outcomes are excluded.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "zone_exit_attempts",
@@ -440,12 +486,14 @@
       "format": "int",
       "unit": "",
       "higher_is_better": true,
-      "definition": "Defensive zone exit attempts with PossessionMaintained, PossessionLost or PuckDumpedIn and an identified skater.",
+      "definition": "Number of defensive-zone exit attempts attributed to the player with a known outcome: keeping control, losing possession, or sending the puck away without control.",
       "source_definition": "Project-defined KPI from Wisehockey blue-line crossings, team-relative directions and puck/shot events.",
       "category_id": "zone-entries-exits",
       "events": [
         "zone_exit"
-      ]
+      ],
+      "technical_definition": "Defensive zone exit attempts with PossessionMaintained, PossessionLost or PuckDumpedIn and an identified skater.",
+      "source_label": "Wisehockey tracking data; app calculation"
     },
     {
       "id": "interceptions_total",
@@ -455,12 +503,14 @@
       "format": "int",
       "unit": "",
       "higher_is_better": true,
-      "definition": "Opponent passes explicitly marked Intercepted, credited to the identified secondary skater on the opposing team, across all zones. Successful and Failed passes do not count. Goalkeepers are excluded.",
+      "definition": "Number of opponent passes the player cuts out anywhere on the ice. Only confirmed interceptions count; an unsuccessful opponent pass alone is not enough. Goalkeepers are excluded.",
       "source_definition": "Wisehockey PassResult=Intercepted; EventPrimaryPlayerId is the passer and EventSecondaryPlayerId the intercepting opponent.",
       "events": [
         "interception"
       ],
-      "category_id": "defending"
+      "category_id": "defending",
+      "technical_definition": "Opponent passes explicitly marked Intercepted, credited to the identified secondary skater on the opposing team, across all zones. Successful and Failed passes do not count. Goalkeepers are excluded.",
+      "source_label": "Wisehockey tracking data; app calculation"
     }
   ]
 }

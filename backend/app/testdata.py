@@ -312,6 +312,7 @@ class TestData:
             "display_value": self._format(value, metric["format"]), "unit": metric["unit"],
             "higher_is_better": metric["higher_is_better"], "definition": metric["definition"],
             "source_definition": "Official game statistics of the Spengler Cup (spenglercup.ch)",
+            "source_label": "Official Spengler Cup game statistics (spenglercup.ch)",
             "match_rank": 1 + sum(v > raw for v in values) if raw else None,
             "team_rank": 1 + sum((p["stats"].get(stat, 0) or 0) > raw for p in pool if p["team"] == player["team"]) if raw else None,
             "players_in_match": len(pool), "rank_pool": "goalkeepers" if player["goalkeeper"] else "players",

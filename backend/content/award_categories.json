@@ -15,7 +15,8 @@
             "blcxg_total",
             "blcxg_entries"
           ],
-          "definition": "Highest positive average BLCxG with at least three evaluated offensive entries. BLCxG sums own-team shot xG until the puck leaves the offensive zone or play stops, including shots after a puck recovery. Ties favor more evaluated entries, then player ID."
+          "definition": "Awarded for creating the highest average scoring-chance quality after carrying or passing the puck into the attacking zone, with at least three entries that can be assessed and a score above zero. Chance quality adds up the expected goals (xG) of the team's shots until the puck leaves the zone or play stops, including shots after winning the puck back. If players tie, more assessed entries wins.",
+          "technical_definition": "Highest positive average BLCxG with at least three evaluated offensive entries. BLCxG sums own-team shot xG until the puck leaves the offensive zone or play stops, including shots after a puck recovery. Ties favor more evaluated entries, then player ID."
         },
         {
           "id": "exit-specialist",
@@ -28,7 +29,8 @@
             "controlled_exit_share",
             "zone_exit_attempts"
           ],
-          "definition": "Most controlled defensive zone exits with the exported outcome PossessionMaintained. Ties favor the higher controlled-exit share, then player ID. Possession is assessed at the crossing, without a later retention window."
+          "definition": "Awarded for the most exits from the defensive zone while the team still controls the puck as it crosses the blue line. If players tie, the higher share of controlled exits wins. Control is judged at the crossing; the team does not have to keep the puck for a set time afterwards.",
+          "technical_definition": "Most controlled defensive zone exits with the exported outcome PossessionMaintained. Ties favor the higher controlled-exit share, then player ID. Possession is assessed at the crossing, without a later retention window."
         }
       ]
     },
@@ -51,7 +53,8 @@
             "interceptions_total",
             "blocks"
           ],
-          "definition": "Most puck battles won (Wisehockey PCW) across all zones, requiring a positive count. Ties favor more interceptions, then the lexicographically greatest player ID. Interceptions and blocked shots are supporting context, not a weighted score."
+          "definition": "Awarded for winning the most puck battles anywhere on the ice, with at least one battle won. If players tie, more intercepted passes wins. Interceptions and blocked shots also appear on the card to show the player's defensive contribution, but they are not added to the puck-battle total.",
+          "technical_definition": "Most puck battles won (Wisehockey PCW) across all zones, requiring a positive count. Ties favor more interceptions, then the lexicographically greatest player ID. Interceptions and blocked shots are supporting context, not a weighted score."
         },
         {
           "id": "passing-lane-guardian",
@@ -65,7 +68,8 @@
             "puck_contest_wins",
             "blocks"
           ],
-          "definition": "Most intercepted opponent passes across all zones, requiring a positive count. PassResult=Intercepted credits the opposing secondary skater. Ties favor more puck battles won (PCW), then the lexicographically greatest player ID."
+          "definition": "Awarded for intercepting the most opponent passes anywhere on the ice, with at least one interception. The interception belongs to the opposing skater who cuts out the pass; goalkeepers are not counted. If players tie, more puck battles won wins.",
+          "technical_definition": "Most intercepted opponent passes across all zones, requiring a positive count. PassResult=Intercepted credits the opposing secondary skater. Ties favor more puck battles won (PCW), then the lexicographically greatest player ID."
         }
       ]
     }

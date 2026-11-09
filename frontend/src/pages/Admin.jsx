@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../api'
 import CardTile from '../components/CardTile'
 import CardSpotlight from '../components/CardSpotlight'
+import AdminEditionSwitch, { editionQuery, useAdminEdition, withEdition } from '../components/AdminEditionSwitch'
 import { TEAMS, teamOf, teamStyle } from '../teams'
 import Dropdown from '../components/Dropdown'
 import PlayerPhoto from '../components/PlayerPhoto'
@@ -26,8 +27,6 @@ const TEAM_FILTERS = [
   { value: 'all', label: 'All teams', title: 'All teams' },
   ...TEAMS.map((t) => ({ value: t.name, label: t.short, title: t.name, logo: t.logo })),
 ]
-const EDITION = 'standard'
-const withEdition = (c, edition) => (c.kind === 'profile' || c.kind === 'performance' ? { ...c, edition } : c)
 
 
 const kindOf = (c) => c.kind ?? c.type
@@ -52,6 +51,7 @@ function groupPlayers(shown) {
 // Every card that exists after the whole tournament, regardless of what the user owns or where they are on the
 // timeline: the card set of all games.
 export default function Admin() {
+  const [edition, setEdition] = useAdminEdition()
   const [cards, setCards] = useState(null)
   const [error, setError] = useState(null)
   const [kind, setKind] = useState('all')
@@ -102,7 +102,7 @@ export default function Admin() {
         (a.player?.jersey ?? 0) - (b.player?.jersey ?? 0),
     )
   const players = mode === 'players' ? groupPlayers(shown) : []
-  const shownCards = shown.map((c) => withEdition(c, EDITION))
+  const shownCards = shown.map((c) => withEdition(c, edition))
   const items = mode === 'players' ? players : shownCards
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
   const current = Math.min(page, pageCount - 1)
@@ -143,6 +143,7 @@ export default function Admin() {
       </div>
 
       <div className="gallery-tools">
+        <AdminEditionSwitch edition={edition} onChange={setEdition} />
         <label className="search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
@@ -186,7 +187,7 @@ export default function Admin() {
         <div className="card-grid" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           {mode === 'players'
             ? pageItems.map(({ key, cardId, count, p, base }) => (
-                <Link key={key} to={`/players/${cardId}`} className="ptile" style={teamStyle(p.team)}>
+                <Link key={key} to={`/admin/players/${cardId}${editionQuery(edition)}`} className="ptile" style={teamStyle(p.team)}>
                   <div className="ph">
                     {(base ?? p).image_url && <PlayerPhoto player={base ?? p} className="card-art" />}
                   </div>
@@ -226,7 +227,7 @@ export default function Admin() {
         </div>
       )}
 
-      {spotlight && <CardSpotlight card={spotlight} onClose={closeSpotlight} />}
+      {spotlight && <CardSpotlight card={withEdition(spotlight, edition)} onClose={closeSpotlight} />}
     </section>
   )
 }

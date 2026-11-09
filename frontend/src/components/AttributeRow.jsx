@@ -28,8 +28,8 @@ export default function AttributeRow({ attr, moments, onPlay }) {
         <div className="attribute-explainer">
           <p>{attr.definition}</p>
           <p className="muted small">
-            {attr.higher_is_better ? 'Higher is better.' : 'Lower is better.'} Definition source:{' '}
-            <em>{attr.source_definition}</em>
+            {attr.higher_is_better ? 'Higher is better.' : 'Lower is better.'} Source:{' '}
+            <em>{attr.source_label ?? 'Match statistics'}</em>
           </p>
           {moments && (
             <div className="attribute-events">

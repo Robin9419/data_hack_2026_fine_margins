@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ARCHETYPES, PERFORMANCE_ICON } from './CardFace'
 import CardIcon from './CardIcon'
+import LegendFrame from './LegendFrame'
 
 // The info button in the top bar and the card guide it opens: every card type with an outline of the card, what it
 // is and how to unlock it. The rules mirror the backend (main.py, content.py, road_to_final.py, legends.json).
@@ -119,8 +120,8 @@ const TYPES = [
     unlock: ['Pulled by luck from packs and trade-ins, from day one.', 'Bonus: every goal or assist by your player earns a pack of 5 cards.'],
   },
   {
-    id: 'legend', name: 'Legend', color: '#d9b45a', icon: 'star', label: 'Legend', rarity: '★★★', dark: true,
-    what: 'Club greats from earlier Spengler Cups, in black and gold.',
+    id: 'legend', name: 'Legend', color: '#d5bd8d', icon: 'star', label: 'Legend', rarity: '★★★', legend: true,
+    what: 'Club greats from earlier Spengler Cups, in midnight teal with a gold filigree frame.',
     unlock: ["Collect 50%, 75% and 100% of a club's cards: one legend at each step.", 'Cannot be drawn or traded.'],
   },
   {
@@ -146,15 +147,16 @@ const TYPES = [
 ]
 
 // A small outline of a card in the real card shape: accent edge, icon top left, label at the bottom, rarity in the point.
-function Outline({ color, icon, label, rarity, dark }) {
+function Outline({ color, icon, label, rarity, dark, legend }) {
   return (
-    <div className={`guide-outline ${dark ? 'dark' : ''}`} style={{ '--gc': color }} aria-hidden="true">
+    <div className={`guide-outline ${dark ? 'dark' : ''} ${legend ? 'legend' : ''}`} style={{ '--gc': color, '--legend-frame-ink': color }} aria-hidden="true">
       <div className="guide-outline-in">
         {icon && <span className="guide-outline-icon"><CardIcon name={icon} /></span>}
         <span className="guide-outline-photo" />
         <span className="guide-outline-label">{label}</span>
         <span className="guide-outline-rarity">{rarity}</span>
       </div>
+      {legend && <LegendFrame glint={false} />}
     </div>
   )
 }
@@ -261,7 +263,7 @@ function Guide({ onClose }) {
         {TYPES.slice(1).map((t) => (
           <section key={t.id} className="guide-type">
             <div className="guide-outlines">
-              <Outline color={t.color} icon={t.icon} label={t.label} rarity={t.rarity} dark={t.dark} />
+              <Outline color={t.color} icon={t.icon} label={t.label} rarity={t.rarity} dark={t.dark} legend={t.legend} />
             </div>
             <div className="guide-text">
               <h3>{t.name}</h3>

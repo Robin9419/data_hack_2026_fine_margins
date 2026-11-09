@@ -52,6 +52,11 @@ export const api = {
   trade: (cardIds) => request('/trade', { method: 'POST', body: { card_ids: cardIds } }),
   reset: () => request('/reset', { method: 'POST' }),
   quizStart: (venue) => request('/quiz/start', { method: 'POST', body: { venue } }),
+  // Shootout duel: the unfinished duel, every pickable player, a new duel, and playing the current turn.
+  duelInfo: () => request('/duel'),
+  duelPlayers: () => request('/duel/players'),
+  duelStart: (mode) => request('/duel/start', { method: 'POST', body: { mode } }),
+  duelPlay: (duelId, picks) => request(`/duel/${duelId}/play`, { method: 'POST', body: { picks } }),
   quizAnswer: (questionId, optionId) =>
     request(`/quiz/${questionId}/answer`, { method: 'POST', body: { option_id: optionId } }),
 }

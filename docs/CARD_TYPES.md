@@ -62,6 +62,7 @@ Awarded by a fixed rule from the match data, for a performance that stands out. 
 - Shows: MR, position, label on the side edge, no tier. Rarity symbol: ★★★.
 - Obtained: trivia or live drop.
 - Status: Player of the Match, Game Winner and Brick Wall **in app**; Record Breaker **in app with test data only** (needs earlier games). The other ten 2025 games (official results and statistics, see `backend/app/testdata.py`) add these specials marked TEST once they are played on the tournament timeline, with made-up match ratings; Brick Wall there counts all saves because there is no xG.
+- Man of the Match and Game Winner can go to a player who also holds a profile card of the game (Tambellini is Sniper and Man of the Match, Zadina Volume Shooter and Game Winner). A goalkeeper holds one card per game: in the final Gajan is the Brick Wall (most high-danger saves) and Aeschlimann the Shot Stopper (best save percentage, 87% against Gajan's 84%).
 - "Team Leader" (highest xG on the losing team) is the Go-To Scorer profile card, so there is no separate type.
 
 ### 4. Road to Final (evolving)

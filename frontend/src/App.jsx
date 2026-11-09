@@ -17,6 +17,7 @@ import PackOpening from './pages/PackOpening'
 import PlayerProfile from './pages/PlayerProfile'
 import Predictions from './pages/Predictions'
 import Quiz from './pages/Quiz'
+import Shootout from './pages/Shootout'
 import Trade from './pages/Trade'
 
 function RequireAuth({ children }) {
@@ -79,6 +80,7 @@ export default function App() {
               <NavLink to="/quiz" data-tour="nav-quiz">Quiz</NavLink>
               <NavLink to="/predict" data-tour="nav-predict">Predictions</NavLink>
               <NavLink to="/trade" data-tour="nav-trade">Trade</NavLink>
+              <NavLink to="/duel" data-tour="nav-duel">Shootout</NavLink>
             </nav>
           )}
           {user && (
@@ -172,6 +174,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <Quiz />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/duel"
+            element={
+              <RequireAuth>
+                <Shootout />
               </RequireAuth>
             }
           />

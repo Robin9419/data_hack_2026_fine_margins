@@ -143,6 +143,20 @@ export default function Activities() {
       />,
     )
   const always = []
+  always.push(
+    <Activity
+      key="duel"
+      icon={
+        <Line>
+          <path d="M5 21 15 5M15 5l2-2 2 2-2 2zM4 21h5" />
+          <circle cx="18" cy="18" r="2" />
+        </Line>
+      }
+      title="Shootout duel"
+      text="Challenge a friend: pick players by their strengths and win the shootout. A free pack every duel, a special card for a win."
+      to="/duel"
+    />,
+  )
   if (trade.base_copies >= trade.cost)
     always.push(
       <Activity

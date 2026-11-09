@@ -42,9 +42,9 @@
       "why": "They got the \"Go-To Scorer\" card for leading their team in shots and in quality of chances."
     },
     "Shot Stopper": {
-      "prompt": "Which goalkeeper faced the most shots over the game and stopped the most of them?",
-      "hint": "A busy goalkeeper usually means their team spent a lot of time defending. Think about which side was under more pressure.",
-      "why": "They got the \"Shot Stopper\" card for making the most saves."
+      "prompt": "Which goalkeeper kept out the biggest share of the shots on his net?",
+      "hint": "It is not about how many shots a goalkeeper faced, but how many of them stayed out.",
+      "why": "They got the \"Shot Stopper\" card for the best save percentage of the game."
     },
     "Brick Wall": {
       "prompt": "Which goalkeeper, over the whole game, kept the most dangerous close-range chances out of the net?",

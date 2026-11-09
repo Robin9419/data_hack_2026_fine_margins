@@ -71,6 +71,8 @@ Open http://localhost:5173. Vite forwards `/api` to the backend on port 8000. AP
 | CSV loading, value formatting, match rank | `backend/app/content.py` |
 | API routes | `backend/app/main.py` |
 | Tournament timeline (stages, rotating goal and KPI prediction questions, pack contents) | `backend/app/tournament.py`; bar `frontend/src/components/TimelineBar.jsx`, predictions page `frontend/src/pages/Predictions.jsx`, results pop-up `frontend/src/components/ResultsModal.jsx` |
+| Shootout duel: player strengths and weaknesses (real data for the final's cards, sampled for the other games), the final's zone entries as starting positions, the play simulation with its explanation, and the bot | `backend/app/shootout.py`; routes `/api/duel*` and the packs in `backend/app/main.py` |
+| Shootout page and the half-rink view | `frontend/src/pages/Shootout.jsx`, `frontend/src/components/HalfRink.jsx`, `.duel-*` and `.rink-*` in `index.css` |
 | Activities in the gallery (daily card per gameday, social channel of the day, predictions, packs, trivia, trade, tickets) | `frontend/src/components/Activities.jsx`; `/api/activities` and `SOCIALS` in `backend/app/main.py` |
 | Users / sessions / owned cards (SQLite) | `backend/app/db.py` → `backend/hockey_cards.sqlite3` |
 | Styles (deliberately plain, ready for design) | `frontend/src/index.css` |

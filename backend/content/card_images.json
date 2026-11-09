@@ -1,6 +1,11 @@
 {
   "_comment": "Card images (under frontend/public), keyed by card id; they override the portrait from docs/player-images.json. A value is a URL or {image_url, position (CSS object-position for the tall card crop), credit, source}. Every special card has its own photo, never shared with another card or the player's base card (the '-special' artwork, and frontend/public/specials). On performance and road cards the image is also the full art action image. Muldowney's special card is the generated 'pressure-reliever' card. The photos are press, club and agency pictures for the internal demo only; rights are not established.",
-  "gajan": "/players/gajan-special.jpg",
+  "aeschlimann": {
+    "image_url": "/players/aeschlimann-special.jpg",
+    "position": "55% 30%",
+    "credit": "Supplied by the project team (rights not established)",
+    "source": ""
+  },
   "tambellini": "/players/tambellini-special.jpg",
   "fink": "/players/fink-special.jpg",
   "corvi": "/players/corvi-special.jpg",

@@ -49,6 +49,11 @@ const STEPS = [
     text: 'Got duplicates? Trade 3 spares for 1 card you do not have yet.',
   },
   {
+    target: 'nav-duel',
+    title: 'Shootout duel',
+    text: 'Challenge a friend: pick players for the attack and the defence, then watch the play. Every player is good at different things, taken from how they really played. Every duel earns a pack, a win also a special card.',
+  },
+  {
     target: 'timeline',
     title: 'Tournament timeline',
     text: 'Follow the Spengler Cup day by day. New cards, quizzes and predictions open as the tournament moves on.',

@@ -10,7 +10,7 @@
     "Shot Blocker": "Puts their body in front of shots to protect the goal.",
     "Workhorse": "Plays the most minutes and skates the farthest.",
     "Go-To Scorer": "The main scoring threat on their team: leads their side in shots and expected goals.",
-    "Shot Stopper": "The goalkeeper who makes the most saves."
+    "Shot Stopper": "The goalkeeper with the best save percentage: the biggest share of the shots on goal kept out."
   },
   "archetype_metrics": {
     "_comment": "The three KPIs that earn a player each archetype (see the definitions in 'archetypes'). The card back shows these, and the clips next to it come from the events behind them.",
@@ -22,7 +22,7 @@
     "Shot Blocker": ["blocks", "puck_contest_wins", "toi"],
     "Workhorse": ["toi", "distance", "puck_contest_wins"],
     "Go-To Scorer": ["shots", "xg_sum", "goals"],
-    "Shot Stopper": ["saves", "save_pct", "shots_on_goal_against"]
+    "Shot Stopper": ["save_pct", "saves", "shots_on_goal_against"]
   },
   "performance_specials": {
     "_comment": "Specials awarded by a fixed rule from the match data (see _add_performance_cards in content.py). 'rule' is the plain-language qualification shown as the quiz clue; 'attributes' are the KPIs on the card back.",
@@ -141,13 +141,13 @@
       "video": null
     },
     {
-      "id": "gajan",
-      "team": "U.S. Collegiate Selects",
-      "jersey": 30,
+      "id": "aeschlimann",
+      "team": "HC Davos",
+      "jersey": 29,
       "position": "Goalkeeper",
       "title": "Shot Stopper",
-      "attributes": ["saves", "shots_on_goal_against", "shot_attempts_against"],
-      "explanation": "Made 26 saves, the most in the game, as Davos sent 69 shot attempts his way. 26 of the 31 shots on goal he faced stayed out.",
+      "attributes": ["save_pct", "saves", "shots_on_goal_against"],
+      "explanation": "Stopped 20 of the 23 shots on goal he faced (87%), the best save percentage of the game, as Davos won 6–3. All 13 shots from 11 m or farther stayed out.",
       "achievement": null,
       "video": null
     }

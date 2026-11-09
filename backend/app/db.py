@@ -79,6 +79,14 @@ CREATE TABLE IF NOT EXISTS social_follows (
     platform TEXT NOT NULL,
     PRIMARY KEY (user_id, platform)
 );
+-- Shootout duels (see shootout.py): the whole duel as JSON. Starting a new duel drops an unfinished one.
+CREATE TABLE IF NOT EXISTS duels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    stage TEXT NOT NULL,
+    state TEXT NOT NULL,
+    finished INTEGER NOT NULL DEFAULT 0
+);
 """
 
 
@@ -265,6 +273,7 @@ def clear_cards(user_id: int):
         conn.execute("DELETE FROM watch_packs WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM social_follows WHERE user_id = ?", (user_id,))
         conn.execute("DELETE FROM trivia_rounds WHERE user_id = ?", (user_id,))
+        conn.execute("DELETE FROM duels WHERE user_id = ?", (user_id,))
         conn.execute("UPDATE users SET stage = 'pre', last_daily_claim = NULL WHERE id = ?", (user_id,))
 
 
@@ -389,3 +398,30 @@ def claim_watch_packs(user_id: int, game_id: str) -> int:
         rows = conn.execute("UPDATE watch_packs SET claimed = 1 WHERE user_id = ? AND game_id = ? AND claimed = 0 "
                             "RETURNING packs", (user_id, game_id)).fetchall()
     return sum(r["packs"] for r in rows)
+
+
+def create_duel(user_id: int, stage: str, state: dict) -> int:
+    """Stores a new duel and drops the user's unfinished one."""
+    with connect() as conn:
+        conn.execute("DELETE FROM duels WHERE user_id = ? AND finished = 0", (user_id,))
+        cur = conn.execute("INSERT INTO duels (user_id, stage, state) VALUES (?, ?, ?)",
+                           (user_id, stage, json.dumps(state)))
+        return cur.lastrowid
+
+
+def get_duel(user_id: int, duel_id: int | None = None) -> tuple[int, dict] | None:
+    """(id, state) of the given duel, or of the user's unfinished one."""
+    with connect() as conn:
+        if duel_id is None:
+            row = conn.execute("SELECT id, state FROM duels WHERE user_id = ? AND finished = 0 ORDER BY id DESC",
+                               (user_id,)).fetchone()
+        else:
+            row = conn.execute("SELECT id, state FROM duels WHERE user_id = ? AND id = ?", (user_id, duel_id)).fetchone()
+    return (row["id"], json.loads(row["state"])) if row else None
+
+
+def save_duel(duel_id: int, state: dict):
+    with connect() as conn:
+        conn.execute("UPDATE duels SET state = ?, finished = ? WHERE id = ?",
+                     (json.dumps(state), int(state["finished"]), duel_id))
+

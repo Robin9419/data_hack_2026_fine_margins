@@ -42,7 +42,7 @@ The table includes all current player-performance awards. Entries marked **Manua
 | Volume Shooter | Scoring | **Manually assigned.** Profile for the player taking the most shots; supporting KPIs: shots, total xG and top shot speed. |
 | Chance Creator | Scoring | **Manually assigned.** Profile for the player generating the greatest total shot xG; supporting KPIs: total xG, shots and goals. |
 | Go-To Scorer | Scoring | **Manually assigned.** Team-leading shooting threat; supporting KPIs: shots, total xG and goals. |
-| Shot Stopper | Goalkeeping | **Manually assigned.** Profile for the goalkeeper making the most saves; supporting KPIs: saves, save percentage and shots on goal against. |
+| Shot Stopper | Goalkeeping | **Manually assigned.** Profile for the goalkeeper with the best save percentage; supporting KPIs: save percentage, saves and shots on goal against. |
 | Shot Blocker | Defending | **Manually assigned.** Shot-blocking profile; supporting KPIs: blocked shots, puck battles won and time on ice. |
 | Workhorse | Work Rate / Skating | **Manually assigned.** Workload profile emphasizing time on ice and distance skated; supporting KPIs also include puck battles won. Definition is pending refinement. |
 | Speedster | Work Rate / Skating | **Manually assigned.** Speed-focused profile; supporting KPIs: top skating speed, puck battles won and distance skated. |

@@ -42,7 +42,7 @@ const AWARDS = [
     ['Speedster', 'Fastest skater on the ice.'],
   ]],
   ['Goalkeeping', [
-    ['Shot Stopper', 'Most saves.'],
+    ['Shot Stopper', 'Best save percentage.'],
     ['Brick Wall', 'Most saves on high-danger chances, even in a loss.', PERFORMANCE_ICON.wall],
   ]],
 ]
@@ -102,7 +102,7 @@ const AWARD_DETAIL = {
   'Pass Thief': { about: 'Reads the play and steals the most opponent passes.', kpis: ['interceptions_total', 'puck_contest_wins', 'blocks'] },
   Workhorse: { about: 'Never stops: the most minutes on the ice and the most distance skated.', kpis: ['toi', 'distance', 'puck_contest_wins'] },
   Speedster: { about: 'The fastest skater on the ice, who also wins the race to the puck.', kpis: ['skate_top_speed', 'puck_contest_wins', 'distance'] },
-  'Shot Stopper': { about: 'The goalie who made the most saves.', kpis: ['saves', 'save_pct', 'shots_on_goal_against'] },
+  'Shot Stopper': { about: 'The goalie who kept out the biggest share of the shots on goal.', kpis: ['save_pct', 'saves', 'shots_on_goal_against'] },
   'Brick Wall': { about: 'The goalie who stopped the most high-danger chances, even if the team lost.', kpis: ['saves', 'save_pct', 'shots_on_goal_against'], note: 'A high-danger chance is a shot with at least a 15% chance of going in (0.15 xG), usually from close to the net.' },
 }
 

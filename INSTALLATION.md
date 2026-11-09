@@ -1,4 +1,6 @@
-# Installation and local demo
+# Installation and evaluation guide
+
+This guide describes how to run the submission locally for evaluation. It assumes you have access to the original Wisehockey exports and arena recording supplied for the hackathon. Use those files in the locations below.
 
 ## Prerequisites
 
@@ -7,11 +9,25 @@
 - To launch both servers with `make`: Linux, WSL, or macOS with Make.
 - Internet access for the initial dependency installation, external player portraits, and YouTube videos.
 
-Docker, cloud credentials, and the full game recording are not required. All necessary CSVs, content files, and local images are included.
+Docker and cloud credentials are not required. Card configuration, saved public tournament data, and local images are included. The hackathon's Wisehockey CSV exports and full arena recording are supplied separately from the submission.
+
+## Supply the match data before starting
+
+From the hackathon dataset, use the final-game exports for U.S. Collegiate Selects vs. HC Davos on December 31, 2025. Create a `data/` directory at the repository root and copy these two files into it, preserving their exact filenames:
+
+```text
+data/
+  U.S. Collegiate Selects_HC Davos_Wisehockey_Match_Statistics_31_12_2025 All.csv
+  U.S. Collegiate Selects_HC Davos_Wisehockey_Match_Events_31_12_2025.csv
+```
+
+Use the original CSV contents and headers. Period-specific exports and sample spreadsheets are not needed. The backend requires both files to start; installing dependencies does not download or generate them. Their filenames are configured in `backend/content/match.json` (`stats_file` and `events_file`).
+
+The local data directory and generated clips are covered by `.gitignore`. Images are included in the submission, so no separate image setup is needed.
 
 ## Quick start on Linux, WSL, or macOS
 
-Clone the repository or download and extract a ZIP. From the project directory:
+Clone the repository or download and extract a ZIP. Supply the two CSVs as described above, then run these commands from the project directory:
 
 ```bash
 make install
@@ -23,7 +39,7 @@ make dev
 - App: http://localhost:5173
 - API documentation: http://localhost:8000/docs
 
-In the browser, choose a username and optionally a favorite team, open the starter pack, and select a matchday using the tournament timeline.
+In the browser, choose a username and optionally a favorite team, then open the starter pack. Use the tournament timeline to explore different matchdays. For evaluation, advance to December 31 or the post-tournament stage to inspect the final's Wisehockey-based cards and KPI explanations. Predictions can be tested before advancing a matchday; trivia and newly earned cards become available after the games have been played in the simulation.
 
 ## Manual launch
 
@@ -65,13 +81,13 @@ For a full reset, stop both servers, remove the local database and any associate
 
 ## Generate optional arena videos
 
-The demo launches without local videos. If you have the full recording and permission to use it, place it at this path:
+The app runs without the full recording or generated clips once the required CSVs are supplied. To evaluate the arena replays linked to individual events, copy the original recording from the hackathon dataset to this exact path relative to the repository root:
 
 ```text
 data/20251231_115035_SpenglerCup_Kam1 31.12.25 Game 11.mp4
 ```
 
-Then, from the project directory:
+After supplying both CSVs, placing the recording, and installing dependencies, run these commands from the project directory:
 
 ```bash
 cd backend
@@ -79,11 +95,13 @@ source .venv/bin/activate
 python -m scripts.cut_clips
 ```
 
-On Windows, use the PowerShell activation command described above. `imageio-ffmpeg` is installed with the backend dependencies. The cutter generates clips and poster images in `backend/media/clips/`, skipping existing pairs. If clip windows or synchronization change, regenerate with `python -m scripts.cut_clips --force`; this overwrites existing clips. Restart the backend afterwards.
+On Windows, use the PowerShell activation command described above. `imageio-ffmpeg` is installed with the backend dependencies. The cutter generates `backend/media/clips/<event Timestamp>.mp4` and matching `.jpg` poster images, skipping existing pairs. These are served by the backend at `/api/media/clips/`. Clip generation is manual and does not run at server startup; allow several minutes, depending on your machine and the number of events. If clip windows or synchronization change, regenerate with `python -m scripts.cut_clips --force`; this overwrites existing clips. Restart the backend afterwards.
 
 Clipping accounts for shared event timestamps and longer zone-entry sequences. The offset and clip windows are configured in `backend/content/videos.json`. The recording and generated media remain local and are excluded by `.gitignore`.
 
 ## Tests and frontend build
+
+Supply the two CSVs before running backend tests. The arena recording is only needed for clip generation.
 
 From the project directory on Linux/WSL/macOS:
 
@@ -107,6 +125,8 @@ npm --prefix frontend run build
 
 - Run `python -m scripts.fetch_testdata` from `backend/` to update saved official tournament games. Internet access is required, and the script overwrites `backend/content/testdata.json`.
 - Afterwards, run `python -m scripts.player_games` from `backend/` to update the included player statistics export. Neither step is needed for installation.
+- If startup reports a missing CSV, check the `data/` directory, exact filenames (including spaces), and `backend/content/match.json`.
+- If the cutter reports `Recording not found`, check the recording path in `backend/content/videos.json`.
 - If packages are missing, rerun `make install` or install the requirements in the activated virtual environment.
 - For API connection errors, check that the backend is running on port 8000 and the frontend on port 5173.
 - For YouTube errors, check VPN or corporate filters and ad blockers, particularly for `youtube-nocookie.com`. Individual videos may have regional or embedding restrictions.

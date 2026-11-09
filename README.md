@@ -17,7 +17,7 @@ Setup and launch instructions: [INSTALLATION.md](INSTALLATION.md).
 
 ## Data and demo scope
 
-The U.S. Collegiate Selects vs. HC Davos final uses the included Wisehockey match statistics and events. The backend calculates metrics including Pass Packing, pressure on the passer, Expected Assists, Zone Entries/Exits, and Interceptions. Individual events make the calculations traceable on the cards. Decimal statistics display two decimal places; a third is retained when the value would otherwise round to zero.
+The U.S. Collegiate Selects vs. HC Davos final uses separately supplied Wisehockey match statistics and events. These CSV exports are not included in the repository; place them under `data/` as described in the installation guide before starting the backend. The backend calculates metrics including Pass Packing, pressure on the passer, Expected Assists, Zone Entries/Exits, and Interceptions. Individual events make the calculations traceable on the cards. Decimal statistics display two decimal places; a third is retained when the value would otherwise round to zero.
 
 Other tournament games use saved data from the official Spengler Cup game pages. Additional demo KPIs and ratings for these games are partly simulated and do not represent a complete Wisehockey event analysis. Sources and definitions are recorded in the content files and the app's KPI explanations.
 
@@ -31,7 +31,7 @@ Sign-in is a demo flow without passwords. Tournament progress, sessions, and car
 | `backend/content/` | Card configuration, player profiles, image sources, and saved tournament data |
 | `backend/scripts/` | Data updates, player statistics export, and optional video clipping |
 | `backend/tests/` | Tests for calculations and app features |
-| `data/` | The two required CSV exports for the final |
+| `data/` | Local CSV exports for the final and optional recording; excluded from Git |
 | `frontend/src/` | React interface with Vite |
 | `frontend/public/` | Images, logos, and player statistics export used by the app |
 | `scripts/dev.py`, `Makefile` | Local installation and launch of both servers |
@@ -40,4 +40,4 @@ Sign-in is a demo flow without passwords. Tournament progress, sessions, and car
 
 Local images are included in the repository; some player portraits load from external sources. Sources and image credits are recorded primarily in `backend/content/player-images.json`, `card_images.json`, and `legends.json`. Reuse rights for several press, club, and agency images have not been established; public distribution requires appropriate permissions or replacement images.
 
-YouTube videos are embedded and require internet access. Availability also depends on regional restrictions, embedding policies, and browser or network filters. The full arena recording and generated clips are not included in the repository. The app works without these files; optional video clipping is covered in the installation guide.
+YouTube videos are embedded and require internet access. Availability also depends on regional restrictions, embedding policies, and browser or network filters. The full arena recording and generated clips are not included in the repository. With the required CSVs supplied, the app works without the recording or clips; optional video clipping is covered in the installation guide.

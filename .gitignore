@@ -25,6 +25,8 @@ frontend/dist/
 .codex/
 .agents/
 
-# Media: full-game recordings and the clips cut from them (backend/scripts/cut_clips.py)
-data/*.mp4
+# Restricted match exports and full-game recordings: supplied separately
+data/
+
+# Generated event clips (backend/scripts/cut_clips.py)
 backend/media/

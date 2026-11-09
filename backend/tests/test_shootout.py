@@ -29,7 +29,7 @@ class ShootoutTests(unittest.TestCase):
         self.assertIn('blocking', self.game.profiles['mccartthy']['strengths'])
 
     def test_other_games_are_sampled_and_stable(self):
-        sampled = [p for p in self.game.profiles.values() if not p['real']]
+        sampled = [p for p in self.game.profiles.values() if not p['real'] and not p.get('stand_in')]
         self.assertTrue(sampled)
         self.assertTrue(all(t['evidence'] is None for p in sampled for t in p['traits'].values()))
         again = shootout.Shootout(self.game.content).profiles
@@ -89,10 +89,22 @@ class ShootoutTests(unittest.TestCase):
             self.assertTrue(all(self.game.profiles[cid]['real'] for cid in duel['bot_picks'].values()))
 
     def test_players_without_data_are_weaker(self):
-        sampled = [p for p in self.game.profiles.values() if not p['real']]
-        types = {self.game.content.cards[p['card_id']]['type'] for p in sampled}
+        sampled = [p for p in self.game.profiles.values() if not p['real'] and not p.get('stand_in')]
+        types = {self.game.content.cards[p['card_id']]['type'] for p in sampled if p['card_id'] in self.game.content.cards}
         self.assertTrue({'base', 'legend', 'special'} <= types)
-        self.assertTrue(all(t['value'] <= shootout.SAMPLED_MAX for p in sampled for t in p['traits'].values()))
+        content = self.game.content
+        special = lambda p: content.cards.get(p['card_id'], {'type': 'special'})['type'] in ('special', 'legend')
+        self.assertTrue(all(t['value'] <= shootout.SAMPLED_MAX for p in sampled if not special(p) for t in p['traits'].values()))
+        legend = lambda p: content.cards.get(p['card_id'], {})['type'] == 'legend' if p['card_id'] in content.cards else False
+        self.assertTrue(all(t['value'] <= shootout.SPECIAL_MAX for p in sampled if special(p) and not legend(p) for t in p['traits'].values()))
+        self.assertTrue(all(t['value'] <= shootout.LEGEND_MAX for p in sampled if legend(p) for t in p['traits'].values()))
+        mean = lambda ps: sum(t['value'] for p in ps for t in p['traits'].values()) / sum(len(p['traits']) for p in ps)
+        # Special cards are stronger than base cards, and a forward is still better up close than a defender.
+        self.assertGreater(mean([p for p in sampled if special(p)]), mean([p for p in sampled if not special(p)]) + 8)
+        fw = [p for p in sampled if special(p) and p['position'] == 'Forward']
+        df = [p for p in sampled if special(p) and p['position'] == 'Defender']
+        close = lambda ps: sum(p['traits']['close']['value'] for p in ps) / len(ps)
+        self.assertGreater(close(fw), close(df))
 
     def test_duels_finish(self):
         skaters = [cid for cid, p in self.game.profiles.items() if p['role'] == 'skater']
@@ -120,10 +132,13 @@ class ShootoutTests(unittest.TestCase):
         token = client.post('/api/login', json={'username': f'duel{random.random()}'}).json()['token']
         headers = {'Authorization': f'Bearer {token}'}
         client.post('/api/tournament/stage', json={'stage': 'post'}, headers=headers)
+        user = db.user_for_token(token)
+        db.grant_cards(user['id'], ['brick-wall', 'corvi'])
         players = client.get('/api/duel/players', headers=headers).json()['players']
-        self.assertGreater(len(players), 200)
-        goalie = next(e['card']['id'] for e in players if e['role'] == 'goalie')
-        skater = next(e['card']['id'] for e in players if e['role'] == 'skater')
+        ids = {e['card']['id'] for e in players}
+        self.assertLess(len(players), 50)  # only the user's collection, not every card
+        self.assertTrue({'brick-wall', 'corvi'} <= ids)
+        goalie, skater = 'brick-wall', 'corvi'
         rewarded = 0
         for _ in range(4):
             duel = client.post('/api/duel/start', json={'mode': '1v1'}, headers=headers).json()
@@ -167,6 +182,112 @@ class ShootoutTests(unittest.TestCase):
         res = client.post(f"/api/duel/{duel['id']}/play", json={'picks': {'carrier': 'player-of-the-match', 'support': 'base-hcd-19'}},
                           headers=headers)
         self.assertEqual(res.status_code, 400)
+
+    def test_api_only_picks_from_your_collection(self):
+        client = TestClient(main.app)
+        token = client.post('/api/login', json={'username': f'duel{random.random()}'}).json()['token']
+        headers = {'Authorization': f'Bearer {token}'}
+        client.post('/api/tournament/stage', json={'stage': 'post'}, headers=headers)
+        user = db.user_for_token(token)
+        owned = main.owned_now(user)
+        self.assertNotIn('corvi', owned)
+        shown = {e['card']['id'].removeprefix(shootout.STAND_IN) for e in client.get('/api/duel/players', headers=headers).json()['players']}
+        self.assertTrue(shown <= set(owned) | set(main.road_cards_for(user)))
+        duel = client.post('/api/duel/start', json={'mode': '1v1'}, headers=headers).json()
+        slot = 'goalie' if 'goalie' in duel['turn']['slots'] else 'carrier'
+        card = 'brick-wall' if slot == 'goalie' else 'corvi'
+        res = client.post(f"/api/duel/{duel['id']}/play", json={'picks': {slot: card}}, headers=headers)
+        self.assertEqual(res.status_code, 400)
+
+    def test_no_goalkeeper_puts_a_skater_in_goal(self):
+        client = TestClient(main.app)
+        token = client.post('/api/login', json={'username': f'duel{random.random()}'}).json()['token']
+        headers = {'Authorization': f'Bearer {token}'}
+        user = db.user_for_token(token)
+        owned = main.owned_now(user)
+        profiles = self.game.profiles
+        for cid in [c for c in owned if profiles.get(c, {}).get('role') == 'goalie']:
+            self.skipTest('starter pack had a goalkeeper')
+        db.grant_cards(user['id'], ['corvi'])
+        players = client.get('/api/duel/players', headers=headers).json()['players']
+        goalies = [e for e in players if e['role'] == 'goalie']
+        self.assertEqual(len(goalies), 1)
+        stand_in = goalies[0]
+        self.assertTrue(stand_in['profile']['stand_in'])
+        self.assertTrue(all(t['value'] <= 18 for t in stand_in['profile']['traits'].values()))
+        again = client.get('/api/duel/players', headers=headers).json()['players']
+        self.assertEqual([e['card']['id'] for e in again if e['role'] == 'goalie'], [stand_in['card']['id']])
+        duel = client.post('/api/duel/start', json={'mode': '1v1'}, headers=headers).json()
+        while not duel['finished']:
+            slot = 'goalie' if 'goalie' in duel['turn']['slots'] else 'carrier'
+            card = stand_in['card']['id'] if slot == 'goalie' else 'corvi'
+            res = client.post(f"/api/duel/{duel['id']}/play", json={'picks': {slot: card}}, headers=headers)
+            if res.status_code == 400:  # the stand-in may be Corvi himself or the bot may already hold the player
+                break
+            duel = res.json()['duel']
+
+    def test_ones_to_watch_cards_can_play(self):
+        client = TestClient(main.app)
+        token = client.post('/api/login', json={'username': f'duel{random.random()}'}).json()['token']
+        headers = {'Authorization': f'Bearer {token}'}
+        user = db.user_for_token(token)
+        road = next(c for c in main.road_cards_for(user).values() if c['player']['position'] != 'Goalkeeper')
+        self.assertIn(road['id'], self.game.profiles)
+        db.grant_cards(user['id'], [road['id']])
+        players = client.get('/api/duel/players', headers=headers).json()['players']
+        self.assertIn(road['id'], {e['card']['id'] for e in players})
+        # No collector or context (reward) cards are ever playable.
+        self.assertFalse([e for e in players if e['card']['type'] == 'reward'])
+        duel = client.post('/api/duel/start', json={'mode': '1v1'}, headers=headers).json()
+        if 'carrier' in duel['turn']['slots']:
+            res = client.post(f"/api/duel/{duel['id']}/play", json={'picks': {'carrier': road['id']}}, headers=headers)
+            self.assertEqual(res.status_code, 200, res.text)
+
+    def test_ones_to_watch_only_have_data_once_the_final_is_played(self):
+        client = TestClient(main.app)
+        token = client.post('/api/login', json={'username': f'duel{random.random()}'}).json()['token']
+        headers = {'Authorization': f'Bearer {token}'}
+        user = db.user_for_token(token)
+        # A star who played the final (a few stars did not, they never have data).
+        road = next(c for c in main.road_cards_for(user) if self.game.final_profiles[c]['real'])
+        db.grant_cards(user['id'], [road])
+        for stage, real in (('pre', False), ('post', True)):
+            client.post('/api/tournament/stage', json={'stage': stage}, headers=headers)
+            players = client.get('/api/duel/players', headers=headers).json()['players']
+            entry = next(e for e in players if e['card']['id'] == road)
+            self.assertEqual(entry['real'], real)
+            traits = entry['profile']['traits'].values()
+            self.assertEqual(all(t['evidence'] for t in traits), real)
+            self.assertEqual(bool(entry['profile']['game']), real)
+
+    def test_players_are_sorted_by_rarity(self):
+        client = TestClient(main.app)
+        token = client.post('/api/login', json={'username': f'duel{random.random()}'}).json()['token']
+        headers = {'Authorization': f'Bearer {token}'}
+        client.post('/api/tournament/stage', json={'stage': 'post'}, headers=headers)
+        user = db.user_for_token(token)
+        road = next(iter(main.road_cards_for(user)))
+        db.grant_cards(user['id'], [road, 'corvi', 'brick-wall'])
+        players = client.get('/api/duel/players', headers=headers).json()['players']
+        ranks = [main.duel_rarity(e['card']) for e in players]
+        self.assertEqual(ranks, sorted(ranks, reverse=True))
+        self.assertGreater(len(set(ranks)), 1)
+
+    def test_bot_picks_only_available_cards(self):
+        early = main.get_content().available(set())  # no game played yet: no real-data cards exist
+        for role in ('skater', 'goalie'):
+            pool = shootout.bot_pool(role, available=early)
+            self.assertTrue(pool)
+            self.assertTrue(all(cid in early for cid in pool))
+        # Once the final is played its real-data cards are available and the bot prefers them.
+        final = main.get_content().tournament.final['id']
+        late = main.get_content().available({final})
+        for role in ('skater', 'goalie'):
+            pool = shootout.bot_pool(role, available=late)
+            self.assertTrue(all(cid in late and self.game.profiles[cid]['real'] for cid in pool))
+        # A duel from an early stage works end to end.
+        duel = shootout.new_duel('2v2', random.Random(3), early)
+        self.assertTrue(all(cid in early for cid in duel['bot_picks'].values()))
 
 
 if __name__ == '__main__':

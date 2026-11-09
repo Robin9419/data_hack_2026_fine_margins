@@ -12,7 +12,7 @@ import PlayerPhoto from '../components/PlayerPhoto'
 // play from the players' strengths and weaknesses, and the page replays it on the rink and explains it. The page stays
 // simple for newcomers: a player shows what they are good at in a few words, and the numbers behind it are one tap away
 // (the stats sheet, "Show the numbers"). Every player card can play; the ones without tracking data wait under
-// "Other players".
+// "Other players". The user only picks from their own collection; the bot can pick any card available at the stage.
 
 const SLOT_LABEL = { carrier: 'Puck carrier', support: 'Support', goalie: 'Goalie', defender: 'Defender' }
 const SLOT_ROLE = { carrier: 'skater', support: 'skater', defender: 'skater', goalie: 'goalie' }
@@ -35,7 +35,7 @@ export default function Shootout() {
   const navigate = useNavigate()
   const { setProgress } = useAuth()
   const [info, setInfo] = useState(null)
-  const [players, setPlayers] = useState(null) // every pickable player card, the real-data ones first
+  const [players, setPlayers] = useState(null) // the player cards in the user's collection, the real-data ones first
   const [duel, setDuel] = useState(null)
   const [picks, setPicks] = useState({})
   const [slot, setSlot] = useState(null)
@@ -203,8 +203,9 @@ function Lobby({ active, busy, onStart, onContinue }) {
           <li>Three rounds: you attack, then your friend attacks. Level after three rounds: sudden death.</li>
           <li>Every attack starts at the blue line, from a real zone entry of the final.</li>
           <li>The defence picks first. When you attack you see who defends, but not what they are good at until they have played.</li>
-          <li>Pick any player for any turn, as often as you like. A player just can't play for both sides in the same turn.</li>
-          <li>Players from the final use the real tracking data. You can pick any other card too, but without tracking data their stats are random and weaker.</li>
+          <li>You can only pick players from your own collection, as often as you like. Collect more cards to get more choice.</li>
+          <li>Your friend can pick any card that exists at this point of the tournament.</li>
+          <li>Players from the final use the real tracking data. Other cards work too, but without tracking data their stats are random and weaker.</li>
         </ul>
       </details>
     </div>
@@ -301,10 +302,12 @@ function Picker({ duel, players, picks, slot, setSlot, setPicks, busy, onSubmit,
   }
 
   const fitting = players.filter((e) => e.role === SLOT_ROLE[slot])
-  const real = fitting.filter((e) => e.real)
+  // Without any tracking data in the collection there is nothing to set apart: everyone is shown up front.
+  const noData = !fitting.some((e) => e.real)
+  const real = noData ? fitting : fitting.filter((e) => e.real)
   const q = query.trim().toLowerCase()
   const others = fitting.filter(
-    (e) => !e.real && (!q || [fullName(e.card), e.card.player.team, e.card.title].some((t) => t && t.toLowerCase().includes(q))),
+    (e) => !noData && !e.real && (!q || [fullName(e.card), e.card.player.team, e.card.title].some((t) => t && t.toLowerCase().includes(q))),
   )
   const tile = (e) => (
     <Tile
@@ -337,8 +340,13 @@ function Picker({ duel, players, picks, slot, setSlot, setPicks, busy, onSubmit,
       <p className="duel-hand-title">
         Choose your <strong>{SLOT_LABEL[slot]?.toLowerCase()}</strong>
       </p>
+      {!fitting.length && (
+        <p className="muted small">
+          You don't have {SLOT_ROLE[slot] === 'goalie' ? 'a goalkeeper' : 'a skater'} card yet. Open packs to collect some.
+        </p>
+      )}
       <div className="duel-hand">{real.map(tile)}</div>
-      <details className="duel-bench">
+      {!noData && <details className="duel-bench">
         <summary>
           Other players ({fitting.length - real.length}) <span className="muted">· no tracking data, so their stats are random and weaker</span>
         </summary>
@@ -361,7 +369,7 @@ function Picker({ duel, players, picks, slot, setSlot, setPicks, busy, onSubmit,
           </button>
         )}
         {!others.length && <p className="muted small">No players match.</p>}
-      </details>
+      </details>}
     </div>
   )
 }
@@ -407,7 +415,9 @@ function Tile({ entry, picked, blocked, slot, onPick, onStats }) {
         <PlayerPhoto player={card.player} className="duel-photo" />
         <span className="duel-tile-body">
           <strong>{card.player.last_name}</strong>
-          <small className="muted">{card.title ?? `${card.player.position} · ${card.player.team}`}</small>
+          <small className="muted">
+            {profile.stand_in ? 'Stand-in goalie · a skater in goal' : card.title ?? `${card.player.position} · ${card.player.team}`}
+          </small>
           {blocked ? <small className="muted">{blocked}</small> : <Good profile={profile} slot={slot} />}
           {picked && <small className="duel-picked">{SLOT_LABEL[picked]}</small>}
         </span>
@@ -443,7 +453,9 @@ function StatsSheet({ entry, onClose }) {
               {card.title ?? 'Base card'} · {entry.position}
             </p>
             <p className={`small ${profile.real ? 'duel-real' : 'muted'}`}>
-              {profile.real
+              {profile.stand_in
+                ? 'You have no goalkeeper card, so this skater plays in goal with really bad goalie stats.'
+                : profile.real
                 ? `Real tracking data from ${profile.game}`
                 : `No tracking data for this player, so the stats are random, based on the position, and weaker than the real ones.`}
             </p>

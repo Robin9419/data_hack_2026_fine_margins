@@ -747,7 +747,20 @@ def open_all_packs(user: dict = Depends(current_user)):
 # Shootout duel against a bot (see shootout.py). It can be played as often as the user likes: every finished duel
 # pays a free pack and a win a second pack with a special card.
 DUEL_PACK_CARDS = 5
-DUEL_CARD_KEYS = ("id", "type", "kind", "special_type", "title", "player", "match", "rating", "edition", "test")
+DUEL_CARD_KEYS = ("id", "type", "kind", "special_type", "title", "player", "match", "rating", "edition", "test", "road")
+
+
+def duel_profiles(user: dict) -> dict[str, dict]:
+    """The player profiles at the user's stage: tracking data only exists for games that are played."""
+    return shootout.get_shootout().at(get_content().tournament.final["id"] in played_for(user))
+
+
+def duel_collection(user: dict, roads: dict[str, dict]) -> list[str]:
+    """The player cards the user can play in a duel: the cards of their collection that are players (not the collector
+    and context cards), including their Ones to Watch cards, which are not part of the regular card set."""
+    profiles = shootout.get_shootout().profiles
+    own_roads = [cid for cid in db.owned_cards(user["id"]) if cid in roads]
+    return [cid for cid in [*owned_now(user), *own_roads] if cid in profiles]
 
 
 class DuelStart(BaseModel):
@@ -758,11 +771,20 @@ class DuelPlay(BaseModel):
     picks: dict[str, str]  # slot (carrier, support, goalie, defender) -> card id
 
 
-def duel_entry(cid: str, show_profile: bool) -> dict:
+def duel_rarity(card: dict) -> int:
+    """How rare a card is, as its symbol shows: 4 legends and champion Ones to Watch (three stars), 3 Ones to Watch (two
+    stars), 2 impact specials, 1 base cards."""
+    if card["type"] == "legend" or (card.get("road") or {}).get("stage") == 4:
+        return 4
+    return 3 if card.get("kind") == "road" else 2 if card["type"] == "special" else 1
+
+
+def duel_entry(cid: str, show_profile: bool, roads: dict[str, dict], profiles: dict[str, dict]) -> dict:
     """A card in a duel: what the card face needs, and its strengths and weaknesses if the user may see them (their
     own cards, and the opponent's once they have played)."""
-    card = get_content().cards[cid]
-    profile = shootout.get_shootout().profiles[cid]
+    base = cid.removeprefix(shootout.STAND_IN)
+    card = {**(roads.get(base) or get_content().cards[base]), "id": cid}
+    profile = profiles[cid]
     public = {k: v for k, v in profile.items() if k != "who"} if show_profile else None
     return {"card": {k: card[k] for k in DUEL_CARD_KEYS if k in card}, "profile": public,
             "role": profile["role"], "position": profile["position"], "real": profile["real"]}
@@ -778,6 +800,7 @@ def duel_playable(duel: dict) -> bool:
 
 
 def duel_view(duel_id: int, duel: dict, user: dict) -> dict:
+    roads = road_cards_for(user)
     turn = None
     if not duel["finished"]:
         attacking = duel["attacker"] == "you"
@@ -787,7 +810,7 @@ def duel_view(duel_id: int, duel: dict, user: dict) -> dict:
             "scenario": duel["scenario"],
             # The defence commits first: when the user attacks, the bot's goalie and defender are known (their
             # strengths only once scouted). When the user defends, the bot picks its attackers afterwards.
-            "opponent": {slot: duel_entry(cid, cid in duel["scouted"]) for slot, cid in (duel["bot_picks"] or {}).items()},
+            "opponent": {slot: duel_entry(cid, cid in duel["scouted"], roads, duel_profiles(user)) for slot, cid in (duel["bot_picks"] or {}).items()},
         }
     return {
         "id": duel_id, "mode": duel["mode"], "round": duel["round"], "regulation": shootout.REGULATION_ROUNDS,
@@ -818,16 +841,27 @@ def duel_info(user: dict = Depends(current_user)):
 
 @app.get("/api/duel/players")
 def duel_players(user: dict = Depends(current_user)):
-    """Every player card the user can pick, with its strengths and weaknesses: the real-data players first."""
-    profiles = shootout.get_shootout().profiles
-    order = sorted(profiles, key=lambda cid: (not profiles[cid]["real"], profiles[cid]["name"]))
-    return {"players": [duel_entry(cid, True) for cid in order]}
+    """The player cards in the user's collection (at their stage), with strengths and weaknesses: the real-data players
+    first. The user can only pick from these; the bot is not limited to a collection."""
+    profiles = duel_profiles(user)
+    roads = road_cards_for(user)
+    mine = duel_collection(user, roads)
+    if not any(profiles[cid]["role"] == "goalie" for cid in mine):
+        # No goalkeeper card: a random skater of the collection (always the same one) goes in goal, with bad stats.
+        skaters = sorted(cid for cid in mine if profiles[cid]["role"] == "skater")
+        if skaters:
+            mine.append(shootout.STAND_IN + random.Random(user["id"]).choice(skaters))
+    entries = [duel_entry(cid, True, roads, profiles) for cid in mine]
+    # The rarest cards first (legends and champions, Ones to Watch, impact specials, base cards), then the real-data
+    # players, then by name.
+    entries.sort(key=lambda e: (-duel_rarity(e["card"]), not e["real"], e["card"]["player"]["last_name"]))
+    return {"players": entries}
 
 
 @app.post("/api/duel/start")
 def duel_start(body: DuelStart, user: dict = Depends(current_user)):
     """A new duel (an unfinished one is dropped): both hands dealt and the first scenario."""
-    state = shootout.new_duel(body.mode, random.Random())
+    state = shootout.new_duel(body.mode, random.Random(), available_for(user))
     duel_id = db.create_duel(user["id"], user["stage"], state)
     return duel_view(duel_id, state, user)
 
@@ -844,23 +878,30 @@ def duel_play(duel_id: int, body: DuelPlay, user: dict = Depends(current_user)):
         raise HTTPException(409, "This duel is over")
     if not duel_playable(duel):
         raise HTTPException(409, "This duel can't be continued, the card set has changed. Start a new one.")
-    profiles = shootout.get_shootout().profiles
+    profiles = duel_profiles(user)
     expected = shootout.slots(duel["mode"], duel["attacker"] == "you")
     picks = body.picks
     if sorted(picks) != sorted(expected):
         raise HTTPException(400, f"Pick one card for each of: {', '.join(expected)}")
+    roads = road_cards_for(user)
+    owned = set(duel_collection(user, roads))
     for slot, cid in picks.items():
         if cid not in profiles or (profiles[cid]["role"] == "goalie") != (slot == "goalie"):
             raise HTTPException(400, "That card can't play this slot")
+        stand_in = profiles[cid].get("stand_in")
+        if cid.removeprefix(shootout.STAND_IN) not in owned:
+            raise HTTPException(400, "You can only pick cards from your collection")
+        if stand_in and any(profiles[o]["role"] == "goalie" for o in owned):
+            raise HTTPException(400, "You have a goalkeeper, so no skater needs to play in goal")
     who = [profiles[cid]["who"] for cid in picks.values()]
     if len(set(who)) != len(who):
         raise HTTPException(400, "Pick a different player for each slot")
     if set(who) & {profiles[cid]["who"] for cid in (duel["bot_picks"] or {}).values()}:
         raise HTTPException(400, "That player already plays for your friend this turn")
-    result = shootout.play_turn(duel, picks, random.Random())
+    result = shootout.play_turn(duel, picks, random.Random(), available_for(user), profiles)
     db.save_duel(duel_id, duel)
     ids = [*result["attack"].values(), *result["defense"].values()]
-    response = {"result": {**result, "cards": {cid: duel_entry(cid, True) for cid in ids}}}
+    response = {"result": {**result, "cards": {cid: duel_entry(cid, True, roads, profiles) for cid in ids}}}
     if duel["finished"]:
         pack = open_random_base_cards(user, DUEL_PACK_CARDS)
         if duel["winner"] == "you":

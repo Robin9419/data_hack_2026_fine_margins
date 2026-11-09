@@ -33,6 +33,7 @@ CLOSE_RANGE = 11  # metres from the net: closer is a close-range shot, farther a
 ONE_TIMER_MS = 3000  # a shot within this time of a teammate's completed pass counts as a shot after a pass
 REGULATION_ROUNDS = 3
 MAX_ROUNDS = 8  # sudden death ends in a draw after this many rounds
+STAND_IN = "goalie:"  # id prefix of a skater card playing in goal
 
 # trait: (label, short label, what it does in the duel, phrase when strong, phrase when weak)
 SKATER_TRAITS = {
@@ -54,6 +55,12 @@ GOALIE_TRAITS = {
 # Sampled profiles: random around SAMPLED_LEVEL, moved by the position, never above SAMPLED_MAX.
 SAMPLED_LEVEL = 35
 SAMPLED_MAX = 60
+# Special cards (impact specials, Ones to Watch, legends) without data are stronger than base cards, still random.
+SPECIAL_LEVEL = 52
+SPECIAL_MAX = 80
+# Legends are the best of them: a higher level, and the stats can reach the top of the scale.
+LEGEND_LEVEL = 65
+LEGEND_MAX = 100
 POSITION_BIAS = {
     "Forward": {"close": 10, "long": 8, "power": 5, "blocking": -10, "reading": -5},
     "Defender": {"blocking": 12, "reading": 10, "battles": 5, "close": -10, "long": -5},
@@ -118,7 +125,34 @@ class Shootout:
         for cid, card in content.cards.items():
             if card["type"] in ("special", "base", "legend") and card.get("player"):
                 self.profiles[cid] = self._profile(cid, card)
+        # The Ones to Watch (Road to Final) cards are players too: they are not in content.cards, but they play with the
+        # real data of the final when the player played it.
+        # A Ones to Watch card only has data once the final is played, so there are two versions of it (see at()).
+        self.final_profiles = dict(self.profiles)
+        for card in content.road_to_final.cards_for(set()):
+            self.profiles[card["id"]] = self._profile(card["id"], card, data=False)
+            self.final_profiles[card["id"]] = self._profile(card["id"], card, data=True)
+        self._add_stand_ins()
         self.scenarios = self._scenarios()
+
+    def at(self, final_played: bool) -> dict:
+        """The profiles at a stage of the tournament: the tracking data of the final only exists once it is played."""
+        return self.final_profiles if final_played else self.profiles
+
+    def _add_stand_ins(self):
+        """For a user without a goalkeeper card: every skater card also exists as a stand-in goalie (id STAND_IN + card
+        id), a skater put in goal with really bad goalie stats."""
+        for cid, p in list(self.final_profiles.items()):
+            if p["role"] != "skater":
+                continue
+            key = STAND_IN + cid
+            rng = random.Random(key)
+            traits = {t: {"value": rng.randint(5, 18), "evidence": None, "label": v[0], "short": v[1], "use": v[2]}
+                      for t, v in GOALIE_TRAITS.items()}
+            strengths, weaknesses = _strengths(traits)
+            self.profiles[key] = self.final_profiles[key] = {
+                **p, "card_id": key, "role": "goalie", "position": "Goalkeeper", "real": False, "game": None,
+                "traits": traits, "strengths": strengths, "weaknesses": weaknesses, "stand_in": True}
 
     # Profiles
 
@@ -230,32 +264,35 @@ class Shootout:
         return result
 
     @staticmethod
-    def _sampled(cid: str, position: str) -> dict:
+    def _sampled(cid: str, position: str, special: bool = False, legend: bool = False) -> dict:
         rng = random.Random(cid)
+        level, top = ((LEGEND_LEVEL, LEGEND_MAX) if legend else (SPECIAL_LEVEL, SPECIAL_MAX)) if special else (SAMPLED_LEVEL, SAMPLED_MAX)
         if position == "Goalkeeper":
-            return {t: {"value": round(_clamp(SAMPLED_LEVEL + 3 + rng.randint(-12, 12), 15, SAMPLED_MAX)), "evidence": None}
+            return {t: {"value": round(_clamp(level + 3 + rng.randint(-12, 12), 15, top)), "evidence": None}
                     for t in GOALIE_TRAITS}
         bias = POSITION_BIAS.get(position, {})
-        return {t: {"value": round(_clamp(SAMPLED_LEVEL + bias.get(t, 0) + rng.randint(-12, 12), 10, SAMPLED_MAX)),
+        return {t: {"value": round(_clamp(level + bias.get(t, 0) + rng.randint(-12, 12), 10, top)),
                     "evidence": None} for t in SKATER_TRAITS}
 
-    def _profile(self, cid: str, card: dict) -> dict:
+    def _profile(self, cid: str, card: dict, data: bool = True) -> dict:
         p = card["player"]
         position = self._position(card)
         goalie = position == "Goalkeeper"
         traits = None
-        if self.content.card_game.get(cid) == self.final_id:
+        if self.content.card_game.get(cid) == self.final_id or (card.get("kind") == "road" and data):
             if goalie:
                 traits = self.goalie_data.get(self.content.events.player_id(p["team"], p["jersey"]))
             else:
                 traits = self.skater_data.get((p["team"], p["jersey"]))
         real = traits is not None
         if not real:
-            traits = self._sampled(cid, position)
+            traits = self._sampled(cid, position, card["type"] in ("special", "legend"), card["type"] == "legend")
         labels = GOALIE_TRAITS if goalie else SKATER_TRAITS
         traits = {t: {**traits[t], "label": labels[t][0], "short": labels[t][1], "use": labels[t][2]} for t in labels}
         strengths, weaknesses = _strengths(traits)
         m = card.get("match") or {}
+        if real and card.get("kind") == "road":
+            m = self.content.tournament.final  # the data is from the final
         return {
             "card_id": cid,
             "player": f'{p["first_name"]} {p["last_name"]}',
@@ -264,7 +301,7 @@ class Shootout:
             "role": "goalie" if goalie else "skater",
             "position": position,
             "real": real,
-            "game": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}' if m and card["type"] == "special" else None,
+            "game": f'{m["home_team"]} {m["home_score"]}–{m["away_score"]} {m["away_team"]}' if m and (card["type"] == "special" or real) else None,
             "traits": traits,
             "strengths": strengths,
             "weaknesses": weaknesses,
@@ -649,38 +686,44 @@ def slots(mode: str, attacking: bool) -> list[str]:
     return ["goalie", "defender"] if mode == "2v2" else ["goalie"]
 
 
-def new_duel(mode: str, rng: random.Random) -> dict:
+def new_duel(mode: str, rng: random.Random, available: set[str] | None = None) -> dict:
     duel = {
         "mode": mode, "round": 1, "attacker": "you", "score": {"you": 0, "bot": 0}, "attempts": {"you": 0, "bot": 0},
         "scouted": [], "history": [], "finished": False, "winner": None, "seen": [],
     }
-    start_turn(duel, rng)
+    start_turn(duel, rng, available)
     return duel
 
 
-def start_turn(duel: dict, rng: random.Random):
+def start_turn(duel: dict, rng: random.Random, available: set[str] | None = None):
     """A new zone entry. When the bot defends, it commits its goalie (and defender) now, before the user picks."""
     seen = duel.setdefault("seen", [])  # duels saved before zone entries have no list yet
     index, duel["scenario"] = get_shootout().scenario(duel["mode"], rng, seen)
     seen.append(index)
-    duel["bot_picks"] = bot_defend(duel, rng) if duel["attacker"] == "you" else None
+    duel["bot_picks"] = bot_defend(duel, rng, available) if duel["attacker"] == "you" else None
 
 
-def bot_pool(role: str, exclude: set[tuple] = frozenset()) -> list[str]:
+def bot_pool(role: str, exclude: set[tuple] = frozenset(), available: set[str] | None = None) -> list[str]:
     """The cards the bot picks from: only players with real data, one card per player, none of the excluded players
-    (those the user plays this turn)."""
-    pool = {}
-    for p in get_shootout().profiles.values():
-        if p["real"] and p["role"] == role and p["who"] not in exclude:
-            pool.setdefault(p["who"], p["card_id"])
-    return list(pool.values())
+    (those the user plays this turn). The bot is not limited to a collection: it can pick any card that exists at this
+    state of the tournament (available), or any card when that is None."""
+    def pick(real_only: bool) -> list[str]:
+        pool = {}
+        for p in get_shootout().profiles.values():
+            if (p["real"] or not real_only) and p["role"] == role and p["who"] not in exclude \
+                    and (available is None or p["card_id"] in available):
+                pool.setdefault(p["who"], p["card_id"])
+        return list(pool.values())
+
+    # Before the final is played there are no real-data cards yet: then the bot plays whatever exists.
+    return pick(True) or pick(False)
 
 
 def _noisy(rng: random.Random, value: float, spread: float) -> float:
     return value + rng.gauss(0, spread)
 
 
-def bot_defend(duel: dict, rng: random.Random) -> dict:
+def bot_defend(duel: dict, rng: random.Random, available: set[str] | None = None) -> dict:
     """The bot's goalie (and defender), picked without knowing the attackers."""
     profiles = get_shootout().profiles
     lateral = 0.3 if duel["mode"] == "2v2" else 0.0
@@ -689,21 +732,22 @@ def bot_defend(duel: dict, rng: random.Random) -> dict:
         t = profiles[cid]["traits"]
         return _noisy(rng, (t["close"]["value"] + t["long"]["value"]) / 2 + t["lateral"]["value"] * lateral, 12)
 
-    picks = {"goalie": max(bot_pool("goalie"), key=goalie_score)}
+    picks = {"goalie": max(bot_pool("goalie", available=available), key=goalie_score)}
     if duel["mode"] == "2v2":
         def defender_score(cid):
             t = profiles[cid]["traits"]
             return _noisy(rng, t["blocking"]["value"] * 0.35 + t["battles"]["value"] * 0.3
                           + t["reading"]["value"] * 0.3 + t["speed"]["value"] * 0.2, 12)
-        picks["defender"] = max(bot_pool("skater"), key=defender_score)
+        picks["defender"] = max(bot_pool("skater", available=available), key=defender_score)
     return picks
 
 
-def bot_attack(duel: dict, defense: dict, rng: random.Random) -> dict:
+def bot_attack(duel: dict, defense: dict, rng: random.Random, available: set[str] | None = None,
+               profiles: dict | None = None) -> dict:
     """The bot's attackers, picked after it has seen who defends: it tries the line-ups and keeps the one that looks
     best, with noise so it can be outplayed."""
-    profiles = get_shootout().profiles
-    free = bot_pool("skater", {profiles[cid]["who"] for cid in defense.values()})
+    profiles = profiles or get_shootout().profiles
+    free = bot_pool("skater", {profiles[cid]["who"] for cid in defense.values()}, available)
     scenario = duel["scenario"]
     state = {"A1": scenario["carrier"], "G": _goalie_spot(scenario["carrier"])}
     if duel["mode"] == "2v2":
@@ -720,16 +764,18 @@ def bot_attack(duel: dict, defense: dict, rng: random.Random) -> dict:
     return max(lineups, key=value)
 
 
-def play_turn(duel: dict, picks: dict, rng: random.Random) -> dict:
-    """The user's picks for the current turn (slot -> card id, already validated). Plays it, records it and moves the
-    duel on. Returns the simulation result."""
-    profiles = get_shootout().profiles
+def play_turn(duel: dict, picks: dict, rng: random.Random, available: set[str] | None = None,
+              profiles: dict | None = None) -> dict:
+    """The user's picks for the current turn (slot -> card id, already validated against their collection). Plays it,
+    records it and moves the duel on. The bot picks from the cards available at this state of the tournament. Returns
+    the simulation result. profiles are those of the user's stage (see Shootout.at)."""
+    profiles = profiles or get_shootout().profiles
     you_attack = duel["attacker"] == "you"
     if you_attack:
         attack_ids, defense_ids = picks, duel["bot_picks"]
     else:
         defense_ids = picks
-        attack_ids = bot_attack(duel, picks, rng)
+        attack_ids = bot_attack(duel, picks, rng, available, profiles)
     attacker = duel["attacker"]
     result = simulate(duel["scenario"], {s: profiles[c] for s, c in attack_ids.items()},
                       {s: profiles[c] for s, c in defense_ids.items()}, rng)
@@ -740,11 +786,11 @@ def play_turn(duel: dict, picks: dict, rng: random.Random) -> dict:
     entry = {"round": duel["round"], "attacker": attacker, "goal": result["goal"], "summary": result["summary"],
              "attack": attack_ids, "defense": defense_ids, "scenario": duel["scenario"]}
     duel["history"].append(entry)
-    _advance(duel, rng)
+    _advance(duel, rng, available)
     return {**result, "attacker": attacker, "attack": attack_ids, "defense": defense_ids}
 
 
-def _advance(duel: dict, rng: random.Random):
+def _advance(duel: dict, rng: random.Random, available: set[str] | None = None):
     """Next turn, or the end: in regulation as soon as one side cannot catch up, in sudden death after a round with
     different results. After MAX_ROUNDS still level it is a draw."""
     score, attempts, r = duel["score"], duel["attempts"], duel["round"]
@@ -761,7 +807,7 @@ def _advance(duel: dict, rng: random.Random):
         duel["attacker"] = "you"
     else:
         duel["attacker"] = "bot"
-    start_turn(duel, rng)
+    start_turn(duel, rng, available)
 
 
 def _finish(duel: dict):

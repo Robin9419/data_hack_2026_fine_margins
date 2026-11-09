@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../auth'
 import RewardIcon from './RewardIcon'
 
@@ -36,7 +37,9 @@ export default function RewardUnlock() {
     setPending((queue) => [...queue, ...unlocked.filter((reward) => !queue.some((item) => item.id === reward.id))])
   }, [storageKey, progress])
 
-  const reward = pending[0]
+  // Hold the popup while packs are being opened (the /pack page); it shows once the user leaves it.
+  const openingPacks = useLocation().pathname === '/pack'
+  const reward = openingPacks ? undefined : pending[0]
   useEffect(() => {
     if (reward && !dialog.current.open) dialog.current.showModal()
     else if (!reward && dialog.current.open) dialog.current.close()

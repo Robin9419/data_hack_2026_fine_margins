@@ -1819,7 +1819,10 @@ button.card-tile { width: 100%; padding: 0; border: none; background: none; font
 .duel-photo span { font: 800 0.9rem var(--display); color: var(--muted); }
 .duel-photo.tiny { width: 30px; height: 30px; }
 .duel-search { margin-bottom: 10px; }
-.duel-more { margin-top: 10px; }
+.duel-data-note { margin: 0 0 10px; }
+.duel-pager { display: flex; align-items: center; gap: 8px; }
+.duel-pager .duel-hand { flex: 1; min-width: 0; }
+@media (max-width: 600px) { .duel-pager { gap: 4px; } .duel-pager .pager-arrow { width: 34px; height: 34px; font-size: 1.3rem; } }
 .duel-thumb.big { flex: none; width: 104px; aspect-ratio: 5 / 7; container-type: inline-size; }
 /* The stats sheet shows the card as a picture: frame and photo only, the name and labels are right next to it. */
 .duel-thumb.big :is(.card-info, .card-tag, .card-corner, .card-label, .card-bigscore, .arena-mark, .legend-retro-header) { display: none; }

@@ -4,6 +4,8 @@ import { api } from '../api'
 import { useAuth } from '../auth'
 import BackLink from '../components/BackLink'
 import CardFace from '../components/CardFace'
+import Dropdown from '../components/Dropdown'
+import { teamOf } from '../teams'
 import HalfRink from '../components/HalfRink'
 import PlayerPhoto from '../components/PlayerPhoto'
 
@@ -29,7 +31,20 @@ const pct = (v) => `${Math.round(v * 100)}%`
 const fullName = (card) => `${card.player.first_name} ${card.player.last_name}`
 // One player can have several cards (a base card and a special): they are the same player on the ice.
 const playerOf = (card) => `${fullName(card)}|${card.player.team}`
-const OTHERS_PAGE = 24
+const PAGE_SIZE = 8
+const POSITION_FILTERS = [
+  { value: 'all', label: 'All positions' },
+  { value: 'Forward', label: 'Forwards' },
+  { value: 'Defender', label: 'Defenders' },
+]
+const TYPE_FILTERS = [
+  { value: 'all', label: 'All cards' },
+  { value: 'legend', label: 'Legends' },
+  { value: 'base', label: 'Base' },
+  { value: 'profile', label: 'Profile specials' },
+  { value: 'performance', label: 'Performance specials' },
+  { value: 'road', label: 'Ones to Watch' },
+]
 
 export default function Shootout() {
   const navigate = useNavigate()
@@ -202,7 +217,8 @@ function Lobby({ active, busy, onStart, onContinue }) {
           <li>This is a demo, so you play alone: your friend is played by the computer.</li>
           <li>Three rounds: you attack, then your friend attacks. Level after three rounds: sudden death.</li>
           <li>Every attack starts at the blue line, from a real zone entry of the final.</li>
-          <li>The defence picks first. When you attack you see who defends, but not what they are good at until they have played.</li>
+          <li>The defence picks first, but you don't see who your friend picked until the play starts.</li>
+          <li>Your friend may pick the same player as you.</li>
           <li>You can only pick players from your own collection, as often as you like. Collect more cards to get more choice.</li>
           <li>Your friend can pick any card that exists at this point of the tournament.</li>
           <li>Players from the final use the real tracking data. Other cards work too, but without tracking data their stats are random and weaker.</li>
@@ -246,8 +262,7 @@ function Board({ players, turn, picks, slot, setSlot, play, frame, phase }) {
   } else {
     const own = Object.fromEntries(players.map((e) => [e.card.id, e]))
     const label = (key) => (picks[key] ? own[picks[key]]?.card.player.last_name : SLOT_LABEL[key])
-    const opp = (key) => turn.opponent[key]?.card.player.last_name
-    if (turn.attacking) Object.assign(names, { A1: label('carrier'), A2: label('support'), G: opp('goalie'), D: opp('defender') })
+    if (turn.attacking) Object.assign(names, { A1: label('carrier'), A2: label('support'), G: 'Goalie', D: 'Defender' })
     else Object.assign(names, { A1: 'Attacker', A2: 'Attacker', G: label('goalie'), D: label('defender') })
   }
 
@@ -288,11 +303,13 @@ function Board({ players, turn, picks, slot, setSlot, play, frame, phase }) {
 function Picker({ duel, players, picks, slot, setSlot, setPicks, busy, onSubmit, onStats }) {
   const { turn } = duel
   const [query, setQuery] = useState('')
-  const [limit, setLimit] = useState(OTHERS_PAGE)
+  const [team, setTeam] = useState('all')
+  const [position, setPosition] = useState('all')
+  const [type, setType] = useState('all')
+  const [page, setPage] = useState(0)
   const byId = Object.fromEntries(players.map((e) => [e.card.id, e]))
   const full = turn.slots.every((k) => picks[k])
-  // A player can't play twice in one turn: not for both sides, not in two of your slots.
-  const friends = new Set(Object.values(turn.opponent).map((e) => playerOf(e.card)))
+  // A player can't be in two of your slots (your friend may use the same player as you).
   const yours = new Set(Object.entries(picks).filter(([k]) => k !== slot).map(([, cid]) => playerOf(byId[cid].card)))
 
   const choose = (cid) => {
@@ -302,19 +319,36 @@ function Picker({ duel, players, picks, slot, setSlot, setPicks, busy, onSubmit,
   }
 
   const fitting = players.filter((e) => e.role === SLOT_ROLE[slot])
-  // Without any tracking data in the collection there is nothing to set apart: everyone is shown up front.
-  const noData = !fitting.some((e) => e.real)
-  const real = noData ? fitting : fitting.filter((e) => e.real)
+  const teamOptions = [
+    { value: 'all', label: 'All teams', title: 'All teams' },
+    ...[...new Set(fitting.map((e) => e.card.player.team))].sort().map((name) => {
+      const t = teamOf(name)
+      return { value: name, label: t.short ?? name, title: name, logo: t.logo }
+    }),
+  ]
   const q = query.trim().toLowerCase()
-  const others = fitting.filter(
-    (e) => !noData && !e.real && (!q || [fullName(e.card), e.card.player.team, e.card.title].some((t) => t && t.toLowerCase().includes(q))),
-  )
+  // The players with tracking data first (the list is already ordered by rarity), then the others.
+  const matching = fitting
+    .filter(
+      (e) =>
+        (team === 'all' || e.card.player.team === team) &&
+        (SLOT_ROLE[slot] === 'goalie' || position === 'all' || e.position === position) &&
+        (type === 'all' || (e.card.kind ?? e.card.type) === type) &&
+        (!q || [fullName(e.card), e.card.player.team, e.card.title].some((t) => t && t.toLowerCase().includes(q))),
+    )
+    .sort((a, b) => Number(b.real) - Number(a.real))
+  const pageCount = Math.max(1, Math.ceil(matching.length / PAGE_SIZE))
+  const current = Math.min(page, pageCount - 1)
+  const filterBy = (set) => (v) => {
+    set(v)
+    setPage(0)
+  }
   const tile = (e) => (
     <Tile
       key={e.card.id}
       entry={e}
       picked={Object.entries(picks).find(([, cid]) => cid === e.card.id)?.[0]}
-      blocked={friends.has(playerOf(e.card)) ? 'Plays for your friend' : yours.has(playerOf(e.card)) ? 'Already in your line-up' : null}
+      blocked={yours.has(playerOf(e.card)) ? 'Already in your line-up' : null}
       slot={slot}
       onPick={() => choose(e.card.id)}
       onStats={() => onStats(e)}
@@ -322,7 +356,6 @@ function Picker({ duel, players, picks, slot, setSlot, setPicks, busy, onSubmit,
   )
   return (
     <div className="duel-picker">
-      <Opponent turn={turn} onStats={onStats} />
       <div className="duel-slots">
         {turn.slots.map((k) => {
           const e = byId[picks[k]]
@@ -345,50 +378,40 @@ function Picker({ duel, players, picks, slot, setSlot, setPicks, busy, onSubmit,
           You don't have {SLOT_ROLE[slot] === 'goalie' ? 'a goalkeeper' : 'a skater'} card yet. Open packs to collect some.
         </p>
       )}
-      <div className="duel-hand">{real.map(tile)}</div>
-      {!noData && <details className="duel-bench">
-        <summary>
-          Other players ({fitting.length - real.length}) <span className="muted">· no tracking data, so their stats are random and weaker</span>
-        </summary>
-        <label className="search duel-search">
-          <input
-            type="search"
-            value={query}
-            placeholder="Search a player, team or card"
-            aria-label="Search the other players"
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setLimit(OTHERS_PAGE)
-            }}
-          />
-        </label>
-        <div className="duel-hand">{others.slice(0, limit).map(tile)}</div>
-        {others.length > limit && (
-          <button type="button" className="link-button duel-more" onClick={() => setLimit(limit + OTHERS_PAGE)}>
-            Show more ({others.length - limit} left)
-          </button>
-        )}
-        {!others.length && <p className="muted small">No players match.</p>}
-      </details>}
-    </div>
-  )
-}
-
-function Opponent({ turn, onStats }) {
-  const entries = Object.entries(turn.opponent)
-  if (!entries.length) return null
-  return (
-    <div className="duel-opponent">
-      <small className="muted">Defending:</small>
-      {entries.map(([k, e]) => (
-        <button key={k} type="button" className="duel-opp" disabled={!e.profile} onClick={() => onStats(e)}>
-          <PlayerPhoto player={e.card.player} className="duel-photo tiny" />
-          <span>
-            <strong>{e.card.player.last_name}</strong>
-            <small className="muted">{e.profile ? <Good profile={e.profile} slot={k} /> : `${e.card.title} · strengths unknown`}</small>
-          </span>
-        </button>
-      ))}
+      {fitting.length > 0 && (
+        <>
+          <label className="search duel-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            <input type="search" value={query} placeholder="Search a player, team or card" aria-label="Search players" onChange={(e) => filterBy(setQuery)(e.target.value)} />
+          </label>
+          <div className="dd-row">
+            <Dropdown label="Team" options={teamOptions} value={team} onChange={filterBy(setTeam)} />
+            {SLOT_ROLE[slot] !== 'goalie' && <Dropdown label="Position" options={POSITION_FILTERS} value={position} onChange={filterBy(setPosition)} />}
+            <Dropdown label="Card type" options={TYPE_FILTERS} value={type} onChange={filterBy(setType)} />
+          </div>
+          <p className="muted small duel-data-note">Players without tracking data have random, weaker stats and come last.</p>
+          <div className="duel-pager">
+            <button type="button" className="pager-arrow" aria-label="Previous players" disabled={current === 0} onClick={() => setPage(current - 1)}>
+              ‹
+            </button>
+            <div className="duel-hand">{matching.slice(current * PAGE_SIZE, (current + 1) * PAGE_SIZE).map(tile)}</div>
+            <button type="button" className="pager-arrow" aria-label="Next players" disabled={current >= pageCount - 1} onClick={() => setPage(current + 1)}>
+              ›
+            </button>
+          </div>
+          {!matching.length && <p className="muted small">No players match these filters.</p>}
+          {pageCount > 1 && (
+            <div className="pager-dots">
+              {Array.from({ length: pageCount }, (_, i) => (
+                <button key={i} type="button" className={i === current ? 'active' : ''} aria-label={`Page ${i + 1} of ${pageCount}`} aria-current={i === current ? 'page' : undefined} onClick={() => setPage(i)} />
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

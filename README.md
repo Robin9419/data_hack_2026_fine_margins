@@ -38,6 +38,6 @@ Sign-in is a demo flow without passwords. Tournament progress, sessions, and car
 
 ## Images and videos
 
-Local images are included in the repository; some player portraits load from external sources. Sources and image credits are recorded primarily in `backend/content/player-images.json`, `card_images.json`, and `legends.json`. Reuse rights for several press, club, and agency images have not been established; public distribution requires appropriate permissions or replacement images.
+Local images are included in the repository; some player portraits load from external sources. Sources and image credits are recorded primarily in `backend/content/player-images.json`, `card_images.json`, and `legends.json`.
 
 YouTube videos are embedded and require internet access. Availability also depends on regional restrictions, embedding policies, and browser or network filters. The full arena recording and generated clips are not included in the repository. With the required CSVs supplied, the app works without the recording or clips; optional video clipping is covered in the installation guide.

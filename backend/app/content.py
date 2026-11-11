@@ -153,8 +153,9 @@ class Content:
             row = self.event_rows[result['source_row'] - 1]
             moment = self.events._moment(
                 row, 'pass_pressure', 'Pressure-reducing pass' if result['value'] > 0 else 'Successful pass',
-                f"To {self.events.names.get(result['receiver_id'], 'receiver')}. "
-                f"PBP {result['value']:+d}: {result['pbp_pg']} → {result['pbp_pe']} opposing skaters.")
+                f"Pass to {self.events.names.get(result['receiver_id'], 'receiver')}. "
+                f"Opponents applying pressure: {result['pbp_pg']} before the pass, "
+                f"{result['pbp_pe']} at reception (pressure reduction: {result['value']:+d}).")
             moment.update(id=result['id'], kpi=result)
             self.events.by_player.setdefault(result['passer_id'], []).append(moment)
         for moments in self.events.by_player.values():
@@ -167,8 +168,9 @@ class Content:
             row = self.event_rows[result['source_row'] - 1]
             moment = self.events._moment(
                 row, 'pass_packing', 'Packing pass',
-                f"To {self.events.names.get(result['receiver_id'], 'receiver')}. "
-                f"Packing {result['value']:+d} opposing skaters (positions frozen at release).")
+                f"Pass to {self.events.names.get(result['receiver_id'], 'receiver')}. "
+                f"Net change in opponents bypassed by the pass: {result['value']:+d}, "
+                "based on their positions when the puck was released.")
             moment.update(id=result['id'], kpi=result)
             self.events.by_player.setdefault(result['passer_id'], []).append(moment)
         for moments in self.events.by_player.values():
@@ -241,7 +243,8 @@ class Content:
                 continue
             row = self.event_rows[result['source_row'] - 1]
             moment = self.events._moment(row, 'expected_assist', 'Chance set up',
-                f"Pass to {self.events.names.get(result['shooter_id'], 'shooter')}; xA {result['value']:.3f}.", shot=row)
+                f"Pass to {self.events.names.get(result['shooter_id'], 'shooter')} sets up a shot "
+                f"with {result['value']:.3f} xG.", shot=row)
             moment.update(id=result['id'], kpi=result)
             self.events.by_player.setdefault(result['passer_id'], []).append(moment)
         for moments in self.events.by_player.values():
@@ -284,9 +287,16 @@ class Content:
                 row = self.event_rows[result['source_row'] - 1]
                 entry = metric_id == 'blc_xg'
                 title = 'Offensive zone entry' if entry else ('Controlled zone exit' if result['value'] else 'Uncontrolled zone exit')
-                text = (f"BLCxG {result['value']:.3f} from {len(result['shot_source_rows'])} own-team shots. "
-                        'Opponent possession inside the zone does not end the sequence.' if entry
-                        else f"Crossing outcome: {result['crossing_result']}.")
+                outcomes = {
+                    'PossessionMaintained': 'Possession maintained after crossing the blue line.',
+                    'PossessionLost': 'Possession lost after crossing the blue line.',
+                    'PuckDumpedIn': 'Puck dumped in rather than carried under control.',
+                }
+                text = (f"The team's {len(result['shot_source_rows'])} shots after this entry "
+                        f"total {result['value']:.3f} expected goals. "
+                        'The sequence includes any recovery of the puck inside the zone.' if entry
+                        else outcomes.get(result['crossing_result'],
+                                          re.sub(r'(?<=[a-z])(?=[A-Z])', ' ', result['crossing_result']) + '.'))
                 moment = self.events._moment(row, kind, title, text)
                 moment.update(id=result['id'], kpi=result)
                 if entry:

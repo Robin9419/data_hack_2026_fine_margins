@@ -808,9 +808,8 @@ def duel_view(duel_id: int, duel: dict, user: dict) -> dict:
             "attacking": attacking,
             "slots": shootout.slots(duel["mode"], attacking),
             "scenario": duel["scenario"],
-            # The defence commits first: when the user attacks, the bot's goalie and defender are known (their
-            # strengths only once scouted). When the user defends, the bot picks its attackers afterwards.
-            "opponent": {slot: duel_entry(cid, cid in duel["scouted"], roads, duel_profiles(user)) for slot, cid in (duel["bot_picks"] or {}).items()},
+            # The bot's picks stay hidden until the play has been simulated (they are in the play result).
+            "opponent": {},
         }
     return {
         "id": duel_id, "mode": duel["mode"], "round": duel["round"], "regulation": shootout.REGULATION_ROUNDS,
@@ -896,8 +895,6 @@ def duel_play(duel_id: int, body: DuelPlay, user: dict = Depends(current_user)):
     who = [profiles[cid]["who"] for cid in picks.values()]
     if len(set(who)) != len(who):
         raise HTTPException(400, "Pick a different player for each slot")
-    if set(who) & {profiles[cid]["who"] for cid in (duel["bot_picks"] or {}).values()}:
-        raise HTTPException(400, "That player already plays for your friend this turn")
     result = shootout.play_turn(duel, picks, random.Random(), available_for(user), profiles)
     db.save_duel(duel_id, duel)
     ids = [*result["attack"].values(), *result["defense"].values()]

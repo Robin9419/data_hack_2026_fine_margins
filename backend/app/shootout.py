@@ -439,7 +439,7 @@ def battle_chance(carrier: dict, defender: dict | None, d_pos, start, target) ->
         return 0.0, []
     factors = [_factor(carrier, "speed", True, 0.9), _factor(carrier, "battles", True, 0.9),
                _factor(defender, "battles", False, 1.08), _factor(defender, "speed", False, 0.72)]
-    return contest * _sigmoid(-sum(f["impact"] for f in factors)) * 0.45, factors
+    return contest * _sigmoid(-sum(f["impact"] for f in factors)) * 0.17, factors
 
 
 def pass_chance(passer: dict, defender: dict | None, d_pos, start, target) -> tuple[float, list[dict]]:
@@ -450,7 +450,7 @@ def pass_chance(passer: dict, defender: dict | None, d_pos, start, target) -> tu
     if lane > 2.5 or t < 0.05 or t > 0.95:
         return 0.0, []
     factors = [_factor(passer, "passing", True, 1.8), _factor(defender, "reading", False, 1.8)]
-    return (1 - lane / 2.5) * _sigmoid(-sum(f["impact"] for f in factors)) * 0.9, factors
+    return (1 - lane / 2.5) * _sigmoid(-sum(f["impact"] for f in factors)) * 0.4, factors
 
 
 def _move(a, b, step: float):
@@ -528,7 +528,8 @@ def _continuations(p: dict, state: dict, holder: str) -> list[tuple]:
         risk, factors = battle_chance(p[holder], p.get("D"), state.get("D"), state[holder], target)
         moves.append(("skate", risk, factors, _after_skate(p, state, holder), holder, False))
     mate = _mate(holder)
-    if p.get(mate):
+    # Passes move the attack forward: nobody passes the puck back to a team-mate who is farther from the net.
+    if p.get(mate) and _dist(state[mate], NET) < _dist(state[holder], NET):
         risk, factors = pass_chance(p[holder], p.get("D"), state.get("D"), state[holder], state[mate])
         moves.append(("pass", risk, factors, _after_pass(p, state, holder), mate, True))
     return moves
@@ -538,6 +539,8 @@ def _value(p: dict, state: dict, holder: str, left: int, after_pass: bool, depth
     """Expected goals of the best way to play on from here, looking depth moves ahead."""
     blocked, _, chance, _ = _shot_risks(p, state, holder, after_pass)
     best = (1 - blocked) * chance
+    if left > 1:
+        best = _shoot_value(best, state[holder])  # with moves left, a far shot is not the plan
     if left > 1 and depth > 0:
         for _, risk, _, nxt, nholder, npass in _continuations(p, state, holder):
             best = max(best, (1 - risk) * _value(p, nxt, nholder, left - 1, npass, depth - 1))
@@ -548,6 +551,13 @@ def _choose(options: list[tuple[str, float]], rng: random.Random) -> str:
     """Mostly the best option, sometimes another: players don't always read a play right."""
     weights = [math.exp(value / 0.03) for _, value in options]
     return rng.choices([kind for kind, _ in options], weights=weights)[0]
+
+
+def _shoot_value(value: float, pos) -> float:
+    """What a shot is worth to a player who can still skate or pass: shooters prefer to work the puck closer first, so a
+    shot from far away is discounted and then marked down (nothing up to 6 m from the net, the most from 14 m)."""
+    far = _clamp((_dist(pos, NET) - 6) / 8, 0, 1)
+    return value * (1 - 0.85 * far) - 0.08 * far
 
 
 def _players(attack: dict, defense: dict) -> dict:
@@ -600,7 +610,7 @@ def simulate(scenario: dict, attack: dict, defense: dict, rng: random.Random) ->
         player = p[holder]
         moves = _continuations(p, state, holder) if left > 1 else []
         blocked, block_factors, chance, shot_factors = _shot_risks(p, state, holder, after_pass)
-        options = [("shoot", (1 - blocked) * chance)] + [
+        options = [("shoot", _shoot_value((1 - blocked) * chance, state[holder]) if moves else (1 - blocked) * chance)] + [
             (kind, (1 - risk) * _value(p, nxt, nh, left - 1, npass)) for kind, risk, _, nxt, nh, npass in moves]
         kind = _choose(options, rng)
         left -= 1
@@ -747,7 +757,7 @@ def bot_attack(duel: dict, defense: dict, rng: random.Random, available: set[str
     """The bot's attackers, picked after it has seen who defends: it tries the line-ups and keeps the one that looks
     best, with noise so it can be outplayed."""
     profiles = profiles or get_shootout().profiles
-    free = bot_pool("skater", {profiles[cid]["who"] for cid in defense.values()}, available)
+    free = bot_pool("skater", available=available)  # the bot may pick the same player as the user
     scenario = duel["scenario"]
     state = {"A1": scenario["carrier"], "G": _goalie_spot(scenario["carrier"])}
     if duel["mode"] == "2v2":

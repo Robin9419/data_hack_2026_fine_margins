@@ -45,6 +45,10 @@ export default function App() {
   const navigate = useNavigate()
   const inAdmin = pathname.startsWith('/admin')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [demoMode, setDemoMode] = useState(false)
+  useEffect(() => {
+    api.dataStatus().then((status) => setDemoMode(status.demo_mode)).catch(() => {})
+  }, [])
   const menuRef = useRef(null)
 
   // Close the menu after navigating (Admin, Exit admin) or signing out.
@@ -139,6 +143,7 @@ export default function App() {
       <RewardUnlock />
 
       <main>
+        {demoMode && <p role="status" className="muted">Public-data demo: explore cards, packs, predictions and the shootout. Final-game tracking KPIs and arena moments require the two Wisehockey CSVs. Add them to the data folder and restart the backend for the full experience.</p>}
         <Routes>
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route

@@ -50,6 +50,8 @@ def event_windows(content):
 def main():
     force = "--force" in sys.argv
     content = get_content()
+    if content.demo_mode:
+        sys.exit("Clip generation requires both Wisehockey CSVs in data/.")
     rec = content.recording
     source = ROOT / rec["file"]
     if not source.exists():

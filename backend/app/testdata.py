@@ -100,9 +100,12 @@ class TestData:
     __test__ = False  # not a pytest class
 
     def __init__(self, specs: dict, metrics: dict, format_value, positions: dict, images: dict, nationalities: dict,
-                 action_media: dict, card_images: dict, archetypes: dict):
+                 action_media: dict, card_images: dict, archetypes: dict, use_wisehockey: bool = True):
         doc = json.loads(TESTDATA_FILE.read_text(encoding="utf-8"))
         self.games = sorted(doc["games"], key=lambda g: (g["date"], g["start"]))
+        if not use_wisehockey:
+            for game in self.games:
+                game["has_wisehockey"] = False
         self.by_id = {g["id"]: g for g in self.games}
         self.source_note = doc["source"]
         self._specs, self._metrics, self._format = specs, metrics, format_value
@@ -370,7 +373,7 @@ class TestData:
                 "nationality": self._nationalities.get(_key(player)),
                 **self.action_of(_key(player)),
             }, self.card_images.get(card_id)),
-            "title": title, "archetype": self._archetypes[title], "archetype_kpis": None,
+            "title": title, "archetype": self._archetypes.get(title, "Demo award based on public game statistics; tracking data is unavailable."), "archetype_kpis": None,
             "match": {
                 "id": game["id"], "date": game["date"], "stage": game["stage"], "home_team": game["home_team"],
                 "away_team": game["away_team"], "home_score": game["home_score"], "away_score": game["away_score"],

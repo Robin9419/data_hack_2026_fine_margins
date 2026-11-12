@@ -4,6 +4,8 @@ An interactive hockey trading card app for the Sports Innovation Challenge. Fans
 
 Setup and launch instructions: [INSTALLATION.md](INSTALLATION.md).
 
+What to try, card types, and the first-use tour: [WALKTHROUGH.md](WALKTHROUGH.md).
+
 ## Features
 
 - **Collection and packs:** Sign in with a username of your choice, open a starter pack, collect daily cards, browse a filterable gallery, and accumulate duplicate copies.
@@ -17,7 +19,7 @@ Setup and launch instructions: [INSTALLATION.md](INSTALLATION.md).
 
 ## Data and demo scope
 
-The U.S. Collegiate Selects vs. HC Davos final uses separately supplied Wisehockey match statistics and events. These CSV exports are not included in the repository; place them under `data/` as described in the installation guide before starting the backend. The backend calculates metrics including Pass Packing, pressure on the passer, Expected Assists, Zone Entries/Exits, and Interceptions. Individual events make the calculations traceable on the cards. Decimal statistics display two decimal places; a third is retained when the value would otherwise round to zero.
+The U.S. Collegiate Selects vs. HC Davos final uses separately supplied Wisehockey match statistics and events. These CSV exports are not included in the repository; place them under `data/` as described in the installation guide to enable the full analysis. Without either CSV, the app starts using included public tournament statistics and simulated demo awards. Cards, packs, predictions, trivia and the shootout remain available; the app shows a notice that final-game tracking KPIs and arena moments are unavailable. Add both files and restart the backend to switch to the full analysis. The backend calculates metrics including Pass Packing, pressure on the passer, Expected Assists, Zone Entries/Exits, and Interceptions. Individual events make the calculations traceable on the cards. Decimal statistics display two decimal places; a third is retained when the value would otherwise round to zero.
 
 Other tournament games use saved data from the official Spengler Cup game pages. Additional demo KPIs and ratings for these games are partly simulated and do not represent a complete Wisehockey event analysis. Sources and definitions are recorded in the content files and the app's KPI explanations.
 

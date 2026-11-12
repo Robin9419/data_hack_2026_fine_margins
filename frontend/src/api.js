@@ -25,6 +25,7 @@ async function request(path, { method = 'GET', body } = {}) {
 }
 
 export const api = {
+  dataStatus: () => request('/data-status'),
   login: (username, favoriteTeam) =>
     request('/login', { method: 'POST', body: { username, favorite_team: favoriteTeam || null } }),
   teams: () => request('/teams'),

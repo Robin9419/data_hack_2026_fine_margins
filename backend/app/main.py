@@ -30,7 +30,7 @@ app.mount("/api/media", StaticFiles(directory=MEDIA_DIR, check_dir=False), name=
 @app.on_event("startup")
 def startup():
     db.init_db()
-    get_content()  # fail fast if the content or CSV is broken
+    get_content()  # validate content; missing CSVs select the public-data demo
     shootout.get_shootout()
 
 
@@ -975,3 +975,9 @@ def award_categories(user: dict = Depends(current_user)):
 @app.get('/api/analysis/interceptions')
 def interception_analysis(user: dict = Depends(current_user)):
     return get_content().derived_kpis['interceptions']
+
+
+@app.get("/api/data-status")
+def data_status():
+    content = get_content()
+    return {"demo_mode": content.demo_mode, "missing_files": content.missing_data_files}

@@ -80,12 +80,15 @@ class Content:
         videos_doc = _load_json("videos.json")
         self.videos = {v["id"]: v for v in videos_doc["videos"]}
         self.recording = videos_doc.get("recording")
-        self.rows = self._load_stats()
-        self.event_rows = self._load_events()
+        self.missing_data_files = [self.match[key] for key in ("stats_file", "events_file")
+                                   if not (DATA_DIR / self.match[key]).is_file()]
+        self.demo_mode = bool(self.missing_data_files)
+        self.rows = [] if self.demo_mode else self._load_stats()
+        self.event_rows = [] if self.demo_mode else self._load_events()
         self.events = MatchEvents(
             self.event_rows,
             {"Home": self.match["home_team"], "Away": self.match["away_team"]},
-            list(self.videos.values()),
+            [] if self.demo_mode else list(self.videos.values()),
             self._camera_clip,
         )
         self.sides = {"Home": self.match["home_team"], "Away": self.match["away_team"]}
@@ -113,20 +116,21 @@ class Content:
         self.instagram = {(c["team"], c["jersey"]): c["instagram"] for c in base_doc["cards"] if c.get("instagram")}
         self.action_media = {(m["team"], m["jersey"]): m for m in _load_json("action_media.json")["players"]}
         self.card_images = _load_json("card_images.json")
-        self.cards = {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
+        self.cards = {} if self.demo_mode else {c["id"]: self._build_card(c) for c in cards_doc["cards"]}
         self._add_pressure_card()
         self._add_progression_card()
         self._add_xa_card()
         self._add_category_cards()
         self.cards |= {c["id"]: self._build_base_card(c, base_doc) for c in base_doc["cards"]}
-        self._add_performance_cards(cards_doc["performance_specials"])
+        if not self.demo_mode:
+            self._add_performance_cards(cards_doc["performance_specials"])
         self.reward_rules = {}  # reward card id -> function(owned card ids -> editions) saying whether it is earned
         self._add_reward_cards(_load_json("reward_cards.json"))
         positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"]
                      for c in self.cards.values() if c["player"]}
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
                                  self.nationalities, self.action_media, self.card_images,
-                                 self.archetypes)
+                                 self.archetypes, use_wisehockey=not self.demo_mode)
         self.road_to_final = RoadToFinal(self.testdata, positions, _load_json("road_videos.json")["players"],
                                          _load_json("watch_stats.json")["players"])
         self.tournament = Tournament(self.testdata)
@@ -321,6 +325,8 @@ class Content:
     def _add_category_cards(self):
         for category in self.award_categories:
             for award in category['awards']:
+                self.archetypes[award['title']] = award['definition']
+                self.archetype_metrics[award['title']] = award['metrics']
                 if award.get('derived'):
                     calculation = self.derived_kpis[award['derived']]
                     candidates = [(pid, stats) for pid, stats in calculation['players'].items()
@@ -416,6 +422,11 @@ class Content:
         for row in self.rows + self.goalie_rows:
             if row["Team"] == team and int(row["Jersey"]) == jersey:
                 return row
+        if self.demo_mode:
+            for player in _load_json("player-images.json")["players"]:
+                if player["team"] == team and int(player["jersey"]) == jersey:
+                    first, last = player["name"].split(" ", 1)
+                    return {"FirstName": first, "LastName": last}
         raise ValueError(f"No stats row for {team} #{jersey}")
 
     def _pool(self, metric: dict) -> list[dict]:
@@ -640,6 +651,8 @@ class Content:
             self.reward_rules[card_id] = lambda owned, ids=ids: all(i in owned for i in ids)
 
         for cfg in doc["context"]:
+            if self.demo_mode and cfg["context_type"] == "moment":
+                continue
             card = {
                 "id": cfg["id"], "type": "reward", "kind": "context", "context_type": cfg["context_type"],
                 "special_type": None, "rating": None, "player": None, "title": cfg["title"], "match": match,

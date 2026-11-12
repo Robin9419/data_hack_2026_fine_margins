@@ -313,6 +313,16 @@ class Shootout:
         """The controlled zone entries of the final: the puck carrier at the blue line with his nearest teammate (the
         support) and the nearest opposing skater (the defender), where they are spread out enough to be told apart."""
         content = self.content
+        if content.demo_mode:
+            return [
+                {"carrier": carrier, "support": support, "defender": defender,
+                 "source": "Simulated demo zone entry (tracking data unavailable)"}
+                for carrier, support, defender in (
+                    ((8, -6), (12, 4), (15, -2)),
+                    ((8, 6), (12, -4), (15, 2)),
+                    ((7, 0), (11, 8), (14, 3)),
+                )
+            ]
         goalies = content.analysis.goalkeeper_ids
         sides = {"Home": content.match["home_team"], "Away": content.match["away_team"]}
         result = []

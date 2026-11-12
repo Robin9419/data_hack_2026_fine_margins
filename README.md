@@ -43,3 +43,5 @@ Sign-in is a demo flow without passwords. Tournament progress, sessions, and car
 Local images are included in the repository; some player portraits load from external sources. Sources and image credits are recorded primarily in `backend/content/player-images.json`, `card_images.json`, and `legends.json`.
 
 YouTube videos are embedded and require internet access. Availability also depends on regional restrictions, embedding policies, and browser or network filters. The full arena recording and generated clips are not included in the repository. With the required CSVs supplied, the app works without the recording or clips; optional video clipping is covered in the installation guide.
+
+**Photo disclaimer:** This prototype uses third-party photos solely for demonstration and evaluation within this educational hackathon pilot. All rights remain with their respective owners. The photos are not intended for commercial use or further redistribution; their inclusion does not grant permission to reuse them.

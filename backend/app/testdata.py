@@ -96,11 +96,50 @@ def _goalie_rating(stats: dict) -> int:
     return int(40 + 59 * max(0, min(1, ((stats.get("save_pct") or 0) - 80) / 15)) + 0.5)
 
 
+# The KPIs of the awards whose own card is only built when the final's tracking data exists (see content.py).
+FALLBACK_ARCHETYPE_METRICS = {
+    "Pressure Breaker": ["pbp_mean", "packing_mean", "packing_total"],
+    "Progression Master": ["packing_mean", "packing_total", "packing_positive_share"],
+    "Chance Architect": ["xa_total", "xa_assisted_shots", "xa_mean"],
+}
+# Metrics without official statistics get made-up values: metric id -> (whole number?, forward range, defender range).
+# The award's first KPI is drawn from the top of its range, the others from anywhere but the extremes.
+SIMULATED = {
+    "goals": (True, (1, 3), (0, 1)),
+    "assists": (True, (1, 3), (1, 2)),
+    "points": (True, (2, 5), (1, 3)),
+    "shots": (True, (3, 8), (1, 4)),
+    "shot_top_speed": (False, (105.0, 150.0), (110.0, 150.0)),
+    "toi": (True, (780, 1260), (1020, 1500)),
+    "xg_sum": (False, (0.3, 1.8), (0.05, 0.6)),
+    "pass_pct": (False, (0.72, 0.92), (0.78, 0.94)),
+    "skate_top_speed": (False, (29.0, 35.0), (28.0, 33.5)),
+    "distance": (True, (3600, 6200), (3800, 6600)),
+    "puck_contest_wins": (True, (3, 12), (3, 10)),
+    "blocks": (True, (0, 3), (1, 6)),
+    "interceptions_total": (True, (1, 5), (2, 7)),
+    "faceoff_win_pct": (False, (0.4, 0.65), (0.4, 0.65)),
+    "pbp_mean": (False, (0.1, 0.7), (0.15, 0.8)),
+    "pbp_positive_share": (False, (0.3, 0.6), (0.35, 0.65)),
+    "pbp_evaluated": (True, (18, 45), (22, 55)),
+    "packing_mean": (False, (0.3, 1.1), (0.4, 1.3)),
+    "packing_positive_share": (False, (0.5, 0.8), (0.55, 0.85)),
+    "xa_total": (False, (0.3, 1.5), (0.1, 0.8)),
+    "xa_assisted_shots": (True, (2, 6), (1, 4)),
+    "blcxg_total": (False, (0.3, 1.5), (0.1, 0.8)),
+    "blcxg_entries": (True, (5, 14), (3, 10)),
+    "controlled_exits": (True, (2, 8), (5, 14)),
+    "zone_exit_attempts": (True, (3, 10), (6, 16)),
+}
+
+
 class TestData:
     __test__ = False  # not a pytest class
 
     def __init__(self, specs: dict, metrics: dict, format_value, positions: dict, images: dict, nationalities: dict,
-                 action_media: dict, card_images: dict, archetypes: dict, use_wisehockey: bool = True):
+                 action_media: dict, card_images: dict, archetypes: dict, use_wisehockey: bool = True,
+                 archetype_metrics: dict | None = None):
+        self._archetype_metrics = {**FALLBACK_ARCHETYPE_METRICS, **(archetype_metrics or {})}
         doc = json.loads(TESTDATA_FILE.read_text(encoding="utf-8"))
         self.games = sorted(doc["games"], key=lambda g: (g["date"], g["start"]))
         if not use_wisehockey:
@@ -351,6 +390,60 @@ class TestData:
             "moments": moments, "edition": "standard", "source": SOURCE,
         }
 
+    def _archetype_kpis(self, game: dict, title: str, player: dict, moments: list[dict], card_id: str) -> list[dict] | None:
+        """The KPIs that earn the award, for the card back. Those the official statistics have (goals, shots, time on
+        ice, saves ...) are real; the rest are made up to fit the player's position, seeded by the card so they never
+        change. The first KPI is the award's main one, so it is drawn high and the player ranks near the top for it."""
+        metric_ids = self._archetype_metrics.get(title)
+        if not metric_ids:
+            return None
+        rng = random.Random(card_id)
+        defender = self._positions.get(_key(player)) == DEF
+        stats = player["stats"]
+        pool = [p for p in game["players"] if p["goalkeeper"] == player["goalkeeper"]]
+        values: dict[str, float] = {}
+        for i, metric_id in enumerate(metric_ids):
+            if metric_id in SIMULATED:
+                whole, forward, back = SIMULATED[metric_id]
+                low, high = back if defender else forward
+                value = low + rng.uniform(0.6 if i == 0 else 0.25, 1.0 if i == 0 else 0.9) * (high - low)
+                value = round(value) if whole else value
+                # Never below what the player really did in the game, so the back agrees with the front.
+                real = stats.get(STAT_OF.get(metric_id, ""), 0) or 0
+                values[metric_id] = max(value, real)
+        # Values that depend on each other stay consistent.
+        if "points" in values:
+            values["points"] = max(values["points"], values.get("goals", 0) + values.get("assists", 0))
+        if "xg_sum" in values and "shots" in values:
+            values["xg_sum"] = values["shots"] * rng.uniform(0.07, 0.15)
+        if {"blcxg_total", "blcxg_entries"} <= values.keys():
+            values["blcxg_mean"] = values["blcxg_total"] / values["blcxg_entries"]
+        if {"controlled_exits", "zone_exit_attempts"} <= values.keys():
+            attempts = max(values["zone_exit_attempts"], values["controlled_exits"] + rng.randint(1, 3))
+            values["zone_exit_attempts"] = attempts
+            values["controlled_exit_share"] = values["controlled_exits"] / attempts
+        if {"xa_total", "xa_assisted_shots"} <= values.keys():
+            values["xa_mean"] = values["xa_total"] / values["xa_assisted_shots"]
+        if "packing_mean" in values and "packing_total" in metric_ids:
+            values["packing_total"] = round(values["packing_mean"] * rng.randint(25, 50))
+        kpis = []
+        for i, metric_id in enumerate(metric_ids):
+            if metric_id not in values:
+                kpis.append(self._attribute(game, metric_id, player, moments))
+                continue
+            metric, value = self._metrics[metric_id], values[metric_id]
+            match_rank = rng.choice([1, 1, 2, 2, 3, 4]) if i == 0 else rng.randint(1, 8)
+            kpis.append({
+                "metric_id": metric_id, "label": metric["label"], "value": value,
+                "display_value": self._format(value, metric["format"]), "unit": metric["unit"],
+                "higher_is_better": metric["higher_is_better"], "definition": metric["definition"],
+                "source_definition": "Simulated for the demo: there is no tracking data for this game.",
+                "source_label": "Simulated demo data",
+                "match_rank": match_rank, "team_rank": rng.randint(1, min(match_rank, 4)),
+                "players_in_match": len(pool), "rank_pool": "players", "moment_ids": None,
+            })
+        return kpis
+
     def _award_card(self, game: dict, title: str, player: dict, attributes: list[str]) -> dict:
         if title == "Puck Hunter" and player["last_name"] == "Fora":
             # The demo Puck Hunter card goes to Nico Gross instead, when he played in the game.
@@ -373,7 +466,8 @@ class TestData:
                 "nationality": self._nationalities.get(_key(player)),
                 **self.action_of(_key(player)),
             }, self.card_images.get(card_id)),
-            "title": title, "archetype": self._archetypes.get(title, "Demo award based on public game statistics; tracking data is unavailable."), "archetype_kpis": None,
+            "title": title, "archetype": self._archetypes.get(title, "Demo award based on public game statistics; tracking data is unavailable."),
+            "archetype_kpis": self._archetype_kpis(game, title, player, moments, card_id),
             "match": {
                 "id": game["id"], "date": game["date"], "stage": game["stage"], "home_team": game["home_team"],
                 "away_team": game["away_team"], "home_score": game["home_score"], "away_score": game["away_score"],

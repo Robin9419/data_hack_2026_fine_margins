@@ -130,7 +130,8 @@ class Content:
                      for c in self.cards.values() if c["player"]}
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
                                  self.nationalities, self.action_media, self.card_images,
-                                 self.archetypes, use_wisehockey=not self.demo_mode)
+                                 self.archetypes, use_wisehockey=not self.demo_mode,
+                                 archetype_metrics=self.archetype_metrics)
         self.road_to_final = RoadToFinal(self.testdata, positions, _load_json("road_videos.json")["players"],
                                          _load_json("watch_stats.json")["players"])
         self.tournament = Tournament(self.testdata)

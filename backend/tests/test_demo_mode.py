@@ -36,6 +36,13 @@ class DemoModeTests(unittest.TestCase):
                                     self.assertEqual(response.status_code, 200, response.text)
                             final = content.get_content().tournament.final['id']
                             self.assertTrue(content.get_content().game_cards(final))
+                            # The final's specials and moment card exist without the data, with random values.
+                            demo_final = content._load_json('demo_final_cards.json')
+                            cards = content.get_content().cards
+                            for spec in demo_final['specials']:
+                                self.assertIsNone(cards[spec['id']]['video'])
+                                self.assertIn(spec['id'], content.get_content().game_cards(final))
+                            self.assertIn('No video', cards[demo_final['moment']['id']]['text'])
                             quiz = client.post('/api/quiz/start', json={'venue': 'home'})
                             self.assertEqual(quiz.status_code, 200, quiz.text)
                             self.assertTrue(quiz.json()['questions'])

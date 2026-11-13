@@ -137,14 +137,10 @@ class TestData:
     __test__ = False  # not a pytest class
 
     def __init__(self, specs: dict, metrics: dict, format_value, positions: dict, images: dict, nationalities: dict,
-                 action_media: dict, card_images: dict, archetypes: dict, use_wisehockey: bool = True,
-                 archetype_metrics: dict | None = None):
+                 action_media: dict, card_images: dict, archetypes: dict, archetype_metrics: dict | None = None):
         self._archetype_metrics = {**FALLBACK_ARCHETYPE_METRICS, **(archetype_metrics or {})}
         doc = json.loads(TESTDATA_FILE.read_text(encoding="utf-8"))
         self.games = sorted(doc["games"], key=lambda g: (g["date"], g["start"]))
-        if not use_wisehockey:
-            for game in self.games:
-                game["has_wisehockey"] = False
         self.by_id = {g["id"]: g for g in self.games}
         self.source_note = doc["source"]
         self._specs, self._metrics, self._format = specs, metrics, format_value

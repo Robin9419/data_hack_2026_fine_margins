@@ -1,0 +1,401 @@
+{
+  "_comment": "Cards of the final built from the Wisehockey CSVs. Without the CSVs (demo mode) they are rebuilt from this list with random KPI values and no video. Players and titles only, no match data.",
+  "specials": [
+    {
+      "id": "tambellini",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 19,
+      "position": "Forward",
+      "title": "Sniper",
+      "attributes": [
+        "goals",
+        "points",
+        "shots"
+      ],
+      "archetype_metrics": [
+        "goals",
+        "shots",
+        "xg_sum"
+      ],
+      "archetype": "Lives for the goal: scores and shoots to put the puck in the net."
+    },
+    {
+      "id": "corvi",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 70,
+      "position": "Forward",
+      "title": "Playmaker",
+      "attributes": [
+        "points",
+        "faceoff_win_pct",
+        "pass_pct"
+      ],
+      "archetype_metrics": [
+        "assists",
+        "points",
+        "pass_pct"
+      ],
+      "archetype": "Creates for others: involved in goals through assists and accurate passing."
+    },
+    {
+      "id": "zadina",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 18,
+      "position": "Forward",
+      "title": "Volume Shooter",
+      "attributes": [
+        "shots",
+        "shot_top_speed",
+        "points"
+      ],
+      "archetype_metrics": [
+        "shots",
+        "xg_sum",
+        "shot_top_speed"
+      ],
+      "archetype": "Keeps pulling the trigger: took more shots than anyone else."
+    },
+    {
+      "id": "stransky",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 44,
+      "position": "Forward",
+      "title": "Chance Creator",
+      "attributes": [
+        "xg_sum",
+        "shot_top_speed",
+        "goals"
+      ],
+      "archetype_metrics": [
+        "xg_sum",
+        "shots",
+        "goals"
+      ],
+      "archetype": "Generates the most dangerous scoring chances in the game (expected goals)."
+    },
+    {
+      "id": "nussbaumer",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 66,
+      "position": "Forward",
+      "title": "Speedster",
+      "attributes": [
+        "skate_top_speed",
+        "puck_contest_wins",
+        "passes"
+      ],
+      "archetype_metrics": [
+        "skate_top_speed",
+        "puck_contest_wins",
+        "distance"
+      ],
+      "archetype": "Fastest skater on the ice and wins the battles for the puck."
+    },
+    {
+      "id": "mccartthy",
+      "kind": "profile",
+      "special_type": null,
+      "team": "U.S. Collegiate Selects",
+      "jersey": 2,
+      "position": "Defender",
+      "title": "Shot Blocker",
+      "attributes": [
+        "blocks",
+        "shot_top_speed",
+        "toi"
+      ],
+      "archetype_metrics": [
+        "blocks",
+        "puck_contest_wins",
+        "toi"
+      ],
+      "archetype": "Puts their body in front of shots to protect the goal.",
+      "category_id": "defending",
+      "category": "Defending"
+    },
+    {
+      "id": "pohlkamp",
+      "kind": "profile",
+      "special_type": null,
+      "team": "U.S. Collegiate Selects",
+      "jersey": 23,
+      "position": "Defender",
+      "title": "Workhorse",
+      "attributes": [
+        "toi",
+        "distance",
+        "blocks"
+      ],
+      "archetype_metrics": [
+        "toi",
+        "distance",
+        "puck_contest_wins"
+      ],
+      "archetype": "Plays the most minutes and skates the farthest."
+    },
+    {
+      "id": "fink",
+      "kind": "profile",
+      "special_type": null,
+      "team": "U.S. Collegiate Selects",
+      "jersey": 18,
+      "position": "Forward",
+      "title": "Go-To Scorer",
+      "attributes": [
+        "goals",
+        "shots",
+        "xg_sum"
+      ],
+      "archetype_metrics": [
+        "shots",
+        "xg_sum",
+        "goals"
+      ],
+      "archetype": "The main scoring threat on their team: leads their side in shots and expected goals."
+    },
+    {
+      "id": "aeschlimann",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 29,
+      "position": "Goalkeeper",
+      "title": "Shot Stopper",
+      "attributes": [
+        "save_pct",
+        "saves",
+        "shots_on_goal_against"
+      ],
+      "archetype_metrics": [
+        "save_pct",
+        "saves",
+        "shots_on_goal_against"
+      ],
+      "archetype": "The goalkeeper with the best save percentage: the biggest share of the shots on goal kept out."
+    },
+    {
+      "id": "pressure-reliever",
+      "kind": "profile",
+      "special_type": null,
+      "team": "U.S. Collegiate Selects",
+      "jersey": 8,
+      "position": "Skater",
+      "title": "Pressure Breaker",
+      "attributes": [
+        "pbp_mean",
+        "packing_mean",
+        "packing_total"
+      ],
+      "archetype_metrics": [
+        "pbp_mean",
+        "packing_mean",
+        "packing_total"
+      ],
+      "archetype": "Highest average reduction in nearby opposing skaters through successful passes, with at least 10 passes that can be assessed. Compares pressure within 3 metres of the passer with pressure on the receiver shortly afterwards, using tracking estimates."
+    },
+    {
+      "id": "progression-master",
+      "kind": "profile",
+      "special_type": null,
+      "team": "U.S. Collegiate Selects",
+      "jersey": 4,
+      "position": "Skater",
+      "title": "Progression Master",
+      "attributes": [
+        "packing_mean",
+        "packing_total",
+        "packing_positive_share"
+      ],
+      "archetype_metrics": [
+        "packing_mean",
+        "packing_total",
+        "packing_positive_share"
+      ],
+      "archetype": "Highest average number of opponents bypassed towards the attacking goal, with a score above zero and at least 10 passes that can be assessed. Opponents are judged by where they stood when the pass was released. Backward passes can reduce the score; ties favour more assessed passes."
+    },
+    {
+      "id": "chance-architect",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 72,
+      "position": "Skater",
+      "title": "Chance Architect",
+      "attributes": [
+        "xa_total",
+        "xa_assisted_shots",
+        "xa_mean"
+      ],
+      "archetype_metrics": [
+        "xa_total",
+        "xa_assisted_shots",
+        "xa_mean"
+      ],
+      "archetype": "Highest total expected assists (xA): scoring-chance quality created by passes that set up shots. The last completed pass within four seconds of a shot receives that shot's estimated chance of scoring, provided the opponents do not gain control before the shot."
+    },
+    {
+      "id": "entry-catalyst",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 38,
+      "position": "Skater",
+      "title": "Attack Launcher",
+      "attributes": [
+        "blcxg_mean",
+        "blcxg_total",
+        "blcxg_entries"
+      ],
+      "archetype_metrics": [
+        "blcxg_mean",
+        "blcxg_total",
+        "blcxg_entries"
+      ],
+      "archetype": "Awarded for creating the highest average scoring-chance quality after carrying or passing the puck into the attacking zone, with at least three entries that can be assessed and a score above zero. Chance quality adds up the expected goals (xG) of the team's shots until the puck leaves the zone or play stops, including shots after winning the puck back. If players tie, more assessed entries wins.",
+      "category_id": "zone-entries-exits",
+      "category": "Zone entries / exits"
+    },
+    {
+      "id": "exit-specialist",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 96,
+      "position": "Skater",
+      "title": "Escape Artist",
+      "attributes": [
+        "controlled_exits",
+        "controlled_exit_share",
+        "zone_exit_attempts"
+      ],
+      "archetype_metrics": [
+        "controlled_exits",
+        "controlled_exit_share",
+        "zone_exit_attempts"
+      ],
+      "archetype": "Awarded for the most exits from the defensive zone while the team still controls the puck as it crosses the blue line. If players tie, the higher share of controlled exits wins. Control is judged at the crossing; the team does not have to keep the puck for a set time afterwards.",
+      "category_id": "zone-entries-exits",
+      "category": "Zone entries / exits"
+    },
+    {
+      "id": "puck-hunter",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 93,
+      "position": "Skater",
+      "title": "Puck Hunter",
+      "attributes": [
+        "puck_contest_wins",
+        "interceptions_total",
+        "blocks"
+      ],
+      "archetype_metrics": [
+        "puck_contest_wins",
+        "interceptions_total",
+        "blocks"
+      ],
+      "archetype": "Awarded for winning the most puck battles anywhere on the ice, with at least one battle won. If players tie, more intercepted passes wins. Interceptions and blocked shots also appear on the card to show the player's defensive contribution, but they are not added to the puck-battle total.",
+      "category_id": "defending",
+      "category": "Defending"
+    },
+    {
+      "id": "passing-lane-guardian",
+      "kind": "profile",
+      "special_type": null,
+      "team": "HC Davos",
+      "jersey": 6,
+      "position": "Skater",
+      "title": "Pass Thief",
+      "attributes": [
+        "interceptions_total",
+        "puck_contest_wins",
+        "blocks"
+      ],
+      "archetype_metrics": [
+        "interceptions_total",
+        "puck_contest_wins",
+        "blocks"
+      ],
+      "archetype": "Awarded for intercepting the most opponent passes anywhere on the ice, with at least one interception. The interception belongs to the opposing skater who cuts out the pass; goalkeepers are not counted. If players tie, more puck battles won wins.",
+      "category_id": "defending",
+      "category": "Defending"
+    },
+    {
+      "id": "player-of-the-match",
+      "kind": "performance",
+      "special_type": "motm",
+      "team": "HC Davos",
+      "jersey": 19,
+      "position": "Forward",
+      "title": "Man of the Match",
+      "attributes": [
+        "goals",
+        "assists",
+        "points"
+      ],
+      "archetype_metrics": [
+        "goals",
+        "assists",
+        "points"
+      ],
+      "archetype": "Most points on the winning team. Ties are broken by goals."
+    },
+    {
+      "id": "game-winner",
+      "kind": "performance",
+      "special_type": "gamewinner",
+      "team": "HC Davos",
+      "jersey": 18,
+      "position": "Forward",
+      "title": "Game Winner",
+      "attributes": [
+        "goals",
+        "points",
+        "shots"
+      ],
+      "archetype_metrics": [
+        "goals",
+        "points",
+        "shots"
+      ],
+      "archetype": "Scored the game-winning goal: the goal after which the opponent never drew level again."
+    },
+    {
+      "id": "brick-wall",
+      "kind": "performance",
+      "special_type": "wall",
+      "team": "U.S. Collegiate Selects",
+      "jersey": 30,
+      "position": "Goalkeeper",
+      "title": "Brick Wall",
+      "attributes": [
+        "saves",
+        "save_pct",
+        "shots_on_goal_against"
+      ],
+      "archetype_metrics": [
+        "saves",
+        "save_pct",
+        "shots_on_goal_against"
+      ],
+      "archetype": "The goalkeeper who stopped the most high-danger chances (shots worth at least 0.15 expected goals), even if his team lost."
+    }
+  ],
+  "moment": {
+    "id": "moment-last-goal",
+    "team": "HC Davos",
+    "jersey": 44,
+    "position": "Forward"
+  }
+}

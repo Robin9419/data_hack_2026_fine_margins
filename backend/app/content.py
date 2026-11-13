@@ -4,6 +4,7 @@ Wisehockey match statistics and events CSVs so card values always come from the 
 import csv
 import json
 import math
+import random
 import re
 from functools import lru_cache
 from pathlib import Path
@@ -22,6 +23,23 @@ PLAYER_IMAGES_FILE = CONTENT_DIR / "player-images.json"
 MEDIA_DIR = ROOT / "backend" / "media"  # served at /api/media; not in git
 CLIPS_DIR = MEDIA_DIR / "clips"  # filled by scripts/cut_clips.py
 MOMENTS_PER_KPI = 5  # most moments (video clips) a final impact special shows per KPI
+
+# Demo mode (no Wisehockey CSVs): plausible ranges for the random KPI values on the final's cards. Integer bounds give
+# integer values. Percentages are shares (0-1), distance is in metres, time on ice in seconds.
+DEMO_SOURCE = "Demo values (random): the Wisehockey match data is not available"
+DEMO_RANGES = {
+    "goals": (0, 2), "assists": (0, 2), "points": (1, 3), "shots": (2, 7), "blocks": (1, 4), "passes": (10, 30),
+    "puck_contest_wins": (2, 9), "saves": (18, 35), "shots_on_goal_against": (20, 38),
+    "save_pct": (0.86, 0.97), "faceoff_win_pct": (0.4, 0.65), "pass_pct": (0.72, 0.92),
+    "controlled_exit_share": (0.45, 0.8), "packing_positive_share": (0.35, 0.7),
+    "distance": (3500.0, 6500.0), "toi": (900, 1500), "shot_top_speed": (125.0, 160.0), "skate_top_speed": (30.0, 36.0),
+    "xg_sum": (0.2, 1.2), "xa_total": (0.1, 0.6), "xa_mean": (0.03, 0.15), "xa_assisted_shots": (2, 6),
+    "blcxg_total": (0.15, 0.8), "blcxg_mean": (0.03, 0.12), "blcxg_entries": (3, 10),
+    "controlled_exits": (3, 10), "zone_exit_attempts": (6, 15), "interceptions_total": (2, 6),
+    "packing_mean": (0.3, 1.5), "packing_total": (4, 20), "pbp_mean": (0.1, 0.8),
+}
+DEMO_FORMAT_RANGES = {"int": (0, 5), "pct": (0.3, 0.8), "decimal1": (1.0, 10.0), "decimal2": (0.1, 1.0),
+                      "decimal3": (0.01, 0.5), "km": (3000.0, 6000.0), "mmss": (600, 1500)}
 
 
 def _load_json(name: str) -> dict:
@@ -121,17 +139,20 @@ class Content:
         self._add_progression_card()
         self._add_xa_card()
         self._add_category_cards()
+        demo_final = _load_json("demo_final_cards.json")
+        if self.demo_mode:
+            # Before the base cards, so that the base cards' positions win (some specials only say "Skater").
+            self._add_demo_specials(demo_final["specials"])
         self.cards |= {c["id"]: self._build_base_card(c, base_doc) for c in base_doc["cards"]}
         if not self.demo_mode:
             self._add_performance_cards(cards_doc["performance_specials"])
         self.reward_rules = {}  # reward card id -> function(owned card ids -> editions) saying whether it is earned
-        self._add_reward_cards(_load_json("reward_cards.json"))
+        self._add_reward_cards(_load_json("reward_cards.json"), demo_final["moment"])
         positions = {(c["player"]["team"], c["player"]["jersey"]): c["player"]["position"]
                      for c in self.cards.values() if c["player"]}
         self.testdata = TestData(cards_doc["performance_specials"], self.metrics, format_value, positions, self.player_images,
                                  self.nationalities, self.action_media, self.card_images,
-                                 self.archetypes, use_wisehockey=not self.demo_mode,
-                                 archetype_metrics=self.archetype_metrics)
+                                 self.archetypes, archetype_metrics=self.archetype_metrics)
         self.road_to_final = RoadToFinal(self.testdata, positions, _load_json("road_videos.json")["players"],
                                          _load_json("watch_stats.json")["players"])
         self.tournament = Tournament(self.testdata)
@@ -629,7 +650,61 @@ class Content:
             }
             self.cards[cfg["id"]] = self._build_card(cfg)
 
-    def _add_reward_cards(self, doc: dict):
+    def _demo_attribute(self, metric_id: str, team: str, jersey: int) -> dict:
+        """A KPI with a random value, for a card of the final in demo mode. Seeded by player and metric, so a value is
+        the same on every card of the player and on every restart."""
+        metric = self.metrics[metric_id]
+        rng = random.Random(f"{team}#{jersey}#{metric_id}")
+        low, high = DEMO_RANGES.get(metric_id, DEMO_FORMAT_RANGES.get(metric["format"], (0, 5)))
+        value = rng.randint(low, high) if isinstance(low, int) and isinstance(high, int) else rng.uniform(low, high)
+        players = 2 if metric.get("goalkeeper") else 40
+        return {
+            "metric_id": metric_id, "label": metric["label"], "value": value,
+            "display_value": format_value(value, metric["format"]), "unit": metric["unit"],
+            "higher_is_better": metric["higher_is_better"], "definition": metric["definition"],
+            "source_definition": metric["source_definition"], "source_label": DEMO_SOURCE,
+            "match_rank": rng.randint(1, players if players == 2 else 5), "team_rank": rng.randint(1, 3),
+            "players_in_match": players, "rank_pool": "goalkeepers" if metric.get("goalkeeper") else "players",
+            "detail": "random demo value", "moment_ids": None,
+        }
+
+    def _add_demo_specials(self, specs: list[dict]):
+        """The specials of the final without the Wisehockey CSVs: the same cards and players, random KPI values and no
+        video (see demo_final_cards.json)."""
+        for spec in specs:
+            team, jersey = spec["team"], spec["jersey"]
+            self.archetypes.setdefault(spec["title"], spec["archetype"])
+            self.archetype_metrics.setdefault(spec["title"], spec["archetype_metrics"])
+            card = {
+                "id": spec["id"], "type": "special", "kind": spec["kind"], "special_type": spec["special_type"],
+                "rating": None,
+                "player": self._player({**spec, "kind": spec["kind"]}, self._find_row(team, jersey)),
+                "title": spec["title"], "archetype": spec["archetype"],
+                "archetype_kpis": [self._demo_attribute(m, team, jersey) for m in spec["archetype_metrics"]],
+                "match": self._match(team),
+                "attributes": [self._demo_attribute(m, team, jersey) for m in spec["attributes"]],
+                "explanation": f"{spec['archetype']} Demo card: the numbers are random because the Wisehockey match "
+                               "data is not available, and no video is available.",
+                "achievement": None, "video": None, "video_sources": [], "moments": [],
+                "edition": "standard", "source": DEMO_SOURCE,
+            }
+            if spec.get("category_id"):
+                card.update(category_id=spec["category_id"], category=spec["category"])
+            self.cards[spec["id"]] = card
+
+    def _add_demo_moment_facts(self, card: dict, scorer: dict) -> tuple[str, int]:
+        """The moment card in demo mode: the scorer of the last goal and the final score, without time or video."""
+        team, jersey = scorer["team"], scorer["jersey"]
+        row = self._find_row(team, jersey)
+        card["player"] = self._player({"id": card["id"], "team": team, "jersey": jersey,
+                                       "position": scorer["position"]}, row)
+        card["intro_video"] = None
+        card["headline"] = f'{self.match["home_score"]}–{self.match["away_score"]}'
+        card["text"] = (f'{row["FirstName"]} {row["LastName"]} scored the last goal of the final. '
+                        "No video is available in this demo.")
+        return team, jersey
+
+    def _add_reward_cards(self, doc: dict, demo_moment: dict):
         """Cards earned from what the user owns: a collector card per club whose base cards are all owned, plus context cards."""
         match = self._match(self.match["home_team"])
         by_team: dict[str, list[str]] = {}
@@ -652,8 +727,6 @@ class Content:
             self.reward_rules[card_id] = lambda owned, ids=ids: all(i in owned for i in ids)
 
         for cfg in doc["context"]:
-            if self.demo_mode and cfg["context_type"] == "moment":
-                continue
             card = {
                 "id": cfg["id"], "type": "reward", "kind": "context", "context_type": cfg["context_type"],
                 "special_type": None, "rating": None, "player": None, "title": cfg["title"], "match": match,
@@ -664,7 +737,8 @@ class Content:
             if cfg.get("video_id"):
                 card["intro_video"] = self._intro_video(cfg["video_id"], cfg.get("video_description", ""))
             if cfg["context_type"] == "moment":
-                scorer = self._add_moment_facts(card)
+                scorer = (self._add_demo_moment_facts(card, demo_moment) if self.demo_mode
+                          else self._add_moment_facts(card))
                 self.reward_rules[cfg["id"]] = lambda owned, who=scorer: any(
                     (self.cards[c]["player"] or {}).get("team") == who[0] and (self.cards[c]["player"] or {}).get("jersey") == who[1]
                     for c in owned if c in self.cards and self.cards[c]["type"] != "reward"

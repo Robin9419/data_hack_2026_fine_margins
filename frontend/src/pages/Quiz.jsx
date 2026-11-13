@@ -54,7 +54,7 @@ export default function Quiz() {
         setUnlock({
           card: data.card,
           result: data.result,
-          points: data.progress.points - progress.points,
+          points: data.points,
           progress: data.progress,
         })
         setQueued([

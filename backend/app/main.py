@@ -565,12 +565,15 @@ def quiz_answer(question_id: int, body: QuizAnswer, user: dict = Depends(current
                 "explanation": content.explain_answer(question["card_id"])}
 
     edition = _edition(question["venue"])
+    points_before = progress_for(user)["points"]
     result = db.grant_card(user["id"], question["card_id"], edition)
+    # The points of the unlocked card alone, before any legend or collector card it earns is added.
+    points = progress_for(user)["points"] - points_before
     card = {**get_content().cards[question["card_id"]], "owned": True, "edition": edition}
     legends = award_legends(user)
     collectors = award_collectors(user)
     return {"correct": True, "result": result, "card": card, "legends": legends, "collectors": collectors,
-            "progress": progress_for(user)}
+            "points": points, "progress": progress_for(user)}
 
 
 class StageRequest(BaseModel):

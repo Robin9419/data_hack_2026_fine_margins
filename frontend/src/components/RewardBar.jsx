@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../auth'
 import RewardIcon from './RewardIcon'
 
@@ -5,7 +6,10 @@ import RewardIcon from './RewardIcon'
 // more than a home one) and the milestones on the bar are the (illustrative) rewards.
 export default function RewardBar() {
   const { progress } = useAuth()
-  if (!progress) return null
+  const openingPacks = useLocation().pathname === '/pack'
+  // Hide the bar while packs are being opened so newly earned rewards are not spoiled;
+  // it (and the unlock popup) shows once the user leaves the pack page.
+  if (!progress || openingPacks) return null
 
   const { points, max_points: max, rewards } = progress
   const next = rewards.find((r) => !r.reached)
